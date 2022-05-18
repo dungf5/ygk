@@ -152,7 +152,7 @@ file that was distributed with this source code.
         {{ form_widget(form.redirect_to) }}
         <div class="ec-orderRole">
             <div class="ec-orderRole__detail">
-                <div class="ec-orderAccount">
+                <div class="ec-orderAccount hidden nvtrong">
                     <div class="ec-rectHeading">
                         <h2>{{ 'front.shopping.customer_info'|trans }}</h2>
                     </div>
@@ -277,14 +277,15 @@ file that was distributed with this source code.
                         <input type="hidden" id="customer-email" class="customer-in" name="customer_email" value="{{ Order.email }}">
                     {% endif %}
                 </div>
-                <div class="ec-orderDelivery">
-                    <div class="ec-rectHeading">
+                <div class="ec-orderDelivery ">
+                    <div class="ec-rectHeading  nvtrong hidden">
                         <h2>{{ 'front.shopping.delivery_info'|trans }}</h2>
                     </div>
+
                     {% for shipping in Order.shippings %}
                         {% set idx = loop.index0 %}
                         {% set isShowReducedTaxMess = false %}
-                        <div class="ec-orderDelivery__title">{{ 'front.shopping.delivery_to'|trans }}{% if Order.multiple %}({{ loop.index }}){% endif %}
+                        <div class="ec-orderDelivery__title nvtrong hidden">{{ 'front.shopping.delivery_to'|trans }}{% if Order.multiple %}({{ loop.index }}){% endif %}
                             <div class="ec-orderDelivery__change">
                                 {% if is_granted('ROLE_USER') %}
                                     <button class="ec-inlineBtn" data-id="{{ shipping.id }}" data-trigger="click" data-path="{{ path('shopping_shipping', {'id': shipping.id}) }}">{{ 'common.change'|trans }}</button>
@@ -320,7 +321,7 @@ file that was distributed with this source code.
                             <p>{{ 'common.postal_symbol'|trans }}{{ shipping.postal_code }} {{ shipping.pref }}{{ shipping.addr01 }}{{ shipping.addr02 }}</p>
                             <p>{{ shipping.phone_number }}</p>
                         </div>
-                        <div class="ec-orderDelivery__actions">
+                        <div class="ec-orderDelivery__actions nvtrong hidden ">
                             <div class="ec-selects">
                                 <div class="ec-select">
                                     <label>{{ 'front.shopping.delivery_provider'|trans }}</label>
@@ -340,11 +341,112 @@ file that was distributed with this source code.
                             </div>
                         </div>
                     {% endfor %}
-                    <div class="ec-orderDelivery__edit">
+                    <div class="ec-orderDelivery__edit nvtrong hidden">
                         <button type="button" class="ec-inlineBtn" data-trigger="click" data-path="{{ path('shopping_shipping_multiple') }}">{{ 'front.shopping.to_multiple'|trans }}</button>
                     </div>
                 </div>
-                <div class="ec-orderPayment">
+
+{#                nvtrong start #}
+                <style>
+                    .shipping_destination{
+                        display: flex;
+                    }
+                    .shipping_destination_left{
+                        width: 130px
+                    }
+                    .shipping_destination_left >div{
+                        width: 100px;
+                        background-color: #c9b5b5;
+                        text-align: center;
+
+                    }
+                    .shipping_destination_right{
+
+                    }
+                    .shipping_row{
+                        display: flex;
+                    }
+
+                    .shipping_col1{
+                        width: 150px;
+                    }
+
+                    .shipping_col2{
+
+                    }
+                </style>
+
+                <div class="ec-orderAccount shipping_destination ">
+                    <div class="shipping_destination_left">
+                        <div>お客様情報</div>
+                    </div>
+                    <div class="shipping_destination_right">
+                        <div class="shipping_row">
+                            <div class="shipping_col1 Order.name01 Order.name02">
+                                {{ Order.name01 }} {{ Order.name02 }} {{ 'common.name.suffix'|trans }}
+                            </div>
+                            <div class="shipping_col2">
+                                〒 {{ Order.postal_code }}
+                                {{ Order.pref }}
+                                {{ Order.addr01 }}
+                                {{ Order.addr02 }}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="ec-orderAccount shipping_destination ">
+                    <div class="shipping_destination_left">
+                        <div> 請求先</div>
+                    </div>
+                    <div class="shipping_destination_right">
+                        <div class="shipping_row">
+                            <div class="shipping_col1 Order.name01 Order.name02">
+                                {{ Order.name01 }} {{ Order.name02 }} {{ 'common.name.suffix'|trans }}
+                            </div>
+                            <div class="shipping_col2">
+                                〒 {{ Order.postal_code }}
+                                {{ Order.pref }}
+                                {{ Order.addr01 }}
+                                {{ Order.addr02 }}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="shipping_destination">
+                    <div class="shipping_destination_left">
+                       <div>出荷先</div>
+                    </div>
+                    <div class="shipping_destination_right">
+
+                        {% for arShipping in Order.mstShips %}
+
+                            <div class="shipping_row">
+
+                                <div class="shipping_col1">
+                                    <span><input type="radio" name="shipping_radio" id="{{ arShipping["shipping_code"] }}" ></span>
+                                    <label for="{{ arShipping["shipping_code"] }}" >上州様</label>
+                                </div>
+                                <div class="shipping_col2">
+                                    〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }}
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+
+
+
+
+                    </div>
+
+                </div>
+
+                <div class="ec-orderPayment  hidden nvtrong">
                     <div class="ec-rectHeading">
                         <h2>{{ 'front.shopping.payment_info'|trans }}</h2>
                     </div>
@@ -362,7 +464,7 @@ file that was distributed with this source code.
                     <div class="ec-input {{ has_errors(form.Payment) ? ' error' }}">{{ form_errors(form.Payment) }}</div>
                 </div>
                 {% if BaseInfo.isOptionPoint and Order.Customer is not null %}
-                    <div class="ec-orderPayment">
+                    <div class="ec-orderPayment hidden nvtrong">
                         <div class="ec-rectHeading">
                             <h2>{{ 'front.shopping.point_info'|trans }}</h2>
                         </div>
@@ -373,11 +475,11 @@ file that was distributed with this source code.
                         </div>
                     </div>
                 {% endif %}
-                <div class="ec-orderConfirm">
+                <div class="ec-orderConfirm hidden">
                     <div class="ec-rectHeading">
                         <h2>{{ 'front.shopping.message_info'|trans }}</h2>
                     </div>
-                    <div class="ec-input">
+                    <div class="ec-input ">
                         {{ form_widget(form.message, {'attr': {'class': 'form-control', 'placeholder': 'front.shopping.message_placeholder'|trans, 'rows': '6'}}) }}
                         {{ form_errors(form.message) }}
                     </div>

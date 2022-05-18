@@ -13,6 +13,8 @@
 
 namespace Eccube\Controller;
 
+use Customize\Service\Common\MyCommonService;
+
 use Eccube\Entity\CustomerAddress;
 use Eccube\Entity\Order;
 use Eccube\Entity\Shipping;
@@ -25,6 +27,7 @@ use Eccube\Form\Type\Shopping\CustomerAddressType;
 use Eccube\Form\Type\Shopping\OrderType;
 use Eccube\Repository\OrderRepository;
 use Eccube\Service\CartService;
+
 use Eccube\Service\MailService;
 use Eccube\Service\OrderHelper;
 use Eccube\Service\Payment\PaymentDispatcher;
@@ -89,6 +92,10 @@ class ShoppingController extends AbstractShoppingController
      */
     public function index(PurchaseFlow $cartPurchaseFlow)
     {
+
+
+
+
         // ログイン状態のチェック.
         if ($this->orderHelper->isLoginRequired()) {
             log_info('[注文手続] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
@@ -108,7 +115,10 @@ class ShoppingController extends AbstractShoppingController
         log_info('[注文手続] 受注の初期化処理を開始します.');
         $Customer = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
         $Order = $this->orderHelper->initializeOrder($Cart, $Customer);
+        $commonService = new MyCommonService($this->entityManager);
+        $mstShip =$commonService->getMstShipping();
 
+        $Order->mstShips =$mstShip;
         // 集計処理.
         log_info('[注文手続] 集計処理を開始します.', [$Order->getId()]);
         $flowResult = $this->executePurchaseFlow($Order, false);
