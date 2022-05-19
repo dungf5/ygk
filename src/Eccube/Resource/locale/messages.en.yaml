@@ -349,6 +349,7 @@ front.shopping.message_placeholder: Please enter your message here (Max. 3,000 c
 front.shopping.go_to_confirm: Review
 front.shopping.back_to_cart: Go Back to Cart
 front.shopping.shipping_title: Select a Delivery Address
+front.shopping.shipping_title_error: Select a Delivery Address111
 front.shopping.shipping_add_new_shipping: Add a New Delivery Address
 front.shopping.shipping_add_new_shipping__short: Add an Address
 front.shopping.shipping_unselected: Please select a delivery address.

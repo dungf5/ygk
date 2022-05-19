@@ -1,0 +1,72 @@
+
+
+<div class="delivery_address shipping_destination">
+    <div class="shipping_destination_left">
+        <div>届け先 </div>
+    </div>
+    <div class="shipping_destination_right">
+
+        {% for arShipping in data.shipping %}
+
+            <div class="shipping_row">
+
+                <div class="shipping_col1">
+                    <span><input type="radio" name="delivery_address" value="{{ arShipping["id"] }}" id="ship_{{ arShipping["id"] }}" ></span>
+                    <label for="ship_{{ arShipping["id"] }}" >{{ arShipping["name01"] }} {{ arShipping["name02"] }}</label>
+                </div>
+                <div class="shipping_col2">
+                    〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }}
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+
+
+
+
+    </div>
+
+</div>
+<p class="error_delivery_address" style="color: red;font-size: larger;font-weight: bold;display: none">
+    {{ 'front.shopping.shipping_title_error'|trans }}
+</p>
+
+
+
+<div class="bill_address shipping_destination">
+    <div class="shipping_destination_left">
+        <div>請求先 </div>
+    </div>
+    <div class="shipping_destination_right">
+
+        {% for arShipping in data.bill %}
+
+            <div class="shipping_row">
+
+                <div class="shipping_col1">
+                    <span><input type="radio" name="bill_address" value="{{ arShipping["id"] }}" id="bill_{{ arShipping["id"] }}" ></span>
+                    <label for="bill_{{ arShipping["id"] }}" >{{ arShipping["name01"] }} {{ arShipping["name02"] }}</label>
+                </div>
+                <div class="shipping_col2">
+                    〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }}
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+
+
+
+
+    </div>
+
+</div>
+<p class="error_delivery_address" style="color: red;font-size: larger;font-weight: bold;display: none">
+    {{ 'front.shopping.shipping_title_error'|trans }}
+</p>
+

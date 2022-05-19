@@ -92,12 +92,54 @@ file that was distributed with this source code.
                 $('.mod-button').hide();
             });
             {% endif %}
+
+//nvtrong ajax
+            $('.mySubmitConfirm').click(function() {
+
+                if (typeof $("input[name='shipping_radio']:checked").val() === "undefined") {
+
+                    $('.errorshipping_radio').show();
+                }else{
+                $('.errorshipping_radio').hide();
+                    $('#shopping-form').submit();
+                }
+
+            });
+
+            $('.delivery_address').delegate("input[name='bill_address']", 'change', function() {
+            console.log($(this).val());
+            });
+
+            $("input[name='shipping_radio']").change(function(){
+
+                $('.errorshipping_radio').hide();
+                $.ajax({
+                        url: '{{ url('cart_save_temp') }}',
+                        type: 'POST',
+                        data: {
+                            shipping_code: $(this).val(),
+                            '_token':'{{ csrf_token('_token') }}',
+                            'pre_order_id':'{{ Order.pre_order_id }}',
+                             'customer_id':'{{ Order.Customer.id }}'
+
+                        }
+                    }).done(function(htmlRe, statusText, jqXHR) {
+
+                        $('.delivery_address').html(htmlRe);
+
+                    }).fail(function(jqXHR, statusText, errorThrown) {
+
+                    });
+
+             });
+
+
         });
     </script>
 {% endblock javascript %}
 
 {% block main %}
-
+{#    <pre> {{ dump(Order) }}</pre>#}
     <div class="ec-role">
         <div class="ec-pageHeader">
             <h1>{{ 'front.shopping.title'|trans }}</h1>
@@ -303,12 +345,12 @@ file that was distributed with this source code.
                                             <div class="ec-imageGrid__content">
                                                 <p>{{ orderItem.productName }}{% if is_reduced_tax_rate(orderItem) %}{{ 'common.reduced_tax_rate_symbol'|trans }}{% set isShowReducedTaxMess = true %}{% endif %}</p>
                                                 {% if orderItem.productClass is not null and orderItem.productClass.classCategory1 %}
-                                                    <p>{{ orderItem.productClass.classCategory1.className.name }}：{{ orderItem.productClass.classCategory1 }}</p>
+                                                    {{ orderItem.productClass.classCategory1.className.name }}：{{ orderItem.productClass.classCategory1 }}
                                                 {% endif %}
                                                 {% if orderItem.productClass is not null and orderItem.productClass.classCategory2 %}
-                                                    <p>{{ orderItem.productClass.classCategory2.className.name }}：{{ orderItem.productClass.classCategory2 }}</p>
+                                                    {{ orderItem.productClass.classCategory2.className.name }}：{{ orderItem.productClass.classCategory2 }}
                                                 {% endif %}
-                                                <p>{{ orderItem.priceIncTax|price }} × {{ orderItem.quantity|number_format }}<span>{{ 'common.subtotal__with_separator'|trans }}{{ orderItem.totalPrice|price }}</span></p>
+                                               {{ orderItem.priceIncTax|price }} × {{ orderItem.quantity|number_format }} {{ 'common.subtotal__with_separator'|trans }}{{ orderItem.totalPrice|price }}
                                             </div>
                                         </div>
                                     </li>
@@ -316,7 +358,7 @@ file that was distributed with this source code.
                             </ul>
                             <p>{{ isShowReducedTaxMess ? 'common.reduced_tax_rate_messeage'|trans }}</p>
                         </div>
-                        <div class="ec-orderDelivery__address">
+                        <div class="ec-orderDelivery__address nvtrong hidden">
                             <p>{{ 'common.name.prefix'|trans }}{{ shipping.name01 }} {{ shipping.name02 }} ({{ shipping.kana01 }} {{ shipping.kana02 }}){{ 'common.name.suffix'|trans }}</p>
                             <p>{{ 'common.postal_symbol'|trans }}{{ shipping.postal_code }} {{ shipping.pref }}{{ shipping.addr01 }}{{ shipping.addr02 }}</p>
                             <p>{{ shipping.phone_number }}</p>
@@ -411,6 +453,7 @@ file that was distributed with this source code.
                                 {{ Order.addr02 }}
                             </div>
 
+
                         </div>
                     </div>
                 </div>
@@ -426,8 +469,8 @@ file that was distributed with this source code.
                             <div class="shipping_row">
 
                                 <div class="shipping_col1">
-                                    <span><input type="radio" name="shipping_radio" id="{{ arShipping["shipping_code"] }}" ></span>
-                                    <label for="{{ arShipping["shipping_code"] }}" >上州様</label>
+                                    <span><input type="radio" name="shipping_radio" value="{{ arShipping["shipping_code"] }}" id="{{ arShipping["shipping_code"] }}" ></span>
+                                    <label for="{{ arShipping["shipping_code"] }}" >{{ arShipping["shipping_name"] }}</label>
                                 </div>
                                 <div class="shipping_col2">
                                     〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }}
@@ -445,6 +488,16 @@ file that was distributed with this source code.
                     </div>
 
                 </div>
+                <p class="errorshipping_radio" style="color: red;font-size: larger;font-weight: bold;display: none">
+                    {{ 'front.shopping.shipping_title_error'|trans }}
+                </p>
+{#                dtCusAddress#}
+                <div class="delivery_address">
+                </div>
+
+
+
+
 
                 <div class="ec-orderPayment  hidden nvtrong">
                     <div class="ec-rectHeading">
@@ -533,11 +586,12 @@ file that was distributed with this source code.
                     </div>
                     {% endif %}
                     <div class="ec-totalBox__btn">
-                        <button type="submit" class="ec-blockBtn--action">{{ 'front.shopping.go_to_confirm'|trans }}</button>
+                        <button type="button" class="ec-blockBtn--action mySubmitConfirm">{{ 'front.shopping.go_to_confirm'|trans }}</button>
                         <a href="{{ url("cart") }}" class="ec-blockBtn--cancel">{{ 'front.shopping.back_to_cart'|trans }}</a>
                     </div>
                 </div>
             </div>
         </div>
     </form>
+
 {% endblock %}
