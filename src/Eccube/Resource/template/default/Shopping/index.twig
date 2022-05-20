@@ -106,9 +106,46 @@ file that was distributed with this source code.
 
             });
 
-            $('.delivery_address').delegate("input[name='bill_address']", 'change', function() {
-            console.log($(this).val());
-            });
+            $('.delivery_address_main').delegate("input[name='delivery_address']", 'change', function() {
+
+            $.ajax({
+                        url: '{{ url('cart_save_temp_order') }}',
+                        type: 'POST',
+                        data: {
+                            delivery_code: $(this).val(),
+                            '_token':'{{ csrf_token('_token') }}',
+                            'pre_order_id':'{{ Order.pre_order_id }}',
+                             'customer_id':'{{ Order.Customer.id }}'
+
+                        }
+                    }).done(function(htmlRe, statusText, jqXHR) {
+
+                       console.log(htmlRe);
+
+                    }).fail(function(jqXHR, statusText, errorThrown) {
+                    });
+             });
+
+            $('.delivery_address_main').delegate("input[name='bill_address']", 'change', function() {
+
+            $.ajax({
+                        url: '{{ url('cart_save_temp_order') }}',
+                        type: 'POST',
+                        data: {
+                            bill_code: $(this).val(),
+                            '_token':'{{ csrf_token('_token') }}',
+                            'pre_order_id':'{{ Order.pre_order_id }}',
+                             'customer_id':'{{ Order.Customer.id }}'
+
+                        }
+                    }).done(function(htmlRe, statusText, jqXHR) {
+                      console.log(htmlRe);
+
+                    }).fail(function(jqXHR, statusText, errorThrown) {
+                    });
+             });
+
+
 
             $("input[name='shipping_radio']").change(function(){
 
@@ -125,16 +162,18 @@ file that was distributed with this source code.
                         }
                     }).done(function(htmlRe, statusText, jqXHR) {
 
-                        $('.delivery_address').html(htmlRe);
+                        $('.delivery_address_main').html(htmlRe);
 
                     }).fail(function(jqXHR, statusText, errorThrown) {
 
-                    });
+
 
              });
+                });
+            });
 
 
-        });
+
     </script>
 {% endblock javascript %}
 
@@ -437,26 +476,61 @@ file that was distributed with this source code.
                         </div>
                     </div>
                 </div>
-                <div class="ec-orderAccount shipping_destination ">
+{#                <div class="ec-orderAccount shipping_destination ">#}
+{#                    <div class="shipping_destination_left">#}
+{#                        <div> 請求先</div>#}
+{#                    </div>#}
+{#                    <div class="shipping_destination_right">#}
+{#                        <div class="shipping_row">#}
+{#                            <div class="shipping_col1 Order.name01 Order.name02">#}
+{#                                {{ Order.name01 }} {{ Order.name02 }} {{ 'common.name.suffix'|trans }}#}
+{#                            </div>#}
+{#                            <div class="shipping_col2">#}
+{#                                〒 {{ Order.postal_code }}#}
+{#                                {{ Order.pref }}#}
+{#                                {{ Order.addr01 }}#}
+{#                                {{ Order.addr02 }}#}
+{#                            </div>#}
+
+
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+
+                <div class="bill_address shipping_destination" style="margin-bottom: 30px;">
                     <div class="shipping_destination_left">
-                        <div> 請求先</div>
+                        <div>請求先 </div>
                     </div>
                     <div class="shipping_destination_right">
-                        <div class="shipping_row">
-                            <div class="shipping_col1 Order.name01 Order.name02">
-                                {{ Order.name01 }} {{ Order.name02 }} {{ 'common.name.suffix'|trans }}
-                            </div>
-                            <div class="shipping_col2">
-                                〒 {{ Order.postal_code }}
-                                {{ Order.pref }}
-                                {{ Order.addr01 }}
-                                {{ Order.addr02 }}
+
+                        {% for arShipping in Order.dtBillSeikyuCode %}
+
+                            <div class="shipping_row">
+
+                                <div class="shipping_col1">
+                                    <span><input type="radio" name="bill_address" value="{{ arShipping["id"] }}" id="bill_{{ arShipping["id"] }}" ></span>
+                                    <label for="bill_{{ arShipping["id"] }}" >{{ arShipping["name01"] }} {{ arShipping["name02"] }}</label>
+                                </div>
+                                <div class="shipping_col2">
+                                    〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }}
+
+                                </div>
+
                             </div>
 
+                        {% endfor %}
 
-                        </div>
+
+
+
+
                     </div>
+
                 </div>
+                <p class="error_delivery_address" style="color: red;font-size: larger;font-weight: bold;display: none">
+                    {{ 'front.shopping.shipping_title_error'|trans }}
+                </p>
+
 
                 <div class="shipping_destination">
                     <div class="shipping_destination_left">
@@ -492,7 +566,7 @@ file that was distributed with this source code.
                     {{ 'front.shopping.shipping_title_error'|trans }}
                 </p>
 {#                dtCusAddress#}
-                <div class="delivery_address">
+                <div class="delivery_address_main">
                 </div>
 
 

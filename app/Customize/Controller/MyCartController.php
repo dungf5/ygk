@@ -37,6 +37,7 @@ class MyCartController extends AbstractController
             $shipping_code = $request->get('shipping_code');
             $pre_order_id = $request->get('pre_order_id');
             $customer_id = $request->get('customer_id');
+
             $commonService->saveTempCart($shipping_code, $pre_order_id);
             $arrOtoProductOrder = $commonService->getCustomerOtodoke($customer_id, $shipping_code);
             $arrBill = $commonService->getCustomerSeikyuCode($customer_id, $shipping_code);
@@ -50,6 +51,37 @@ class MyCartController extends AbstractController
         }
 
         return [];
+    }
+
+    /**
+     * MyCartController
+     *
+     * @param Request   $request
+     * @Route("/cart_save_temp_order", name="cart_save_temp_order", methods={"POST"})
+     *
+     * @return array
+     */
+    public function cartSaveTempOrder(Request $request)
+    {
+        $result = ['is_ok' => '0', 'msg' => 'NG', 'delivery_code' => ''];
+        if ('POST' === $request->getMethod()) {
+            $commonService = new MyCommonService($this->entityManager);
+            $delivery_code = $request->get('delivery_code');
+            $pre_order_id = $request->get('pre_order_id');
+            $bill_code = $request->get('bill_code');
+            if (!empty($bill_code)) {
+                $commonService->saveTempCartBillSeiky($bill_code, $pre_order_id);
+            }
+            if (!empty($delivery_code)) {
+                $commonService->saveTempCartDeliCodeOto($delivery_code, $pre_order_id);
+            }
+
+            $result = ['is_ok' => '1', 'msg' => 'OK', 'delivery_code' => $delivery_code];
+
+            return $this->json($result, 200);
+        }
+
+        return $this->json($result, 400);
     }
 
     /**

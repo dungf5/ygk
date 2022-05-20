@@ -79,7 +79,26 @@ class MyCommonService extends AbstractRepository
 
         return $rows;
     }
+    /***
+     * seikyu_code  noi nhan hoa don
+     * @param $customer_id
+     * @return array
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getCustomerBillSeikyuCode($customer_id)
+    {
+        //seikyu_code  noi nhan hoa don
+        $sql = 'SELECT a.*   FROM dtb_customer_address a
+                join dt_customer_relation b on b.seikyu_code =a.id and a.customer_id=b.customer_code
+                where a.customer_id=? order by a.id desc limit 1
+                ';
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery([$customer_id]);
+        $rows = $result->fetchAllAssociative();
 
+        return $rows;
+    }
     /***
      * Otodoke  nhan hang hoa
      * @param $customer_id
@@ -134,4 +153,29 @@ class MyCommonService extends AbstractRepository
         $statement = $this->entityManager->getConnection()->prepare($sql);
         $result = $statement->executeStatement([$shipping_code, $pre_order_id]);
     }
+    /***
+     * @param $shipping_code
+     * @param $pre_order_id
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function saveTempCartDeliCodeOto($delivery_code, $pre_order_id)
+    {
+        $sql = 'update  dtb_order SET otodoke_code=? where pre_order_id = ?';
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeStatement([$delivery_code, $pre_order_id]);
+    }
+    /***
+     * @param $shipping_code
+     * @param $pre_order_id
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function saveTempCartBillSeiky($bill_code, $pre_order_id)
+    {
+        $sql = 'update  dtb_order SET seikyu_code=? where pre_order_id = ?';
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeStatement([$bill_code, $pre_order_id]);
+    }
+
 }
