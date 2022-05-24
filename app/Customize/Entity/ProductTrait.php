@@ -17,7 +17,7 @@ trait ProductTrait
      * @var \Customize\Entity\MstProduct
      * @ORM\OneToOne(targetEntity="\Customize\Entity\MstProduct")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="product_cd", referencedColumnName="product_code")
+     *   @ORM\JoinColumn(name="product_code", referencedColumnName="product_code")
      * })
      */
     private $MstProduct;
