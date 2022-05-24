@@ -2,8 +2,11 @@
 
 
 namespace Customize\Controller;
+use Customize\Repository\PriceRepository;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
+use Eccube\Entity\Master\ProductStatus;
+use Eccube\Entity\Product;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
 use Eccube\Form\Type\AddCartType;
@@ -19,6 +22,7 @@ use Eccube\Service\PurchaseFlow\PurchaseFlow;
 use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -65,6 +69,11 @@ class MyProductController extends AbstractController
     private $title = '';
 
     /**
+     * @var PriceRepository
+     */
+    protected $priceRepository;
+
+    /**
      * ProductController constructor.
      *
      * @param PurchaseFlow $cartPurchaseFlow
@@ -82,7 +91,8 @@ class MyProductController extends AbstractController
         ProductRepository $productRepository,
         BaseInfoRepository $baseInfoRepository,
         AuthenticationUtils $helper,
-        ProductListMaxRepository $productListMaxRepository
+        ProductListMaxRepository $productListMaxRepository,
+        PriceRepository $priceRepository
     ) {
         $this->purchaseFlow = $cartPurchaseFlow;
         $this->customerFavoriteProductRepository = $customerFavoriteProductRepository;
@@ -91,6 +101,7 @@ class MyProductController extends AbstractController
         $this->BaseInfo = $baseInfoRepository->get();
         $this->helper = $helper;
         $this->productListMaxRepository = $productListMaxRepository;
+        $this->priceRepository = $priceRepository;
     }
 
     /**
@@ -260,5 +271,96 @@ class MyProductController extends AbstractController
         } else {
             return trans('front.product.all_products');
         }
+    }
+
+
+    /**
+     * 商品詳細画面.
+     *
+     * @Route("/products/detail/{id}", name="product_detail", methods={"GET"}, requirements={"id" = "\d+"})
+     * @Template("Product/detail.twig")
+     * @ParamConverter("Product", options={"repository_method" = "findWithSortedClassCategories"})
+     *
+     * @param Request $request
+     * @param Product $Product
+     *
+     * @return array
+     */
+    public function detail(Request $request, Product $Product)
+    {
+
+        if (!$this->checkVisibility($Product)) {
+            throw new NotFoundHttpException();
+        }
+
+        $builder = $this->formFactory->createNamedBuilder(
+            '',
+            AddCartType::class,
+            null,
+            [
+                'product' => $Product,
+                'id_add_product_id' => false,
+            ]
+        );
+
+        $event = new EventArgs(
+            [
+                'builder' => $builder,
+                'Product' => $Product,
+            ],
+            $request
+        );
+        $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_DETAIL_INITIALIZE, $event);
+
+        $is_favorite = false;
+        $price=null;
+        if ($this->isGranted('ROLE_USER')) {
+            $Customer = $this->getUser();
+            $is_favorite = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
+            //dd($Product->getMstProduct()->getId());
+            //dd($Customer->getId());
+            $price = $this->priceRepository->getData($Product->getMstProduct()->getProductCode(),$Customer->getId());
+
+        }
+        //dd($price);
+        //dd($Product);
+
+
+        return [
+            'title' => $this->title,
+            'subtitle' => $Product->getName(),
+            'form' => $builder->getForm()->createView(),
+            'Product' => $Product,
+            'is_favorite' => $is_favorite,
+            'Price'=>$price,
+        ];
+    }
+
+    /**
+     * 閲覧可能な商品かどうかを判定
+     *
+     * @param Product $Product
+     *
+     * @return boolean 閲覧可能な場合はtrue
+     */
+    protected function checkVisibility(Product $Product)
+    {
+        $is_admin = $this->session->has('_security_admin');
+
+        // 管理ユーザの場合はステータスやオプションにかかわらず閲覧可能.
+        if (!$is_admin) {
+            // 在庫なし商品の非表示オプションが有効な場合.
+            // if ($this->BaseInfo->isOptionNostockHidden()) {
+            //     if (!$Product->getStockFind()) {
+            //         return false;
+            //     }
+            // }
+            // 公開ステータスでない商品は表示しない.
+            if ($Product->getStatus()->getId() !== ProductStatus::DISPLAY_SHOW) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
