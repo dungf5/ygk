@@ -12,7 +12,7 @@ if (!class_exists('\Customize\Entity\MstShippingAddress', false)) {
      * @ORM\Entity(repositoryClass="Customize\Repository\MstShippingAddressRepository")
      */
     class MstShippingAddress extends AbstractEntity
-    { 
+    {
  /**
          * @var integer
          *
@@ -45,6 +45,14 @@ if (!class_exists('\Customize\Entity\MstShippingAddress', false)) {
          * @ORM\Column(name="name01",nullable=true, type="string", length=50, options={"comment":""})
          */
         private $name01;
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="name02",nullable=true, type="string", length=50, options={"comment":""})
+         */
+        private $name02;
+
 /**
          * @var string
          *
