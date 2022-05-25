@@ -212,6 +212,29 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         private $model;
 
         /**
+         * @var int
+         *
+         * @ORM\Column(name="ec_product_id", type="integer")
+         */
+        private $ec_product_id;
+
+        /**
+         * @return int
+         */
+        public function getEcProductId(): int
+        {
+            return $this->ec_product_id;
+        }
+
+        /**
+         * @param int $ec_product_id
+         */
+        public function setEcProductId(int $ec_product_id): void
+        {
+            $this->ec_product_id = $ec_product_id;
+        }
+
+        /**
          * @return string
          */
         public function getProductCode(): string

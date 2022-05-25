@@ -82,7 +82,7 @@ if (!class_exists('\Customize\Entity\Price', false)) {
         /**
          * @var \DateTime
          *
-         * @ORM\Column(name="update_date", type="datetimetz", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'データ更新日時'")
+         * @ORM\Column(name="update_date", type="datetimetz", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'データ更新日時'")
          *
          */
         private $update_date;

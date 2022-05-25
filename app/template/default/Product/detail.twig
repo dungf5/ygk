@@ -286,8 +286,8 @@ file that was distributed with this source code.
                                     {% if Price is defined and Price is not null %}
                                         {{ Price.price_s01|price }}
                                     {% else %}
-                                        {% if Product.MstProduct is defined and Product.MstProduct is not null %}
-                                            {{ Product.MstProduct.unit_price|price }}
+                                        {% if MstProduct is defined and MstProduct is not null %}
+                                            {{ MstProduct.unit_price|price }}
                                         {% endif %}
                                     {% endif %}
                                 </span>
@@ -295,25 +295,25 @@ file that was distributed with this source code.
                         {% else %}
                             {# 価格 #}
                             <div class="ec-price">
-                                <span class="ec-price__price">{{ Product.MstProduct.unit_price|price }}</span>
+                                <span class="ec-price__price">{{ MstProduct.unit_price|price }}</span>
                             </div>
                         {% endif %}
                     </div>
                     {# 商品コード #}
                     <div class="ec-productRole__code">
-                        {% if Product.MstProduct is defined and Product.MstProduct is not null %}
-                        <div class="product-code-default">{{ 'front.product.code'|trans }}： {{ Product.MstProduct.product_code }}</div>
-                        <div class="product-name-default">{{ 'front.product.name'|trans }}： {{ Product.MstProduct.product_name }}</div>
-                        <div class="product-jan-code-default">{{ 'front.product.jan_code'|trans }}： {{ Product.MstProduct.jan_code }}</div>
-                        <div class="product-product-name-abb-default">{{ 'front.product.product_name_abb'|trans }}： {{ Product.MstProduct.product_name_abb }}</div>
-                        <div class="product-unit-price-default">{{ 'front.product.unit_price'|trans }}： {{ Product.MstProduct.unit_price }}</div>
-                        <div class="product-series-name-default">{{ 'front.product.series_name'|trans }}： {{ Product.MstProduct.series_name }}</div>
-                        <div class="product-line-no-default">{{ 'front.product.line_no'|trans }}： {{ Product.MstProduct.line_no }}</div>
-                        <div class="product-quantity-default">{{ 'front.product.quantity'|trans }}： {{ Product.MstProduct.quantity }}</div>
-                        <div class="product-size-default">{{ 'front.product.size'|trans }}： {{ Product.MstProduct.size }}</div>
-                        <div class="product-color-default">{{ 'front.product.color'|trans }}： {{ Product.MstProduct.color }}</div>
-                        <div class="product-material-default">{{ 'front.product.material'|trans }}： {{ Product.MstProduct.material }}</div>
-                        <div class="product-model-default">{{ 'front.product.model'|trans }}： {{ Product.MstProduct.model }}</div>
+                        {% if MstProduct is defined and MstProduct is not null %}
+                        <div class="product-code-default">{{ 'front.product.code'|trans }}： {{ MstProduct.product_code }}</div>
+                        <div class="product-name-default">{{ 'front.product.name'|trans }}： {{ MstProduct.product_name }}</div>
+                        <div class="product-jan-code-default">{{ 'front.product.jan_code'|trans }}： {{ MstProduct.jan_code }}</div>
+                        <div class="product-product-name-abb-default">{{ 'front.product.product_name_abb'|trans }}： {{ MstProduct.product_name_abb }}</div>
+                        <div class="product-unit-price-default">{{ 'front.product.unit_price'|trans }}： {{ MstProduct.unit_price }}</div>
+                        <div class="product-series-name-default">{{ 'front.product.series_name'|trans }}： {{ MstProduct.series_name }}</div>
+                        <div class="product-line-no-default">{{ 'front.product.line_no'|trans }}： {{ MstProduct.line_no }}</div>
+                        <div class="product-quantity-default">{{ 'front.product.quantity'|trans }}： {{ MstProduct.quantity }}</div>
+                        <div class="product-size-default">{{ 'front.product.size'|trans }}： {{ MstProduct.size }}</div>
+                        <div class="product-color-default">{{ 'front.product.color'|trans }}： {{ MstProduct.color }}</div>
+                        <div class="product-material-default">{{ 'front.product.material'|trans }}： {{ MstProduct.material }}</div>
+                        <div class="product-model-default">{{ 'front.product.model'|trans }}： {{ MstProduct.model }}</div>
                         {% endif %}
                     </div>
                     {# 在庫 #}
