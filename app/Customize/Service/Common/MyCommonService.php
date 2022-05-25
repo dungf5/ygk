@@ -69,7 +69,14 @@ class MyCommonService extends AbstractRepository
 
         return $rows;
     }
-
+    public function runQuery($query)
+    {
+        $sql = $query;
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery();
+        $rows = $result->fetchAllAssociative();
+        return $rows;
+    }
     public function getCustomerAddress()
     {
         $sql = 'SELECT *   FROM dtb_customer_address';
