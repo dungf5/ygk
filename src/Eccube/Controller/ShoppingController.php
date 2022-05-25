@@ -117,9 +117,11 @@ class ShoppingController extends AbstractShoppingController
         $Order = $this->orderHelper->initializeOrder($Cart, $Customer);
         $commonService = new MyCommonService($this->entityManager);
         $mstShip =$commonService->getMstShipping();
-        $dtCusAddress =$commonService->getCustomerAddress();
+
+        $dtBillSeikyuCode =$commonService->getCustomerBillSeikyuCode($Customer->getId());
+
         $Order->mstShips =$mstShip;
-        $Order->dtCusAddress =$dtCusAddress;
+        $Order->dtBillSeikyuCode =$dtBillSeikyuCode;
         // 集計処理.
         log_info('[注文手続] 集計処理を開始します.', [$Order->getId()]);
         $flowResult = $this->executePurchaseFlow($Order, false);

@@ -107,32 +107,21 @@ file that was distributed with this source code.
             });
 
             $('.delivery_address_main').delegate("input[name='delivery_address']", 'change', function() {
-
-            $.ajax({
-                        url: '{{ url('cart_save_temp_order') }}',
-                        type: 'POST',
-                        data: {
-                            delivery_code: $(this).val(),
-                            '_token':'{{ csrf_token('_token') }}',
-                            'pre_order_id':'{{ Order.pre_order_id }}',
-                             'customer_id':'{{ Order.Customer.id }}'
-
-                        }
-                    }).done(function(htmlRe, statusText, jqXHR) {
-
-                       console.log(htmlRe);
-
-                    }).fail(function(jqXHR, statusText, errorThrown) {
-                    });
+              let delivery_code =  $(this).val();
+               updateDeliverydAdress(delivery_code);
              });
 
             $('.delivery_address_main').delegate("input[name='bill_address']", 'change', function() {
+                let bill_code =  $(this).val();
+                updateBillAddress(bill_code);
+             });
 
-            $.ajax({
+            function updateBillAddress(bill_code){
+             $.ajax({
                         url: '{{ url('cart_save_temp_order') }}',
                         type: 'POST',
                         data: {
-                            bill_code: $(this).val(),
+                            'bill_code': bill_code,
                             '_token':'{{ csrf_token('_token') }}',
                             'pre_order_id':'{{ Order.pre_order_id }}',
                              'customer_id':'{{ Order.Customer.id }}'
@@ -143,7 +132,9 @@ file that was distributed with this source code.
 
                     }).fail(function(jqXHR, statusText, errorThrown) {
                     });
-             });
+            }
+
+
 
 
 
@@ -170,15 +161,43 @@ file that was distributed with this source code.
 
              });
                 });
+
+              {% if Order.dtBillSeikyuCode|length == 1 %}
+                updateBillAddress('{{ Order.dtBillSeikyuCode[0]["id"] }}');
+              {% endif %}
+
+            {% if Order.mstShips|length == 1 %}
+             updateBillAddress('{{ Order.mstShips[0]["id"] }}');
+            {% endif %}
+
+
             });
+function updateDeliverydAdress(delivery_code){
 
+                 $.ajax({
+                        url: '{{ url('cart_save_temp_order') }}',
+                        type: 'POST',
+                        data: {
+                            'delivery_code': delivery_code,
+                            '_token':'{{ csrf_token('_token') }}',
+                            'pre_order_id':'{{ Order.pre_order_id }}',
+                             'customer_id':'{{ Order.Customer.id }}'
 
+                        }
+                    }).done(function(htmlRe, statusText, jqXHR) {
 
+                       console.log(htmlRe);
+
+                    }).fail(function(jqXHR, statusText, errorThrown) {
+
+                });
+
+            }
     </script>
 {% endblock javascript %}
 
 {% block main %}
-{#    <pre> {{ dump(Order) }}</pre>#}
+
     <div class="ec-role">
         <div class="ec-pageHeader">
             <h1>{{ 'front.shopping.title'|trans }}</h1>
@@ -508,7 +527,15 @@ file that was distributed with this source code.
                             <div class="shipping_row">
 
                                 <div class="shipping_col1">
-                                    <span><input type="radio" name="bill_address" value="{{ arShipping["id"] }}" id="bill_{{ arShipping["id"] }}" ></span>
+                                    <span>
+                                        {% if Order.dtBillSeikyuCode|length == 1 %}
+                                            <input class="hidden"  type="radio" checked name="bill_address" value="{{ arShipping["id"] }}" id="bill_{{ arShipping["id"] }}" >
+
+                                        {% else %}
+                                            <input type="radio" checked name="bill_address" value="{{ arShipping["id"] }}" id="bill_{{ arShipping["id"] }}" >
+                                        {% endif %}
+
+                                    </span>
                                     <label for="bill_{{ arShipping["id"] }}" >{{ arShipping["name01"] }} {{ arShipping["name02"] }}</label>
                                 </div>
                                 <div class="shipping_col2">
@@ -543,7 +570,17 @@ file that was distributed with this source code.
                             <div class="shipping_row">
 
                                 <div class="shipping_col1">
-                                    <span><input type="radio" name="shipping_radio" value="{{ arShipping["shipping_code"] }}" id="{{ arShipping["shipping_code"] }}" ></span>
+                                    <span>
+
+                                         {% if Order.mstShips|length == 1 %}
+                                             <input type="radio" class="hidden"  checked name="shipping_radio" value="{{ arShipping["shipping_code"] }}" id="{{ arShipping["shipping_code"] }}" >
+
+                                        {% else %}
+                                             <input type="radio"  name="shipping_radio" value="{{ arShipping["shipping_code"] }}" id="{{ arShipping["shipping_code"] }}" >
+
+                                         {% endif %}
+
+                                    </span>
                                     <label for="{{ arShipping["shipping_code"] }}" >{{ arShipping["shipping_name"] }}</label>
                                 </div>
                                 <div class="shipping_col2">

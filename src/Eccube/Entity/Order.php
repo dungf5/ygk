@@ -223,7 +223,40 @@ if (!class_exists('\Eccube\Entity\Order')) {
 
             return array_values($orderItemArray);
         }
+        /**
+         * 同じ規格の商品の個数をまとめた受注明細を取得
+         *
+         * @return OrderItem[]
+         */
+        public function getMergedProductOrderItemsMore()
+        {
+            $ProductOrderItems = $this->getProductOrderItems();
+            $orderItemArray = [];
+            /** @var OrderItem $ProductOrderItem */
+            foreach ($ProductOrderItems as $ProductOrderItem) {
+                /** @var ItemInterface $OrderItem */
+                $OrderItem = null;
+                $productClassId = $ProductOrderItem->getProductClass()->getId();
+                if (array_key_exists($productClassId, $orderItemArray)) {
+                    // 同じ規格の商品がある場合は個数をまとめる
 
+                    $OrderItem = $orderItemArray[$productClassId];
+                    $quantity = $OrderItem->getQuantity() + $ProductOrderItem->getQuantity();
+                    $OrderItem->setQuantity($quantity);
+                } else {
+                    // 新規規格の商品は新しく追加する
+                    $OrderItem = new OrderItem();
+                    $OrderItem->copyProperties($ProductOrderItem, ['id']);
+                    $OrderItem->shipping_status ='shíptatuss999';
+                    $OrderItem->reserve_stock_num ='rever1000';
+                    $OrderItem->order_remain_num ='remain8522';
+                    $OrderItem->type ='typeECCCC';
+                    $orderItemArray[$productClassId] = $OrderItem;
+                }
+            }
+
+            return array_values($orderItemArray);
+        }
         /**
          * 合計金額を計算
          *

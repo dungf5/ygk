@@ -61,7 +61,7 @@ class MyCommonService extends AbstractRepository
 
     public function getMstShipping()
     {
-        $sql = 'SELECT *   FROM mst_shipping';
+        $sql = 'SELECT *   FROM mst_shipping_address';
         $statement = $this->entityManager->getConnection()->prepare($sql);
         $result = $statement->executeQuery();
 
@@ -96,9 +96,9 @@ class MyCommonService extends AbstractRepository
     public function getCustomerBillSeikyuCode($customer_id)
     {
         //seikyu_code  noi nhan hoa don
-        $sql = 'SELECT a.*   FROM dtb_customer_address a
-                join dt_customer_relation b on b.seikyu_code =a.id and a.customer_id=b.customer_code
-                where a.customer_id=? order by a.id desc limit 1
+        $sql = 'SELECT a.*   FROM mst_seikyu_address a
+                join dt_customer_relation b on b.seikyu_code =a.seikyu_code
+                where b.customer_code=? order by a.postal_code desc
                 ';
         $statement = $this->entityManager->getConnection()->prepare($sql);
         $result = $statement->executeQuery([$customer_id]);
@@ -116,9 +116,9 @@ class MyCommonService extends AbstractRepository
     public function getCustomerOtodoke($customer_id, $shipping_code)
     {
         //otodoke_code dia chi nhan hang
-        $sql = 'SELECT a.*   FROM dtb_customer_address a
-                join dt_customer_relation b on b.otodoke_code =a.id and a.customer_id=b.customer_code
-                where a.customer_id=? and b.shipping_code=?
+        $sql = 'SELECT a.*   FROM mst_otodoke_address a
+                join dt_customer_relation b on b.otodoke_code =a.otodoke_code
+                where a.customer_code=? and b.shipping_code=?
                 ';
         $statement = $this->entityManager->getConnection()->prepare($sql);
         $result = $statement->executeQuery([$customer_id, $shipping_code]);
@@ -127,26 +127,26 @@ class MyCommonService extends AbstractRepository
         return $rows;
     }
 
-    /***
-     * seikyu_code  noi nhan hoa don
-     * @param $customer_id
-     * @return array
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
-     */
-    public function getCustomerSeikyuCode($customer_id,$shipping_code)
-    {
-        //seikyu_code  noi nhan hoa don
-        $sql = 'SELECT a.*   FROM dtb_customer_address a
-                join dt_customer_relation b on b.seikyu_code =a.id and a.customer_id=b.customer_code
-                where a.customer_id=? and b.shipping_code=?
-                ';
-        $statement = $this->entityManager->getConnection()->prepare($sql);
-        $result = $statement->executeQuery([$customer_id,$shipping_code]);
-        $rows = $result->fetchAllAssociative();
-
-        return $rows;
-    }
+//    /***
+//     * seikyu_code  noi nhan hoa don
+//     * @param $customer_id
+//     * @return array
+//     * @throws \Doctrine\DBAL\Driver\Exception
+//     * @throws \Doctrine\DBAL\Exception
+//     */
+//    public function getCustomerSeikyuCode($customer_id,$shipping_code)
+//    {
+//        //seikyu_code  noi nhan hoa don
+//        $sql = 'SELECT a.*   FROM dtb_customer_address a
+//                join dt_customer_relation b on b.seikyu_code =a.id and a.customer_id=b.customer_code
+//                where a.customer_id=? and b.shipping_code=?
+//                ';
+//        $statement = $this->entityManager->getConnection()->prepare($sql);
+//        $result = $statement->executeQuery([$customer_id,$shipping_code]);
+//        $rows = $result->fetchAllAssociative();
+//
+//        return $rows;
+//    }
 
     /***
      * @param $shipping_code
