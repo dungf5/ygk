@@ -3,6 +3,7 @@
 
 namespace Customize\Controller;
 use Customize\Repository\PriceRepository;
+use Customize\Repository\StockListRepository;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
 use Eccube\Entity\Master\ProductStatus;
@@ -74,8 +75,12 @@ class MyProductController extends AbstractController
     protected $priceRepository;
 
     /**
-     * ProductController constructor.
-     *
+     * @var StockListRepository
+     */
+    protected $stockListRepository;
+
+    /***
+     * MyProductController constructor.
      * @param PurchaseFlow $cartPurchaseFlow
      * @param CustomerFavoriteProductRepository $customerFavoriteProductRepository
      * @param CartService $cartService
@@ -83,6 +88,8 @@ class MyProductController extends AbstractController
      * @param BaseInfoRepository $baseInfoRepository
      * @param AuthenticationUtils $helper
      * @param ProductListMaxRepository $productListMaxRepository
+     * @param PriceRepository $priceRepository
+     * @param StockListRepository $stockListRepository
      */
     public function __construct(
         PurchaseFlow $cartPurchaseFlow,
@@ -92,7 +99,8 @@ class MyProductController extends AbstractController
         BaseInfoRepository $baseInfoRepository,
         AuthenticationUtils $helper,
         ProductListMaxRepository $productListMaxRepository,
-        PriceRepository $priceRepository
+        PriceRepository $priceRepository,
+        StockListRepository $stockListRepository
     ) {
         $this->purchaseFlow = $cartPurchaseFlow;
         $this->customerFavoriteProductRepository = $customerFavoriteProductRepository;
@@ -102,6 +110,7 @@ class MyProductController extends AbstractController
         $this->helper = $helper;
         $this->productListMaxRepository = $productListMaxRepository;
         $this->priceRepository = $priceRepository;
+        $this->stockListRepository = $stockListRepository;
     }
 
     /**
@@ -317,14 +326,10 @@ class MyProductController extends AbstractController
         if ($this->isGranted('ROLE_USER')) {
             $Customer = $this->getUser();
             $is_favorite = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
-            //dd($Product->getMstProduct()->getId());
-            //dd($Customer->getId());
+
             $price = $this->priceRepository->getData($Product->getMstProduct()->getProductCode(),$Customer->getId());
-
+            $stock = $this->stockListRepository->getData($Product->getMstProduct()->getProductCode(),$Customer->getId());
         }
-        //dd($price);
-        //dd($Product);
-
 
         return [
             'title' => $this->title,
@@ -333,6 +338,7 @@ class MyProductController extends AbstractController
             'Product' => $Product,
             'is_favorite' => $is_favorite,
             'Price'=>$price,
+            'Stock'=>$stock
         ];
     }
 

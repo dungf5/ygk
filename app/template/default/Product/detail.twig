@@ -316,7 +316,29 @@ file that was distributed with this source code.
                         <div class="product-model-default">{{ 'front.product.model'|trans }}： {{ Product.MstProduct.model }}</div>
                         {% endif %}
                     </div>
-
+                    {# 在庫 #}
+                    <div class="ec-productRole__code">
+                        <div class="product-stock_default">
+                            {{ 'front.product.stock'|trans }}：
+                            {% if app.user -%}
+                                {% if Stock is defined and Stock is not null %}
+                                    {% if Stock.stock_num >= 31 %}
+                                        〇
+                                    {% else  %}
+                                        {% if Stock.stock_num == 0 %}
+                                            ×
+                                        {% else  %}
+                                            △
+                                        {% endif %}
+                                    {% endif %}
+                                {% else %}
+                                    ×
+                                {% endif %}
+                            {% else %}
+                                ×
+                            {% endif %}
+                        </div>
+                    </div>
                     {# 関連カテゴリ #}
                     {% if Product.ProductCategories is not empty %}
                         <div class="ec-productRole__category">
