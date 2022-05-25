@@ -11,7 +11,17 @@
             <div class="shipping_row">
 
                 <div class="shipping_col1">
-                    <span><input type="radio" name="delivery_address" value="{{ arShipping["id"] }}" id="ship_{{ arShipping["id"] }}" ></span>
+                    <span>
+
+                         {% if data.shipping|length == 1 %}
+
+                             <input class="hidden"  type="radio" checked name="delivery_address" value="{{ arShipping["id"] }}" id="ship_{{ arShipping["id"] }}" >
+                                        {% else %}
+                             <input type="radio" name="delivery_address" value="{{ arShipping["id"] }}" id="ship_{{ arShipping["id"] }}" >
+                         {% endif %}
+
+
+                    </span>
                     <label for="ship_{{ arShipping["id"] }}" >{{ arShipping["name01"] }} {{ arShipping["name02"] }}</label>
                 </div>
                 <div class="shipping_col2">
@@ -22,6 +32,11 @@
             </div>
 
         {% endfor %}
+        <script>
+            {% if data.shipping|length == 1 %}
+            updateDeliverydAdress({{ data.shipping[0]["id"] }}) ;
+            {% endif %}
+        </script>
 
 
 
