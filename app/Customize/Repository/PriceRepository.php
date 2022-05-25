@@ -3,22 +3,21 @@
 namespace Customize\Repository;
 
 
-use Customize\Entity\MstShipping;
+use Customize\Entity\Price;
 use Doctrine\Common\Collections\ArrayCollection;
 use Eccube\Repository\AbstractRepository;
-use Customize\Entity\StockList;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class StockListRepository extends AbstractRepository
+class PriceRepository extends AbstractRepository
 {
     /**
-     * MstProductRepository constructor.
+     * PriceRepository constructor.
      *
      * @param RegistryInterface $registry
      */
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, StockList::class);
+        parent::__construct($registry, Price::class);
     }
 
     /***
@@ -29,8 +28,8 @@ class StockListRepository extends AbstractRepository
      */
     public function getData($product_code = '', $customer_code ='')
     {
-        $qb = $this->createQueryBuilder('s');
-        $qb->where('s.product_code = :product_code AND s.customer_code = :customer_code')
+        $qb = $this->createQueryBuilder('p');
+        $qb->where('p.product_code = :product_code AND p.customer_code = :customer_code')
             ->setParameter('product_code', $product_code)
             ->setParameter('customer_code', $customer_code);
         return $qb

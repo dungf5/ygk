@@ -12,7 +12,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
      * @ORM\Table(name="mst_product")
      * @ORM\Entity(repositoryClass="Customize\Repository\MstProductRepository")
      */
-    class MstProduct extends \Eccube\Entity\Master\AbstractMasterEntity
+    class MstProduct extends \Eccube\Entity\AbstractEntity
     {
         /**
          * @var string
@@ -20,7 +20,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
          * @ORM\Column(name="product_code", type="string", length=20, nullable=false)
          * @ORM\Id
          */
-        protected $id;
+        private $product_code;
 
         /**
          * @var string
@@ -197,6 +197,58 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
          */
         private $color;
 
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="material", type="string", length=255)
+         */
+        private $material;
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="model", type="string", length=255)
+         */
+        private $model;
+
+        /**
+         * @var int
+         *
+         * @ORM\Column(name="ec_product_id", type="integer")
+         */
+        private $ec_product_id;
+
+        /**
+         * @return int
+         */
+        public function getEcProductId(): int
+        {
+            return $this->ec_product_id;
+        }
+
+        /**
+         * @param int $ec_product_id
+         */
+        public function setEcProductId(int $ec_product_id): void
+        {
+            $this->ec_product_id = $ec_product_id;
+        }
+
+        /**
+         * @return string
+         */
+        public function getProductCode(): string
+        {
+            return $this->product_code;
+        }
+
+        /**
+         * @param string $product_code
+         */
+        public function setProductCode(string $product_code): void
+        {
+            $this->product_code = $product_code;
+        }
 
         /**
          * @return string
@@ -598,7 +650,37 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
             $this->color = $color;
         }
 
+        /**
+         * @return string
+         */
+        public function getMaterial(): string
+        {
+            return $this->material;
+        }
 
+        /**
+         * @param string $material
+         */
+        public function setMaterial(string $material): void
+        {
+            $this->material = $material;
+        }
+
+        /**
+         * @return string
+         */
+        public function getModel(): string
+        {
+            return $this->model;
+        }
+
+        /**
+         * @param string $model
+         */
+        public function setModel(string $model): void
+        {
+            $this->model = $model;
+        }
 
     }
 }
