@@ -40,10 +40,10 @@ class MyCartController extends AbstractController
 
             $commonService->saveTempCart($shipping_code, $pre_order_id);
             $arrOtoProductOrder = $commonService->getCustomerOtodoke($customer_id, $shipping_code);
-            $arrBill = $commonService->getCustomerSeikyuCode($customer_id, $shipping_code);
+
             $data = (object) [];
             $data->shipping = $arrOtoProductOrder;
-            $data->bill = $arrBill;
+
 
             $result = ['is_ok' => '1', 'msg' => 'OK', 'data' => $data];
 

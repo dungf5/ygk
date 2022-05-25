@@ -25,55 +25,100 @@ file that was distributed with this source code.
         <div class="ec-mypageRole">
             {% if pagination.totalItemCount > 0 %}
                 <p class="ec-para-normal">{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}</p>
-                {% for Order in pagination %}
-                    <div class="ec-historyRole">
-                        <div class="ec-historyRole__contents">
+                <table class="table">
+                <thead>
+                <tr>
+                    <th>type</th>
+                    <th>order_no</th>
+                    <th>order_lineno</th>
+                    <th>image</th>
+                    <th>product_name</th>
+                    <th>product_code</th>
 
-                            <div class="ec-historyRole__header">
-                                <div class="ec-historyListHeader">
-                                    <p class="ec-historyListHeader__date">{{ Order.order_date|date_sec }}</p>
-                                    <dl class="ec-definitions">
-                                        <dt>{{ 'front.mypage.order_no'|trans }}</dt>
-                                        <dd>{{ Order.order_no }}</dd>
-                                    </dl>
-                                    {% if (BaseInfo.option_mypage_order_status_display) %}
-                                        <dl class="ec-definitions">
-                                            <dt>{{ 'front.mypage.order_status'|trans }}</dt>
-                                            <dd>{{ Order.CustomerOrderStatus }}</dd>
-                                        </dl>
-                                    {% endif %}
-                                    <p class="ec-historyListHeader__action"><a class="ec-inlineBtn"
-                                                                               href="{{ url('mypage_history', {'order_no': Order.order_no}) }}">{{ 'front.mypage.view_detail'|trans }}</a>
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="ec-historyRole__detail">
-                                {% for OrderItem in Order.MergedProductOrderItems %}
-                                    <div class="ec-imageGrid">
-                                        <div class="ec-imageGrid__img">
-                                            {% if OrderItem.Product is null %}
-                                                <img src="{{ asset(''|no_image_product, 'save_image') }}"/>
-                                            {% else %}
-                                                <img src="{{ asset(OrderItem.Product.MainListImage|no_image_product, 'save_image') }}">
-                                            {% endif %}
-                                        </div>
-                                        <div class="ec-imageGrid__content">
-                                            <p class="ec-historyRole__detailTitle">{{ OrderItem.product_name }}</p>
-                                            {% if OrderItem.class_category_name1 is not empty %}
-                                                {{ OrderItem.class_category_name1 }}
-                                            {% endif %}
-                                            {% if OrderItem.class_category_name2 is not empty %}
-                                                / {{ OrderItem.class_category_name2 }}
-                                            {% endif %}
-                                            <p class="ec-historyRole__detailPrice">{{ OrderItem.price_inc_tax|price }}
-                                                × {{ OrderItem.quantity }}</p>
-                                        </div>
-                                    </div>
+                    <th>order_status</th>
+                    <th>shipping_status</th>
+                    <th>reserve_stock_num</th>
+                    <th>order_remain_num</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for Order in pagination %}
+
+
+{#                            <div class="ec-historyRole__header">#}
+{#                                <div class="ec-historyListHeader">#}
+{#                                    <p class="ec-historyListHeader__date">{{ Order.order_date|date_sec }}</p>#}
+{#                                    <dl class="ec-definitions">#}
+{#                                        <dt>{{ 'front.mypage.order_no'|trans }}</dt>#}
+{#                                        <dd>{{ Order.order_no }}</dd>#}
+{#                                    </dl>#}
+{#                                    {% if (BaseInfo.option_mypage_order_status_display) %}#}
+{#                                        <dl class="ec-definitions">#}
+{#                                            <dt>{{ 'front.mypage.order_status'|trans }}</dt>#}
+{#                                            <dd>{{ Order.CustomerOrderStatus }}</dd>#}
+{#                                        </dl>#}
+{#                                    {% endif %}#}
+{#                                    <p class="ec-historyListHeader__action"><a class="ec-inlineBtn"#}
+{#                                                                               href="{{ url('mypage_history', {'order_no': Order.order_no}) }}">{{ 'front.mypage.view_detail'|trans }}</a>#}
+{#                                    </p>#}
+{#                                </div>#}
+{#                            </div>#}
+
+
+                                {% for OrderItem in Order.MergedProductOrderItemsMore %}
+{#                                    <div class="ec-imageGrid">#}
+{#                                        <div class="ec-imageGrid__img">#}
+{#                                            {% if OrderItem.Product is null %}#}
+{#                                                <img src="{{ asset(''|no_image_product, 'save_image') }}"/>#}
+{#                                            {% else %}#}
+{#                                                <img src="{{ asset(OrderItem.Product.MainListImage|no_image_product, 'save_image') }}">#}
+{#                                            {% endif %}#}
+{#                                        </div>#}
+{#                                        <div class="ec-imageGrid__content">#}
+{#                                            <p class="ec-historyRole__detailTitle">{{ OrderItem.product_name }}</p>#}
+{#                                            {% if OrderItem.class_category_name1 is not empty %}#}
+{#                                                {{ OrderItem.class_category_name1 }}#}
+{#                                            {% endif %}#}
+{#                                            {% if OrderItem.class_category_name2 is not empty %}#}
+{#                                                / {{ OrderItem.class_category_name2 }}#}
+{#                                            {% endif %}#}
+{#                                            <p class="ec-historyRole__detailPrice">{{ OrderItem.price_inc_tax|price }}#}
+{#                                                × {{ OrderItem.quantity }}</p>#}
+{#                                        </div>#}
+{#                                    </div>#}
+
+
+                                            <tr>
+                                                <td>Order.type</td>
+                                                <td>{{Order.order_no}}</td>
+                                                <td>order_lineno</td>
+                                                <td> {% if OrderItem.Product is null %}
+                                                    <img src="{{ asset(''|no_image_product, 'save_image') }}"/>
+                                                {% else %}
+                                                    <img src="{{ asset(OrderItem.Product.MainListImage|no_image_product, 'save_image') }}">
+                                                {% endif %}
+                                                </td>
+                                                <td>{{OrderItem.product_name}}</td>
+                                                <td>{{OrderItem.product_code}}</td>
+                                                <td>{{Order.order_status}}</td>
+                                                <td>{{OrderItem.shipping_status}}</td>
+                                                <td>{{OrderItem.reserve_stock_num}}</td>
+                                                <td>{{OrderItem.order_remain_num}}</td>
+
+
+
+                                            </tr>
+
+
+
+
                                 {% endfor %}
-                            </div>
-                        </div>
-                    </div>
+
+
+
                 {% endfor %}
+                </tbody>
+                </table>
                 <div class="ec-pagerRole">
                     {% include "pager.twig" with {'pages': pagination.paginationData} %}
                 </div>
