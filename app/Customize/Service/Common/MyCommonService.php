@@ -13,6 +13,9 @@
 
 namespace Customize\Service\Common;
 
+use Customize\Entity\MoreOrder;
+use Customize\Repository\MoreOrderRepository;
+use Doctrine\DBAL\Driver\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Repository\AbstractRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -59,15 +62,20 @@ class MyCommonService extends AbstractRepository
         // var_dump($stmt->executeQuery([]));
     }
 
-    public function getMstShipping()
+    public function getMstShippingCustomer($customerId)
     {
         $sql = 'SELECT *   FROM mst_shipping_address';
         $statement = $this->entityManager->getConnection()->prepare($sql);
-        $result = $statement->executeQuery();
+        try {
+            $result = $statement->executeQuery();
+            $rows = $result->fetchAllAssociative();
+            return $rows;
+        } catch (Exception $e) {
+            return null;
+        }
 
-        $rows = $result->fetchAllAssociative();
 
-        return $rows;
+
     }
     public function runQuery($query)
     {
@@ -118,7 +126,7 @@ class MyCommonService extends AbstractRepository
         //otodoke_code dia chi nhan hang
         $sql = 'SELECT a.*   FROM mst_otodoke_address a
                 join dt_customer_relation b on b.otodoke_code =a.otodoke_code
-                where a.customer_code=? and b.shipping_code=?
+                where b.customer_code=? and b.shipping_code=?
                 ';
         $statement = $this->entityManager->getConnection()->prepare($sql);
         $result = $statement->executeQuery([$customer_id, $shipping_code]);
@@ -156,9 +164,18 @@ class MyCommonService extends AbstractRepository
      */
     public function saveTempCart($shipping_code, $pre_order_id)
     {
-        $sql = 'update  dtb_order SET shipping_code=? where pre_order_id = ?';
-        $statement = $this->entityManager->getConnection()->prepare($sql);
-        $result = $statement->executeStatement([$shipping_code, $pre_order_id]);
+       // $rep = new MoreOrderRepository();
+        //$objRep = $rep->findOneBy(["more_order"=>$pre_order_id]);
+        $objRep = $this->entityManager->getRepository(MoreOrder::class)->findOneBy(['pre_order_id' => $pre_order_id]);
+        $orderItem = new MoreOrder();
+        if($objRep!==null){
+            $orderItem = $objRep;
+        }
+        $orderItem->setPreOrderId($pre_order_id);
+        $orderItem->setShippingCode($shipping_code);
+        $this->entityManager->persist($orderItem);
+        $this->entityManager->flush();
+
     }
     /***
      * @param $shipping_code
@@ -166,11 +183,22 @@ class MyCommonService extends AbstractRepository
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    public function saveTempCartDeliCodeOto($delivery_code, $pre_order_id)
+    public function saveTempCartDeliCodeOto($otodoke_code, $pre_order_id)
     {
-        $sql = 'update  dtb_order SET otodoke_code=? where pre_order_id = ?';
-        $statement = $this->entityManager->getConnection()->prepare($sql);
-        $result = $statement->executeStatement([$delivery_code, $pre_order_id]);
+//        $sql = 'update  dtb_order SET otodoke_code=? where pre_order_id = ?';
+//        $statement = $this->entityManager->getConnection()->prepare($sql);
+//        $result = $statement->executeStatement([$delivery_code, $pre_order_id]);
+
+        $objRep = $this->entityManager->getRepository(MoreOrder::class)->findOneBy(['pre_order_id' => $pre_order_id]);
+        $orderItem = new MoreOrder();
+        if($objRep!==null){
+            $orderItem = $objRep;
+        }
+        $orderItem->setPreOrderId($pre_order_id);
+        $orderItem->setOtodokeCode($otodoke_code);
+        $this->entityManager->persist($orderItem);
+        $this->entityManager->flush();
+
     }
     /***
      * @param $shipping_code

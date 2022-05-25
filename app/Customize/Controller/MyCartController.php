@@ -69,14 +69,18 @@ class MyCartController extends AbstractController
             $delivery_code = $request->get('delivery_code');
             $pre_order_id = $request->get('pre_order_id');
             $bill_code = $request->get('bill_code');
+            $result = ['is_ok' => '1', 'msg' => 'OK', 'delivery_code' => $delivery_code];
+
             if (!empty($bill_code)) {
                 $commonService->saveTempCartBillSeiky($bill_code, $pre_order_id);
+                $result = ['is_ok' => '1', 'msg' => 'OK', 'bill_code' => $bill_code, 'pre_order_id' => $pre_order_id];
             }
             if (!empty($delivery_code)) {
                 $commonService->saveTempCartDeliCodeOto($delivery_code, $pre_order_id);
+                $result = ['is_ok' => '1', 'msg' => 'OK', 'delivery_code' => $delivery_code, 'pre_order_id' => $pre_order_id];
             }
 
-            $result = ['is_ok' => '1', 'msg' => 'OK', 'delivery_code' => $delivery_code];
+
 
             return $this->json($result, 200);
         }
