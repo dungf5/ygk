@@ -323,6 +323,7 @@ class MyProductController extends AbstractController
 
         $is_favorite = false;
         $price=null;
+        $stock=null;
         if ($this->isGranted('ROLE_USER')) {
             $Customer = $this->getUser();
             $is_favorite = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
