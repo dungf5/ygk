@@ -116,7 +116,7 @@ class ShoppingController extends AbstractShoppingController
         $Customer = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
         $Order = $this->orderHelper->initializeOrder($Cart, $Customer);
         $commonService = new MyCommonService($this->entityManager);
-        $mstShip =$commonService->getMstShipping();
+        $mstShip =$commonService->getMstShippingCustomer($Customer->getId());
 
         $dtBillSeikyuCode =$commonService->getCustomerBillSeikyuCode($Customer->getId());
 

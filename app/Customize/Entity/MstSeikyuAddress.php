@@ -51,24 +51,27 @@ if (!class_exists('\Customize\Entity\MstSeikyuAddress', false)) {
          * @ORM\Column(name="addr01",nullable=true, type="string", length=50, options={"comment":"住所1"})
          */
         private $addr01;
+
         /**
          * @var string
          *
          * @ORM\Column(name="name01",nullable=true, type="string", length=50, options={"comment":""})
          */
         private $name01;
+
         /**
          * @var string
          *
          * @ORM\Column(name="addr02",nullable=true, type="string", length=50, options={"comment":"住所2"})
          */
+        private $addr02;
         /**
          * @var string
          *
          * @ORM\Column(name="name02",nullable=true, type="string", length=50, options={"comment":""})
          */
         private $name02;
-        private $addr02;
+
         /**
          * @var \DateTime
          *
