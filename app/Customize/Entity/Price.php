@@ -50,8 +50,8 @@ if (!class_exists('\Customize\Entity\Price', false)) {
         /**
          * @var float
          *
-         * @ORM\Column(name="price_s01", type="float", options={"comment":"価格"}, columnDefinition="FLOAT")
-         * @ORM\Id
+         * @ORM\Column(name="price_s01", type="float", columnDefinition="FLOAT COMMENT '価格'")
+         *
          */
         private $price_s01;
 
@@ -74,16 +74,16 @@ if (!class_exists('\Customize\Entity\Price', false)) {
         /**
          * @var \DateTime
          *
-         * @ORM\Column(name="create_date", type="datetimetz", nullable=false, options={"comment":"データ登録日時"}, columnDefinition="TIMESTAMP")
-         * @ORM\Id
+         * @ORM\Column(name="create_date", type="datetimetz", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'データ登録日時'")
+         *
          */
         private $create_date;
 
         /**
          * @var \DateTime
          *
-         * @ORM\Column(name="update_date", type="datetimetz", nullable=false, options={"comment":"データ更新日時"}, columnDefinition="TIMESTAMP")
-         * @ORM\Id
+         * @ORM\Column(name="update_date", type="datetimetz", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'データ更新日時'")
+         *
          */
         private $update_date;
 
