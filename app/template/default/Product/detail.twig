@@ -167,6 +167,10 @@ file that was distributed with this source code.
                     $('#quantity')[0].setCustomValidity('{{ 'front.product.invalid_quantity'|trans }}');
                     return true;
                 } else {
+                    if($('#quantity').val() % {{ MstProduct.quantity }}  !== 0) {
+                        $('#quantity')[0].setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity_multiples'|trans }}');
+                        return true;
+                    }
                     $('#quantity')[0].setCustomValidity('');
                 }
 
@@ -371,7 +375,7 @@ file that was distributed with this source code.
                                     {% endif %}
                                 {% endif %}
                                 <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}</span>
-                                    {{ form_widget(form.quantity) }}
+                                    {{ form_widget(form.quantity,{'value': MstProduct.quantity|number_format }) }}
                                     {{ form_errors(form.quantity) }}
                                 </div>
                             </div>

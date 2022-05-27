@@ -13,14 +13,82 @@
 
 namespace Customize\Controller;
 
+use Customize\Repository\MstProductRepository;
+use Customize\Repository\PriceRepository;
+use Customize\Repository\StockListRepository;
 use Customize\Service\Common\MyCommonService;
 use Eccube\Controller\AbstractController;
+use Eccube\Entity\BaseInfo;
+use Eccube\Entity\ProductClass;
+use Eccube\Repository\BaseInfoRepository;
+use Eccube\Repository\ProductClassRepository;
+use Eccube\Service\CartService;
+use Eccube\Service\OrderHelper;
+use Eccube\Service\PurchaseFlow\PurchaseContext;
+use Eccube\Service\PurchaseFlow\PurchaseFlow;
+use Eccube\Service\PurchaseFlow\PurchaseFlowResult;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 
 class MyCartController extends AbstractController
 {
+    /**
+     * @var ProductClassRepository
+     */
+    protected $productClassRepository;
+
+    /**
+     * @var CartService
+     */
+    protected $cartService;
+
+    /**
+     * @var PurchaseFlow
+     */
+    protected $purchaseFlow;
+
+    /**
+     * @var BaseInfo
+     */
+    protected $baseInfo;
+
+    /**
+     * @var PriceRepository
+     */
+    protected $priceRepository;
+
+    /**
+     * @var MstProductRepository
+     */
+    protected $mstProductRepository;
+
+    /**
+     * MyCartController constructor.
+     * @param ProductClassRepository $productClassRepository
+     * @param CartService $cartService
+     * @param PurchaseFlow $cartPurchaseFlow
+     * @param BaseInfoRepository $baseInfoRepository
+     * @param PriceRepository $priceRepository
+     * @param MstProductRepository $mstProductRepository
+     */
+    public function __construct(
+        ProductClassRepository $productClassRepository,
+        CartService $cartService,
+        PurchaseFlow $cartPurchaseFlow,
+        BaseInfoRepository $baseInfoRepository,
+        PriceRepository $priceRepository,
+        MstProductRepository $mstProductRepository
+    ) {
+        $this->productClassRepository = $productClassRepository;
+        $this->cartService = $cartService;
+        $this->purchaseFlow = $cartPurchaseFlow;
+        $this->baseInfo = $baseInfoRepository->get();
+        $this->priceRepository = $priceRepository;
+        $this->mstProductRepository = $mstProductRepository;
+    }
+
+
     /**
      * MyCartController
      *
@@ -105,4 +173,135 @@ class MyCartController extends AbstractController
             return trans('front.product.all_products');
         }
     }
+
+    /**
+     * カート画面.
+     *
+     * @Route("/cart", name="cart", methods={"GET"})
+     * @Template("Cart/index.twig")
+     */
+    public function showCart(Request $request)
+    {
+        // カートを取得して明細の正規化を実行
+        $Carts = $this->cartService->getCarts();
+
+        //$this->execPurchaseFlow($Carts);
+
+        // TODO itemHolderから取得できるように
+        $least = [];
+        $quantity = [];
+        $isDeliveryFree = [];
+        $totalPrice = 0;
+        $totalQuantity = 0;
+
+        foreach ($Carts as $Cart) {
+            $quantity[$Cart->getCartKey()] = 0;
+            $isDeliveryFree[$Cart->getCartKey()] = false;
+
+            if ($this->baseInfo->getDeliveryFreeQuantity()) {
+                if ($this->baseInfo->getDeliveryFreeQuantity() > $Cart->getQuantity()) {
+                    $quantity[$Cart->getCartKey()] = $this->baseInfo->getDeliveryFreeQuantity() - $Cart->getQuantity();
+                } else {
+                    $isDeliveryFree[$Cart->getCartKey()] = true;
+                }
+            }
+
+            if ($this->baseInfo->getDeliveryFreeAmount()) {
+                if (!$isDeliveryFree[$Cart->getCartKey()] && $this->baseInfo->getDeliveryFreeAmount() <= $Cart->getTotalPrice()) {
+                    $isDeliveryFree[$Cart->getCartKey()] = true;
+                } else {
+                    $least[$Cart->getCartKey()] = $this->baseInfo->getDeliveryFreeAmount() - $Cart->getTotalPrice();
+                }
+            }
+
+            $totalPrice += $Cart->getTotalPrice();
+            $totalQuantity += $Cart->getQuantity();
+        }
+
+        // カートが分割された時のセッション情報を削除
+        $request->getSession()->remove(OrderHelper::SESSION_CART_DIVIDE_FLAG);
+
+        return [
+            'totalPrice' => $totalPrice,
+            'totalQuantity' => $totalQuantity,
+            // 空のカートを削除し取得し直す
+            'Carts' => $this->cartService->getCarts(true),
+            'least' => $least,
+            'quantity' => $quantity,
+            'is_delivery_free' => $isDeliveryFree,
+        ];
+    }
+
+
+    /**
+     * カート明細の加算/減算/削除を行う.
+     *
+     * - 加算
+     *      - 明細の個数を1増やす
+     * - 減算
+     *      - 明細の個数を1減らす
+     *      - 個数が0になる場合は、明細を削除する
+     * - 削除
+     *      - 明細を削除する
+     *
+     * @Route(
+     *     path="/cart/{operation}/{productClassId}",
+     *     name="cart_handle_item",
+     *     methods={"PUT"},
+     *     requirements={
+     *          "operation": "up|down|remove",
+     *          "productClassId": "\d+"
+     *     }
+     * )
+     */
+    public function handleCartItem($operation, $productClassId)
+    {
+        log_info('カート明細操作開始', ['operation' => $operation, 'product_class_id' => $productClassId]);
+
+        $this->isTokenValid();
+
+        /** @var ProductClass $ProductClass */
+        $ProductClass = $this->productClassRepository->find($productClassId);
+
+        if (is_null($ProductClass)) {
+            log_info('商品が存在しないため、カート画面へredirect', ['operation' => $operation, 'product_class_id' => $productClassId]);
+
+            return $this->redirectToRoute('cart');
+        }
+
+        $mstProduct = $this->mstProductRepository->getData($ProductClass->getProduct()->getId());
+
+        // 明細の増減・削除
+        switch ($operation) {
+            case 'up':
+                $this->cartService->addProductCustomize($ProductClass, $mstProduct->getQuantity());
+                break;
+            case 'down':
+                $this->cartService->addProductCustomize($ProductClass, -1*$mstProduct->getQuantity());
+                break;
+            case 'remove':
+                $this->cartService->removeProductCustomize($ProductClass);
+                break;
+        }
+        $Carts = $this->cartService->getCarts();
+        foreach ($Carts as $Cart) {
+            $totalPrice = 0;
+            foreach($Cart['CartItems'] as $CartItem){
+                $totalPrice += $CartItem['price'] * $CartItem['quantity'];
+            }
+
+            $Cart->setTotalPrice($totalPrice);
+            $Cart->setDeliveryFeeTotal(0);
+        }
+        $this->cartService->saveCustomize();
+
+        // カートを取得して明細の正規化を実行
+//        $Carts = $this->cartService->getCarts();
+//        $this->execPurchaseFlow($Carts);
+
+        log_info('カート演算処理終了', ['operation' => $operation, 'product_class_id' => $productClassId]);
+
+        return $this->redirectToRoute('cart');
+    }
+
 }

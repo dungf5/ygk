@@ -11,6 +11,9 @@ front.product.color: カラー
 front.product.material: 素材
 front.product.model: 規格（m）
 front.product.stock: 在庫
+
+front.product.invalid_quantity_multiples:  の倍数で入力してください。
+
 front.shopping.shipping_title_error: 出荷先をご指定ください。
 front.order.order_no_type: 区分
 front.order.order_no: 注文番号
@@ -26,4 +29,5 @@ front.order.order_remain_num: 注文残
 front.order.update_date: 引当日
 front.order.shipping_date: 発送日
 front.order.inquiry_no: 荷送伝票番号
+
 
