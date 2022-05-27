@@ -11,3 +11,19 @@ front.product.color: カラー
 front.product.material: 素材
 front.product.model: 規格（m）
 front.product.stock: 在庫
+front.shopping.shipping_title_error: 出荷先をご指定ください。
+front.order.order_no_type: 区分
+front.order.order_no: 注文番号
+front.order.order_lineno: 明細
+front.order.image: 画像
+front.order.product_name: 商品
+front.order.product_code: コード
+front.order.order_status: 受注ステータス
+front.order.shipping_status: 出荷ステータス
+front.order.order_plus: 数量
+front.order.reserve_stock_num: 引当数
+front.order.order_remain_num: 注文残
+front.order.update_date: 引当日
+front.order.shipping_date: 発送日
+front.order.inquiry_no: 荷送伝票番号
+

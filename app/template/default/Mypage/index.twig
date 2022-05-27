@@ -28,19 +28,19 @@ file that was distributed with this source code.
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>type</th>
-                        <th>order_no</th>
-                        <th>order_lineno</th>
-                        <th>image</th>
-                        <th>product_name</th>
-                        <th>product_code</th>
+                        <th title="order_no_type">{{ 'front.order.order_no_type'|trans }}</th>
+                        <th title="order_no">{{ 'front.order.order_no'|trans }}</th>
+                        <th title="order_lineno">{{ 'front.order.order_lineno'|trans }}</th>
+                        <th title="image">{{ 'front.order.image'|trans }}</th>
+                        <th title="product_name">{{ 'front.order.product_name'|trans }}</th>
+                        <th title="product_code">{{ 'front.order.product_code'|trans }}</th>
 
-                        <th>order_status</th>
-                        <th>shipping_status</th>
-                        <th>数量</th>
-                        <th>reserve_stock_num</th>
-                        <th>order_remain_num</th>
-                        <th>inquiry_no</th>
+                        <th title="order_status">{{ 'front.order.order_status'|trans }}</th>
+                        <th title="shipping_status">{{ 'front.order.shipping_status'|trans }}</th>
+                        <th title="order_plus">{{ 'front.order.order_plus'|trans }}</th>
+                        <th title="reserve_stock_num">{{ 'front.order.reserve_stock_num'|trans }}</th>
+                        <th title="order_remain_num">{{ 'front.order.order_remain_num'|trans }}</th>
+                        <th title="inquiry_no">{{ 'front.order.inquiry_no'|trans }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -97,9 +97,9 @@ file that was distributed with this source code.
                                 <td>{{Order.ec_order_no}}</td>
                                 <td>
                                     {% if Order.main_img is null %}#}
-                                    <img src="{{ asset(''|no_image_product, 'save_image') }}"/>
+                                    <img style="width: 100px" src="{{ asset(''|no_image_product, 'save_image') }}"/>
                                     {% else %}
-                                        <img src="{{ asset(Order.main_img|no_image_product, 'save_image') }}">
+                                        <img  style="width: 100px"  src="{{ asset(Order.main_img|no_image_product, 'save_image') }}">
                                     {% endif %}
                                 </td>
                                 <td>{{Order.product_name}}</td>
