@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Eccube\Entity\Master\OrderItemType;
 use Eccube\Entity\Master\RoundingType;
 use Eccube\Entity\Master\TaxDisplayType;
-
+use Customize\Entity\MstShipping;
 if (!class_exists('\Eccube\Entity\OrderItem')) {
     /**
      * OrderItem
@@ -165,6 +165,13 @@ if (!class_exists('\Eccube\Entity\OrderItem')) {
         private $class_name2;
 
         /**
+         * @var int
+         *
+         * @ORM\Column(name="unit_price", type="integer")
+         */
+        private $order_id;
+
+        /**
          * @var string|null
          *
          * @ORM\Column(name="class_category_name1", type="string", length=255, nullable=true)
@@ -273,6 +280,7 @@ if (!class_exists('\Eccube\Entity\OrderItem')) {
          * })
          */
         private $Shipping;
+
 
         /**
          * @var \Eccube\Entity\Master\RoundingType
