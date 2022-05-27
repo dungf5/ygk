@@ -35,4 +35,6 @@ Trait ProductClassTrait
     {
         $this->MstProduct = $MstProduct;
     }
+
+
 }
