@@ -73,9 +73,18 @@ class MyCommonService extends AbstractRepository
         } catch (Exception $e) {
             return null;
         }
-
-
-
+    }
+    public function getMainImgProduct($whereI)
+    {
+        $sql = 'SELECT file_name   FROM dtb_product_image where product_id=1 order by sort_no';
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery();
+            $rows = $result->fetchAllAssociative();
+            return $rows;
+        } catch (Exception $e) {
+            return null;
+        }
     }
     public function runQuery($query)
     {
@@ -106,7 +115,9 @@ class MyCommonService extends AbstractRepository
         //seikyu_code  noi nhan hoa don
         $sql = 'SELECT a.*   FROM mst_seikyu_address a
                 join dt_customer_relation b on b.seikyu_code =a.seikyu_code
-                where b.customer_code=? order by a.postal_code desc
+                where b.customer_code=?
+                group by b.seikyu_code
+                order by a.postal_code desc
                 ';
         $statement = $this->entityManager->getConnection()->prepare($sql);
         $result = $statement->executeQuery([$customer_id]);

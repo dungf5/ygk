@@ -15,6 +15,8 @@ namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Eccube\Entity\AbstractEntity;
+use Eccube\Entity\ItemInterface;
+use Eccube\Entity\OrderItem;
 
 if (!class_exists('\Customize\Entity\MstShipping', false)) {
     /**
@@ -30,10 +32,10 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @var string
          *
-         * @ORM\Column(name="shipping_no", type="string", length=15, nullable=false)
+         * @ORM\Column(name="shipping_no", type="string", length=15, nullable=true)
          * @ORM\Id
          */
-        protected $id;
+        protected $shipping_no;
 
         /**
          * @var string

@@ -350,7 +350,7 @@ front.shopping.go_to_confirm: 確認する
 front.shopping.back_to_cart: カートに戻る
 front.shopping.shipping_title: お届け先の指定
 front.shopping.shipping_add_new_shipping: 新規お届け先を追加する
-front.shopping.shipping_title_error: Please Select
+front.shopping.shipping_title_error: 出荷先をご指定ください。
 front.shopping.shipping_add_new_shipping__short: お届け先追加
 front.shopping.shipping_unselected: お届け先を指定してください
 front.shopping.shipping_send_selected_shipping: 選択したお届け先に送る
