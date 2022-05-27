@@ -15,9 +15,9 @@
 
                          {% if data.shipping|length == 1 %}
 
-                             <input class="hidden"  type="radio" checked name="delivery_address" value="{{ arShipping["id"] }}" id="ship_{{ arShipping["id"] }}" >
+                             <input class="hidden otodoke_code"  type="radio" checked name="delivery_address" value="{{ arShipping["otodoke_code"] }}" id="ship_{{ arShipping["otodoke_code"] }}" >
                                         {% else %}
-                             <input type="radio" name="delivery_address" value="{{ arShipping["id"] }}" id="ship_{{ arShipping["id"] }}" >
+                             <input type="radio" class=" otodoke_code"  name="delivery_address" value="{{ arShipping["otodoke_code"] }}" id="ship_{{ arShipping["otodoke_code"] }}" >
                          {% endif %}
 
 
@@ -34,7 +34,7 @@
         {% endfor %}
         <script>
             {% if data.shipping|length == 1 %}
-            updateDeliverydAdress({{ data.shipping[0]["id"] }}) ;
+            updateDeliverydAdress({{ data.shipping[0]["otodoke_code"] }}) ;
             {% endif %}
         </script>
 

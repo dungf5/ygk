@@ -16,6 +16,7 @@ namespace Customize\Controller\Mypage;
 use Customize\Entity\MstShipping;
 use Customize\Repository\OrderRepository;
 use Customize\Repository\ProductImageRepository;
+use Customize\Service\Common\MyCommonService;
 use Eccube\Controller\AbstractController;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
@@ -102,6 +103,7 @@ class MypageController extends AbstractController
                 $myItem['main_img'] = $hsProductImgMain[$myItem['product_id']];
             }
         }
+
 
         $pagination->setItems($listItem);
 
