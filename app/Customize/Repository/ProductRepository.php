@@ -108,7 +108,7 @@ class ProductRepository extends AbstractRepository
             // 価格高い順
         } elseif (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['eccube_product_order_price_higher']) {
             $qb->addSelect('MAX(pc.price02) as HIDDEN price02_max');
-            $qb->innerJoin('p.ProductClasses', 'pc');
+          //  $qb->innerJoin('p.ProductClasses', 'pc');
             $qb->andWhere('pc.visible = true');
             $qb->groupBy('p.id');
             $qb->orderBy('price02_max', 'DESC');
@@ -132,11 +132,12 @@ class ProductRepository extends AbstractRepository
             $qb
                 ->addOrderBy('p.id', 'DESC');
         }
-        if($user) {
-            $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH,'price.product_code = pc.code AND price.customer_code = :customer_code')
-            ->setParameter(':customer_code', $customer_code);
-            $qb->addSelect('price.price_s01 as price_s01');
+        if(!$user) {
+            $customer_code = '';
         }
+        $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH,'price.product_code = pc.code AND price.customer_code = :customer_code')
+            ->setParameter(':customer_code', $customer_code);
+        $qb->addSelect('price.price_s01 as  price_s01');
 
 
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
