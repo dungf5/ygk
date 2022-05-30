@@ -5,15 +5,14 @@
         <div>届け先 </div>
     </div>
     <div class="shipping_destination_right">
-
-        {% for arShipping in data.shipping %}
+        {% for arShipping in data %}
 
             <div class="shipping_row">
 
                 <div class="shipping_col1">
                     <span>
 
-                         {% if data.shipping|length == 1 %}
+                         {% if data|length == 1 %}
 
                              <input class="hidden otodoke_code"  type="radio" checked name="delivery_address" value="{{ arShipping["otodoke_code"] }}" id="ship_{{ arShipping["otodoke_code"] }}" >
                                         {% else %}
@@ -32,12 +31,6 @@
             </div>
 
         {% endfor %}
-        <script>
-            {% if data.shipping|length == 1 %}
-            updateDeliverydAdress({{ data.shipping[0]["otodoke_code"] }}) ;
-            {% endif %}
-        </script>
-
 
 
 

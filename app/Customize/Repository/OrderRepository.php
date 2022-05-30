@@ -66,7 +66,7 @@ class OrderRepository extends AbstractRepository
             ->innerJoin('Customize\Entity\Product', 'p', Join::WITH, 'i.product_id=p.id')
             ->innerJoin('Customize\Entity\MstProduct', 'mstp', Join::WITH, 'mstp.ec_product_id=i.product_id')
             ->innerJoin('Customize\Entity\DtOrderStatus', 'ordStatus', Join::WITH, 'ordStatus.ec_order_no=o.order_no and ordStatus.ec_order_lineno=i.id')
-            ->innerJoin('Customize\Entity\MstShipping', 'mstShip', Join::WITH, 'mstShip.ec_order_no=o.order_no and mstShip.ec_order_lineno=i.id')
+            ->leftJoin('Customize\Entity\MstShipping', 'mstShip', Join::WITH, 'mstShip.ec_order_no=o.order_no and mstShip.ec_order_lineno=i.id')
             ->where('o.Customer = :Customer')
             ->setParameter('Customer', $Customer);
 

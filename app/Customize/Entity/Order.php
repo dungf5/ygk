@@ -165,24 +165,7 @@ if (!class_exists('\Customize\Entity\Order', false)) {
          * @ORM\Column(name="discriminator_type",nullable=false, type="string", length=255, options={"comment":""})
          */
         private $discriminator_type;
-        /**
-         * @var string
-         *
-         * @ORM\Column(name="seikyu_code",nullable=true, type="string", length=255, options={"comment":""})
-         */
-        private $seikyu_code;
-        /**
-         * @var string
-         *
-         * @ORM\Column(name="shipping_code",nullable=true, type="string", length=255, options={"comment":""})
-         */
-        private $shipping_code;
-        /**
-         * @var string
-         *
-         * @ORM\Column(name="otodoke_code",nullable=true, type="string", length=255, options={"comment":""})
-         */
-        private $otodoke_code;
+
 
         /**
          * @return int
