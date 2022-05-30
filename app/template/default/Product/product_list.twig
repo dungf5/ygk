@@ -178,7 +178,15 @@ file that was distributed with this source code.
                                     </td>
                                     <td >
                                         {% if app.user -%}
-                                            {{ Product.price_s01|price }}
+                                            {% if Product.price_s01 is not empty %}
+                                                {{ Product.price_s01|price }}
+                                            {% else %}
+                                                {% for ProductCl in ProductClass %}
+                                                    {% if loop.first %}
+                                                        {{ ProductCl.MstProduct.unit_price|price }}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
                                         {% else %}
                                             {% for ProductCl in ProductClass %}
                                                 {% if loop.first %}
