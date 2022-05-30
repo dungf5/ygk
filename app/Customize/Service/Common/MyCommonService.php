@@ -260,8 +260,9 @@ class MyCommonService extends AbstractRepository
             }else{
                 $orderItem->setOrderStatus("1");
             }
-            $orderItem->setEcOrderLineno($ec_order_lineno);
-            $orderItem->setEcOrderNo($ec_order);
+           // $orderItem->setPropertiesFromArray($keyFind,['create_date']);
+           $orderItem->setEcOrderLineno($ec_order_lineno);
+           $orderItem->setEcOrderNo($ec_order);
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
 

@@ -4,14 +4,14 @@ namespace Customize\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Eccube\Entity\AbstractEntity;
 
-if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
+if (!class_exists('\Customize\Entity\DtOrderStatusText', false)) {
     /**
      * DtOrderStatus
      *
      * @ORM\Table(name="dt_order_status")
      * @ORM\Entity(repositoryClass="Customize\Repository\DtOrderStatusRepository")
      */
-    class DtOrderStatus extends AbstractEntity
+    class DtOrderStatusText extends AbstractEntity
     {
         /**
          * @var string
@@ -201,17 +201,17 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         }
 
         /**
-         * @return \DateTime
+         *
          */
-        public function getCreateDate(): \DateTime
+        public function getCreateDate()
         {
             return $this->create_date;
         }
 
         /**
-         * @param \DateTime $create_date
+         *
          */
-        public function setCreateDate(\DateTime $create_date): void
+        public function setCreateDate( $create_date): void
         {
             $this->create_date = $create_date;
         }
