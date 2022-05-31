@@ -8,12 +8,18 @@ class MyEccubeExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('test', [$this, 'getTest']),
+            new TwigFunction('getNext3Month', [$this, 'getNext3Month']),
+            new TwigFunction('getMinDate', [$this, 'getMinDate']),
         ];
     }
 
-    public function getTest($x, $y){
-        $result = $x * $y;
-        return "{$x} * {$y} = {$result}";
+    public function getNext3Month(){
+        $newDate = date('Y-m-d', strtotime(date("Y-m-d"). ' + 3 months'));
+
+      return $newDate;
+    }
+    public function getMinDate(){
+        $newDate = date("Y-m-d");
+        return $newDate;
     }
 }

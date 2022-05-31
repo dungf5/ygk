@@ -1,8 +1,19 @@
 <?php
 
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Customize\Controller;
 
+use Customize\Common\MyCommon;
 use Customize\Service\Common\MyCommonService;
 use Eccube\Controller\AbstractShoppingController;
 use Eccube\Entity\Order;
@@ -28,7 +39,6 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class MyShoppingController extends AbstractShoppingController
 {
-
     /**
      * @var CartService
      */
@@ -98,6 +108,7 @@ class MyShoppingController extends AbstractShoppingController
             'form' => $form->createView(),
         ];
     }
+
     /**
      * 注文手続き画面を表示する
      *
@@ -114,7 +125,6 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function index(PurchaseFlow $cartPurchaseFlow)
     {
-
         // ログイン状態のチェック.
         if ($this->orderHelper->isLoginRequired()) {
             log_info('[注文手続] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
@@ -135,12 +145,12 @@ class MyShoppingController extends AbstractShoppingController
         $Customer = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
         $Order = $this->orderHelper->initializeOrder($Cart, $Customer);
         $commonService = new MyCommonService($this->entityManager);
-        $mstShip =$commonService->getMstShippingCustomer($Customer->getId());
+        $mstShip = $commonService->getMstShippingCustomer($Customer->getId());
 
-        $dtBillSeikyuCode =$commonService->getCustomerBillSeikyuCode($Customer->getId());
+        $dtBillSeikyuCode = $commonService->getCustomerBillSeikyuCode($Customer->getId());
 
-        $Order->mstShips =$mstShip;
-        $Order->dtBillSeikyuCode =$dtBillSeikyuCode;
+        $Order->mstShips = $mstShip;
+        $Order->dtBillSeikyuCode = $dtBillSeikyuCode;
         // 集計処理.
         log_info('[注文手続] 集計処理を開始します.', [$Order->getId()]);
         $flowResult = $this->executePurchaseFlow($Order, false);
@@ -168,6 +178,21 @@ class MyShoppingController extends AbstractShoppingController
             $this->orderHelper->updateCustomerInfo($Order, $Customer);
             $this->entityManager->flush();
         }
+
+        $moreOrder = $commonService->getMoreOrder($Order->getPreOrderId());
+        $shipping_no_checked = '';
+        if (!MyCommon::isEmptyOrNull($moreOrder)) {
+            $Order->moreOrder = $moreOrder;
+            $Order->hasMoreOrder = 1;
+            foreach ($mstShip as $mS) {
+                if ($mS['shipping_no'] == $moreOrder['shipping_code']) {
+                    $shipping_no_checked = $mS['shipping_no'];
+                }
+            }
+        } else {
+            $Order->hasMoreOrder = 0;
+        }
+        $Order->shipping_no_checked = $shipping_no_checked;
 
         $form = $this->createForm(OrderType::class, $Order);
 
@@ -251,15 +276,15 @@ class MyShoppingController extends AbstractShoppingController
             $commonService = new MyCommonService($this->entityManager);
             $moreOrder = $commonService->getMoreOrder($Order->getPreOrderId());
 
-            $mstShip =$commonService->getMstShippingCustomer($Customer->getId(),$moreOrder);
+            $mstShip = $commonService->getMstShippingCustomer($Customer->getId(), $moreOrder);
 
-            $dtBillSeikyuCode =$commonService->getCustomerBillSeikyuCode($Customer->getId(),$moreOrder);
+            $dtBillSeikyuCode = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $moreOrder);
 
-             $arrOtoProductOrder = $commonService->getCustomerOtodoke($Customer->getId(),  $moreOrder->getShippingCode(),$moreOrder);
-            $Order->MoreOrder =$moreOrder;
-            $Order->mstShips =$mstShip;
-            $Order->dtBillSeikyuCode =$dtBillSeikyuCode;
-            $Order->dtCustomerOtodoke =$arrOtoProductOrder;
+            $arrOtoProductOrder = $commonService->getCustomerOtodoke($Customer->getId(), $moreOrder->getShippingCode(), $moreOrder);
+            $Order->MoreOrder = $moreOrder;
+            $Order->mstShips = $mstShip;
+            $Order->dtBillSeikyuCode = $dtBillSeikyuCode;
+            $Order->dtCustomerOtodoke = $arrOtoProductOrder;
             //nvtrong end
 
             return [
@@ -278,6 +303,7 @@ class MyShoppingController extends AbstractShoppingController
             'Order' => $Order,
         ];
     }
+
     /**
      * PaymentMethodをコンテナから取得する.
      *
@@ -294,6 +320,7 @@ class MyShoppingController extends AbstractShoppingController
 
         return $PaymentMethod;
     }
+
     /**
      * 注文処理を行う.
      *
@@ -365,15 +392,14 @@ class MyShoppingController extends AbstractShoppingController
 
                 $this->entityManager->flush();
 
-
                 //save more nvtrong
-                $comS =new MyCommonService($this->entityManager);
-                $orderNo =$Order->getOrderNo();
+                $comS = new MyCommonService($this->entityManager);
+                $orderNo = $Order->getOrderNo();
                 $itemList = $Order->getItems()->toArray();
-                $arEcLData=[];
-                foreach ($itemList as $itemOr){
-                    if($itemOr->isProduct()){
-                        $arEcLData[] = ['ec_order_no'=>$orderNo,'ec_order_lineno'=>$itemOr->getId()];
+                $arEcLData = [];
+                foreach ($itemList as $itemOr) {
+                    if ($itemOr->isProduct()) {
+                        $arEcLData[] = ['ec_order_no' => $orderNo, 'ec_order_lineno' => $itemOr->getId()];
                     }
                 }
                 $comS->saveOrderStatus($arEcLData);
@@ -381,8 +407,6 @@ class MyShoppingController extends AbstractShoppingController
 
                 $ship_code = $moreOrder->getShippingCode();
                 $comS->saveOrderShiping($arEcLData);
-
-
 
                 log_info('[注文処理] 注文処理が完了しました.', [$Order->getId()]);
             } catch (ShoppingException $e) {
@@ -424,6 +448,7 @@ class MyShoppingController extends AbstractShoppingController
 
         return $this->redirectToRoute('shopping_error');
     }
+
     /**
      * PaymentMethod::applyを実行する.
      *
@@ -463,6 +488,7 @@ class MyShoppingController extends AbstractShoppingController
             }
         }
     }
+
     /**
      * PaymentMethod::checkoutを実行する.
      *
@@ -496,5 +522,4 @@ class MyShoppingController extends AbstractShoppingController
 
         return null;
     }
-
 }

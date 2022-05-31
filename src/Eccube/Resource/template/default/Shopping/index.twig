@@ -148,11 +148,11 @@ file that was distributed with this source code.
                 });
 
               {% if Order.dtBillSeikyuCode|length == 1 %}
-                updateBillAddress('{{ Order.dtBillSeikyuCode[0]["id"] }}');
+                updateBillAddress('{{ Order.dtBillSeikyuCode[0]["seikyu_code"] }}');
               {% endif %}
 
             {% if Order.mstShips|length == 1 %}
-             updateBillAddress('{{ Order.mstShips[0]["id"] }}');
+             updateBillAddress('{{ Order.mstShips[0]["shipping_no"] }}');
             {% endif %}
 
 
@@ -642,7 +642,7 @@ function updateDeliverydAdress(delivery_code){
                         </div>
                     </div>
                 {% endif %}
-                <div class="ec-orderConfirm hidden">
+                <div class="ec-orderConfirm nvtrong hidden">
                     <div class="ec-rectHeading">
                         <h2>{{ 'front.shopping.message_info'|trans }}</h2>
                     </div>

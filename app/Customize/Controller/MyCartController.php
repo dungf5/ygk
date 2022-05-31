@@ -13,9 +13,9 @@
 
 namespace Customize\Controller;
 
+use Customize\Common\MyCommon;
 use Customize\Repository\MstProductRepository;
 use Customize\Repository\PriceRepository;
-use Customize\Repository\StockListRepository;
 use Customize\Service\Common\MyCommonService;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
@@ -24,9 +24,7 @@ use Eccube\Repository\BaseInfoRepository;
 use Eccube\Repository\ProductClassRepository;
 use Eccube\Service\CartService;
 use Eccube\Service\OrderHelper;
-use Eccube\Service\PurchaseFlow\PurchaseContext;
 use Eccube\Service\PurchaseFlow\PurchaseFlow;
-use Eccube\Service\PurchaseFlow\PurchaseFlowResult;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,6 +63,7 @@ class MyCartController extends AbstractController
 
     /**
      * MyCartController constructor.
+     *
      * @param ProductClassRepository $productClassRepository
      * @param CartService $cartService
      * @param PurchaseFlow $cartPurchaseFlow
@@ -88,7 +87,6 @@ class MyCartController extends AbstractController
         $this->mstProductRepository = $mstProductRepository;
     }
 
-
     /**
      * MyCartController
      *
@@ -105,13 +103,28 @@ class MyCartController extends AbstractController
             $shipping_code = $request->get('shipping_code');
             $pre_order_id = $request->get('pre_order_id');
             $customer_id = $request->get('customer_id');
+            $date_want_delivery = $request->get('date_want_delivery');
 
             $commonService->saveTempCart($shipping_code, $pre_order_id);
             $arrOtoProductOrder = $commonService->getCustomerOtodoke($customer_id, $shipping_code);
 
+            $moreOrder = $commonService->getMoreOrder($pre_order_id);
             $data = (object) [];
-            $data->shipping = $arrOtoProductOrder;
+            $otodoke_code_checked = '';
+            if (!MyCommon::isEmptyOrNull($moreOrder)) {
+                $data->moreOrder = $moreOrder;
+                $data->hasMoreOrder = 1;
+                foreach ($arrOtoProductOrder as $mS) {
+                    if ($mS['otodoke_code'] == $moreOrder['otodoke_code']) {
+                        $otodoke_code_checked = $mS['otodoke_code'];
+                    }
+                }
+            } else {
+                $data->hasMoreOrder = 0;
+            }
 
+            $data->otodoke_code_checked = $otodoke_code_checked;
+            $data->shipping = $arrOtoProductOrder;
 
             $result = ['is_ok' => '1', 'msg' => 'OK', 'data' => $data];
 
@@ -135,8 +148,10 @@ class MyCartController extends AbstractController
         if ('POST' === $request->getMethod()) {
             $commonService = new MyCommonService($this->entityManager);
             $delivery_code = $request->get('delivery_code');
+            $date_want_delivery = $request->get('date_want_delivery');
             $pre_order_id = $request->get('pre_order_id');
             $bill_code = $request->get('bill_code');
+            $date_want_delivery = $request->get('date_want_delivery');
             $result = ['is_ok' => '1', 'msg' => 'OK', 'delivery_code' => $delivery_code];
 
             if (!empty($bill_code)) {
@@ -147,8 +162,10 @@ class MyCartController extends AbstractController
                 $commonService->saveTempCartDeliCodeOto($delivery_code, $pre_order_id);
                 $result = ['is_ok' => '1', 'msg' => 'OK', 'delivery_code' => $delivery_code, 'pre_order_id' => $pre_order_id];
             }
-
-
+            if (!MyCommon::isEmptyOrNull($date_want_delivery)) {
+                $commonService->saveTempCartDateWantDeli($date_want_delivery, $pre_order_id);
+                $result = ['is_ok' => '1', 'msg' => 'OK', 'date_want_delivery' => $date_want_delivery, 'pre_order_id' => $pre_order_id];
+            }
 
             return $this->json($result, 200);
         }
@@ -232,7 +249,6 @@ class MyCartController extends AbstractController
         ];
     }
 
-
     /**
      * カート明細の加算/減算/削除を行う.
      *
@@ -277,7 +293,7 @@ class MyCartController extends AbstractController
                 $this->cartService->addProductCustomize($ProductClass, $mstProduct->getQuantity());
                 break;
             case 'down':
-                $this->cartService->addProductCustomize($ProductClass, -1*$mstProduct->getQuantity());
+                $this->cartService->addProductCustomize($ProductClass, -1 * $mstProduct->getQuantity());
                 break;
             case 'remove':
                 $this->cartService->removeProductCustomize($ProductClass);
@@ -286,7 +302,7 @@ class MyCartController extends AbstractController
         $Carts = $this->cartService->getCarts();
         foreach ($Carts as $Cart) {
             $totalPrice = 0;
-            foreach($Cart['CartItems'] as $CartItem){
+            foreach ($Cart['CartItems'] as $CartItem) {
                 $totalPrice += $CartItem['price'] * $CartItem['quantity'];
             }
 
@@ -303,5 +319,4 @@ class MyCartController extends AbstractController
 
         return $this->redirectToRoute('cart');
     }
-
 }
