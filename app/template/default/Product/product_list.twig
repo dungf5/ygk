@@ -16,7 +16,7 @@ file that was distributed with this source code.
     <script>
         eccube.productsClassCategories = {
             {% for Product in pagination %}
-            "{{ Product.id|escape('js') }}": {{ class_categories_as_json(Product)|raw }}{% if loop.last == false %}, {% endif %}
+            "{{ Product[0].id|escape('js') }}": {{ class_categories_as_json(Product[0])|raw }}{% if loop.last == false %}, {% endif %}
             {% endfor %}
         };
 
@@ -39,12 +39,18 @@ file that was distributed with this source code.
             });
 
             $('.add-cart').on('click', function(e) {
-                var $form = $(this).parents('li').find('form');
+                var $form = $(this).parents('tr').find('form');
 
-                // 個数フォームのチェック
+                {#// 個数フォームのチェック#}
                 var $quantity = $form.parent().find('.quantity');
-                if ($quantity.val() < 1) {
-                    $quantity[0].setCustomValidity('{{ 'front.product.invalid_quantity'|trans }}');
+
+                var $checkQuantity = $form.parent().find('.checkQuantity');
+
+                if (parseInt($quantity.val()) % parseInt($checkQuantity.val()) !== 0) {
+
+                    $quantity[0].setCustomValidity($checkQuantity.val()+'{{ 'front.product.invalid_quantity_multiples'|trans }}');
+                    $quantity[0].reportValidity();
+
                     setTimeout(function() {
                         loadingOverlay('hide');
                     }, 100);
@@ -148,181 +154,98 @@ file that was distributed with this source code.
             </div>
         </div>
         {% if pagination.totalItemCount > 0 %}
-            <div class="ec-shelfRole">
-                <ul class="ec-shelfGrid">
+                    <div class="w-100" >
+                    <table class="table w-100" >
                     {% for Product in pagination %}
-                        <li class="ec-shelfGrid__item">
-                            <a href="{{ url('product_detail', {'id': Product.id}) }}">
-                                <p class="ec-shelfGrid__item-image">
-                                    <img src="{{ asset(Product.main_list_image|no_image_product, 'save_image') }}" alt="{{ Product.name }}" loading="lazy">
-                                </p>
-                                <p>{{ Product.name }}</p>
-                                {% if Product.description_list %}
-                                    <p>{{ Product.description_list|raw|nl2br }}</p>
-                                {% endif %}
-                                <p class="price02-default">
-                                    {% if Product.hasProductClass %}
-                                        {% if Product.getPrice02Min == Product.getPrice02Max %}
-                                            {{ Product.getPrice02IncTaxMin|price }}
-                                        {% else %}
-                                            {{ Product.getPrice02IncTaxMin|price }} ～ {{ Product.getPrice02IncTaxMax|price }}
-                                        {% endif %}
-                                    {% else %}
-                                        {{ Product.getPrice02IncTaxMin|price }}
-                                    {% endif %}
-                                </p>
-                            </a>
-
-                            {% if Product.stock_find %}
-                                {% set form = forms[Product.id] %}
-                                <form name="form{{ Product.id }}" id="productForm{{ Product.id }}" action="{{ url('product_add_cart', {id:Product.id}) }}" method="post">
-                                    <div class="ec-productRole__actions">
-                                        {% if form.classcategory_id1 is defined %}
-                                            <div class="ec-select">
-                                                {{ form_widget(form.classcategory_id1) }}
-                                                {{ form_errors(form.classcategory_id1) }}
-                                            </div>
-                                            {% if form.classcategory_id2 is defined %}
-                                                <div class="ec-select">
-                                                    {{ form_widget(form.classcategory_id2) }}
-                                                    {{ form_errors(form.classcategory_id2) }}
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
-                                        <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}</span>
-                                            {{ form_widget(form.quantity, {'attr': {'class': 'quantity'}}) }}
-                                            {{ form_errors(form.quantity) }}
+                        {% set ProductClass = Product[0].ProductClasses %}
+                        {% set form = forms[Product[0].id] %}
+                                <tr>
+                                    <td rowspan="2">
+                                        <div >
+                                            <img  style="width: 150px;height: 150px" src="{{ asset(Product[0].main_list_image|no_image_product, 'save_image') }}" alt="{{ Product[0].name }}" loading="lazy">
                                         </div>
-                                    </div>
-                                    {{ form_rest(form) }}
-                                </form>
-                                <div class="ec-productRole__btn">
-                                    <button type="submit" class="ec-blockBtn--action add-cart" data-cartid="{{ Product.id }}" form="productForm{{ Product.id }}">
-                                        {{ 'front.product.add_cart'|trans }}
-                                    </button>
-                                </div>
-                            {% else %}
-                                <div class="ec-productRole__btn">
-                                    <button type="button" class="ec-blockBtn--action" disabled="disabled">
-                                        {{ 'front.product.out_of_stock'|trans }}
-                                    </button>
-                                </div>
-                            {% endif %}
-                        </li>
 
-                    {% endfor %}
+                                    </td>
+                                    <td colspan="3">
+                                        <a href="{{ url('product_detail', {'id': Product[0].id}) }}">
+                                        {{ Product[0].name }}
+                                        </a>
+                                    </td>
+                                    <td >
+                                        {% if Product[0].description_list %}
+                                        <p>{{ Product[0].description_list|raw|nl2br }}</p>
+                                        {% endif %}
+                                    </td>
+                                    <td >
+                                        {% if app.user -%}
+                                            {% if Product.price_s01 is not empty %}
+                                                {{ Product.price_s01|price }}
+                                            {% else %}
+                                                {% for ProductCl in ProductClass %}
+                                                    {% if loop.first %}
+                                                        {{ ProductCl.MstProduct.unit_price|price }}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% else %}
+                                            {% for ProductCl in ProductClass %}
+                                                {% if loop.first %}
+                                                    {{ ProductCl.MstProduct.unit_price|price }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                    <td >
 
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>type</th>
-                            <th>order_no</th>
-                            <th>order_lineno</th>
-                            <th>image</th>
-                            <th>product_name</th>
-                            <th>product_code</th>
+                                    </td>
+                                </tr>
+                                <tr style="border-bottom: 1px dotted #ccc;">
 
+                                    <td colspan="2">
 
-                        </tr>
-                        </thead>
-                        <tbody>
-                    {% for Product in pagination %}
+                                    </td>
+                                    <td colspan="2">
+                                        {{ Product[0].free_area }}
+                                    </td>
 
-                        <tr>
-                            <td rowspan="2">
-                                <img src="{{ asset(Product.main_list_image|no_image_product, 'save_image') }}" alt="{{ Product.name }}" loading="lazy">
-                            </td>
-                            <td>{{ Product.name }}</td>
-                            <td>
-                                {% if Product.description_list %}
-                                    <p>{{ Product.description_list|raw|nl2br }}</p>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if Product.hasProductClass %}
-                                    {% if Product.getPrice02Min == Product.getPrice02Max %}
-                                        {{ Product.getPrice02IncTaxMin|price }}
-                                    {% else %}
-                                        {{ Product.getPrice02IncTaxMin|price }} ～ {{ Product.getPrice02IncTaxMax|price }}
-                                    {% endif %}
-                                {% else %}
-                                    {{ Product.getPrice02IncTaxMin|price }}
-                                {% endif %}
-
-
-                            </td>
-                            <td> {% if Product.hasProductClass %}
-                                    {% if Product.getPrice02Min == Product.getPrice02Max %}
-                                        {{ Product.getPrice02IncTaxMin|price }}
-                                    {% else %}
-                                        {{ Product.getPrice02IncTaxMin|price }} ～ {{ Product.getPrice02IncTaxMax|price }}
-                                    {% endif %}
-                                {% else %}
-                                    {{ Product.getPrice02IncTaxMin|price }}
-                                {% endif %}</td>
-                            <td>{% if Product.stock_find %}
-                                    {% set form = forms[Product.id] %}
-                                    <form name="form{{ Product.id }}" id="productForm{{ Product.id }}" action="{{ url('product_add_cart', {id:Product.id}) }}" method="post">
-                                        <div class="ec-productRole__actions">
-                                            {% if form.classcategory_id1 is defined %}
+                                    <td>
+                                        <form name="form{{ Product[0].id }}" id="productForm{{ Product[0].id }}" action="{{ url('product_add_cart', {id:Product[0].id}) }}" method="post">
+                                            <div class="ec-productRole__actions">
+                                                {% if form.classcategory_id1 is defined %}
                                                 <div class="ec-select">
                                                     {{ form_widget(form.classcategory_id1) }}
                                                     {{ form_errors(form.classcategory_id1) }}
                                                 </div>
                                                 {% if form.classcategory_id2 is defined %}
-                                                    <div class="ec-select">
-                                                        {{ form_widget(form.classcategory_id2) }}
-                                                        {{ form_errors(form.classcategory_id2) }}
-                                                    </div>
+                                                <div class="ec-select">
+                                                    {{ form_widget(form.classcategory_id2) }}
+                                                    {{ form_errors(form.classcategory_id2) }}
+                                                </div>
                                                 {% endif %}
-                                            {% endif %}
-                                            <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}</span>
-                                                {{ form_widget(form.quantity, {'attr': {'class': 'quantity'}}) }}
-                                                {{ form_errors(form.quantity) }}
+                                                {% endif %}
+                                                <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}</span>
+                                                    {{ form_widget(form.quantity, {'attr': {'class': 'quantity','value': ProductClass[0].MstProduct.quantity|number_format}}) }}
+                                                    {{ form_errors(form.quantity) }}
+                                                </div>
+                                                <input type="hidden" id="checkQuantity{{ Product[0].id }}" class="checkQuantity"  value="{{ ProductClass[0].MstProduct.quantity }}">
                                             </div>
+                                            {{ form_rest(form) }}
+                                        </form>
+                                    </td>
+                                    <td >
+                                        <div class="ec-productRole__btn">
+                                            <button type="button" class="ec-blockBtn--action add-cart" data-cartid="{{ Product[0].id }}" form="productForm{{ Product[0].id }}">
+                                                {{ 'front.product.add_cart'|trans }}
+                                            </button>
                                         </div>
-                                        {{ form_rest(form) }}
-                                    </form>
-                                    <div class="ec-productRole__btn">
-                                        <button type="submit" class="ec-blockBtn--action add-cart" data-cartid="{{ Product.id }}" form="productForm{{ Product.id }}">
-                                            {{ 'front.product.add_cart'|trans }}
-                                        </button>
-                                    </div>
-                                {% else %}
-                                    <div class="ec-productRole__btn">
-                                        <button type="button" class="ec-blockBtn--action" disabled="disabled">
-                                            {{ 'front.product.out_of_stock'|trans }}
-                                        </button>
-                                    </div>
-                                {% endif %}</td>
-
-                            <td>6</td>
-                            <td>7</td>
-
-                        </tr>
-
-                        <tr>
-
-                            <td>1</td>
-                            <td>2
-                            </td>
-                            <td>33
-                            </td>
-                            <td> 44</td>
-                            <td>55</td>
-                            <td>66</td>
-                            <td>77</td>
+                                    </td>
+                                </tr>
 
 
-
-
-                        </tr>
                     {% endfor %}
-                        </tbody>
                     </table>
+                    </div>
 
-                </ul>
-            </div>
             <div class="ec-modal">
                 <div class="ec-modal-overlay">
                     <div class="ec-modal-wrap">
