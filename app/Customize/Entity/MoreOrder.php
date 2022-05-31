@@ -114,6 +114,7 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
             $this->otodoke_code = $otodoke_code;
         }
 
+
         /**
          * @var string
          *
@@ -126,5 +127,31 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
          * @ORM\Column(name="otodoke_code",nullable=true, type="string", length=4, options={"comment":"address to customer for product"})
          */
         private $otodoke_code;
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="date_want_delivery",nullable=true, type="string", length=10, options={"comment":""})
+         */
+        private $date_want_delivery;
+
+        /**
+         * @return string
+         */
+        public function getDateWantDelivery(): string
+        {
+            return $this->date_want_delivery;
+        }
+
+        /**
+         * field new save
+         * @param string $date_want_delivery
+         */
+        public function setDateWantDelivery(string $date_want_delivery): void
+        {
+            $this->date_want_delivery = $date_want_delivery;
+        }
+
+
     }
 }

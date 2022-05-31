@@ -58,9 +58,10 @@ class OrderRepository extends AbstractRepository
      */
     public function getQueryBuilderByCustomer(Customer $Customer)
     {
+        //ordStatus.update_date,
         $qb = $this->createQueryBuilder('o')
             ->select('ordStatus.ec_order_no,ordStatus.order_line_no,o.order_status_id,i.product_id,i.product_name,mstp.product_code,
-            ordStatus.order_status,ordStatus.reserve_stock_num,ordStatus.order_remain_num,ordStatus.update_date,mstShip.shipping_status,mstShip.inquiry_no,mstShip.shipping_date')
+            ordStatus.order_status,ordStatus.reserve_stock_num,ordStatus.update_date,ordStatus.order_remain_num,mstShip.shipping_status,mstShip.inquiry_no,mstShip.shipping_date')
            // ->leftJoin('Customize\Entity\MstShipping', 'mstShip',Join::WITH,'mstShip.ec_order_no=o.order_no')
             ->innerJoin('Customize\Entity\OrderItem', 'i', Join::WITH, 'i.order_id=o.id')
             ->innerJoin('Customize\Entity\Product', 'p', Join::WITH, 'i.product_id=p.id')
@@ -72,7 +73,7 @@ class OrderRepository extends AbstractRepository
 
         // Order By
         $qb->addOrderBy('o.id', 'DESC');
-        //var_dump( $qb->select('o.id')->getQuery()->getArrayResult());
+        //var_dump( $qb->getQuery()->getSQL());
 
         return $this->queries->customize(QueryKey::ORDER_SEARCH_BY_CUSTOMER, $qb, ['customer' => $Customer]);
     }

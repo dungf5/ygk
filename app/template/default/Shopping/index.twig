@@ -118,33 +118,10 @@ file that was distributed with this source code.
              });
 
 
-
-
-
-
-
             $("input[name='shipping_radio']").change(function(){
+                let shipping_code =  $(this).val();
+                updateShipingAddress(shipping_code);
 
-                $('.errorshipping_radio').hide();
-                $.ajax({
-                        url: '{{ url('cart_save_temp') }}',
-                        type: 'POST',
-                        data: {
-                            shipping_code: $(this).val(),
-                            '_token':'{{ csrf_token('_token') }}',
-                            'pre_order_id':'{{ Order.pre_order_id }}',
-                             'customer_id':'{{ Order.Customer.id }}'
-
-                        }
-                    }).done(function(htmlRe, statusText, jqXHR) {
-
-                        $('.delivery_address_main').html(htmlRe);
-
-                    }).fail(function(jqXHR, statusText, errorThrown) {
-
-
-
-             });
                 });
 
               {% if Order.dtBillSeikyuCode|length == 1 %}
@@ -156,8 +133,31 @@ file that was distributed with this source code.
             {% endif %}
 
 
+
+
             });
 
+        function updateShipingAddress(shipping_code) {
+
+                $('.errorshipping_radio').hide();
+                $.ajax({
+                        url: '{{ url('cart_save_temp') }}',
+                        type: 'POST',
+                        data: {
+                            shipping_code:shipping_code ,
+                            '_token':'{{ csrf_token('_token') }}',
+                            'pre_order_id':'{{ Order.pre_order_id }}',
+                             'customer_id':'{{ Order.Customer.id }}'
+
+                        }
+                    }).done(function(htmlRe, statusText, jqXHR) {
+
+                        $('.delivery_address_main').html(htmlRe);
+
+                    }).fail(function(jqXHR, statusText, errorThrown) {
+             });
+
+        }
         function updateBillAddress(bill_code){
              $.ajax({
                         url: '{{ url('cart_save_temp_order') }}',
@@ -175,7 +175,7 @@ file that was distributed with this source code.
                     }).fail(function(jqXHR, statusText, errorThrown) {
                     });
             }
-function updateDeliverydAdress(delivery_code){
+        function updateDeliverydAdress(delivery_code){
 
                  $.ajax({
                         url: '{{ url('cart_save_temp_order') }}',
@@ -196,10 +196,91 @@ function updateDeliverydAdress(delivery_code){
                 });
 
             }
+
+            {% if Order.shipping_no_checked !=""  %}
+              updateShipingAddress("{{Order.shipping_no_checked}}");
+             {% endif %}
+
+
     </script>
+
+<script src="{{ asset('assets/js/vendor/moment.min.js', 'admin') }}"></script>
+<script src="{{ asset('assets/js/vendor/moment-with-locales.min.js', 'admin') }}"></script>
+<script src="{{ asset('assets/js/vendor/tempusdominus-bootstrap-4.min.js', 'admin') }}"></script>
+
+<script>
+    $(function() {
+
+       var maxDate = "{{ getNext3Month() }}";
+       var minDate = "{{ getMinDate() }}";
+       let defaultDate='';
+           {% if Order.hasMoreOrder == 1 %}
+           defaultDate = '{{ Order.moreOrder.date_want_delivery }}';
+           {% endif %}
+        $('#date_picker_delivery').datetimepicker({
+            locale: 'ja',
+            format: 'YYYY-MM-DD',
+            useCurrent: false,
+            maxDate: maxDate,
+            minDate: minDate,
+            defaultDate:defaultDate,
+            buttons: {
+                showToday: true,
+                showClose: true
+            }
+        });
+         $("#date_picker_delivery").on("change.datetimepicker", function (e) {
+            let dateChoose = e.date.format('YYYY-MM-DD');
+            updateDateDeli(dateChoose);
+
+        });
+
+
+
+
+
+    });
+
+      function updateDateDeli(dateChoose){
+
+                 $.ajax({
+                        url: '{{ url('cart_save_temp_order') }}',
+                        type: 'POST',
+                        data: {
+                            'date_want_delivery': dateChoose,
+                            'pre_order_id':'{{ Order.pre_order_id }}',
+                             'customer_id':'{{ Order.Customer.id }}'
+                        }
+                    }).done(function(htmlRe, statusText, jqXHR) {
+
+                       console.log(htmlRe);
+
+                    }).fail(function(jqXHR, statusText, errorThrown) {
+
+                });
+
+            }
+
+</script>
 {% endblock javascript %}
 
 {% block main %}
+
+    <style type="text/css">
+                          .datepicker-days th.dow:first-child,
+                          .datepicker-days td:first-child {
+                              color: #f00;
+                          }
+                          .disabled{
+                              background: gray !important;
+                              color: rgba(0, 0, 0, 0.84) !important;
+                          }
+
+    .datepicker-days th.dow:last-child,
+    .datepicker-days td:last-child {
+        color: #00f;
+    }
+</style>
 
     <div class="ec-role">
         <div class="ec-pageHeader">
@@ -477,6 +558,10 @@ function updateDeliverydAdress(delivery_code){
                     .shipping_col2{
 
                     }
+                    .date_picker_row{
+                        display: flex;
+                        margin-top: 10px;
+                    }
                 </style>
 
                 <div class="ec-orderAccount shipping_destination ">
@@ -557,7 +642,15 @@ function updateDeliverydAdress(delivery_code){
                                              <input type="radio" class="hidden shipping_no"  checked name="shipping_radio" value="{{ arShipping["shipping_no"] }}" id="{{ arShipping["shipping_no"] }}" >
 
                                         {% else %}
-                                             <input type="radio"  class=" shipping_no"  name="shipping_radio" value="{{ arShipping["shipping_no"] }}" id="{{ arShipping["shipping_no"] }}" >
+
+
+                                            {% if Order.shipping_no_checked ==  arShipping["shipping_no"]  %}
+                                                <input type="radio" checked class=" shipping_no"  name="shipping_radio" value="{{ arShipping["shipping_no"] }}" id="{{ arShipping["shipping_no"] }}" >
+
+                                            {% else %}
+                                                <input type="radio"  class=" shipping_no"  name="shipping_radio" value="{{ arShipping["shipping_no"] }}" id="{{ arShipping["shipping_no"] }}" >
+                                            {% endif %}
+
 
                                          {% endif %}
 
@@ -580,6 +673,32 @@ function updateDeliverydAdress(delivery_code){
 {#                dtCusAddress#}
                 <div class="delivery_address_main">
                 </div>
+
+
+
+                <div class="ec-orderAccount date_picker_row ">
+                    <div class="shipping_destination_left date_picker_delivery">
+                        <div> {{ 'front.shopping.date_picker_delivery'|trans }}</div>
+                    </div>
+                    <div class="shipping_destination_right">
+                        <div class="shipping_row">
+                            <div class="date_picker_delivery">
+                                <div class="controls" id="date_picker_delivery_p" style="position: relative">
+                                    <input type="text"
+                                           id="date_picker_delivery" name="date_picker_delivery" class="datetimepicker-input form-control" data-target="#date_picker_delivery" data-toggle="datetimepicker" />
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
                 <div class="ec-orderPayment  hidden nvtrong">
                     <div class="ec-rectHeading">
                         <h2>{{ 'front.shopping.payment_info'|trans }}</h2>

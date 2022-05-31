@@ -162,6 +162,10 @@ file that was distributed with this source code.
                 .shipping_col2{
 
                 }
+                .date_picker_row{
+                    display: flex;
+                    margin-top: 10px;
+                }
             </style>
             <div class="bill_address shipping_destination" style="margin-bottom: 30px;">
                 <div class="shipping_destination_left">
@@ -245,6 +249,18 @@ file that was distributed with this source code.
             <div class="delivery_address_main">
                 {% include "Ajax/oto_list.twig" with {'data':Order.dtCustomerOtodoke } %}
             </div>
+
+            <div class="ec-orderAccount date_picker_row ">
+                <div class="shipping_destination_left date_picker_delivery">
+                    <div> {{ 'front.shopping.date_picker_delivery'|trans }}</div>
+                </div>
+                <div class="shipping_destination_right">
+                    <div class="shipping_row">
+                        {{ Order.MoreOrder.date_want_delivery }}
+                    </div>
+                </div>
+            </div>
+
 {################            nvtrong end#}
 
             <div class="ec-orderPayment nvtrong hidden">

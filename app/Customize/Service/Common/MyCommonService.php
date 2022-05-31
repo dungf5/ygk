@@ -63,16 +63,15 @@ class MyCommonService extends AbstractRepository
         $stmt = $em->getConnection()->prepare($sql);
         // var_dump($stmt->executeQuery([]));
     }
+
     /**
      * @param MoreOrder $moreOrder
-
      */
-    public function getMstShippingCustomer($customerId,MoreOrder $moreOrder =null)
+    public function getMstShippingCustomer($customerId, MoreOrder $moreOrder = null)
     {
         $sql = 'SELECT *   FROM mst_shipping_address';
-        $param  =[];
-        if(null!=$moreOrder){
-
+        $param = [];
+        if (null != $moreOrder) {
             $sql = 'SELECT *   FROM mst_shipping_address where shipping_no=?';
             $param[] = $moreOrder->getShippingCode();
         }
@@ -80,11 +79,13 @@ class MyCommonService extends AbstractRepository
         try {
             $result = $statement->executeQuery($param);
             $rows = $result->fetchAllAssociative();
+
             return $rows;
         } catch (Exception $e) {
             return null;
         }
     }
+
     public function getMainImgProduct($whereI)
     {
         $sql = 'SELECT file_name   FROM dtb_product_image where product_id=1 order by sort_no';
@@ -92,19 +93,23 @@ class MyCommonService extends AbstractRepository
         try {
             $result = $statement->executeQuery();
             $rows = $result->fetchAllAssociative();
+
             return $rows;
         } catch (Exception $e) {
             return null;
         }
     }
+
     public function runQuery($query)
     {
         $sql = $query;
         $statement = $this->entityManager->getConnection()->prepare($sql);
         $result = $statement->executeQuery();
         $rows = $result->fetchAllAssociative();
+
         return $rows;
     }
+
     public function getCustomerAddress()
     {
         $sql = 'SELECT *   FROM dtb_customer_address';
@@ -114,6 +119,7 @@ class MyCommonService extends AbstractRepository
 
         return $rows;
     }
+
     /***
      * seikyu_code  noi nhan hoa don
      * @param $customer_id
@@ -121,7 +127,7 @@ class MyCommonService extends AbstractRepository
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCustomerBillSeikyuCode($customer_id,$moreOrder =null)
+    public function getCustomerBillSeikyuCode($customer_id, $moreOrder = null)
     {
         //seikyu_code  noi nhan hoa don
         $sql = 'SELECT a.*   FROM mst_seikyu_address a
@@ -131,8 +137,8 @@ class MyCommonService extends AbstractRepository
                 order by a.postal_code desc
                 ';
         $myPara = [$customer_id];
-        if($moreOrder!=null){
-             $seikyu_code =$moreOrder->getSeikyuCode();
+        if ($moreOrder != null) {
+            $seikyu_code = $moreOrder->getSeikyuCode();
             $sql = 'SELECT a.*   FROM mst_seikyu_address a
                 join dt_customer_relation b on b.seikyu_code =a.seikyu_code
                 where b.customer_code=? and a.seikyu_code=?
@@ -147,6 +153,7 @@ class MyCommonService extends AbstractRepository
 
         return $rows;
     }
+
     /***
      * Otodoke  nhan hang hoa
      * @param $customer_id
@@ -154,7 +161,7 @@ class MyCommonService extends AbstractRepository
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCustomerOtodoke($customer_id, $shipping_code,$moreOrder =null)
+    public function getCustomerOtodoke($customer_id, $shipping_code, $moreOrder = null)
     {
         //otodoke_code dia chi nhan hang
         $sql = 'SELECT a.*   FROM mst_otodoke_address a
@@ -162,7 +169,7 @@ class MyCommonService extends AbstractRepository
                 where b.customer_code=? and b.shipping_code=?
                 ';
         $myPara = [$customer_id, $shipping_code];
-        if($moreOrder!=null){
+        if ($moreOrder != null) {
             $sql = 'SELECT a.*   FROM mst_otodoke_address a
                 join dt_customer_relation b on b.otodoke_code =a.otodoke_code
                 where b.customer_code=? and b.shipping_code=? and a.otodoke_code=?
@@ -205,74 +212,86 @@ class MyCommonService extends AbstractRepository
      */
     public function saveTempCart($shipping_code, $pre_order_id)
     {
-       // $rep = new MoreOrderRepository();
+        // $rep = new MoreOrderRepository();
         //$objRep = $rep->findOneBy(["more_order"=>$pre_order_id]);
         $objRep = $this->entityManager->getRepository(MoreOrder::class)->findOneBy(['pre_order_id' => $pre_order_id]);
         $orderItem = new MoreOrder();
-        if($objRep!==null){
+        if ($objRep !== null) {
             $orderItem = $objRep;
         }
         $orderItem->setPreOrderId($pre_order_id);
         $orderItem->setShippingCode($shipping_code);
         $this->entityManager->persist($orderItem);
         $this->entityManager->flush();
-
     }
 
-    public function saveOrderShiping($arEcLData){
+    public function saveTempCartDeliDate($date_want_delivery, $pre_order_id)
+    {
+        // $rep = new MoreOrderRepository();
+        //$objRep = $rep->findOneBy(["more_order"=>$pre_order_id]);
+        $objRep = $this->entityManager->getRepository(MoreOrder::class)->findOneBy(['pre_order_id' => $pre_order_id]);
+        $orderItem = new MoreOrder();
+        if ($objRep !== null) {
+            $orderItem = $objRep;
+        }
+        $orderItem->setPreOrderId($pre_order_id);
+        $orderItem->setShippingCode($date_want_delivery);
+        $this->entityManager->persist($orderItem);
+        $this->entityManager->flush();
+    }
 
+    public function saveOrderShiping($arEcLData)
+    {
         //dt_order_status
         //$arEcLData[] = ['ec_order_no'=>$orderNo,'ec_order_lineno'=>$itemOr->getId()];
         $keyS = date('YmdHis');
-        $keyTem = (int)$keyS;
-        foreach ($arEcLData as $itemSave){
+        $keyTem = (int) $keyS;
+        foreach ($arEcLData as $itemSave) {
             $ec_order = $itemSave['ec_order_no'];
             $ec_order_lineno = $itemSave['ec_order_lineno'];
-            $keyFind =['ec_order_no' => $ec_order,'ec_order_lineno' => $ec_order_lineno];
+            $keyFind = ['ec_order_no' => $ec_order, 'ec_order_lineno' => $ec_order_lineno];
             $objRep = $this->entityManager->getRepository(MstShipping::class)->findOneBy($keyFind);
             $orderItem = new MstShipping();
-            if($objRep!==null){
+            if ($objRep !== null) {
                 $orderItem = $objRep;
             }
-            $keyTem = $keyTem +1+rand(1,10000);
+            $keyTem = $keyTem + 1 + rand(1, 10000);
             $orderItem->setShippingNo($keyTem);
             $orderItem->setEcOrderLineno($ec_order_lineno);
             $orderItem->setEcOrderNo($ec_order);
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
-
         }
-
     }
 
-    public function saveOrderStatus($arEcLData){
-
+    public function saveOrderStatus($arEcLData)
+    {
         //dt_order_status
         //$arEcLData[] = ['ec_order_no'=>$orderNo,'ec_order_lineno'=>$itemOr->getId()];
-        foreach ($arEcLData as $itemSave){
+        foreach ($arEcLData as $itemSave) {
             $ec_order = $itemSave['ec_order_no'];
             $ec_order_lineno = $itemSave['ec_order_lineno'];
-            $keyFind =['ec_order_no' => $ec_order,'ec_order_lineno' => $ec_order_lineno];
+            $keyFind = ['ec_order_no' => $ec_order, 'ec_order_lineno' => $ec_order_lineno];
             $objRep = $this->entityManager->getRepository(DtOrderStatus::class)->findOneBy($keyFind);
             $orderItem = new DtOrderStatus();
-            if($objRep!==null){
+            if ($objRep !== null) {
                 $orderItem = $objRep;
-            }else{
-                $orderItem->setOrderStatus("1");
+            } else {
+                $orderItem->setOrderStatus('1');
             }
+            // $orderItem->setPropertiesFromArray($keyFind,['create_date']);
             $orderItem->setEcOrderLineno($ec_order_lineno);
             $orderItem->setEcOrderNo($ec_order);
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
-
         }
     }
+
     public function getMoreOrder($pre_order_id)
     {
-
         $objRep = $this->entityManager->getRepository(MoreOrder::class)->findOneBy(['pre_order_id' => $pre_order_id]);
-        return $objRep;
 
+        return $objRep;
     }
 
     /***
@@ -283,18 +302,39 @@ class MyCommonService extends AbstractRepository
      */
     public function saveTempCartDeliCodeOto($otodoke_code, $pre_order_id)
     {
-
         $objRep = $this->entityManager->getRepository(MoreOrder::class)->findOneBy(['pre_order_id' => $pre_order_id]);
         $orderItem = new MoreOrder();
-        if($objRep!==null){
+        if ($objRep !== null) {
             $orderItem = $objRep;
         }
         $orderItem->setPreOrderId($pre_order_id);
         $orderItem->setOtodokeCode($otodoke_code);
         $this->entityManager->persist($orderItem);
         $this->entityManager->flush();
-
     }
+
+    /***
+     * @param $date_want_delivery
+     * @param $pre_order_id
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function saveTempCartDateWantDeli($date_want_delivery, $pre_order_id)
+    {
+        $objRep = $this->entityManager->getRepository(MoreOrder::class)->findOneBy(['pre_order_id' => $pre_order_id]);
+        $orderItem = new MoreOrder();
+
+        if ($objRep !== null) {
+            $orderItem = $objRep;
+        }
+
+        $orderItem->setPreOrderId($pre_order_id);
+        $orderItem->setOrderNo("tedd");
+        $orderItem->setPropertiesFromArray(["date_want_delivery"=>$date_want_delivery]);
+        $this->entityManager->persist($orderItem);
+        $this->entityManager->flush();
+    }
+
     /***
      * @param $shipping_code
      * @param $pre_order_id
@@ -309,7 +349,7 @@ class MyCommonService extends AbstractRepository
         ///
         $objRep = $this->entityManager->getRepository(MoreOrder::class)->findOneBy(['pre_order_id' => $pre_order_id]);
         $orderItem = new MoreOrder();
-        if($objRep!==null){
+        if ($objRep !== null) {
             $orderItem = $objRep;
         }
         $orderItem->setPreOrderId($pre_order_id);
@@ -317,5 +357,4 @@ class MyCommonService extends AbstractRepository
         $this->entityManager->persist($orderItem);
         $this->entityManager->flush();
     }
-
 }

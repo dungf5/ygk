@@ -401,6 +401,23 @@ class ShoppingController extends AbstractShoppingController
 
                 $this->entityManager->flush();
 
+
+                //save more
+                $comS =new MyCommonService($this->entityManager);
+                $orderNo =$Order->getOrderNo();
+                $itemList = $Order->getItems()->toArray();
+                $arEcLData=[];
+                foreach ($itemList as $itemOr){
+                    $arEcLData[] = ['ec_order_no'=>$orderNo,'ec_order_lineno'=>$itemOr->getId()];
+                }
+                $comS->saveOrderStatus($arEcLData);
+                $moreOrder = $comS->getMoreOrder($Order->getPreOrderId());
+
+                $ship_code = $moreOrder->getShippingCode();
+                $comS->saveOrderShiping($arEcLData);
+
+
+
                 log_info('[注文処理] 注文処理が完了しました.', [$Order->getId()]);
             } catch (ShoppingException $e) {
                 log_error('[注文処理] 購入エラーが発生しました.', [$e->getMessage()]);

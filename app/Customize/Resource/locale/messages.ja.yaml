@@ -29,5 +29,8 @@ front.order.order_remain_num: 注文残
 front.order.update_date: 引当日
 front.order.shipping_date: 発送日
 front.order.inquiry_no: 荷送伝票番号
+front.shopping.date_picker_delivery: 配送日 指定
+
+
 
 

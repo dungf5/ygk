@@ -117,7 +117,7 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         private $create_date;
 
         /**
-         * @var \DateTime
+
          *
          * @ORM\Column(name="update_date", type="datetimetz")
          */
@@ -316,17 +316,17 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         }
 
         /**
-         * @return \DateTime
+         * @return
          */
-        public function getUpdateDate(): \DateTime
+        public function getUpdateDate()
         {
             return $this->update_date;
         }
 
         /**
-         * @param \DateTime $update_date
+         * @param  $update_date
          */
-        public function setUpdateDate(\DateTime $update_date): void
+        public function setUpdateDate( $update_date): void
         {
             $this->update_date = $update_date;
         }

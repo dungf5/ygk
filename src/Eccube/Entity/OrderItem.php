@@ -163,14 +163,6 @@ if (!class_exists('\Eccube\Entity\OrderItem')) {
          * @ORM\Column(name="class_name2", type="string", length=255, nullable=true)
          */
         private $class_name2;
-
-        /**
-         * @var int
-         *
-         * @ORM\Column(name="unit_price", type="integer")
-         */
-        private $order_id;
-
         /**
          * @var string|null
          *

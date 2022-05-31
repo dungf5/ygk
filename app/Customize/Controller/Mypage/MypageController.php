@@ -13,10 +13,13 @@
 
 namespace Customize\Controller\;
 
+use Customize\Common\MyCommon;
+use Customize\Common\MyConstant;
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\MstShipping;
 use Customize\Repository\OrderRepository;
 use Customize\Repository\ProductImageRepository;
-use Customize\Service\Common\MyCommonService;
+use Doctrine\DBAL\Types\Type;
 use Eccube\Controller\AbstractController;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
@@ -64,6 +67,11 @@ class MypageController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
+//        $mpdf = new Mpdf();
+//        $mpdf->WriteHTML('<h1>Hello world!</h1>');
+//        $mpdf->Output();
+
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $Customer = $this->getUser();
 
         // 購入処理中/決済処理中ステータスの受注を非表示にする.
@@ -93,17 +101,34 @@ class MypageController extends AbstractController
         $listItem = [];
         $listItem = $pagination->getItems();
         $arProductId = [];
+        //modify data
         foreach ($listItem as &$myItem) {
             $arProductId[] = $myItem['product_id'];
+            if (is_object($myItem['update_date'])) {
+                $myItem['update_date'] = $myItem['update_date']->format('Y-m-d H:i:s.u');
+                if (MyCommon::checkExistText($myItem['update_date'], '.000000')) {
+                    $myItem['update_date'] = str_replace('.000000', '', $myItem['update_date']);
+                } else {
+                    $myItem['update_date'] = str_replace('000', '', $myItem['update_date']);
+                }
+            }
+            if (isset(MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']])) {
+                $myItem['order_status'] = MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']];
+            }
+            if (isset(MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']])) {
+                $myItem['shipping_status'] = MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']];
+            }
+            // if (isset($myItem['shipping_status'])) {
+            $myItem['order_type'] = 'EC';
+            //}
         }
+        //get one image of product
         $hsProductImgMain = $this->productImageRepository->getImageMain($arProductId);
-
         foreach ($listItem as &$myItem) {
             if (isset($hsProductImgMain[$myItem['product_id']])) {
                 $myItem['main_img'] = $hsProductImgMain[$myItem['product_id']];
             }
         }
-
 
         $pagination->setItems($listItem);
 
