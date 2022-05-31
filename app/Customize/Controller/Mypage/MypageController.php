@@ -11,7 +11,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Customize\Controller\;
+namespace Customize\Controller\Mypage;
 
 use Customize\Common\MyCommon;
 use Customize\Common\MyConstant;
