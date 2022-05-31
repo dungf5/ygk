@@ -11,7 +11,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Customize\Controller\Mypage;
+namespace Customize\Controller\;
 
 use Customize\Entity\MstShipping;
 use Customize\Repository\OrderRepository;
