@@ -375,7 +375,9 @@ file that was distributed with this source code.
                                     {% endif %}
                                 {% endif %}
                                 <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}</span>
-                                    {{ form_widget(form.quantity,{'value': MstProduct.quantity|number_format }) }}
+                                    {{ form_widget(form.quantity,{'attr': {'value': MstProduct.quantity|number_format
+                                        ,'min':MstProduct.quantity
+                                        ,'step':MstProduct.quantity}}) }}
                                     {{ form_errors(form.quantity) }}
                                 </div>
                             </div>
