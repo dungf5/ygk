@@ -100,6 +100,9 @@ file that was distributed with this source code.
         $('.ec-modal-overlay, .ec-modal, .ec-modal-close, .ec-inlineBtn--cancel').on('click', function() {
             $('.ec-modal').hide()
         });
+
+
+
     </script>
 {% endblock %}
 
@@ -176,6 +179,14 @@ file that was distributed with this source code.
                                         <p>{{ Product[0].description_list|raw|nl2br }}</p>
                                         {% endif %}
                                     </td>
+                                    <td>
+                                        {{ 'front.product.quantity'|trans }}：
+                                        {% for ProductCl in ProductClass %}
+                                            {% if loop.first %}
+                                                {{ ProductCl.MstProduct.quantity }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
                                     <td >
                                         {% if app.user -%}
                                             {% if Product.price_s01 is not empty %}
@@ -208,7 +219,7 @@ file that was distributed with this source code.
                                         {{ Product[0].free_area }}
                                     </td>
 
-                                    <td>
+                                    <td colspan="2">
                                         <form name="form{{ Product[0].id }}" id="productForm{{ Product[0].id }}" action="{{ url('product_add_cart', {id:Product[0].id}) }}" method="post">
                                             <div class="ec-productRole__actions">
                                                 {% if form.classcategory_id1 is defined %}
@@ -224,7 +235,9 @@ file that was distributed with this source code.
                                                 {% endif %}
                                                 {% endif %}
                                                 <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}</span>
-                                                    {{ form_widget(form.quantity, {'attr': {'class': 'quantity','value': ProductClass[0].MstProduct.quantity|number_format}}) }}
+                                                    {{ form_widget(form.quantity, {'attr': {'class': 'quantity','value': ProductClass[0].MstProduct.quantity|number_format
+                                                        ,'min':ProductClass[0].MstProduct.quantity
+                                                        ,'step':ProductClass[0].MstProduct.quantity}}) }}
                                                     {{ form_errors(form.quantity) }}
                                                 </div>
                                                 <input type="hidden" id="checkQuantity{{ Product[0].id }}" class="checkQuantity"  value="{{ ProductClass[0].MstProduct.quantity }}">
