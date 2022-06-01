@@ -37,7 +37,7 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
         /**
          * @return string
          */
-        public function getPreOrderId(): string
+        public function getPreOrderId()
         {
             return $this->pre_order_id;
         }
@@ -53,7 +53,7 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
         /**
          * @return string
          */
-        public function getOrderNo(): string
+        public function getOrderNo()
         {
             return $this->order_no;
         }
@@ -69,7 +69,7 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
         /**
          * @return string
          */
-        public function getSeikyuCode(): string
+        public function getSeikyuCode()
         {
             return $this->seikyu_code;
         }
@@ -85,7 +85,7 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
         /**
          * @return string
          */
-        public function getShippingCode(): string
+        public function getShippingCode()
         {
             return $this->shipping_code;
         }
@@ -101,7 +101,7 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
         /**
          * @return string
          */
-        public function getOtodokeCode(): string
+        public function getOtodokeCode()
         {
             return $this->otodoke_code;
         }
@@ -136,9 +136,9 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
         private $date_want_delivery;
 
         /**
-         * @return string
+         *
          */
-        public function getDateWantDelivery(): string
+        public function getDateWantDelivery()
         {
             return $this->date_want_delivery;
         }

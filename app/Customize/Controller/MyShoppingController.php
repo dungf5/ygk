@@ -180,7 +180,32 @@ class MyShoppingController extends AbstractShoppingController
         }
 
         $moreOrder = $commonService->getMoreOrder($Order->getPreOrderId());
+
         $shipping_no_checked = '';
+
+        if (!MyCommon::isEmptyOrNull($moreOrder)) {
+            if(MyCommon::isEmptyOrNull($moreOrder["date_want_delivery"])){
+                $moreOrder["date_want_delivery"]="";
+            }
+            if(MyCommon::isEmptyOrNull($moreOrder["date_want_delivery"])){
+                $moreOrder["date_want_delivery"]="";
+            }
+            if(MyCommon::isEmptyOrNull($moreOrder["seikyu_code"])){
+                $moreOrder["seikyu_code"]="";
+            }
+            if(MyCommon::isEmptyOrNull($moreOrder["seikyu_code"])){
+                $moreOrder["seikyu_code"]="";
+            }
+            //shipping_code":"Customize\Entity\MoreOrder":private]=> string(3) "333" ["otodoke_code"
+            if(MyCommon::isEmptyOrNull($moreOrder["shipping_code"])){
+                $moreOrder["shipping_code"]="";
+            }
+            if(MyCommon::isEmptyOrNull($moreOrder["otodoke_code"])){
+                $moreOrder["otodoke_code"]="";
+            }
+
+        }
+
         if (!MyCommon::isEmptyOrNull($moreOrder)) {
             $Order->moreOrder = $moreOrder;
             $Order->hasMoreOrder = 1;

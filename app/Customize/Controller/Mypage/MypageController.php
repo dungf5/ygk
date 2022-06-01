@@ -101,11 +101,13 @@ class MypageController extends AbstractController
         $listItem = [];
         $listItem = $pagination->getItems();
         $arProductId = [];
+        $arOrderNo = [];
         //modify data
         foreach ($listItem as &$myItem) {
             $arProductId[] = $myItem['product_id'];
+            $arOrderNo[$myItem['ec_order_no']][$myItem['ec_order_lineno']] = $myItem['order_line_no'];
             if (is_object($myItem['update_date'])) {
-                $myItem['update_date'] = $myItem['update_date']->format('Y-m-d H:i:s.u');
+                $myItem['update_date'] = $myItem['update_date']->format('Y-m-d');
                 if (MyCommon::checkExistText($myItem['update_date'], '.000000')) {
                     $myItem['update_date'] = str_replace('.000000', '', $myItem['update_date']);
                 } else {
@@ -118,15 +120,35 @@ class MypageController extends AbstractController
             if (isset(MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']])) {
                 $myItem['shipping_status'] = MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']];
             }
+
             // if (isset($myItem['shipping_status'])) {
             $myItem['order_type'] = 'EC';
             //}
+        }
+
+        //auto fill lino
+        $arOrderNoAf = [];
+        foreach ($arOrderNo as $keyOrder => $arEc) {
+            $autoFileId = 1;
+            foreach ($arEc as $keyLine => $valNo) {
+                if (MyCommon::isEmptyOrNull($valNo)) {
+                    $arOrderNoAf[$keyOrder][$keyLine] = $autoFileId;
+                    $autoFileId++;
+                }
+            }
         }
         //get one image of product
         $hsProductImgMain = $this->productImageRepository->getImageMain($arProductId);
         foreach ($listItem as &$myItem) {
             if (isset($hsProductImgMain[$myItem['product_id']])) {
                 $myItem['main_img'] = $hsProductImgMain[$myItem['product_id']];
+            }
+            if (MyCommon::isEmptyOrNull($myItem['order_line_no'])) {
+                if (isset($arOrderNoAf[$myItem['ec_order_no']])) {
+                    if (isset($arOrderNoAf[$myItem['ec_order_no']][$myItem['ec_order_lineno']])) {
+                        $myItem['order_line_no'] = $arOrderNoAf[$myItem['ec_order_no']][$myItem['ec_order_lineno']];
+                    }
+                }
             }
         }
 
