@@ -13,23 +13,30 @@
 
 namespace Customize\Controller\Mypage;
 
+use Customize\Common\FileUtil;
 use Customize\Common\MyCommon;
 use Customize\Common\MyConstant;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\MstDelivery;
 use Customize\Entity\MstShipping;
+use Customize\Repository\OrderItemRepository;
 use Customize\Repository\OrderRepository;
 use Customize\Repository\ProductImageRepository;
 use Doctrine\DBAL\Types\Type;
 use Eccube\Controller\AbstractController;
+use Eccube\Entity\Customer;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
+use Eccube\Form\Type\Front\CustomerLoginType;
 use Eccube\Repository\BaseInfoRepository;
 use Eccube\Service\CartService;
 use Eccube\Service\PurchaseFlow\PurchaseFlow;
 use Knp\Component\Pager\PaginatorInterface;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class MypageController extends AbstractController
 {
@@ -39,9 +46,19 @@ class MypageController extends AbstractController
     protected $orderRepository;
 
     /**
+     * @var OrderItemRepository
+     */
+    protected $orderItemRepository;
+
+    /**
      * @var ProductImageRepository
      */
     protected $productImageRepository;
+
+    /**
+     * @var \Twig_Environment
+     */
+    protected $twig;
 
     /**
      * MypageController constructor.
@@ -53,10 +70,58 @@ class MypageController extends AbstractController
      * @param PurchaseFlow $purchaseFlow
      */
     public function __construct(
-        OrderRepository $orderRepository, ProductImageRepository $productImageRepository
+        OrderRepository $orderRepository, ProductImageRepository $productImageRepository,OrderItemRepository $orderItemRepository,  \Twig_Environment $twig
     ) {
         $this->orderRepository = $orderRepository;
         $this->productImageRepository = $productImageRepository;
+        $this->orderItemRepository = $orderItemRepository;
+         $this->twig = $twig;
+    }
+
+
+    /**
+     * マイページ.
+     *
+     * @Route("/mypage/exportOrderPdf", name="exportOrderPdf", methods={"GET"})
+     * @Template("/Mypage/exportOrderPdf.twig")
+     */
+    public function exportOrderPdf(Request $request)
+    {
+
+        $htmlFileName = "Mypage/exportOrderPdf.twig";
+        $inquiry_no =MyCommon::getPara("inquiry_no");
+        $myData  =(object)[];
+//        $htmlBody = $this->twig->render($htmlFileName, [
+//            'data' => $myData,
+//        ]);
+        $mstDelivery = $this->entityManager->getRepository(MstDelivery::class);
+        $arRe = $mstDelivery->getQueryBuilderByDeli($inquiry_no);
+
+        //add special line
+        $totalTax = 0;
+        $totalaAmount = 0;
+        foreach ($arRe as  &$item){
+            $totalTax = $totalTax + $item["tax"];
+            $totalaAmount = $totalaAmount + $item["amount"];
+            $item['is_total'] = 0;
+        }
+        $arSpecial = ["is_total"=>1,'totalaAmount'=>$totalaAmount,'totalTax'=>$totalTax];
+        $arRe[] =$arSpecial;
+
+        $inquiry_no = MyCommon::getPara("inquiry_no");
+        $dirPdf = MyCommon::getHtmluserDataDir()."/pdf";
+        FileUtil::makeDirectory($dirPdf);
+        $namePdf = "ship_".$inquiry_no.".pdf";
+
+
+
+       // MyCommon::converHtmlToPdf($dirPdf,$namePdf,$htmlBody);
+        //$mpdf->WriteHTML($htmlBody);
+      //  $mpdf->Output($inquiry_no.'.pdf', 'D');
+        //$mpdf->Output();
+        return ["myData"=>$arRe];
+
+
     }
 
     /**
@@ -80,7 +145,7 @@ class MypageController extends AbstractController
             ->enable('incomplete_order_status_hidden');
         $nf = new MstShipping();
         // paginator
-        $qb = $this->orderRepository->getQueryBuilderByCustomer($Customer);
+        $qb = $this->orderItemRepository->getQueryBuilderByCustomer($Customer);
 
         $event = new EventArgs(
             [
@@ -156,6 +221,50 @@ class MypageController extends AbstractController
 
         return [
             'pagination' => $pagination, 'hsProductImgMain' => $hsProductImgMain,
+        ];
+    }
+
+    /**
+     * ログイン画面.
+     *
+     * @Route("/mypage/login", name="mypage_login", methods={"GET", "POST"})
+     * @Template("Mypage/login.twig")
+     */
+    public function login(Request $request, AuthenticationUtils $utils)
+    {
+        if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
+            log_info('認証済のためログイン処理をスキップ');
+
+            return $this->redirectToRoute('mypage');
+        }
+
+        /* @var $form \Symfony\Component\Form\FormInterface */
+        $builder = $this->formFactory
+            ->createNamedBuilder('', CustomerLoginType::class);
+
+        $builder->get('login_memory')->setData((bool) $request->getSession()->get('_security.login_memory'));
+
+        if ($this->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            $Customer = $this->getUser();
+            if ($Customer instanceof Customer) {
+                $builder->get('login_email')
+                    ->setData($Customer->getEmail());
+            }
+        }
+
+        $event = new EventArgs(
+            [
+                'builder' => $builder,
+            ],
+            $request
+        );
+        $this->eventDispatcher->dispatch(EccubeEvents::FRONT_MYPAGE_MYPAGE_LOGIN_INITIALIZE, $event);
+
+        $form = $builder->getForm();
+
+        return [
+            'error' => $utils->getLastAuthenticationError(),
+            'form' => $form->createView(),
         ];
     }
 }

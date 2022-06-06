@@ -230,6 +230,9 @@
     "monolog/monolog": {
         "version": "1.23.0"
     },
+    "mpdf/mpdf": {
+        "version": "v8.1.1"
+    },
     "myclabs/deep-copy": {
         "version": "1.7.0"
     },
@@ -245,6 +248,9 @@
     "ocramius/proxy-manager": {
         "version": "2.1.1"
     },
+    "paragonie/random_compat": {
+        "version": "v9.99.100"
+    },
     "phar-io/manifest": {
         "version": "1.0.1"
     },
@@ -259,6 +265,9 @@
     },
     "php-cs-fixer/diff": {
         "version": "v1.2.0"
+    },
+    "php-http/message-factory": {
+        "version": "v1.0.2"
     },
     "php-webdriver/webdriver": {
         "version": "1.10.0"

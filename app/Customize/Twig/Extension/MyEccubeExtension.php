@@ -1,5 +1,6 @@
 <?php
 namespace Customize\Twig\Extension;
+use Customize\Common\MyConstant;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -10,6 +11,7 @@ class MyEccubeExtension extends AbstractExtension
         return [
             new TwigFunction('getNext3Month', [$this, 'getNext3Month']),
             new TwigFunction('getMinDate', [$this, 'getMinDate']),
+            new TwigFunction('getWebRootUrl', [$this, 'getWebRootUrl']),
         ];
     }
 
@@ -22,4 +24,9 @@ class MyEccubeExtension extends AbstractExtension
         $newDate = date("Y-m-d");
         return $newDate;
     }
+    public function getWebRootUrl(){
+
+        return MyConstant::MY_WEB;
+    }
+
 }

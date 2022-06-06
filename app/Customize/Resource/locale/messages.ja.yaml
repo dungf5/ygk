@@ -21,16 +21,16 @@ front.order.order_lineno: 明細
 front.order.image: 画像
 front.order.product_name: 商品
 front.order.product_code: コード
-front.order.order_status: 受注ステータス
-front.order.shipping_status: 出荷ステータス
+front.order.order_status: 受注<br/>ステータス
+front.order.shipping_status: 出荷</br>ステータス
 front.order.order_plus: 数量
 front.order.reserve_stock_num: 引当数
 front.order.order_remain_num: 注文残
 front.order.update_date: 引当日
 front.order.shipping_date: 発送日
-front.order.inquiry_no: 荷送伝票番号
+front.order.inquiry_no: 荷送</br>伝票番号
 front.shopping.date_picker_delivery: 配送日 指定
-
+front.shopping.error_delivery_address: 届け先を選択してください。
 
 
 

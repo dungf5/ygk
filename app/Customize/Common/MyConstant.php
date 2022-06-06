@@ -31,4 +31,5 @@ class MyConstant
     const ARR_SHIPPING_STATUS_TEXT = [
         '1' => '出荷指示済', '2' => '出荷済',
     ];
+    const MY_WEB ="https://staging.xbraid.net";
 }

@@ -45,6 +45,7 @@ DirectoryIndex index.php index.html .ht
     #Options +FollowSymLinks +SymLinksIfOwnerMatch
 
     RewriteEngine On
+    RewriteRule news/([0-9]+)\.html news.php?news_id=$1
 
     # Acceptヘッダがimage/webpを含む場合
     RewriteCond %{HTTP_ACCEPT} image/webp

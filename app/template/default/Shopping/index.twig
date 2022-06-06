@@ -95,14 +95,28 @@ file that was distributed with this source code.
 
 //nvtrong ajax
             $('.mySubmitConfirm').click(function() {
-
+                let isSubmit =1;
                 if (typeof $("input[name='shipping_radio']:checked").val() === "undefined") {
-
+                    isSubmit =0;
                     $('.errorshipping_radio').show();
                 }else{
                 $('.errorshipping_radio').hide();
-                    $('#shopping-form').submit();
+
                 }
+
+               if (typeof $("input[name='delivery_address']:checked").val() === "undefined") {
+                        $('.error_delivery_address').show();
+                        isSubmit =0;
+               }else{
+                    $('.error_delivery_address').hide();
+               }
+
+                if(isSubmit ===1){
+                  $('#shopping-form').submit();
+                }
+
+
+
 
             });
 
@@ -622,9 +636,7 @@ file that was distributed with this source code.
                     </div>
 
                 </div>
-                <p class="error_delivery_address" style="color: red;font-size: larger;font-weight: bold;display: none">
-                    {{ 'front.shopping.shipping_title_error'|trans }}
-                </p>
+
                 <div class="shipping_destination">
                     <div class="shipping_destination_left">
                        <div>出荷先</div>

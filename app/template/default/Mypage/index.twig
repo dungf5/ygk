@@ -30,6 +30,13 @@ file that was distributed with this source code.
 
 
         </style>
+
+            <iframe id="my_iframe" style="display:none;"></iframe>
+                <script>
+                function Download(url) {
+                    document.getElementById('my_iframe').src = url;
+                };
+        </script>
         <div class="ec-mypageRole">
             {% if pagination.totalItemCount > 0 %}
                 <p class="ec-para-normal">{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}</p>
@@ -87,7 +94,7 @@ file that was distributed with this source code.
 
                                 <td>{{Order.update_date}}</td>
                                 <td>{{Order.shipping_date}}</td>
-                                <td>{{Order.inquiry_no}}</td>
+                                <td><a target="_blank" href="/mypage/exportOrderPdf?inquiry_no={{Order.inquiry_no}}">{{Order.inquiry_no}}</a> </td>
 
 
 
