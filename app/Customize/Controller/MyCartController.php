@@ -128,7 +128,7 @@ class MyCartController extends AbstractController
 
             $result = ['is_ok' => '1', 'msg' => 'OK', 'data' => $data];
 
-            return $result; //$this->json($result, 200);
+            return $result;
         }
 
         return [];
@@ -237,19 +237,19 @@ class MyCartController extends AbstractController
 
         // カートが分割された時のセッション情報を削除
         $request->getSession()->remove(OrderHelper::SESSION_CART_DIVIDE_FLAG);
-        $myCart =$this->cartService->getCarts(true);
+        $myCart = $this->cartService->getCarts(true);
+        //Mapping cart product with mst product
         $comSer = new MyCommonService($this->entityManager);
         $cartList = [];
-        foreach ($myCart as $cartT){
-            $cartList[] = $cartT["id"];
+        foreach ($myCart as $cartT) {
+            $cartList[] = $cartT['id'];
         }
         $mstProduct = $comSer->getMstProductsFromCart($cartList);
         $hsProductId = [];
-        foreach ($mstProduct as $itemP){
-            $hsProductId[$itemP["ec_product_id"]] = $itemP;
+        foreach ($mstProduct as $itemP) {
+            $hsProductId[$itemP['ec_product_id']] = $itemP;
         }
-
-
+        //end mapping
 
         return [
             'totalPrice' => $totalPrice,
@@ -258,7 +258,7 @@ class MyCartController extends AbstractController
             'Carts' => $myCart,
             'least' => $least,
             'quantity' => $quantity,
-            'hsProductId'=>$hsProductId,
+            'hsProductId' => $hsProductId,
             'is_delivery_free' => $isDeliveryFree,
         ];
     }

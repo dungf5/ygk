@@ -69,11 +69,27 @@ class MyCommonService extends AbstractRepository
      */
     public function getMstShippingCustomer($customerId, MoreOrder $moreOrder = null)
     {
-        $sql = 'SELECT *   FROM mst_shipping_address';
+        $column = "customer_code as shipping_no, ec_customer_id, customer_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date";
+        $sql = " SELECT $column   FROM mst_customer a  join
+                (
+                SELECT b.shipping_code from dt_customer_relation b
+
+					 WHERE  b.customer_code= ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id=?  LIMIT 1 )
+                GROUP BY  b.shipping_code
+                ) AS b ON  b.shipping_code =a.customer_code";
         $param = [];
+        $param[] = $customerId;
         if (null != $moreOrder) {
-            $sql = 'SELECT *   FROM mst_shipping_address where shipping_no=?';
+            $sql = " SELECT $column   FROM mst_customer a  join
+                (
+                SELECT b.shipping_code from dt_customer_relation b
+
+					 WHERE  b.customer_code= ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id=?  LIMIT 1 )
+                GROUP BY  b.shipping_code
+                ) AS b ON  b.shipping_code =a.customer_code and b.shipping_code=?";
             $param[] = $moreOrder->getShippingCode();
+        }else{
+
         }
         $statement = $this->entityManager->getConnection()->prepare($sql);
         try {
@@ -159,22 +175,29 @@ class MyCommonService extends AbstractRepository
      */
     public function getCustomerBillSeikyuCode($customer_id, $moreOrder = null)
     {
+        $column = "a.customer_code as seikyu_code, ec_customer_id, customer_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number";
+
         //seikyu_code  noi nhan hoa don
-        $sql = 'SELECT a.*   FROM mst_seikyu_address a
-                join dt_customer_relation b on b.seikyu_code =a.seikyu_code
-                where b.customer_code=?
-                group by b.seikyu_code
-                order by a.postal_code desc
-                ';
+        $sql = " SELECT {$column}   FROM mst_customer a  join
+                (
+                SELECT b.seikyu_code from dt_customer_relation b
+
+					 WHERE  b.customer_code= ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id=?  LIMIT 1 )
+                GROUP BY  b.seikyu_code
+                ) AS b ON  b.seikyu_code =a.customer_code
+                ";
+
         $myPara = [$customer_id];
         if ($moreOrder != null) {
             $seikyu_code = $moreOrder->getSeikyuCode();
-            $sql = 'SELECT a.*   FROM mst_seikyu_address a
-                join dt_customer_relation b on b.seikyu_code =a.seikyu_code
-                where b.customer_code=? and a.seikyu_code=?
-                group by b.seikyu_code
-                order by a.postal_code desc
-                ';
+            $sql = " SELECT {$column}   FROM mst_customer a  join
+                (
+                SELECT b.seikyu_code from dt_customer_relation b
+
+					 WHERE  b.customer_code= ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id=?  LIMIT 1 )
+                GROUP BY  b.seikyu_code
+                ) AS b ON  b.seikyu_code =a.customer_code and b.seikyu_code=?
+                ";
             $myPara[] = $seikyu_code;
         }
         $statement = $this->entityManager->getConnection()->prepare($sql);
@@ -194,16 +217,22 @@ class MyCommonService extends AbstractRepository
     public function getCustomerOtodoke($customer_id, $shipping_code, $moreOrder = null)
     {
         //otodoke_code dia chi nhan hang
-        $sql = 'SELECT a.*   FROM mst_otodoke_address a
-                join dt_customer_relation b on b.otodoke_code =a.otodoke_code
-                where b.customer_code=? and b.shipping_code=?
-                ';
-        $myPara = [$customer_id, $shipping_code];
+        $column = "a.customer_code as otodoke_code, ec_customer_id, customer_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number";
+
+        $sql = "  SELECT {$column}  FROM mst_customer a  join
+                (
+                SELECT  b.otodoke_code from dt_customer_relation b  where b.shipping_code =?
+                  AND   b.customer_code= ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id=?  LIMIT 1 )
+                ) AS b ON  b.otodoke_code =a.customer_code"
+                ;
+        $myPara = [ $shipping_code,$customer_id];
         if ($moreOrder != null) {
-            $sql = 'SELECT a.*   FROM mst_otodoke_address a
-                join dt_customer_relation b on b.otodoke_code =a.otodoke_code
-                where b.customer_code=? and b.shipping_code=? and a.otodoke_code=?
-                ';
+            $sql = "  SELECT {$column}  FROM mst_customer a  join
+                (
+                SELECT  b.otodoke_code from dt_customer_relation b  where b.shipping_code =?
+                  AND   b.customer_code= ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id=?  LIMIT 1 )
+                ) AS b ON  b.otodoke_code =a.customer_code and b.otodoke_code=?"
+            ;
             $myPara[] = $moreOrder->getOtodokeCode();
         }
         $statement = $this->entityManager->getConnection()->prepare($sql);
@@ -359,7 +388,6 @@ class MyCommonService extends AbstractRepository
         }
 
         $orderItem->setPreOrderId($pre_order_id);
-        $orderItem->setOrderNo("tedd");
         $orderItem->setPropertiesFromArray(["date_want_delivery"=>$date_want_delivery]);
         $this->entityManager->persist($orderItem);
         $this->entityManager->flush();

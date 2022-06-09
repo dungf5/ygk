@@ -152,7 +152,6 @@ class MyProductController extends AbstractController
     public function detail(Request $request, Product $Product)
     {
 
-
         if (!$this->checkVisibility($Product)) {
             throw new NotFoundHttpException();
         }

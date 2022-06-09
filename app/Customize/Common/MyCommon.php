@@ -56,7 +56,7 @@ class MyCommon
         $fullPathPdf = $pathSave.'/'.$nameFile;
         FileUtil::writeFileFull($fullPathHtml, $htmlPdfContent);
         $outArr = [];
-        if(getenv("APP_IS_LOCAL")==0){
+        if(getenv("APP_IS_LOCAL")!==0){
             $pathRun = "/usr/bin/wkhtmltopdf/bin/wkhtmltopdf --margin-top {$marginTop} --margin-bottom {$marginBottom} --margin-left {$margin_left} --margin-right {$margin_right} --encoding utf-8 --custom-header 'meta' 'charset=utf-8'";
             exec("{$pathRun} {$fullPathHtml} {$fullPathPdf}", $outArr);
         }else{
