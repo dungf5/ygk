@@ -135,8 +135,15 @@ class ProductRepository extends AbstractRepository
         if(!$user) {
             $customer_code = '';
         }
-        $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH,'price.product_code = pc.code AND price.customer_code = :customer_code')
+
+        $qb->innerJoin('Customize\Entity\MstProduct', 'mstProduct',Join::WITH,'mstProduct.ec_product_id = p.id');
+
+        $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH,'price.product_code = mstProduct.product_code AND price.customer_code = :customer_code')
             ->setParameter(':customer_code', $customer_code);
+
+        $listSelectMstProduct = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name";
+        $listSelectMstProduct.=",mstProduct.quantity as mst_quantity ";
+        $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');
 
 

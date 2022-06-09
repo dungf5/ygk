@@ -74,7 +74,7 @@ file that was distributed with this source code.
                                 <td>{{Order.ec_order_no}}</td>
                                 <td>{{Order.order_line_no}}</td>
                                 <td>
-                                    {% if Order.main_img is null %}#}
+                                    {% if Order.main_img is null %}
                                     <img style="width: 100px" src="{{ asset(''|no_image_product, 'save_image') }}"/>
                                     {% else %}
                                         <img  style="width: 100px"  src="{{ asset(Order.main_img|no_image_product, 'save_image') }}">
@@ -104,9 +104,7 @@ file that was distributed with this source code.
 
 
 
-{#                        {% endfor %}#}
 
-{#                        {{ dump(Order,hsProductImgMain[Order['product_id']]) }}#}
 
 
                     {% endfor %}

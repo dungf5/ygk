@@ -35,6 +35,24 @@ if (!class_exists('\Customize\Entity\Product', false)) {
          */
         private $id;
 
+
+
+        /**
+         * @return MstProduct
+         */
+        public function getMstProduct(): MstProduct
+        {
+            return $this->MstProduct;
+        }
+
+        /**
+         * @param MstProduct $MstProduct
+         */
+        public function setMstProduct(MstProduct $MstProduct): void
+        {
+            $this->MstProduct = $MstProduct;
+        }
+
         /**
          * @return int
          */

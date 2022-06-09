@@ -1,20 +1,29 @@
 <?php
 
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 if (!class_exists('\Customize\Entity\Price', false)) {
-
     /**
      * Price
-     *
      *
      * @ORM\Table(name="dt_price")
      * @ORM\Entity(repositoryClass="Customize\Repository\PriceRepository")
      */
-    class Price extends \Eccube\Entity\AbstractEntity{
-
+    class Price extends \Eccube\Entity\AbstractEntity
+    {
         /**
          * @var string
          *
@@ -51,7 +60,6 @@ if (!class_exists('\Customize\Entity\Price', false)) {
          * @var float
          *
          * @ORM\Column(name="price_s01", type="float", columnDefinition="FLOAT COMMENT '価格'")
-         *
          */
         private $price_s01;
 
@@ -75,7 +83,6 @@ if (!class_exists('\Customize\Entity\Price', false)) {
          * @var \DateTime
          *
          * @ORM\Column(name="create_date", type="datetimetz", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'データ登録日時'")
-         *
          */
         private $create_date;
 
@@ -83,7 +90,6 @@ if (!class_exists('\Customize\Entity\Price', false)) {
          * @var \DateTime
          *
          * @ORM\Column(name="update_date", type="datetimetz", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'データ更新日時'")
-         *
          */
         private $update_date;
 
@@ -102,7 +108,6 @@ if (!class_exists('\Customize\Entity\Price', false)) {
         {
             $this->product_code = $product_code;
         }
-
 
         /**
          * @return string

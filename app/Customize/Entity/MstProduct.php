@@ -25,196 +25,196 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @var string
          *
-         * @ORM\Column(name="product_name", type="string", length=125)
+         * @ORM\Column(name="product_name", type="string", length=125, nullable=true)
          */
         private $product_name;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="product_name_abb", type="string", length=50)
+         * @ORM\Column(name="product_name_abb", type="string", length=50, nullable=true)
          */
         private $product_name_abb;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="jan_code", type="string", length=13)
+         * @ORM\Column(name="jan_code", type="string", length=13, nullable=true)
          */
         private $jan_code;
 
         /**
          * @var int
          *
-         * @ORM\Column(name="unit_price", type="integer")
+         * @ORM\Column(name="unit_price", type="integer", nullable=true)
          */
         private $unit_price;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="tag_code1", type="string", length=10)
+         * @ORM\Column(name="tag_code1", type="string", length=10, nullable=true)
          */
         private $tag_code1;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="tag_name1", type="string", length=30)
+         * @ORM\Column(name="tag_name1", type="string", length=30, nullable=true)
          */
         private $tag_name1;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="tag_code2", type="string", length=10)
+         * @ORM\Column(name="tag_code2", type="string", length=10, nullable=true)
          */
         private $tag_code2;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="tag_name2", type="string", length=30)
+         * @ORM\Column(name="tag_name2", type="string", length=30, nullable=true)
          */
         private $tag_name2;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="tag_code3", type="string", length=10)
+         * @ORM\Column(name="tag_code3", type="string", length=10, nullable=true)
          */
         private $tag_code3;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="tag_name3", type="string", length=30)
+         * @ORM\Column(name="tag_name3", type="string", length=30, nullable=true)
          */
         private $tag_name3;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="tag_code4", type="string", length=10)
+         * @ORM\Column(name="tag_code4", type="string", length=10, nullable=true)
          */
         private $tag_code4;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="tag_name4", type="string", length=30)
+         * @ORM\Column(name="tag_name4", type="string", length=30, nullable=true)
          */
         private $tag_name4;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="tag_code5", type="string", length=10)
+         * @ORM\Column(name="tag_code5", type="string", length=10, nullable=true)
          */
         private $tag_code5;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="tag_name5", type="string", length=30)
+         * @ORM\Column(name="tag_name5", type="string", length=30, nullable=true)
          */
         private $tag_name5;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="category_code1", type="string", length=10)
+         * @ORM\Column(name="category_code1", type="string", length=10, nullable=true)
          */
         private $category_code1;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="category_name1", type="string", length=50)
+         * @ORM\Column(name="category_name1", type="string", length=50, nullable=true)
          */
         private $category_name1;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="category_code2", type="string", length=10)
+         * @ORM\Column(name="category_code2", type="string", length=10, nullable=true)
          */
         private $category_code2;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="category_name2", type="string", length=50)
+         * @ORM\Column(name="category_name2", type="string", length=50, nullable=true)
          */
         private $category_name2;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="category_code3", type="string", length=10)
+         * @ORM\Column(name="category_code3", type="string", length=10, nullable=true)
          */
         private $category_code3;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="category_name3", type="string", length=50)
+         * @ORM\Column(name="category_name3", type="string", length=50, nullable=true)
          */
         private $category_name3;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="series_name", type="string", length=50)
+         * @ORM\Column(name="series_name", type="string", length=50, nullable=true)
          */
         private $series_name;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="line_no", type="string", length=10)
+         * @ORM\Column(name="line_no", type="string", length=10, nullable=true)
          */
         private $line_no;
 
         /**
          * @var int
          *
-         * @ORM\Column(name="quantity", type="integer")
+         * @ORM\Column(name="quantity", type="integer", nullable=true)
          */
         private $quantity;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="size", type="string", length=30)
+         * @ORM\Column(name="size", type="string", length=30, nullable=true)
          */
         private $size;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="color", type="string", length=30)
+         * @ORM\Column(name="color", type="string", length=30, nullable=true)
          */
         private $color;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="material", type="string", length=255)
+         * @ORM\Column(name="material", type="string", length=255, nullable=true)
          */
         private $material;
 
         /**
          * @var string
          *
-         * @ORM\Column(name="model", type="string", length=255)
+         * @ORM\Column(name="model", type="string", length=255, nullable=true)
          */
         private $model;
 
         /**
          * @var int
          *
-         * @ORM\Column(name="ec_product_id", type="integer")
+         * @ORM\Column(name="ec_product_id", type="integer", nullable=true)
          */
         private $ec_product_id;
 
@@ -237,7 +237,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getProductCode(): string
+        public function getProductCode()
         {
             return $this->product_code;
         }
@@ -253,7 +253,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getProductName(): string
+        public function getProductName()
         {
             return $this->product_name;
         }
@@ -269,7 +269,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getProductNameAbb(): string
+        public function getProductNameAbb()
         {
             return $this->product_name_abb;
         }
@@ -285,7 +285,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getJanCode(): string
+        public function getJanCode()
         {
             return $this->jan_code;
         }
@@ -317,7 +317,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getTagCode1(): string
+        public function getTagCode1()
         {
             return $this->tag_code1;
         }
@@ -333,7 +333,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getTagName1(): string
+        public function getTagName1()
         {
             return $this->tag_name1;
         }
@@ -349,7 +349,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getTagCode2(): string
+        public function getTagCode2()
         {
             return $this->tag_code2;
         }
@@ -365,7 +365,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getTagName2(): string
+        public function getTagName2()
         {
             return $this->tag_name2;
         }
@@ -381,7 +381,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getTagCode3(): string
+        public function getTagCode3()
         {
             return $this->tag_code3;
         }
@@ -397,7 +397,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getTagName3(): string
+        public function getTagName3()
         {
             return $this->tag_name3;
         }
@@ -413,7 +413,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getTagCode4(): string
+        public function getTagCode4()
         {
             return $this->tag_code4;
         }
@@ -429,7 +429,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getTagName4(): string
+        public function getTagName4()
         {
             return $this->tag_name4;
         }
@@ -445,7 +445,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getTagCode5(): string
+        public function getTagCode5()
         {
             return $this->tag_code5;
         }
@@ -461,7 +461,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getTagName5(): string
+        public function getTagName5()
         {
             return $this->tag_name5;
         }
@@ -477,7 +477,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getCategoryCode1(): string
+        public function getCategoryCode1()
         {
             return $this->category_code1;
         }
@@ -493,7 +493,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getCategoryName1(): string
+        public function getCategoryName1()
         {
             return $this->category_name1;
         }
@@ -509,7 +509,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getCategoryCode2(): string
+        public function getCategoryCode2()
         {
             return $this->category_code2;
         }
@@ -525,7 +525,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getCategoryName2(): string
+        public function getCategoryName2()
         {
             return $this->category_name2;
         }
@@ -541,7 +541,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getCategoryCode3(): string
+        public function getCategoryCode3()
         {
             return $this->category_code3;
         }
@@ -557,7 +557,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getCategoryName3(): string
+        public function getCategoryName3()
         {
             return $this->category_name3;
         }
@@ -573,7 +573,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getSeriesName(): string
+        public function getSeriesName()
         {
             return $this->series_name;
         }
@@ -589,7 +589,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getLineNo(): string
+        public function getLineNo()
         {
             return $this->line_no;
         }
@@ -621,7 +621,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getSize(): string
+        public function getSize()
         {
             return $this->size;
         }
@@ -637,7 +637,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getColor(): string
+        public function getColor()
         {
             return $this->color;
         }
@@ -653,7 +653,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getMaterial(): string
+        public function getMaterial()
         {
             return $this->material;
         }
@@ -669,7 +669,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return string
          */
-        public function getModel(): string
+        public function getModel()
         {
             return $this->model;
         }

@@ -237,14 +237,28 @@ class MyCartController extends AbstractController
 
         // カートが分割された時のセッション情報を削除
         $request->getSession()->remove(OrderHelper::SESSION_CART_DIVIDE_FLAG);
+        $myCart =$this->cartService->getCarts(true);
+        $comSer = new MyCommonService($this->entityManager);
+        $cartList = [];
+        foreach ($myCart as $cartT){
+            $cartList[] = $cartT["id"];
+        }
+        $mstProduct = $comSer->getMstProductsFromCart($cartList);
+        $hsProductId = [];
+        foreach ($mstProduct as $itemP){
+            $hsProductId[$itemP["ec_product_id"]] = $itemP;
+        }
+
+
 
         return [
             'totalPrice' => $totalPrice,
             'totalQuantity' => $totalQuantity,
             // 空のカートを削除し取得し直す
-            'Carts' => $this->cartService->getCarts(true),
+            'Carts' => $myCart,
             'least' => $least,
             'quantity' => $quantity,
+            'hsProductId'=>$hsProductId,
             'is_delivery_free' => $isDeliveryFree,
         ];
     }

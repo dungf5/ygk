@@ -85,7 +85,37 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
+    /**
+     * @param
+     */
+    public function getMstProductsFromCart($myCart)
+    {
+        $subWhere = "";
+        $c = count($myCart);
+        for ($i = 0;$i<$c;$i++) {
+            if($i ==$c-1){
+                $subWhere .="?";
+            }else{
+                $subWhere .="?,";
+            }
+        }
 
+        $sql = " SELECT c.*
+                FROM  dtb_product_class AS a JOIN dtb_cart_item b ON b.product_class_id =a.id
+                JOIN mst_product AS c ON a.product_id = c.ec_product_id
+                WHERE b.cart_id in({$subWhere}) ";
+        $param = [];
+        $param =$myCart;
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+
+            return $rows;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
     public function getMainImgProduct($whereI)
     {
         $sql = 'SELECT file_name   FROM dtb_product_image where product_id=1 order by sort_no';

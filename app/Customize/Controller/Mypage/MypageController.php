@@ -91,9 +91,7 @@ class MypageController extends AbstractController
         $htmlFileName = "Mypage/exportOrderPdf.twig";
         $inquiry_no =MyCommon::getPara("inquiry_no");
         $myData  =(object)[];
-//        $htmlBody = $this->twig->render($htmlFileName, [
-//            'data' => $myData,
-//        ]);
+
         $mstDelivery = $this->entityManager->getRepository(MstDelivery::class);
         $arRe = $mstDelivery->getQueryBuilderByDeli($inquiry_no);
 
@@ -111,7 +109,25 @@ class MypageController extends AbstractController
         $inquiry_no = MyCommon::getPara("inquiry_no");
         $dirPdf = MyCommon::getHtmluserDataDir()."/pdf";
         FileUtil::makeDirectory($dirPdf);
+        $arReturn = ["myData"=>$arRe,"OrderTotal"=>$totalaAmount];
         $namePdf = "ship_".$inquiry_no.".pdf";
+        $file = $dirPdf."/".$namePdf;
+        if(getenv("APP_IS_LOCAL")==0){
+          $htmlBody = $this->twig->render($htmlFileName, $arReturn);
+
+            MyCommon::converHtmlToPdf($dirPdf,$namePdf,$htmlBody);
+
+            header("Content-Description: File Transfer");
+            header("Content-Type: application/octet-stream");
+            header("Content-Disposition: attachment; filename=\"". basename($file) ."\"");
+
+            readfile ($file);
+            exit();
+        }else{
+
+            exec('"C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe" c:/wamp/www/test/pdf.html c:/wamp/www/test/pdf.pdf');
+        }
+
 
 
 
@@ -119,7 +135,7 @@ class MypageController extends AbstractController
         //$mpdf->WriteHTML($htmlBody);
       //  $mpdf->Output($inquiry_no.'.pdf', 'D');
         //$mpdf->Output();
-        return ["myData"=>$arRe];
+        return $arReturn;
 
 
     }
@@ -207,6 +223,8 @@ class MypageController extends AbstractController
         foreach ($listItem as &$myItem) {
             if (isset($hsProductImgMain[$myItem['product_id']])) {
                 $myItem['main_img'] = $hsProductImgMain[$myItem['product_id']];
+            }else{
+                $myItem['main_img'] = null;
             }
             if (MyCommon::isEmptyOrNull($myItem['order_line_no'])) {
                 if (isset($arOrderNoAf[$myItem['ec_order_no']])) {

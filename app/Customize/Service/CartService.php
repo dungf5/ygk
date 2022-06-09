@@ -371,7 +371,10 @@ class CartService extends Service
             $priceClass = $this->entityManager
                 ->getRepository(Price::class)
                 ->findOneBy(['product_code'=>$mstProductClass->getProductCode(),'customer_code'=>$Customer->getId() ]);
-            $price = $priceClass->getPriceS01();
+            if($priceClass!==null){
+                $price = $priceClass->getPriceS01();
+            }
+
         }
 
         $newItem = new CartItem();
@@ -409,7 +412,10 @@ class CartService extends Service
             $priceClass = $this->entityManager
                 ->getRepository(Price::class)
                 ->findOneBy(['product_code'=>$mstProductClass->getProductCode(),'customer_code'=>$Customer->getId() ]);
-            $price = $priceClass->getPriceS01();
+            if($priceClass!=null){
+                $price = $priceClass->getPriceS01();
+            }
+
         }
 
         $removeItem = new CartItem();

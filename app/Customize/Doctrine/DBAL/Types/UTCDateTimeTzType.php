@@ -54,7 +54,10 @@ class UTCDateTimeTzType extends DateTimeTzType
             return $value;
         }
 
-
+        //nvtrong modify
+        if ($value === null || $value instanceof \DateTime) {
+            return $value->format("Y-m-d H:i:s.u");
+        }
         if ($value instanceof DateTimeInterface) {
             $stringFormat = $platform->getDateTimeTzFormatString();
             if(strpos($value,".") !==false){

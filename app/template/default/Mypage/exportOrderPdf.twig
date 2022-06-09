@@ -278,17 +278,17 @@
                     <p>売上15</p>
                     <p>区分16</p>
                 </td>
-                <td class="" ><span class="">品目No17</span></td>
-                <td class="" ><span class="">数量19</span></td>
-                <td class="" ><span class="">単位20</span></td>
-                <td class=""><span class="">単価21</span></td>
-                <td class="" ><span class="">金額22</span></td>
-                <td class="" ><span class="">消費税23</span></td>
+                <td class="" ><span class="">品目No</span></td>
+                <td class="" ><span class="">数量</span></td>
+                <td class="" ><span class="">単位</span></td>
+                <td class=""><span class="">単価</span></td>
+                <td class="" ><span class="">金額</span></td>
+                <td class="" ><span class="">消費税</span></td>
                 <td class="" ><span class="">ロットNo</span></td>
 
             </tr>
             <tr style="" class="tr-header">
-                <td class="" ><span class="">品目名称18</span></td>
+                <td class="" ><span class="">品目名称</span></td>
                 <td class="" ><span class="">&nbsp;</span></td>
                 <td class=""  colspan="2"><span class="">御社注文No</span></td>
                 <td class="" ><span class="">備考</span></td>
@@ -325,8 +325,8 @@
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
-                        <td title="totalaAmount">{{ deli.totalaAmount }}</td>
-                        <td  title="totalTax" >{{ deli.totalTax }}</td>
+                        <td style="text-align: right" title="totalaAmount">{{ deli.totalaAmount }}</td>
+                        <td  style="text-align: right" title="totalTax" >{{ deli.totalTax }}</td>
                         <td>&nbsp;</td>
                     </tr>
                 {% endif %}
@@ -350,14 +350,14 @@
                         <tr class="tr-content">
                             <td style="width: 32.0866%;">※は軽減税率対象品目です。</td>
                             <td style="width: 29.3307%;">納品書合計金額:</td>
-                            <td style="width: 21.6535%;">total_amount</td>
+                            <td style="width: 21.6535%;text-align: right" >{{ OrderTotal }}</td>
                         </tr>
                         <tr>
-                            <td style="width: 32.0866%;" colspan="3">備考 footer_remark1</td>
+                            <td style="width: 32.0866%;" colspan="3">備考 {{ myData[0].footer_remark1}} </td>
                         </tr>
                         <tr>
-                            <td style="width: 32.0866%;">出荷先 shiping_code</td>
-                            <td style="width: 29.3307%;">届け先 otodoke_code</td>
+                            <td style="width: 32.0866%;">出荷先 {{ myData[0].shiping_code }}</td>
+                            <td style="width: 29.3307%;">届け先 {{ myData[0].otodoke_code }}</td>
                             <td style="width: 21.6535%;">&nbsp;</td>
                         </tr>
                         </tbody>

@@ -39,6 +39,7 @@ file that was distributed with this source code.
             });
 
             $('.add-cart').on('click', function(e) {
+             ;
                 var $form = $(this).parents('tr').find('form');
 
                 {#// 個数フォームのチェック#}
@@ -168,10 +169,12 @@ file that was distributed with this source code.
                                             <img  style="width: 150px;height: 150px" src="{{ asset(Product[0].main_list_image|no_image_product, 'save_image') }}" alt="{{ Product[0].name }}" loading="lazy">
                                         </div>
 
+
                                     </td>
                                     <td colspan="3">
                                         <a href="{{ url('product_detail', {'id': Product[0].id}) }}">
-                                        {{ Product[0].name }}
+                                        {{ Product.product_name }}
+
                                         </a>
                                     </td>
                                     <td >
@@ -181,29 +184,20 @@ file that was distributed with this source code.
                                     </td>
                                     <td>
                                         {{ 'front.product.quantity'|trans }}：
-                                        {% for ProductCl in ProductClass %}
-                                            {% if loop.first %}
-                                                {{ ProductCl.MstProduct.quantity }}
-                                            {% endif %}
-                                        {% endfor %}
+
+                                        {{ Product.mst_quantity }}
                                     </td>
                                     <td >
                                         {% if app.user -%}
+
                                             {% if Product.price_s01 is not empty %}
                                                 {{ Product.price_s01|price }}
                                             {% else %}
-                                                {% for ProductCl in ProductClass %}
-                                                    {% if loop.first %}
-                                                        {{ ProductCl.MstProduct.unit_price|price }}
-                                                    {% endif %}
-                                                {% endfor %}
+                                                {{ Product.mst_unit_price|price }}
                                             {% endif %}
                                         {% else %}
-                                            {% for ProductCl in ProductClass %}
-                                                {% if loop.first %}
-                                                    {{ ProductCl.MstProduct.unit_price|price }}
-                                                {% endif %}
-                                            {% endfor %}
+
+                                            {{ Product.mst_unit_price|price }}
                                         {% endif %}
                                     </td>
                                     <td >
@@ -213,7 +207,7 @@ file that was distributed with this source code.
                                 <tr style="border-bottom: 1px dotted #ccc;">
 
                                     <td colspan="2">
-
+                                        {{ Product.product_code }}
                                     </td>
                                     <td colspan="2">
                                         {{ Product[0].free_area }}
@@ -223,24 +217,24 @@ file that was distributed with this source code.
                                         <form name="form{{ Product[0].id }}" id="productForm{{ Product[0].id }}" action="{{ url('product_add_cart', {id:Product[0].id}) }}" method="post">
                                             <div class="ec-productRole__actions">
                                                 {% if form.classcategory_id1 is defined %}
-                                                <div class="ec-select">
+                                                <div class="ec-select ">
                                                     {{ form_widget(form.classcategory_id1) }}
                                                     {{ form_errors(form.classcategory_id1) }}
                                                 </div>
                                                 {% if form.classcategory_id2 is defined %}
-                                                <div class="ec-select">
+                                                <div class="ec-select ">
                                                     {{ form_widget(form.classcategory_id2) }}
                                                     {{ form_errors(form.classcategory_id2) }}
                                                 </div>
                                                 {% endif %}
                                                 {% endif %}
                                                 <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}</span>
-                                                    {{ form_widget(form.quantity, {'attr': {'class': 'quantity','value': ProductClass[0].MstProduct.quantity|number_format
-                                                        ,'min':ProductClass[0].MstProduct.quantity
-                                                        ,'step':ProductClass[0].MstProduct.quantity}}) }}
+                                                    {{ form_widget(form.quantity, {'attr': {'class': 'quantity','value': Product.mst_quantity|number_format
+                                                        ,'min':Product.mst_quantity
+                                                        ,'step':Product.mst_quantity}}) }}
                                                     {{ form_errors(form.quantity) }}
                                                 </div>
-                                                <input type="hidden" id="checkQuantity{{ Product[0].id }}" class="checkQuantity"  value="{{ ProductClass[0].MstProduct.quantity }}">
+                                                <input type="hidden" id="checkQuantity{{ Product[0].id }}" class="checkQuantity"  value="{{ Product.mst_quantity }}">
                                             </div>
                                             {{ form_rest(form) }}
                                         </form>

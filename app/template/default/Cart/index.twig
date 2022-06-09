@@ -125,7 +125,7 @@ file that was distributed with this source code.
                             {% for CartItem in Cart.CartItems %}
                                 {% set ProductClass = CartItem.ProductClass %}
                                 {% set Product = ProductClass.Product %}
-                                {% set MstProduct = ProductClass.MstProduct %}
+                                {% set MstProduct = hsProductId[Product.id] %}
 
                                 <ul class="ec-cartRow">
                                     <li class="ec-cartRow__delColumn">

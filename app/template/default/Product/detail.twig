@@ -361,7 +361,7 @@ file that was distributed with this source code.
                     {% endif %}
                     <form action="{{ url('product_add_cart', {id:Product.id}) }}" method="post" id="form1" name="form1">
                         {% if Product.stock_find %}
-                            <div class="ec-productRole__actions">
+                            <div class="ec-productRole__actions ">
                                 {% if form.classcategory_id1 is defined %}
                                     <div class="ec-select">
                                         {{ form_widget(form.classcategory_id1) }}

@@ -2,10 +2,15 @@
 
 
 namespace Customize\Controller;
+
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Repository\MstProductRepository;
 use Customize\Repository\PriceRepository;
 use Customize\Repository\ProductRepository as ProductCustomizeRepository;
 use Customize\Repository\StockListRepository;
+
+
+use Doctrine\DBAL\Types\Type;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
 use Eccube\Entity\Master\ProductStatus;
@@ -129,6 +134,7 @@ class MyProductController extends AbstractController
         $this->stockListRepository = $stockListRepository;
         $this->mstProductRepository = $mstProductRepository;
         $this->productCustomizeRepository = $productCustomizeRepository;
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
     }
 
     /**
@@ -145,6 +151,7 @@ class MyProductController extends AbstractController
      */
     public function detail(Request $request, Product $Product)
     {
+
 
         if (!$this->checkVisibility($Product)) {
             throw new NotFoundHttpException();
@@ -229,6 +236,7 @@ class MyProductController extends AbstractController
      */
     public function addCart(Request $request, Product $Product)
     {
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         // エラーメッセージの配列
         $errorMessages = [];
         if (!$this->checkVisibility($Product)) {
@@ -428,6 +436,7 @@ class MyProductController extends AbstractController
         );
 
         $ids = [];
+
         foreach ($pagination as $Product) {
             $ids[] = $Product[0]->getId();
         }
@@ -446,6 +455,7 @@ class MyProductController extends AbstractController
                     'allow_extra_fields' => true,
                 ]
             );
+
             $addCartForm = $builder->getForm();
 
             $forms[$Product[0]->getId()] = $addCartForm->createView();
