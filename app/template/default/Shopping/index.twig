@@ -585,13 +585,13 @@ file that was distributed with this source code.
                     <div class="shipping_destination_right">
                         <div class="shipping_row">
                             <div class="shipping_col1 Order.name01 Order.name02">
-                                {{ Order.name01 }} {{ Order.name02 }} {{ 'common.name.suffix'|trans }}
+                                {{ Order.arCusLogin.name01 }} {{ 'common.name.suffix'|trans }}
                             </div>
                             <div class="shipping_col2">
-                                〒 {{ Order.postal_code }}
-                                {{ Order.pref }}
-                                {{ Order.addr01 }}
-                                {{ Order.addr02 }}
+                                〒 {{ Order.arCusLogin.postal_code }}
+
+                                {{ Order.arCusLogin.addr01 }}
+                                {{ Order.arCusLogin.addr02 }}
                             </div>
 
                         </div>
@@ -760,7 +760,7 @@ file that was distributed with this source code.
                         <dt>{{ 'common.charge'|trans }}</dt>
                         <dd>{{ Order.charge|price }}</dd>
                     </dl>
-                    <dl class="ec-totalBox__spec">
+                    <dl class="ec-totalBox__spec hide">
                         <dt>{{ 'common.delivery_fee'|trans }}</dt>
                         <dd>{{ Order.deliveryFeeTotal|price }}</dd>
                     </dl>

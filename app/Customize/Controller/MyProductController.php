@@ -152,6 +152,7 @@ class MyProductController extends AbstractController
     public function detail(Request $request, Product $Product)
     {
 
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         if (!$this->checkVisibility($Product)) {
             throw new NotFoundHttpException();
         }
@@ -209,6 +210,7 @@ class MyProductController extends AbstractController
      */
     protected function checkVisibility(Product $Product)
     {
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $is_admin = $this->session->has('_security_admin');
 
         // 管理ユーザの場合はステータスやオプションにかかわらず閲覧可能.
@@ -235,6 +237,7 @@ class MyProductController extends AbstractController
      */
     public function addCart(Request $request, Product $Product)
     {
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         // エラーメッセージの配列
         $errorMessages = [];
@@ -370,6 +373,7 @@ class MyProductController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         // Doctrine SQLFilter
         if ($this->BaseInfo->isOptionNostockHidden()) {
             $this->entityManager->getFilters()->enable('option_nostock_hidden');
@@ -412,7 +416,7 @@ class MyProductController extends AbstractController
         // paginator
         $searchData = $searchForm->getData();
 
-        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataA($searchData, $user ,$customer_code);
+        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user ,$customer_code);
 
         $event = new EventArgs(
             [
@@ -434,10 +438,12 @@ class MyProductController extends AbstractController
             !empty($searchData['disp_number']) ? $searchData['disp_number']->getId() : $this->productListMaxRepository->findOneBy([], ['sort_no' => 'ASC'])->getId()
         );
 
+
+
         $ids = [];
 
         foreach ($pagination as $Product) {
-            $ids[] = $Product[0]->getId();
+            $ids[] = $Product["id"];
         }
         $ProductsAndClassCategories = $this->productRepository->findProductsWithSortedClassCategories($ids, 'p.id');
 
@@ -450,14 +456,14 @@ class MyProductController extends AbstractController
                 AddCartType::class,
                 null,
                 [
-                    'product' => $ProductsAndClassCategories[$Product[0]->getId()],
+                    'product' => $ProductsAndClassCategories[$Product["id"]],
                     'allow_extra_fields' => true,
                 ]
             );
 
             $addCartForm = $builder->getForm();
 
-            $forms[$Product[0]->getId()] = $addCartForm->createView();
+            $forms[$Product["id"]] = $addCartForm->createView();
         }
 
         // 表示件数
@@ -521,7 +527,9 @@ class MyProductController extends AbstractController
             'disp_number_form' => $dispNumberForm->createView(),
             'order_by_form' => $orderByForm->createView(),
             'forms' => $forms,
-            'Category' => $Category,
+            'Category' => $Category
+
+
         ];
     }
 

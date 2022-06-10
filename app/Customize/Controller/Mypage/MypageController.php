@@ -148,9 +148,7 @@ class MypageController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
-//        $mpdf = new Mpdf();
-//        $mpdf->WriteHTML('<h1>Hello world!</h1>');
-//        $mpdf->Output();
+
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $Customer = $this->getUser();

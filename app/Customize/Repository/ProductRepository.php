@@ -108,7 +108,7 @@ class ProductRepository extends AbstractRepository
             // 価格高い順
         } elseif (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['eccube_product_order_price_higher']) {
             $qb->addSelect('MAX(pc.price02) as HIDDEN price02_max');
-          //  $qb->innerJoin('p.ProductClasses', 'pc');
+            $qb->innerJoin('p.ProductClasses', 'pc');
             $qb->andWhere('pc.visible = true');
             $qb->groupBy('p.id');
             $qb->orderBy('price02_max', 'DESC');
@@ -149,4 +149,102 @@ class ProductRepository extends AbstractRepository
 
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
+
+    public function getQueryBuilderBySearchDataNewCustom($searchData, $user = false, $customer_code = '')
+    {
+        $sqlColmnsP="p.id,p.description_list,p.free_area";
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb = $qb->andWhere('p.Status = 1');
+        $qb ->select($sqlColmnsP)
+            ->from('Customize\Entity\Product', 'p');
+        // category
+        $categoryJoin = false;
+        if (!empty($searchData['category_id']) && $searchData['category_id']) {
+            $Categories = $searchData['category_id']->getSelfAndDescendants();
+            if ($Categories) {
+                $qb
+                    ->innerJoin('p.ProductCategories', 'pct')
+                    ->innerJoin('pct.Category', 'c')
+                    ->andWhere($qb->expr()->in('pct.Category', ':Categories'))
+                    ->setParameter('Categories', $Categories);
+                $categoryJoin = true;
+            }
+        }
+
+        // name
+        if (isset($searchData['name']) && StringUtil::isNotBlank($searchData['name'])) {
+            $keywords = preg_split('/[\s　]+/u', str_replace(['%', '_'], ['\\%', '\\_'], $searchData['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+            foreach ($keywords as $index => $keyword) {
+                $key = sprintf('keyword%s', $index);
+                $qb
+                    ->andWhere(sprintf('NORMALIZE(p.name) LIKE NORMALIZE(:%s) OR
+                        NORMALIZE(p.search_word) LIKE NORMALIZE(:%s) OR
+                        EXISTS (SELECT wpc%d FROM \Eccube\Entity\ProductClass wpc%d WHERE p = wpc%d.Product AND NORMALIZE(wpc%d.code) LIKE NORMALIZE(:%s))',
+                        $key, $key, $index, $index, $index, $index, $key))
+                    ->setParameter($key, '%'.$keyword.'%');
+            }
+        }
+
+        // Order By
+        // 価格低い順
+        $config = $this->eccubeConfig;
+
+        if (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['eccube_product_order_price_lower']) {
+
+            // 新着順 orderby=0
+            if(!$user) {
+                $qb->addOrderBy('mstProduct.unit_price', 'asc');
+            }else{
+                //price.price_s01
+                $qb->addOrderBy('price.price_s01', 'asc');
+
+            }
+            // 価格高い順
+        } elseif (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['eccube_product_order_price_higher']) {
+
+            if(!$user) {
+                $qb->addOrderBy('mstProduct.unit_price', 'DESC');
+            }else{
+                //price.price_s01
+                $qb->addOrderBy('price.price_s01', 'asc');
+
+            }
+            // 新着順 orderby=1
+        } elseif (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['eccube_product_order_newer']) {
+            // 在庫切れ商品非表示の設定が有効時対応
+            // @see https://github.com/EC-CUBE/ec-cube/issues/1998
+            if ($this->getEntityManager()->getFilters()->isEnabled('option_nostock_hidden') == true) {
+                $qb->innerJoin('p.ProductClasses', 'pc');
+                $qb->andWhere('pc.visible = true');
+            }
+            $qb->orderBy('p.create_date', 'DESC');
+            $qb->addOrderBy('p.id', 'DESC');
+        } else {
+            if ($categoryJoin === false) {
+                $qb
+                    ->leftJoin('p.ProductCategories', 'pct')
+                    ->leftJoin('pct.Category', 'c');
+            }
+            $qb
+                ->addOrderBy('p.id', 'DESC');
+        }
+        if(!$user) {
+            $customer_code = '';
+        }
+
+        $qb->innerJoin('Customize\Entity\MstProduct', 'mstProduct',Join::WITH,'mstProduct.ec_product_id = p.id');
+
+        $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH,'price.product_code = mstProduct.product_code AND price.customer_code = :customer_code')
+            ->setParameter(':customer_code', $customer_code);
+
+        $listSelectMstProduct = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name";
+        $listSelectMstProduct.=",mstProduct.quantity as mst_quantity ";
+        $qb->addSelect($listSelectMstProduct);
+        $qb->addSelect('price.price_s01 as  price_s01');
+
+
+        return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
+    }
+
 }

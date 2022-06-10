@@ -146,7 +146,9 @@ class MyShoppingController extends AbstractShoppingController
         $Order = $this->orderHelper->initializeOrder($Cart, $Customer);
         $commonService = new MyCommonService($this->entityManager);
         $mstShip = $commonService->getMstShippingCustomer($Customer->getId());
+        $arCusLogin = $commonService->getMstCustomer($Customer->getId());
 
+       $Order->arCusLogin =$arCusLogin;
         $dtBillSeikyuCode = $commonService->getCustomerBillSeikyuCode($Customer->getId());
 
         $Order->mstShips = $mstShip;
@@ -304,7 +306,8 @@ class MyShoppingController extends AbstractShoppingController
             $mstShip = $commonService->getMstShippingCustomer($Customer->getId(), $moreOrder);
 
             $dtBillSeikyuCode = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $moreOrder);
-
+            $arCusLogin = $commonService->getMstCustomer($Customer->getId());
+            $Order->arCusLogin =$arCusLogin;
             $arrOtoProductOrder = $commonService->getCustomerOtodoke($Customer->getId(), $moreOrder->getShippingCode(), $moreOrder);
             $Order->MoreOrder = $moreOrder;
             $Order->mstShips = $mstShip;

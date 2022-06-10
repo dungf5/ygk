@@ -14,9 +14,11 @@
 namespace Customize\Controller;
 
 use Customize\Common\MyCommon;
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Repository\MstProductRepository;
 use Customize\Repository\PriceRepository;
 use Customize\Service\Common\MyCommonService;
+use Doctrine\DBAL\Types\Type;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
 use Eccube\Entity\ProductClass;
@@ -286,6 +288,7 @@ class MyCartController extends AbstractController
      */
     public function handleCartItem($operation, $productClassId)
     {
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         log_info('カート明細操作開始', ['operation' => $operation, 'product_class_id' => $productClassId]);
 
         $this->isTokenValid();

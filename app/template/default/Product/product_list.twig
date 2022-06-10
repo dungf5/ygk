@@ -14,11 +14,11 @@ file that was distributed with this source code.
 
 {% block javascript %}
     <script>
-        eccube.productsClassCategories = {
-            {% for Product in pagination %}
-            "{{ Product[0].id|escape('js') }}": {{ class_categories_as_json(Product[0])|raw }}{% if loop.last == false %}, {% endif %}
-            {% endfor %}
-        };
+        {#eccube.productsClassCategories = {#}
+        {#    {% for Product in paginationExt %}#}
+        {#    "{{ Product[0].id|escape('js') }}": {{ class_categories_as_json(Product[0])|raw }}{% if loop.last == false %}, {% endif %}#}
+        {#    {% endfor %}#}
+        {#};#}
 
         $(function() {
 
@@ -161,25 +161,25 @@ file that was distributed with this source code.
                     <div class="w-100" >
                     <table class="table w-100" >
                     {% for Product in pagination %}
-                        {% set ProductClass = Product[0].ProductClasses %}
-                        {% set form = forms[Product[0].id] %}
+
+                        {% set form = forms[Product.id] %}
                                 <tr>
                                     <td rowspan="2">
                                         <div >
-                                            <img  style="width: 150px;height: 150px" src="{{ asset(Product[0].main_list_image|no_image_product, 'save_image') }}" alt="{{ Product[0].name }}" loading="lazy">
+{#                                            <img  style="width: 150px;height: 150px" src="{{ asset(Product.main_list_image|no_image_product, 'save_image') }}" alt="{{ Product.name }}" loading="lazy">#}
                                         </div>
 
 
                                     </td>
                                     <td colspan="3">
-                                        <a href="{{ url('product_detail', {'id': Product[0].id}) }}">
+                                        <a href="{{ url('product_detail', {'id': Product.id}) }}">
                                         {{ Product.product_name }}
 
                                         </a>
                                     </td>
                                     <td >
-                                        {% if Product[0].description_list %}
-                                        <p>{{ Product[0].description_list|raw|nl2br }}</p>
+                                        {% if Product.description_list %}
+                                        <p>{{ Product.description_list|raw|nl2br }}</p>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -210,11 +210,11 @@ file that was distributed with this source code.
                                         {{ Product.product_code }}
                                     </td>
                                     <td colspan="2">
-                                        {{ Product[0].free_area }}
+                                        {{ Product.free_area }}
                                     </td>
 
                                     <td colspan="2">
-                                        <form name="form{{ Product[0].id }}" id="productForm{{ Product[0].id }}" action="{{ url('product_add_cart', {id:Product[0].id}) }}" method="post">
+                                        <form name="form{{ Product.id }}" id="productForm{{ Product.id }}" action="{{ url('product_add_cart', {id:Product.id}) }}" method="post">
                                             <div class="ec-productRole__actions">
                                                 {% if form.classcategory_id1 is defined %}
                                                 <div class="ec-select ">
@@ -234,14 +234,14 @@ file that was distributed with this source code.
                                                         ,'step':Product.mst_quantity}}) }}
                                                     {{ form_errors(form.quantity) }}
                                                 </div>
-                                                <input type="hidden" id="checkQuantity{{ Product[0].id }}" class="checkQuantity"  value="{{ Product.mst_quantity }}">
+                                                <input type="hidden" id="checkQuantity{{ Product.id }}" class="checkQuantity"  value="{{ Product.mst_quantity }}">
                                             </div>
                                             {{ form_rest(form) }}
                                         </form>
                                     </td>
                                     <td >
                                         <div class="ec-productRole__btn">
-                                            <button type="button" class="ec-blockBtn--action add-cart" data-cartid="{{ Product[0].id }}" form="productForm{{ Product[0].id }}">
+                                            <button type="button" class="ec-blockBtn--action add-cart" data-cartid="{{ Product.id }}" form="productForm{{ Product.id }}">
                                                 {{ 'front.product.add_cart'|trans }}
                                             </button>
                                         </div>
