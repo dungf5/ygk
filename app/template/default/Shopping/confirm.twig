@@ -73,7 +73,7 @@ file that was distributed with this source code.
 {#                    <p class="ec-halfInput">{{ Order.kana01 }} {{ Order.kana02 }}</p>#}
                     <p class="ec-input">{{ Order.arCusLogin.company_name }}</p>
                     <p class="ec-zipInput">{{ 'common.postal_symbol'|trans }}{{ Order.arCusLogin.postal_code }}</p>
-                    <p class="ec-input"> {{ Order.arCusLogin.addr01 }} {{ Order.arCusLogin.addr02 }}</p>
+                    <p class="ec-input"> {{ Order.arCusLogin.addr01 }} {{ Order.arCusLogin.addr02 }} {{ Order.arCusLogin.addr03 }}</p>
                     <p class="ec-telInput">{{ Order.arCusLogin.phone_number }}</p>
                     <p class="ec-input">{{ Order.arCusLogin.email }}</p>
                 </div>
@@ -190,7 +190,7 @@ file that was distributed with this source code.
                                 <label for="bill_{{ arShipping["seikyu_code"] }}" >{{ arShipping["name01"] }} </label>
                             </div>
                             <div class="shipping_col2">
-                                〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }}
+                                〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}
 
                             </div>
 
@@ -233,7 +233,7 @@ file that was distributed with this source code.
                                 <label for="{{ arShipping["shipping_no"] }}" >{{ arShipping["name01"] }} </label>
                             </div>
                             <div class="shipping_col2">
-                                〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }}
+                                〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}
 
                             </div>
 

@@ -197,6 +197,7 @@ class ProductRepository extends AbstractRepository
                 $qb->addOrderBy('mstProduct.unit_price', 'asc');
             }else{
                 //price.price_s01
+
                 $qb->addOrderBy('price.price_s01', 'asc');
 
             }
@@ -207,7 +208,7 @@ class ProductRepository extends AbstractRepository
                 $qb->addOrderBy('mstProduct.unit_price', 'DESC');
             }else{
                 //price.price_s01
-                $qb->addOrderBy('price.price_s01', 'asc');
+                $qb->addOrderBy('price.price_s01', 'desc');
 
             }
             // 新着順 orderby=1
@@ -226,8 +227,17 @@ class ProductRepository extends AbstractRepository
                     ->leftJoin('p.ProductCategories', 'pct')
                     ->leftJoin('pct.Category', 'c');
             }
-            $qb
-                ->addOrderBy('p.id', 'DESC');
+//            $qb
+//                ->addOrderBy('p.id', 'DESC');
+
+            // 新着順 orderby=0
+            if(!$user) {
+                $qb->addOrderBy('mstProduct.unit_price', 'asc');
+            }else{
+                //price.price_s01
+                $qb->addOrderBy('price.price_s01', 'asc');
+
+            }
         }
         if(!$user) {
             $customer_code = '';

@@ -10,6 +10,7 @@ use Customize\Repository\ProductRepository as ProductCustomizeRepository;
 use Customize\Repository\StockListRepository;
 
 
+use Customize\Service\Common\MyCommonService;
 use Doctrine\DBAL\Types\Type;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
@@ -409,12 +410,14 @@ class MyProductController extends AbstractController
         $customer_code = '';
         if($this->isGranted('ROLE_USER')) {
             $user = true;
+            $myC = new MyCommonService($this->entityManager);
             $Customer = $this->getUser();
-            $customer_code = $Customer->getId();
+            $customer_code = $myC->getMstCustomer($Customer->getId())['customer_code'];
         }
 
         // paginator
         $searchData = $searchForm->getData();
+
 
         $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user ,$customer_code);
 
