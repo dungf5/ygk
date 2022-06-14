@@ -247,13 +247,17 @@ class ProductRepository extends AbstractRepository
 
         $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH,'price.product_code = mstProduct.product_code AND price.customer_code = :customer_code')
             ->setParameter(':customer_code', $customer_code);
-
+        //valid_date = '2022/06/14'  AND '2022/06/14'<= expire_date and customer_code='9901'
+        if($user) {
+            $curentDate = date('Y/m/d');
+            $qb->andWhere("price.valid_date = '$curentDate'  AND '$curentDate'<= price.expire_date and price.customer_code='$customer_code'");
+        }
         $listSelectMstProduct = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name";
         $listSelectMstProduct.=",mstProduct.quantity as mst_quantity ";
         $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');
 
-
+//var_dump($qb->getQuery()->getSQL(),$customer_code);
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 

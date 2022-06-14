@@ -6,38 +6,34 @@
     </div>
     <div class="shipping_destination_right">
 
-        {% for arShipping in data.shipping %}
-
-            <div class="shipping_row">
-
-                <div class="shipping_col1">
-                    <span>
-
-                         {% if data.shipping|length == 1 %}
-
-                             <input class="hidden otodoke_code"  type="radio" checked name="delivery_address" value="{{ arShipping["otodoke_code"] }}" id="ship_{{ arShipping["otodoke_code"] }}" >
-                          {% else %}
-
-                             {% if data.otodoke_code_checked ==  arShipping["otodoke_code"]  %}
-                                 <input type="radio" checked class=" otodoke_code"  name="delivery_address" value="{{ arShipping["otodoke_code"] }}" id="ship_{{ arShipping["otodoke_code"] }}" >
-                              {% else %}
-                                 <input type="radio" class=" otodoke_code"  name="delivery_address" value="{{ arShipping["otodoke_code"] }}" id="ship_{{ arShipping["otodoke_code"] }}" >
-                             {% endif %}
-
-                         {% endif %}
+        {% if data.shipping|length == 1 %}
 
 
-                    </span>
-                    <label for="ship_{{ arShipping["otodoke_code"] }}" >{{ arShipping["name01"] }} </label>
-                </div>
-                <div class="shipping_col2">
-                    〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}
+        {% else %}
+            <select style="width: 555px" id="delivery_address" name="delivery_address"
+            >
+                <option value=""> {{ 'front.shopping.select_one'|trans }}</option>
+                {% for arShipping in data.shipping %}
 
-                </div>
 
-            </div>
 
-        {% endfor %}
+                    {% if data.otodoke_code_checked ==  arShipping["otodoke_code"]  %}
+
+                        <option selected value="{{ arShipping["otodoke_code"] }}">{{ arShipping["name01"] }} 〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}</option>
+
+                    {% else %}
+                        <option  value="{{ arShipping["otodoke_code"] }}">{{ arShipping["name01"] }} 〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}</option>
+                    {% endif %}
+
+
+                {% endfor %}
+            </select>
+        {% endif %}
+
+
+
+
+
         <script>
             {% if data.shipping|length == 1 %}
             updateDeliverydAdress({{ data.shipping[0]["otodoke_code"] }}) ;

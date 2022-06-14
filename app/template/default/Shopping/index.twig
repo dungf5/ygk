@@ -96,7 +96,14 @@ file that was distributed with this source code.
 //nvtrong ajax
             $('.mySubmitConfirm').click(function() {
                 let isSubmit =1;
-                if (typeof $("input[name='shipping_radio']:checked").val() === "undefined") {
+                // if (typeof $("input[name='shipping_radio']:checked").val() === "undefined") {
+                //     isSubmit =0;
+                //     $('.errorshipping_radio').show();
+                // }else{
+                // $('.errorshipping_radio').hide();
+                //
+                // }
+               if (typeof $("select[name='shipping_radio']").val() === "") {
                     isSubmit =0;
                     $('.errorshipping_radio').show();
                 }else{
@@ -104,7 +111,8 @@ file that was distributed with this source code.
 
                 }
 
-               if (typeof $("input[name='delivery_address']:checked").val() === "undefined") {
+
+               if (typeof $("select[name='delivery_address']").val() === "undefined") {
                         $('.error_delivery_address').show();
                         isSubmit =0;
                }else{
@@ -120,7 +128,7 @@ file that was distributed with this source code.
 
             });
 
-            $('.delivery_address_main').delegate("input[name='delivery_address']", 'change', function() {
+            $('.delivery_address_main').delegate("select[name='delivery_address']", 'change', function() {
               let delivery_code =  $(this).val();
                updateDeliverydAdress(delivery_code);
              });
@@ -132,11 +140,17 @@ file that was distributed with this source code.
              });
 
 
-            $("input[name='shipping_radio']").change(function(){
+            // $("input[name='shipping_radio']").change(function(){
+            //     let shipping_code =  $(this).val();
+            //     updateShipingAddress(shipping_code);
+            //
+            //     });
+              $("select[name='shipping_radio']").change(function(){
                 let shipping_code =  $(this).val();
                 updateShipingAddress(shipping_code);
 
                 });
+
 
               {% if Order.dtBillSeikyuCode|length == 1 %}
                 updateBillAddress('{{ Order.dtBillSeikyuCode[0]["seikyu_code"] }}');
@@ -294,6 +308,9 @@ file that was distributed with this source code.
     .datepicker-days td:last-child {
         color: #00f;
     }
+                          .delivery_address_main{
+                              padding-top: 15px;
+                          }
 </style>
 
     <div class="ec-role">
@@ -646,40 +663,30 @@ file that was distributed with this source code.
                     </div>
                     <div class="shipping_destination_right">
 
-                        {% for arShipping in Order.mstShips %}
+                        {% if Order.mstShips|length == 1 %}
+                        <input type="radio" class="hidden shipping_no"  checked name="shipping_radio" value="{{ arShipping["shipping_no"] }}" id="{{ arShipping["shipping_no"] }}" >
 
-                            <div class="shipping_row">
-
-                                <div class="shipping_col1">
-                                    <span>
-
-                                         {% if Order.mstShips|length == 1 %}
-                                             <input type="radio" class="hidden shipping_no"  checked name="shipping_radio" value="{{ arShipping["shipping_no"] }}" id="{{ arShipping["shipping_no"] }}" >
-
-                                        {% else %}
+                        {% else %}
+                        <select id="shipping_radio" style="width: 555px" name="shipping_radio"
+                                >
+                            <option value=""> {{ 'front.shopping.select_one'|trans }}</option>
+                            {% for arShipping in Order.mstShips %}
 
 
-                                            {% if Order.shipping_no_checked ==  arShipping["shipping_no"]  %}
-                                                <input type="radio" checked class=" shipping_no"  name="shipping_radio" value="{{ arShipping["shipping_no"] }}" id="{{ arShipping["shipping_no"] }}" >
+                                {% if Order.shipping_no_checked ==  arShipping["shipping_no"]  %}
 
-                                            {% else %}
-                                                <input type="radio"  class=" shipping_no"  name="shipping_radio" value="{{ arShipping["shipping_no"] }}" id="{{ arShipping["shipping_no"] }}" >
-                                            {% endif %}
+                                    <option selected value="{{ arShipping["shipping_no"] }}">〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}</option>
+                                {% else %}
+
+                                    <option value="{{ arShipping["shipping_no"] }}">〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}</option>
+
+                                {% endif %}
+
+                            {% endfor %}
+                        </select>
+                        {% endif %}
 
 
-                                         {% endif %}
-
-                                    </span>
-                                    <label for="{{ arShipping["shipping_no"] }}" >{{ arShipping["name01"] }}</label>
-                                </div>
-                                <div class="shipping_col2">
-                                    〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}
-
-                                </div>
-
-                            </div>
-
-                        {% endfor %}
                     </div>
                 </div>
                 <p class="errorshipping_radio" style="color: red;font-size: larger;font-weight: bold;display: none">
