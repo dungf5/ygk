@@ -219,8 +219,13 @@ class MyShoppingController extends AbstractShoppingController
         } else {
             $Order->hasMoreOrder = 0;
         }
-
+//        if(count($mstShip)==1){
+//            $Order->shipping_no_checked = $mstShip[0]['shipping_no'];
+//        }else{
+//
+//        }
         $Order->shipping_no_checked = $shipping_no_checked;
+
         $Order->seikyu_code_checked = isset($moreOrder['seikyu_code'])??'' ;
         $form = $this->createForm(OrderType::class, $Order);
 

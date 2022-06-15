@@ -41,7 +41,7 @@ class OrderItemRepository extends AbstractRepository
         //ordStatus.update_date,
         $qb = $this->createQueryBuilder('i')
             ->select('ordStatus.ec_order_no,ordStatus.order_line_no,ordStatus.ec_order_lineno,o.order_status_id,i.product_id,i.product_name,mstp.product_code,
-            ordStatus.order_status,ordStatus.reserve_stock_num,ordStatus.update_date,ordStatus.order_remain_num,mstShip.shipping_status,mstShip.inquiry_no,mstShip.shipping_date')
+            ordStatus.order_status,ordStatus.reserve_stock_num,ordStatus.update_date,ordStatus.order_remain_num,mstShip.shipping_status,mstShip.inquiry_no,mstShip.shipping_date,mstShip.shipping_no')
             // ->leftJoin('Customize\Entity\MstShipping', 'mstShip',Join::WITH,'mstShip.ec_order_no=o.order_no')
             ->innerJoin('Customize\Entity\Order', 'o', Join::WITH, 'i.order_id=o.id')
             ->innerJoin('Customize\Entity\Product', 'p', Join::WITH, 'i.product_id=p.id')

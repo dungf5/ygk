@@ -227,8 +227,7 @@ class ProductRepository extends AbstractRepository
                     ->leftJoin('p.ProductCategories', 'pct')
                     ->leftJoin('pct.Category', 'c');
             }
-//            $qb
-//                ->addOrderBy('p.id', 'DESC');
+
 
             // 新着順 orderby=0
             if(!$user) {
@@ -249,8 +248,8 @@ class ProductRepository extends AbstractRepository
             ->setParameter(':customer_code', $customer_code);
         //valid_date = '2022/06/14'  AND '2022/06/14'<= expire_date and customer_code='9901'
         if($user) {
-            $curentDate = date('Y/m/d');
-            $qb->andWhere("price.valid_date = '$curentDate'  AND '$curentDate'<= price.expire_date and price.customer_code='$customer_code'");
+           // $curentDate = date('Y/m/d');
+            //$qb->andWhere("price.valid_date = '$curentDate'  AND '$curentDate'<= price.expire_date and price.customer_code='$customer_code'");
         }
         $listSelectMstProduct = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name";
         $listSelectMstProduct.=",mstProduct.quantity as mst_quantity ";

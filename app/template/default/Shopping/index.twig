@@ -13,7 +13,7 @@ file that was distributed with this source code.
 {% form_theme form 'Form/form_div_layout.twig' %}
 
 {% block javascript %}
-<script >
+<script>
 $(function () {
     var $redirectCallback = function () {
         loadingOverlay();
@@ -97,16 +97,34 @@ $(function () {
             $('.mySubmitConfirm').click(function() {
                 let isSubmit =1;
 
-
                let valbill_address = $("select[name='bill_address']").val();
-               if (valbill_address==null || valbill_address=='' ) {
+               let valbill_addressInput = $("input[name='bill_address']").val();//leng =1
+               let ishow2_addressInputOk =0;
+               if (valbill_addressInput!=null || valbill_addressInput!='' ) {
+                        ishow2_addressInputOk=1;
+               }
+               if(ishow2_addressInputOk==0){
+
+                        if ( (valbill_address==null || valbill_address=='' )) {
                         $('.error_bill_address').show();
                         isSubmit =0;
-               }else{
-                    $('.error_bill_address').hide();
+                       }else{
+
+                            $('.error_bill_address').hide();
+                       }
                }
 
-                let valShip = $("select[name='shipping_radio']").val();
+
+
+
+             let shipRadioVal = $("input[name='shipping_radio']").val();//leng =1
+             let isShipNoOk = 0;
+             if(shipRadioVal!=null){
+                 isShipNoOk=1;
+
+             }
+             if(isShipNoOk==0){
+                         let valShip = $("select[name='shipping_radio']").val();
                if ( valShip == null || valShip== "") {
                     isSubmit =0;
                     $('.errorshipping_radio').show();
@@ -114,8 +132,19 @@ $(function () {
                 $('.errorshipping_radio').hide();
 
                 }
+             }else{
+                 $('.errorshipping_radio').hide();
+             }
 
-              let valdelivery_address = $("select[name='delivery_address']").val();
+
+              let deliveryRadioVal = $("input[name='delivery_address']").val();//leng =1
+             let isDeliveryOk = 0;
+             if(deliveryRadioVal!=null){
+                 isDeliveryOk=1;
+
+             }
+             if(isDeliveryOk==0){
+                   let valdelivery_address = $("select[name='delivery_address']").val();
                if (valdelivery_address==null || valdelivery_address=='' ) {
                         $('.error_delivery_address').show();
                         isSubmit =0;
@@ -126,8 +155,12 @@ $(function () {
                 if(isSubmit ===1){
                   $('#shopping-form').submit();
                 }
-
-
+             }else{
+                   $('.error_delivery_address').hide();
+             }
+               if(isSubmit ===1){
+                  $('#shopping-form').submit();
+                }
 
 
             });
@@ -233,6 +266,7 @@ $(function () {
             {% if Order.shipping_no_checked !=""  %}
               updateShipingAddress("{{Order.shipping_no_checked}}");
              {% endif %}
+
 
 
     </script>
@@ -675,7 +709,7 @@ $(function () {
                     </div>
                 </div>
 
-                <div class="bill_address shipping_destination" >
+                <div class="bill_address shipping_destination">
                     <div class="shipping_destination_left">
                         <div>請求先</div>
                     </div>
@@ -743,12 +777,11 @@ $(function () {
                     </div>
 
 
-
                 </div>
                 <p class="error_bill_address" style="color: red;font-size: larger;font-weight: bold;display: none">
                     {{ 'front.shopping.error_bill_address'|trans }}
                 </p>
-                <div style="margin-bottom: 30px;" ></div>
+                <div style="margin-bottom: 30px;"></div>
 
 
                 <div class="shipping_destination">
@@ -758,8 +791,26 @@ $(function () {
                     <div class="shipping_destination_right">
 
                         {% if Order.mstShips|length == 1 %}
-                            <input type="radio" class="hidden shipping_no" checked name="shipping_radio"
-                                   value="{{ arShipping["shipping_no"] }}" id="{{ arShipping["shipping_no"] }}">
+                            <div class="shipping_row">
+
+                                <div class="shipping_col1">
+                                    <span>
+                                        {% if Order.mstShips|length == 1 %}
+                                            <input type="radio" class="hidden shipping_no" checked name="shipping_radio"
+                                                   value="{{ Order.mstShips[0]["shipping_no"] }}"
+                                                   id="{{ Order.mstShips[0]["shipping_no"] }}">
+
+                                        {% endif %}
+
+                                    </span>
+                                    <label
+                                        for="shipping_radio">{{ Order.mstShips[0]["name01"] }} </label>
+                                </div>
+                                <div class="shipping_col2">
+                                    〒 {{ Order.mstShips[0]["postal_code"] }} {{ Order.mstShips[0]["addr01"] }} {{ Order.mstShips[0]["addr02"] }} {{ Order.mstShips[0]["addr03"] }}
+                                </div>
+                            </div>
+
 
                         {% else %}
                             <select id="shipping_radio" style="width: 555px" name="shipping_radio"

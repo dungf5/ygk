@@ -7,6 +7,25 @@
     <div class="shipping_destination_right">
 
         {% if data.shipping|length == 1 %}
+            <div class="shipping_row">
+
+                <div class="shipping_col1">
+                                    <span>
+                                        {% if data.shipping|length|length == 1 %}
+                                            <input type="radio" class="hidden otodoke_code" checked name="delivery_address"
+                                                   value="{{ data.shipping[0]["otodoke_code"] }}" id="{{ data.shipping[0]["otodoke_code"] }}">
+
+                                        {% endif %}
+
+                                    </span>
+                    <label
+                        for="shipping_radio">{{ data.shipping[0]["name01"] }} </label>
+                </div>
+                <div class="shipping_col2">
+                    〒 {{ data.shipping[0]["postal_code"] }} {{ data.shipping[0]["addr01"] }} {{ data.shipping[0]["addr02"] }}
+                    {{ data.shipping[0]["addr03"] }}
+                </div>
+            </div>
 
 
         {% else %}
@@ -36,7 +55,7 @@
 
         <script>
             {% if data.shipping|length == 1 %}
-            updateDeliverydAdress({{ data.shipping[0]["otodoke_code"] }}) ;
+            updateDeliverydAdress('{{ data.shipping[0]["otodoke_code"] }}') ;
             {% endif %}
         </script>
 

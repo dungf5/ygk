@@ -51,15 +51,15 @@ file that was distributed with this source code.
                         <th title="product_code">{{ 'front.order.product_code'|trans| raw }}</th>
 
                         <th title="order_status" style="text-align: center;">{{ 'front.order.order_status'|trans| raw }}</th>
-                        <th title="shipping_status"  style="text-align: center;" >{{ 'front.order.shipping_status'|trans| raw }}</th>
+                        <th  title="shipping_status"  class="hide" style="text-align: center;" >{{ 'front.order.shipping_status'|trans| raw }}</th>
                         <th title="order_plus">{{ 'front.order.order_plus'|trans| raw }}</th>
                         <th title="reserve_stock_num">{{ 'front.order.reserve_stock_num'|trans| raw }}</th>
                         <th title="order_remain_num">{{ 'front.order.order_remain_num'|trans| raw }}</th>
 
 
                         <th title="update_date">{{ 'front.order.update_date'|trans| raw }}</th>
-                        <th title="shipping_date">{{ 'front.order.shipping_date'|trans| raw }}</th>
-                        <th title="inquiry_no"  style="text-align: center;" >{{ 'front.order.inquiry_no'|trans| raw }}</th>
+                        <th class="hide" title="shipping_date">{{ 'front.order.shipping_date'|trans| raw }}</th>
+                        <th title="shipping_no"  style="text-align: center;" >{{ 'front.order.inquiry_no'|trans| raw }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -83,7 +83,7 @@ file that was distributed with this source code.
                                 <td>{{Order.product_name}}</td>
                                 <td>{{Order.product_code}}</td>
                                 <td>{{Order.order_status}}</td>
-                                <td>{{Order.shipping_status}}</td>
+                                <td class="hide">{{Order.shipping_status}}</td>
 
                                 <td>{{Order.reserve_stock_num+Order.order_remain_num}}</td>
 
@@ -93,8 +93,8 @@ file that was distributed with this source code.
                                 <td>{{Order.order_remain_num}}</td>
 
                                 <td>{{Order.update_date}}</td>
-                                <td>{{Order.shipping_date}}</td>
-                                <td><a target="_blank" href="/mypage/exportOrderPdf?inquiry_no={{Order.inquiry_no}}">{{Order.inquiry_no}}</a> </td>
+                                <td class="hide" >{{Order.shipping_date}}</td>
+                                <td><a target="_blank" href="/mypage/exportOrderPdf?inquiry_no={{Order.shipping_no}}">{{Order.shipping_no}}</a> </td>
 
 
 

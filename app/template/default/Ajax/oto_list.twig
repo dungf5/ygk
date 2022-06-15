@@ -15,7 +15,10 @@
                          {% if data|length == 1 %}
 
                              <input class="hidden otodoke_code"  type="radio" checked name="delivery_address" value="{{ arShipping["otodoke_code"] }}" id="ship_{{ arShipping["otodoke_code"] }}" >
-                                        {% else %}
+
+
+
+                         {% else %}
                              <input type="radio" class=" otodoke_code"  name="delivery_address" value="{{ arShipping["otodoke_code"] }}" id="ship_{{ arShipping["otodoke_code"] }}" >
                          {% endif %}
 
@@ -43,38 +46,4 @@
 </p>
 
 
-
-{#<div class="bill_address shipping_destination">#}
-{#    <div class="shipping_destination_left">#}
-{#        <div>請求先 </div>#}
-{#    </div>#}
-{#    <div class="shipping_destination_right">#}
-
-{#        {% for arShipping in data.bill %}#}
-
-{#            <div class="shipping_row">#}
-
-{#                <div class="shipping_col1">#}
-{#                    <span><input type="radio" name="bill_address" value="{{ arShipping["id"] }}" id="bill_{{ arShipping["id"] }}" ></span>#}
-{#                    <label for="bill_{{ arShipping["id"] }}" >{{ arShipping["name01"] }} {{ arShipping["name02"] }}</label>#}
-{#                </div>#}
-{#                <div class="shipping_col2">#}
-{#                    〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }}#}
-
-{#                </div>#}
-
-{#            </div>#}
-
-{#        {% endfor %}#}
-
-
-
-
-
-{#    </div>#}
-
-{#</div>#}
-{#<p class="error_delivery_address" style="color: red;font-size: larger;font-weight: bold;display: none">#}
-{#    {{ 'front.shopping.shipping_title_error'|trans }}#}
-{#</p>#}
 

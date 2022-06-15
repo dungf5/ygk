@@ -11,7 +11,18 @@ file that was distributed with this source code.
 {% extends 'default_frame.twig' %}
 
 {% set body_class = 'cart_page' %}
-
+{% block javascript %}
+<script >
+    function  previewUrl() {
+        let urlBack = document.referrer;
+        if(urlBack==''){
+            window.location.href = '/';
+        }else{
+            window.location.href = urlBack;
+        }
+    }
+</script>
+{% endblock javascript %}
 {% block main %}
 
     <div class="ec-role">
@@ -207,7 +218,7 @@ file that was distributed with this source code.
                         </div>
                         <a class="ec-blockBtn--action" href="{{ path('cart_buystep', {'cart_key':cartKey}) }}">{{ 'front.cart.checkout'|trans }}</a>
                         {% if loop.last %}
-                            <a class="ec-blockBtn--cancel" href="{{ path('homepage') }}">{{ 'front.cart.continue'|trans }}</a>
+                            <a class="ec-blockBtn--cancel" href="javascript:previewUrl()">{{ 'front.cart.continue'|trans }}</a>
                         {% endif %}
                     </div>
                 {% endfor %}
