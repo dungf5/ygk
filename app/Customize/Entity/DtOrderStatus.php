@@ -31,6 +31,7 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         1:未引当、2:一部引当、3:引当済、4:キャンセル、9:クロース(出荷済)" ,"default":1 })
          */
         private $order_status;
+
         /**
          * @var string
          *
@@ -45,10 +46,59 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
          * @ORM\Id
          */
         private $ec_order_lineno;
+
         /**
          * @ORM\Column(name="reserve_stock_num",type="integer",nullable=true, options={"comment":"引当在庫数"  })
          */
         private $reserve_stock_num;
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="cus_order_no", type="string", length=40,options={"comment":"客先発注No"}, nullable=false)
+         * @ORM\Id
+         */
+        private $cus_order_no;
+
+
+        /**
+         * @ORM\Column(name="cus_order_lineno",type="string",length=2, options={"comment":"客先発注No行番号"  })
+         */
+        private $cus_order_lineno;
+
+        /**
+         * @return mixed
+         */
+        public function getCusOrderLineno()
+        {
+            return $this->cus_order_lineno;
+        }
+
+        /**
+         * @param mixed $cus_order_lineno
+         */
+        public function setCusOrderLineno($cus_order_lineno): void
+        {
+            $this->cus_order_lineno = $cus_order_lineno;
+        }
+
+        /**
+         * @return string
+         */
+        public function getCusOrderNo(): string
+        {
+            return $this->cus_order_no;
+        }
+
+        /**
+         * @param string $cus_order_no
+         */
+        public function setCusOrderNo(string $cus_order_no): void
+        {
+            $this->cus_order_no = $cus_order_no;
+        }
+
+
         /**
          * @ORM\Column(name="order_remain_num",type="integer",nullable=true, options={"comment":"受注残"  })
          */

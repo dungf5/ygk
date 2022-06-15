@@ -15,6 +15,8 @@ front.product.stock: 在庫
 front.product.invalid_quantity_multiples:  の倍数で入力してください。
 
 front.shopping.shipping_title_error: 出荷先をご指定ください。
+front.shopping.error_bill_address: 請求先を選んでください。
+
 front.order.order_no_type: 区分
 front.order.order_no: 注文番号
 front.order.order_lineno: 明細
@@ -31,7 +33,12 @@ front.order.shipping_date: 発送日
 front.order.inquiry_no: 荷送</br>伝票番号
 front.shopping.date_picker_delivery: 配送日 指定
 front.shopping.error_delivery_address: 届け先を選択してください。
-front.shopping.select_one: select one
+front.shopping.select_one: ※届け先を選んでください。
+front.shopping.select_one_bill_address: ※請求先を選んでください。
+front.shopping.select_one_shipping_radio: ※出荷先を選んでください。
+front.shopping.select_one_delivery_address: ※届け先を選んでください。
+
+
 
 
 

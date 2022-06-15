@@ -22,24 +22,35 @@ use Customize\Entity\MstShipping;
 use Customize\Repository\OrderItemRepository;
 use Customize\Repository\OrderRepository;
 use Customize\Repository\ProductImageRepository;
+use Customize\Service\Common\MyCommonService;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Controller\AbstractController;
+use Eccube\Entity\BaseInfo;
 use Eccube\Entity\Customer;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
 use Eccube\Form\Type\Front\CustomerLoginType;
 use Eccube\Repository\BaseInfoRepository;
+use Eccube\Repository\CustomerFavoriteProductRepository;
 use Eccube\Service\CartService;
 use Eccube\Service\PurchaseFlow\PurchaseFlow;
 use Knp\Component\Pager\PaginatorInterface;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class MypageController extends AbstractController
 {
+
+    /**
+     * @var BaseInfo
+     */
+    protected $BaseInfo;
+
     /**
      * @var OrderRepository
      */
@@ -61,6 +72,11 @@ class MypageController extends AbstractController
     protected $twig;
 
     /**
+     * @var CustomerFavoriteProductRepository
+     */
+    protected $customerFavoriteProductRepository;
+
+    /**
      * MypageController constructor.
      *
      * @param OrderRepository $orderRepository
@@ -71,11 +87,20 @@ class MypageController extends AbstractController
      */
     public function __construct(
         OrderRepository $orderRepository, ProductImageRepository $productImageRepository,OrderItemRepository $orderItemRepository,  \Twig_Environment $twig
-    ) {
+    ,EntityManagerInterface $entityManager,BaseInfoRepository $baseInfoRepository, CustomerFavoriteProductRepository $customerFavoriteProductRepository) {
         $this->orderRepository = $orderRepository;
         $this->productImageRepository = $productImageRepository;
         $this->orderItemRepository = $orderItemRepository;
          $this->twig = $twig;
+        $this->entityManager =$entityManager;
+        $myCm = new MyCommonService($this->entityManager);
+        $MyDataMstCustomer = $myCm->getMstCustomer($this->twig->getGlobals()["app"]->getUser()->getId());
+        $this->twig->getGlobals()["app"]->MyDataMstCustomer=$MyDataMstCustomer;
+        $this->BaseInfo = $baseInfoRepository->get();
+        $this->customerFavoriteProductRepository = $customerFavoriteProductRepository;
+
+
+
     }
 
 
@@ -281,6 +306,42 @@ class MypageController extends AbstractController
         return [
             'error' => $utils->getLastAuthenticationError(),
             'form' => $form->createView(),
+        ];
+    }
+    /**
+     * お気に入り商品を表示する.
+     *
+     * @Route("/mypage/favorite", name="mypage_favorite", methods={"GET"})
+     * @Template("Mypage/favorite.twig")
+     */
+    public function favorite(Request $request, PaginatorInterface $paginator)
+    {
+        if (!$this->BaseInfo->isOptionFavoriteProduct()) {
+            throw new NotFoundHttpException();
+        }
+        $Customer = $this->getUser();
+
+        // paginator
+        $qb = $this->customerFavoriteProductRepository->getQueryBuilderByCustomer($Customer);
+
+        $event = new EventArgs(
+            [
+                'qb' => $qb,
+                'Customer' => $Customer,
+            ],
+            $request
+        );
+        $this->eventDispatcher->dispatch(EccubeEvents::FRONT_MYPAGE_MYPAGE_FAVORITE_SEARCH, $event);
+
+        $pagination = $paginator->paginate(
+            $qb,
+            $request->get('pageno', 1),
+            $this->eccubeConfig['eccube_search_pmax'],
+            ['wrap-queries' => true]
+        );
+
+        return [
+            'pagination' => $pagination,
         ];
     }
 }

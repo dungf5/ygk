@@ -332,23 +332,23 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         }
 
 
-        /**
-         * @var \Eccube\Entity\Order
-         *
-         * @ORM\OneToOne(targetEntity="Eccube\Entity\Order")
-         * @ORM\JoinColumns({
-         *   @ORM\JoinColumn(name="order_id", referencedColumnName="id")
-         * })
-         */
-        private $Order;
-
-        /**
-         * @param mixed $Order
-         */
-        public function setOrder($Order): void
-        {
-            $this->Order = $Order;
-        }
+//        /**
+//         * @var \Eccube\Entity\Order
+//         *
+//         * @ORM\OneToOne(targetEntity="Eccube\Entity\Order")
+//         * @ORM\JoinColumns({
+//         *   @ORM\JoinColumn(name="order_id", referencedColumnName="id")
+//         * })
+//         */
+//        private $Order;
+//
+//        /**
+//         * @param mixed $Order
+//         */
+//        public function setOrder($Order): void
+//        {
+//            $this->Order = $Order;
+//        }
 
 
 

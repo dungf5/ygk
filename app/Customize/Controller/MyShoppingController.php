@@ -184,6 +184,7 @@ class MyShoppingController extends AbstractShoppingController
         $moreOrder = $commonService->getMoreOrder($Order->getPreOrderId());
 
         $shipping_no_checked = '';
+        $seikyu_code_checked ='';
 
         if (!MyCommon::isEmptyOrNull($moreOrder)) {
             if(MyCommon::isEmptyOrNull($moreOrder["date_want_delivery"])){
@@ -192,9 +193,7 @@ class MyShoppingController extends AbstractShoppingController
             if(MyCommon::isEmptyOrNull($moreOrder["date_want_delivery"])){
                 $moreOrder["date_want_delivery"]="";
             }
-            if(MyCommon::isEmptyOrNull($moreOrder["seikyu_code"])){
-                $moreOrder["seikyu_code"]="";
-            }
+
             if(MyCommon::isEmptyOrNull($moreOrder["seikyu_code"])){
                 $moreOrder["seikyu_code"]="";
             }
@@ -212,6 +211,7 @@ class MyShoppingController extends AbstractShoppingController
             $Order->moreOrder = $moreOrder;
             $Order->hasMoreOrder = 1;
             foreach ($mstShip as $mS) {
+
                 if ($mS['shipping_no'] == $moreOrder['shipping_code']) {
                     $shipping_no_checked = $mS['shipping_no'];
                 }
@@ -219,8 +219,9 @@ class MyShoppingController extends AbstractShoppingController
         } else {
             $Order->hasMoreOrder = 0;
         }
-        $Order->shipping_no_checked = $shipping_no_checked;
 
+        $Order->shipping_no_checked = $shipping_no_checked;
+        $Order->seikyu_code_checked = isset($moreOrder['seikyu_code'])??'' ;
         $form = $this->createForm(OrderType::class, $Order);
 
         return [

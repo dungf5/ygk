@@ -325,7 +325,7 @@ class MyCommonService extends AbstractRepository
     {
         //dt_order_status
         //$arEcLData[] = ['ec_order_no'=>$orderNo,'ec_order_lineno'=>$itemOr->getId()];
-        $keyS = date('YmdHis');
+        $keyS = date('mdHis');
         $keyTem = (int) $keyS;
         foreach ($arEcLData as $itemSave) {
             $ec_order = $itemSave['ec_order_no'];
@@ -340,6 +340,14 @@ class MyCommonService extends AbstractRepository
             $orderItem->setShippingNo($keyTem);
             $orderItem->setEcOrderLineno($ec_order_lineno);
             $orderItem->setEcOrderNo($ec_order);
+            $orderItem->setShippingStatus(0);
+            $orderItem->setShippingNum(0);
+            $orderItem->setShippingPlanDate('');
+            $orderItem->setShippingDate('');
+            $orderItem->setInquiryNo('');
+            $orderItem->setShippingCompanyCode('');
+
+
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
         }
@@ -349,12 +357,14 @@ class MyCommonService extends AbstractRepository
     {
         //dt_order_status
         //$arEcLData[] = ['ec_order_no'=>$orderNo,'ec_order_lineno'=>$itemOr->getId()];
+        $cusOrderLineno=0;
         foreach ($arEcLData as $itemSave) {
             $ec_order = $itemSave['ec_order_no'];
             $ec_order_lineno = $itemSave['ec_order_lineno'];
             $keyFind = ['ec_order_no' => $ec_order, 'ec_order_lineno' => $ec_order_lineno];
             $objRep = $this->entityManager->getRepository(DtOrderStatus::class)->findOneBy($keyFind);
             $orderItem = new DtOrderStatus();
+            $cusOrderLineno++;
             if ($objRep !== null) {
                 $orderItem = $objRep;
             } else {
@@ -363,6 +373,9 @@ class MyCommonService extends AbstractRepository
             // $orderItem->setPropertiesFromArray($keyFind,['create_date']);
             $orderItem->setEcOrderLineno($ec_order_lineno);
             $orderItem->setEcOrderNo($ec_order);
+            //"cus_order_no"=>$ec_order,"cus_order_lineno"=>$ec_order_lineno
+            $orderItem->setCusOrderNo($ec_order);
+            $orderItem->setCusOrderLineno($cusOrderLineno);
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
         }

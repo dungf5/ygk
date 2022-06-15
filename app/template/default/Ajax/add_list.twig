@@ -10,9 +10,9 @@
 
 
         {% else %}
-            <select style="width: 555px" id="delivery_address" name="delivery_address"
+            <select required style="width: 555px" id="delivery_address" name="delivery_address"
             >
-                <option value=""> {{ 'front.shopping.select_one'|trans }}</option>
+                <option value=""  disabled selected > {{ 'front.shopping.select_one_delivery_address'|trans }}</option>
                 {% for arShipping in data.shipping %}
 
 
