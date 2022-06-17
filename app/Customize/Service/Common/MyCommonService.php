@@ -83,10 +83,10 @@ class MyCommonService extends AbstractRepository
         }
     }
 
-    public function getShipList($customer_code)
+    public function getShipList($customer_code,$shipping_no,$order_no)
     {
 
-        $sql = " select c.inquiry_no ,d.customer_name ,c.product_code,
+        $sql = " select c.inquiry_no ,c.shipping_no,d.customer_name ,c.product_code,
                     case when c.shipping_status = 1 then '出荷指示済'  else '出荷済' end as shipping_status,c.shipping_num
                     ,c.shipping_plan_date ,c.inquiry_no,c.shipping_company_code
                     from dt_order_status as a
@@ -97,11 +97,14 @@ class MyCommonService extends AbstractRepository
                     and a.ec_order_lineno = c.ec_order_lineno
                     join mst_customer as d
                     on c.customer_code = d.customer_code
-                    join dt_customer_relation as e
-                    on c.shipping_code = e.shipping_code
-                    where a.customer_code = ?";
+                    -- join dt_customer_relation as e   on c.shipping_code = e.shipping_code
+                    where a.customer_code = ? and c.shipping_no=? and a.ec_order_no=?";
         $param = [];
         $param[] = $customer_code;
+        $param[] = $shipping_no;
+        $param[] = $order_no;
+
+
         $statement = $this->entityManager->getConnection()->prepare($sql);
         try {
             $result = $statement->executeQuery($param);

@@ -109,7 +109,7 @@ class MypageController extends AbstractController
     /**
      * マイページ.
      *
-     * @Route("/mypage/shippingList", name="shippingList", methods={"GET"})
+     * @Route("/mypage/shipping_list", name="shippingList", methods={"GET"})
      * @Template("/Mypage/shipping_list.twig")
      */
     public function shippingList(Request $request)
@@ -118,7 +118,10 @@ class MypageController extends AbstractController
         $arRe=[];
         $comS = new MyCommonService($this->entityManager);
         $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
-        $arRe = $comS->getShipList($customer_code);
+        $shipping_no = $request->get("shipping_no");
+        $order_no = $request->get("order_no");
+
+        $arRe = $comS->getShipList($customer_code,$shipping_no,$order_no);
         $arReturn = ["myData"=>$arRe];
 
         return $arReturn;

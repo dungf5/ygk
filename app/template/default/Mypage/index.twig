@@ -96,9 +96,10 @@ file that was distributed with this source code.
                                 <td class="hide" >{{Order.shipping_date}}</td>
                                 <td>
 {#                                    <a target="_blank" href="/mypage/exportOrderPdf?inquiry_no={{Order.shipping_no}}">{{Order.shipping_no}}</a>#}
-                                    {% include "Mypage/modal_list.twig" with {'shipping_no':Order.shipping_no } %}
+{#                                    <a  onclick="loadDataFor('{{ Order.shipping_no }}')"  href="javascript:loadDataFor('{{ Order.shipping_no }}');"   >{{Order.shipping_no}}</a>#}
 
-                                    <a  href="javascript:;"  data-toggle="modal" data-target="#flipFlop{{ Order.shipping_no }}" >{{Order.shipping_no}}xxx</a>
+
+                                    <a onclick="loadDataFor('{{Order.ec_order_no}}','{{ Order.shipping_no }}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest" >{{Order.shipping_no}}</a>
 
                                 </td>
 
@@ -123,7 +124,35 @@ file that was distributed with this source code.
                 <p class="ec-para-normal">{{ 'front.mypage.history_not_found'|trans }}</p>
             {% endif %}
         </div>
+        {% include "Mypage/modal_list.twig" with {'shipping_no':'Test' } %}
     </div>
 
 
+{% endblock %}
+{% block javascript %}
+<script>
+function updateShipingAddress(shipping_no,ec_order_no) {
+    $('.showbody').html("loading...");
+    let dataSend={
+                    shipping_no:shipping_no ,
+                    order_no:ec_order_no ,
+                    '_token':'{{ csrf_token('_token') }}',
+                 };
+    $.ajax({
+        url: '/mypage/shipping_list',
+                        type: 'GET',
+                        data: dataSend
+                    }).done(function(htmlRe, statusText, jqXHR) {
+
+                        $('.showbody').html(htmlRe);
+
+                    }).fail(function(jqXHR, statusText, errorThrown) {
+             });
+
+
+}
+function loadDataFor(ec_order_no,shipping_no){
+    updateShipingAddress(shipping_no,ec_order_no);
+}
+</script>
 {% endblock %}

@@ -152,11 +152,15 @@ class ProductRepository extends AbstractRepository
 
     public function getQueryBuilderBySearchDataNewCustom($searchData, $user = false, $customer_code = '')
     {
+        $defaultSortLoginorderPrice =" (CASE
+                       WHEN price.price_s01  is null THEN mstProduct.unit_price
+                      ELSE price.price_s01  end) AS hidden orderPrice ";
         $sqlColmnsP="p.id,p.description_list,p.free_area";
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb = $qb->andWhere('p.Status = 1');
         $qb ->select($sqlColmnsP)
             ->from('Customize\Entity\Product', 'p');
+        $qb->addSelect($defaultSortLoginorderPrice);
         // category
         $categoryJoin = false;
         if (!empty($searchData['category_id']) && $searchData['category_id']) {
@@ -197,8 +201,7 @@ class ProductRepository extends AbstractRepository
                 $qb->addOrderBy('mstProduct.unit_price', 'asc');
             }else{
                 //price.price_s01
-
-                $qb->addOrderBy('price.price_s01', 'asc');
+               $qb->addOrderBy('orderPrice', 'asc');
 
             }
             // 価格高い順
@@ -208,7 +211,7 @@ class ProductRepository extends AbstractRepository
                 $qb->addOrderBy('mstProduct.unit_price', 'DESC');
             }else{
                 //price.price_s01
-                $qb->addOrderBy('price.price_s01', 'desc');
+                $qb->addOrderBy('orderPrice', 'desc');
 
             }
             // 新着順 orderby=1
@@ -227,14 +230,12 @@ class ProductRepository extends AbstractRepository
                     ->leftJoin('p.ProductCategories', 'pct')
                     ->leftJoin('pct.Category', 'c');
             }
-
-
             // 新着順 orderby=0
             if(!$user) {
                 $qb->addOrderBy('mstProduct.unit_price', 'asc');
             }else{
                 //price.price_s01
-                $qb->addOrderBy('price.price_s01', 'asc');
+                $qb->addOrderBy('orderPrice', 'desc');
 
             }
         }
