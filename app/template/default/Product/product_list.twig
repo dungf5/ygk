@@ -157,6 +157,7 @@ file that was distributed with this source code.
                 {% endif %}
             </div>
         </div>
+        <div class="ec-shelfRole">
         {% if pagination.totalItemCount > 0 %}
                     <div class="w-100" >
                     <table class="table w-100" >
@@ -164,7 +165,7 @@ file that was distributed with this source code.
 
                         {% set form = forms[Product.id] %}
                                 <tr>
-                                    <td rowspan="2">
+                                    <td rowspan="2" style="width: 100px">
                                         <div >
                                             <img  style="width: 150px;height: 150px" src="{{ asset(hsKeyImg[Product.id]|no_image_product, 'save_image') }}" alt="{{ Product.product_name }}" loading="lazy">
                                         </div>
@@ -271,5 +272,6 @@ file that was distributed with this source code.
                 {% include "pager.twig" with {'pages': pagination.paginationData} %}
             </div>
         {% endif %}
+        </div>
     {% endif %}
 {% endblock %}

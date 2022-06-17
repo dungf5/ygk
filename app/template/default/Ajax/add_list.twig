@@ -7,12 +7,12 @@
     <div class="shipping_destination_right">
 
         {% if data.shipping|length == 1 %}
-            <div class="shipping_row">
+            <div class="shipping_row otodoke_code">
 
-                <div class="shipping_col1">
+                <div class="shipping_col1 otodoke_code">
                                     <span>
                                         {% if data.shipping|length|length == 1 %}
-                                            <input type="radio" class="hidden otodoke_code" checked name="delivery_address"
+                                            <input type="radio" class="hidden otodoke_code " checked name="delivery_address"
                                                    value="{{ data.shipping[0]["otodoke_code"] }}" id="{{ data.shipping[0]["otodoke_code"] }}">
 
                                         {% endif %}
@@ -29,7 +29,7 @@
 
 
         {% else %}
-            <select required style="width: 555px" id="delivery_address" name="delivery_address"
+            <select required style="width: 555px" class="delivery_address_is_otodoke_code" id="delivery_address" name="delivery_address"
             >
                 <option value=""  disabled selected > {{ 'front.shopping.select_one_delivery_address'|trans }}</option>
                 {% for arShipping in data.shipping %}

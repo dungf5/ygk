@@ -18,7 +18,12 @@ file that was distributed with this source code.
         if(urlBack==''){
             window.location.href = '/';
         }else{
-            window.location.href = urlBack;
+            if(urlBack.indexOf('products/list')>-1){
+                window.location.href = urlBack;
+            }else{
+                window.location.href = '/';
+            }
+
         }
     }
 </script>

@@ -120,7 +120,7 @@ class MyCommonService extends AbstractRepository
      */
     public function getMstShippingCustomer($customerId, MoreOrder $moreOrder = null)
     {
-        $column = "customer_code as shipping_no, ec_customer_id, customer_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date";
+        $column = "customer_code as shipping_no,b.shipping_code, ec_customer_id, customer_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date";
         $sql = " SELECT $column   FROM mst_customer a  join
                 (
                 SELECT b.shipping_code from dt_customer_relation b
