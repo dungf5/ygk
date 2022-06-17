@@ -19,7 +19,6 @@ file that was distributed with this source code.
 {% for OrderItem in Order.ProductOrderItems %}
 商品コード：{{ OrderItem.product_code }}
 商品名：{{ OrderItem.product_name }}
-
 単価：{{ OrderItem.price|price }}
 数量：{{ OrderItem.quantity|number_format }}
 
