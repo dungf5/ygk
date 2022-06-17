@@ -239,7 +239,7 @@ class MyProductController extends AbstractController
     public function addCart(Request $request, Product $Product)
     {
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
         // エラーメッセージの配列
         $errorMessages = [];
         if (!$this->checkVisibility($Product)) {
@@ -374,6 +374,7 @@ class MyProductController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         // Doctrine SQLFilter
         if ($this->BaseInfo->isOptionNostockHidden()) {
@@ -405,6 +406,7 @@ class MyProductController extends AbstractController
         $searchForm = $builder->getForm();
 
         $searchForm->handleRequest($request);
+        $commonService = new MyCommonService($this->entityManager);
 
         $user = false;
         $customer_code = '';
@@ -430,7 +432,7 @@ class MyProductController extends AbstractController
         );
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_SEARCH, $event);
         $searchData = $event->getArgument('searchData');
-
+        error_reporting(E_ALL ^ E_DEPRECATED);
         $query = $qb->getQuery()
             ->useResultCache(true, $this->eccubeConfig['eccube_result_cache_lifetime_short']);
 
@@ -449,6 +451,12 @@ class MyProductController extends AbstractController
             $ids[] = $Product["id"];
         }
         $ProductsAndClassCategories = $this->productRepository->findProductsWithSortedClassCategories($ids, 'p.id');
+        $listImgs = $commonService->getImageFromEcProductId($ids);
+        $hsKeyImg = [];
+        //a.file_name,a.product_id,b.product_code
+        foreach ($listImgs as $itemImg){
+            $hsKeyImg[$itemImg["product_id"]] = $itemImg["file_name"];
+        }
 
         // addCart form
         $forms = [];
@@ -530,6 +538,7 @@ class MyProductController extends AbstractController
             'disp_number_form' => $dispNumberForm->createView(),
             'order_by_form' => $orderByForm->createView(),
             'forms' => $forms,
+            'hsKeyImg'=>$hsKeyImg,
             'Category' => $Category
 
 

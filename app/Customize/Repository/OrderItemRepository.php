@@ -32,31 +32,29 @@ class OrderItemRepository extends AbstractRepository
         $this->queries = $queries;
     }
     /**
-     * @param  \Eccube\Entity\Customer $Customer
+     *
      *
      * @return QueryBuilder
      */
-    public function getQueryBuilderByCustomer(Customer $Customer)
+    public function getQueryBuilderByCustomer($customerCode)
     {
         //ordStatus.update_date,
-        $qb = $this->createQueryBuilder('i')
-            ->select('ordStatus.ec_order_no,ordStatus.order_line_no,ordStatus.ec_order_lineno,o.order_status_id,i.product_id,i.product_name,mstp.product_code,
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        //$qb = $this->createQueryBuilder('i');
+        $qb = $qb
+            ->select('ordStatus.ec_order_no,ordStatus.order_line_no,ordStatus.ec_order_lineno,ordStatus.order_status as order_status_id,mstp.ec_product_id as product_id ,mstp.product_name,mstp.product_code,
             ordStatus.order_status,ordStatus.reserve_stock_num,ordStatus.update_date,ordStatus.order_remain_num,mstShip.shipping_status,mstShip.inquiry_no,mstShip.shipping_date,mstShip.shipping_no')
-            // ->leftJoin('Customize\Entity\MstShipping', 'mstShip',Join::WITH,'mstShip.ec_order_no=o.order_no')
-            ->innerJoin('Customize\Entity\Order', 'o', Join::WITH, 'i.order_id=o.id')
-            ->innerJoin('Customize\Entity\Product', 'p', Join::WITH, 'i.product_id=p.id')
-            ->innerJoin('Customize\Entity\MstProduct', 'mstp', Join::WITH, 'mstp.ec_product_id=i.product_id')
-
-            ->innerJoin('Customize\Entity\DtOrderStatus', 'ordStatus', Join::WITH, 'ordStatus.ec_order_no=o.order_no and ordStatus.ec_order_lineno=i.id')
-            ->leftJoin('Customize\Entity\MstShipping', 'mstShip', Join::WITH, 'mstShip.ec_order_no=o.order_no and mstShip.ec_order_lineno=i.id')
-            ->where('o.Customer = :Customer')
-            ->setParameter('Customer', $Customer);
+            ->from('Customize\Entity\DtOrderStatus', 'ordStatus')
+            ->innerJoin('Customize\Entity\MstProduct', 'mstp', Join::WITH, 'ordStatus.product_code=mstp.product_code')
+            ->innerJoin('Customize\Entity\MstShipping', 'mstShip', Join::WITH, 'mstShip.ec_order_no=ordStatus.ec_order_no and mstShip.ec_order_lineno=ordStatus.ec_order_lineno')
+            ->where('ordStatus.customer_code  = :customerCode')
+            ->setParameter('customerCode', $customerCode);
 
         // Order By
-        $qb->addOrderBy('o.id', 'DESC');
-        //var_dump( $qb->getQuery()->getSQL());
+        $qb->addOrderBy('ordStatus.ec_order_no', 'DESC');
+//        var_dump( $qb->getQuery()->getSQL());die();
 
-        return $this->queries->customize(QueryKey::ORDER_SEARCH_BY_CUSTOMER, $qb, ['customer' => $Customer]);
+        return $this->queries->customize("", $qb, []);
     }
 
 

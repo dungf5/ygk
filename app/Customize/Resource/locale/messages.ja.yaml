@@ -37,7 +37,16 @@ front.shopping.select_one: ※届け先を選んでください。
 front.shopping.select_one_bill_address: ※請求先を選んでください。
 front.shopping.select_one_shipping_radio: ※出荷先を選んでください。
 front.shopping.select_one_delivery_address: ※届け先を選んでください。
-
+front.mypage.shipping_no: 出荷指示№
+front.mypage.customer_code: 顧客
+front.mypage.shipping_code: 出荷先
+front.mypage.product_code: 製品コード
+front.mypage.shipping_status: 出荷ステータス
+front.mypage.shipping_num: 出荷数
+front.mypage.shipping_plan_date: 出荷指示日
+front.mypage.inquiry_no: 荷送伝票番号
+front.mypage.shipping_company_code: 運送会社
+front.mypage.shipping_no_no: 出荷指示№
 
 
 

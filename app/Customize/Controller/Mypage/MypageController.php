@@ -106,6 +106,25 @@ class MypageController extends AbstractController
 
     }
 
+    /**
+     * マイページ.
+     *
+     * @Route("/mypage/shippingList", name="shippingList", methods={"GET"})
+     * @Template("/Mypage/shipping_list.twig")
+     */
+    public function shippingList(Request $request)
+    {
+
+        $arRe=[];
+        $comS = new MyCommonService($this->entityManager);
+        $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
+        $arRe = $comS->getShipList($customer_code);
+        $arReturn = ["myData"=>$arRe];
+
+        return $arReturn;
+
+
+    }
 
     /**
      * マイページ.
@@ -187,7 +206,8 @@ class MypageController extends AbstractController
             ->enable('incomplete_order_status_hidden');
         $nf = new MstShipping();
         // paginator
-        $qb = $this->orderItemRepository->getQueryBuilderByCustomer($Customer);
+        $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
+        $qb = $this->orderItemRepository->getQueryBuilderByCustomer($customer_code);
 
         $event = new EventArgs(
             [
@@ -246,9 +266,17 @@ class MypageController extends AbstractController
         }
         //get one image of product
         $hsProductImgMain = $this->productImageRepository->getImageMain($arProductId);
+        $commonService = new MyCommonService($this->entityManager);
+        $listImgs = $commonService->getImageFromEcProductId($arProductId);
+        $hsKeyImg = [];
+        //a.file_name,a.product_id,b.product_code
+        foreach ($listImgs as $itemImg){
+            $hsKeyImg[$itemImg["product_id"]] = $itemImg["file_name"];
+        }
+
         foreach ($listItem as &$myItem) {
-            if (isset($hsProductImgMain[$myItem['product_id']])) {
-                $myItem['main_img'] = $hsProductImgMain[$myItem['product_id']];
+            if (isset($hsKeyImg[$myItem['product_id']])) {
+                $myItem['main_img'] = $hsKeyImg[$myItem['product_id']];
             }else{
                 $myItem['main_img'] = null;
             }

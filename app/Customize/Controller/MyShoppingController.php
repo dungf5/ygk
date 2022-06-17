@@ -428,18 +428,43 @@ class MyShoppingController extends AbstractShoppingController
 
                 //save more nvtrong
                 $comS = new MyCommonService($this->entityManager);
+
                 $orderNo = $Order->getOrderNo();
                 $itemList = $Order->getItems()->toArray();
                 $arEcLData = [];
-                foreach ($itemList as $itemOr) {
-                    if ($itemOr->isProduct()) {
-                        $arEcLData[] = ['ec_order_no' => $orderNo, 'ec_order_lineno' => $itemOr->getId()];
-                    }
+                $hsArrEcProductCusProduct=[];
+                $arEcProduct =[];
+                ///
+                $arMstProduct = $comS->getMstProductsOrderNo($orderNo);
+                $hsArrRemmain=[];
+                foreach ($arMstProduct as $itemPro) {
+                    $hsArrEcProductCusProduct[$itemPro["ec_order_lineno"]] = $itemPro["product_code"];
+                    $hsArrRemmain[$itemPro["ec_order_lineno"]] = $itemPro["quantity"];
                 }
-                $comS->saveOrderStatus($arEcLData);
+                //customer_code
+
+                $oneCustomer = $comS->getMstCustomer( $Order->getCustomer()->getId());
+                $customerCode = $oneCustomer['customer_code'];
                 $moreOrder = $comS->getMoreOrder($Order->getPreOrderId());
 
                 $ship_code = $moreOrder->getShippingCode();
+                $shipping_plan_date = $moreOrder->getDateWantDelivery();
+                foreach ($itemList as $itemOr) {
+                    if ($itemOr->isProduct()) {
+                        $arEcLData[] = ['ec_order_no' => $orderNo,
+                            'ec_order_lineno' => $itemOr->getId()
+                            ,'product_code'=>$hsArrEcProductCusProduct[$itemOr->getId()]
+                            ,'customer_code'=> $customerCode
+                            ,'shipping_code'=> $ship_code,
+                            'order_remain_num'=>$hsArrRemmain[$itemOr->getId()],
+                            'shipping_plan_date'=>$shipping_plan_date,
+                            ];
+
+                    }
+                }
+                log_info('[saveOrderStatussaveOrderStatussaveOrderStatus', $arEcLData);
+                $comS->saveOrderStatus($arEcLData);
+
                 $comS->saveOrderShiping($arEcLData);
 
                 log_info('[注文処理] 注文処理が完了しました.', [$Order->getId()]);

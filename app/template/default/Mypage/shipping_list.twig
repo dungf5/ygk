@@ -1,0 +1,33 @@
+<table class="table myTable">
+    <thead>
+    <tr>
+        <th title="inquiry_no">出荷指示№</th>
+        <th title="customer_name">顧客</th>
+        <th title="product_code">製品コード</th>
+        <th title="shipping_status">出荷ステータス/th>
+        <th title="shipping_num">出荷数</th>
+        <th title="shipping_plan_date">出荷指示日</th>
+        <th title="inquiry_no" >荷送伝票番号</th>
+        <th title="shipping_company_code">運送会社</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in myData %}
+    <tr>
+        <td>{{item.inquiry_no }}</td>
+        <td>{{item.customer_name }}</td>
+        <td>{{item.product_code }}</td>
+        <td>{{item.shipping_status }}</td>
+        <td>{{item.shipping_num }}</td>
+        <td>{{item.shipping_plan_date }}</td>
+        <td>{{item.inquiry_no }}</td>
+        <td>{{item.shipping_company_code }}</td>
+
+
+
+    </tr>
+    {% endfor %}
+
+    </tbody>
+</table>

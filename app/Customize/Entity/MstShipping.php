@@ -52,6 +52,75 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         private $order_lineno;
 
         /**
+         * @var string
+         *
+         * @ORM\Column(name="customer_code", type="string", length=25)
+         */
+        private $customer_code;
+
+        /**
+         * @return string
+         */
+        public function getCustomerCode(): string
+        {
+            return $this->customer_code;
+        }
+
+        /**
+         * @param string $customer_code
+         */
+        public function setCustomerCode(string $customer_code): void
+        {
+            $this->customer_code = $customer_code;
+        }
+
+        /**
+         * @return string
+         */
+        public function getShippingCode(): string
+        {
+            return $this->shipping_code;
+        }
+
+        /**
+         * @param string $shipping_code
+         */
+        public function setShippingCode(string $shipping_code): void
+        {
+            $this->shipping_code = $shipping_code;
+        }
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="shipping_code", type="string", length=25)
+         */
+        private $shipping_code;
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="product_code", type="string", length=25)
+         */
+        private $product_code;
+
+        /**
+         * @return string
+         */
+        public function getProductCode(): string
+        {
+            return $this->product_code;
+        }
+
+        /**
+         * @param string $product_code
+         */
+        public function setProductCode(string $product_code): void
+        {
+            $this->product_code = $product_code;
+        }
+
+        /**
          * @var int
          *
          * @ORM\Column(name="shipping_status", type="smallint", nullable=true)

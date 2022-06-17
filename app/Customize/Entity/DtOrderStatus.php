@@ -18,7 +18,35 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
          *
          * @ORM\Column(name="order_no",nullable=true, type="string", length=15, options={"comment":"STRA注文番号"})
          */
+
         private $order_no;
+
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="product_code",nullable=true, type="string", length=45, options={"comment":"product_code"})
+         */
+
+        private $product_code;
+
+        /**
+         * @return string
+         */
+        public function getProductCode(): string
+        {
+            return $this->product_code;
+        }
+
+        /**
+         * @param string $product_code
+         */
+        public function setProductCode(string $product_code): void
+        {
+            $this->product_code = $product_code;
+        }
+
+
         /**
          * @var string
          *
@@ -36,14 +64,14 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
          * @var string
          *
          * @ORM\Column(name="ec_order_no", type="string", length=15,options={"comment":"EC発注番号"}, nullable=false)
-         * @ORM\Id
+
          */
         private $ec_order_no;
         /**
          * @var string
          *
          * @ORM\Column(name="ec_order_lineno", type="string", length=15,options={"comment":"EC発注明細番号"}, nullable=false)
-         * @ORM\Id
+
          */
         private $ec_order_lineno;
 
@@ -60,11 +88,64 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
          */
         private $cus_order_no;
 
-
         /**
-         * @ORM\Column(name="cus_order_lineno",type="string",length=2, options={"comment":"客先発注No行番号"  })
+         * @var string
+         *
+         * @ORM\Column(name="cus_order_lineno", type="string", length=2,options={"comment":"客先発注No"}, nullable=false)
+
          */
         private $cus_order_lineno;
+
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="customer_code", type="string", length=25,options={"comment":"顧客"}, nullable=true)
+
+         */
+        private $customer_code;
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="shipping_code", type="string", length=25,options={"comment":"顧客"}, nullable=true)
+
+         */
+        private $shipping_code;
+
+        /**
+         * @return string
+         */
+        public function getShippingCode(): string
+        {
+            return $this->shipping_code;
+        }
+
+        /**
+         * @param string $shipping_code
+         */
+        public function setShippingCode(string $shipping_code): void
+        {
+            $this->shipping_code = $shipping_code;
+        }
+
+        /**
+         * @return mixed
+         */
+        public function getCustomerCode()
+        {
+            return $this->customer_code;
+        }
+
+        /**
+         * @param mixed $customer_code
+         */
+        public function setCustomerCode($customer_code): void
+        {
+            $this->customer_code = $customer_code;
+        }
+
+
+
 
         /**
          * @return mixed

@@ -59,7 +59,7 @@ file that was distributed with this source code.
 
                         <th title="update_date">{{ 'front.order.update_date'|trans| raw }}</th>
                         <th class="hide" title="shipping_date">{{ 'front.order.shipping_date'|trans| raw }}</th>
-                        <th title="shipping_no"  style="text-align: center;" >{{ 'front.order.inquiry_no'|trans| raw }}</th>
+                        <th title="shipping_no"  style="text-align: center;" >{{ 'front.mypage.shipping_no_no'|trans| raw }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -94,7 +94,13 @@ file that was distributed with this source code.
 
                                 <td>{{Order.update_date}}</td>
                                 <td class="hide" >{{Order.shipping_date}}</td>
-                                <td><a target="_blank" href="/mypage/exportOrderPdf?inquiry_no={{Order.shipping_no}}">{{Order.shipping_no}}</a> </td>
+                                <td>
+{#                                    <a target="_blank" href="/mypage/exportOrderPdf?inquiry_no={{Order.shipping_no}}">{{Order.shipping_no}}</a>#}
+                                    {% include "Mypage/modal_list.twig" with {'shipping_no':Order.shipping_no } %}
+
+                                    <a  href="javascript:;"  data-toggle="modal" data-target="#flipFlop{{ Order.shipping_no }}" >{{Order.shipping_no}}xxx</a>
+
+                                </td>
 
 
 
@@ -118,4 +124,6 @@ file that was distributed with this source code.
             {% endif %}
         </div>
     </div>
+
+
 {% endblock %}

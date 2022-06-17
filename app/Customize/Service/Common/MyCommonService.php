@@ -83,6 +83,35 @@ class MyCommonService extends AbstractRepository
         }
     }
 
+    public function getShipList($customer_code)
+    {
+
+        $sql = " select c.inquiry_no ,d.customer_name ,c.product_code,
+                    case when c.shipping_status = 1 then '出荷指示済'  else '出荷済' end as shipping_status,c.shipping_num
+                    ,c.shipping_plan_date ,c.inquiry_no,c.shipping_company_code
+                    from dt_order_status as a
+                    join mst_product as b
+                    on a.product_code = b.product_code
+                    join mst_shipping as c
+                    on a.ec_order_no = c.ec_order_no
+                    and a.ec_order_lineno = c.ec_order_lineno
+                    join mst_customer as d
+                    on c.customer_code = d.customer_code
+                    join dt_customer_relation as e
+                    on c.shipping_code = e.shipping_code
+                    where a.customer_code = ?";
+        $param = [];
+        $param[] = $customer_code;
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            return $rows;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
     /**
      * @param MoreOrder $moreOrder
      */
@@ -120,6 +149,69 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
+    /**
+     * @param
+     */
+    public function getMstProductsOrderNo($order_no)
+    {
+
+
+
+        $sql = " 	select b.id AS ec_order_lineno,a.order_no,b.product_id,c.product_code,b.quantity	 from
+				dtb_order as a  join dtb_order_item b on a.id = b.order_id
+				join mst_product as c   on c.ec_product_id = b.product_id
+			WHERE order_no='$order_no'
+				ORDER BY b.id asc ";
+        $param = [];
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            return $rows;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+    public function getImageFromEcProductId($myCart)
+    {
+        $subWhere = "";
+        $c = count($myCart);
+        for ($i = 0;$i<$c;$i++) {
+            if($i ==$c-1){
+                $subWhere .="?";
+            }else{
+                $subWhere .="?,";
+            }
+        }
+        if(count($myCart)==0){
+            return  [];
+        }
+
+        $sql = " SELECT a.file_name,a.product_id,b.product_code
+                FROM  dtb_product_image a JOIN mst_product b
+                ON b.ec_product_id = a.product_id
+                WHERE  a.id IN(
+
+                SELECT MIN(a.id)
+                                 FROM dtb_product_image  a
+                                 WHERE a.product_id in({$subWhere})
+                                GROUP BY a.product_id  )
+                                 ORDER BY a.id ASC
+                ";
+        $param = [];
+        $param =$myCart;
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+
+            return $rows;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
     /**
      * @param
      */
@@ -327,9 +419,11 @@ class MyCommonService extends AbstractRepository
         //$arEcLData[] = ['ec_order_no'=>$orderNo,'ec_order_lineno'=>$itemOr->getId()];
         $keyS = date('mdHis');
         $keyTem = (int) $keyS;
+        $lineNo = 0;
         foreach ($arEcLData as $itemSave) {
+            $lineNo++;
             $ec_order = $itemSave['ec_order_no'];
-            $ec_order_lineno = $itemSave['ec_order_lineno'];
+            $ec_order_lineno = $lineNo;//$itemSave['ec_order_lineno'];
             $keyFind = ['ec_order_no' => $ec_order, 'ec_order_lineno' => $ec_order_lineno];
             $objRep = $this->entityManager->getRepository(MstShipping::class)->findOneBy($keyFind);
             $orderItem = new MstShipping();
@@ -346,6 +440,13 @@ class MyCommonService extends AbstractRepository
             $orderItem->setShippingDate('');
             $orderItem->setInquiryNo('');
             $orderItem->setShippingCompanyCode('');
+            $orderItem->setOrderNo($ec_order);
+            $orderItem->setOrderLineno($lineNo);
+
+            $orderItem->setCustomerCode($itemSave['customer_code']);
+            $orderItem->setShippingCode($itemSave['shipping_code']);
+            $orderItem->setProductCode($itemSave['product_code']);
+            $orderItem->setShippingPlanDate($itemSave['shipping_plan_date']??'');
 
 
             $this->entityManager->persist($orderItem);
@@ -359,12 +460,13 @@ class MyCommonService extends AbstractRepository
         //$arEcLData[] = ['ec_order_no'=>$orderNo,'ec_order_lineno'=>$itemOr->getId()];
         $cusOrderLineno=0;
         foreach ($arEcLData as $itemSave) {
+            $cusOrderLineno++;
             $ec_order = $itemSave['ec_order_no'];
-            $ec_order_lineno = $itemSave['ec_order_lineno'];
+            $ec_order_lineno = $cusOrderLineno;//$itemSave['ec_order_lineno'];
             $keyFind = ['ec_order_no' => $ec_order, 'ec_order_lineno' => $ec_order_lineno];
             $objRep = $this->entityManager->getRepository(DtOrderStatus::class)->findOneBy($keyFind);
             $orderItem = new DtOrderStatus();
-            $cusOrderLineno++;
+
             if ($objRep !== null) {
                 $orderItem = $objRep;
             } else {
@@ -376,6 +478,12 @@ class MyCommonService extends AbstractRepository
             //"cus_order_no"=>$ec_order,"cus_order_lineno"=>$ec_order_lineno
             $orderItem->setCusOrderNo($ec_order);
             $orderItem->setCusOrderLineno($cusOrderLineno);
+            $orderItem->setCustomerCode($itemSave['customer_code']);
+            $orderItem->setShippingCode($itemSave['shipping_code']);
+            $orderItem->setOrderRemainNum($itemSave['order_remain_num']);
+            $orderItem->setProductCode($itemSave['product_code']);
+
+
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
         }

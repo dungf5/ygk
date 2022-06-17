@@ -256,7 +256,7 @@ class ProductRepository extends AbstractRepository
         $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');
 
-//var_dump($qb->getQuery()->getSQL(),$customer_code);
+
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 

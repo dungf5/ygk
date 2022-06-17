@@ -1,0 +1,52 @@
+
+
+<!-- The modal -->
+<div class="modal fade"  id="flipFlop{{ shipping_no }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog"  style="width: 1000px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="modalLabel"></h4>
+            </div>
+            <div class="modal-body">
+                {{ shipping_no }}
+                <table class="table myTable">
+                    <thead>
+                    <tr>
+                        <th title="inquiry_no">出荷指示№</th>
+                        <th title="customer_name">顧客</th>
+                        <th title="product_code">製品コード</th>
+                        <th title="shipping_status">出荷ステータス/th>
+                        <th title="shipping_num">出荷数</th>
+                        <th title="shipping_plan_date">出荷指示日</th>
+                        <th title="inquiry_no" >荷送伝票番号</th>
+                        <th title="shipping_company_code">運送会社</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <tr>
+                        <td>EC</td>
+                        <td>247</td>
+                        <td>1</td>
+                        <td>
+                        </td>
+                        <td>X-BRAID UPGRADE X8</td>
+                        <td>200000-150-200-0.6-1</td>
+                        <td>未引当</td>
+                        <td>0</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
