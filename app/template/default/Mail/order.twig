@@ -1,0 +1,68 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% autoescape 'safe_textmail' %}
+{{ Order.name }} 様
+
+この度はご注文いただき誠にありがとうございます。下記ご注文内容にお間違えがないかご確認下さい。
+
+************************************************
+　ご注文商品明細
+************************************************
+{% for OrderItem in Order.ProductOrderItems %}
+商品コード：{{ OrderItem.product_code }}
+商品名：{{ OrderItem.product_name }}
+
+単価：{{ OrderItem.price|price }}
+数量：{{ OrderItem.quantity|number_format }}
+
+{% endfor %}
+-------------------------------------------------
+小　計：{{ Order.subtotal|price }}
+手数料：{{ Order.charge|price }}
+-------------------------------------------------
+合　計：{{ Order.total|price }}
+    ({{ Order.rate }} %対象：{{ Order.total|price }})
+============================================
+お支払い合計：{{ Order.payment_total|price }}
+
+************************************************
+　ご注文者情報
+************************************************
+お名前：{{ Order.name }} 様
+{% if Order.company_name %}
+会社名：{{ Order.company_name }}
+{% endif %}
+郵便番号：〒{{ Order.postal_code }}
+住所：{{ Order.addr01 }}{{ Order.addr02 }}{{ Order.addr03 }}
+電話番号：{{ Order.phone_number }}
+メールアドレス：{{ Order.email }}
+
+************************************************
+　配送情報
+************************************************
+◎お届け先
+
+お名前：{{ Order.Shipping.customer_name }} 様
+{% if Order.Shipping.company_name %}
+会社名：{{ Order.Shipping.company_name }}
+{% endif %}
+郵便番号：〒{{ Order.Shipping.postal_code }}
+住所：{{ Order.Shipping.addr01 }}{{ Order.Shipping.addr02 }}{{ Order.Shipping.addr03 }}
+電話番号：{{ Order.Shipping.phone_number }}
+
+お届け日：{{ Order.Shipping.shipping_plan_date|date_day }}
+
+============================================
+
+このメッセージはお客様へのお知らせ専用ですので、
+このメッセージへの返信としてご質問をお送りいただいても回答できません。
+ご了承ください。
+{% endautoescape %}
