@@ -18,6 +18,7 @@ use Customize\Entity\Price;
 use Customize\Repository\MstProductRepository;
 use Customize\Repository\PriceRepository;
 use Customize\Repository\StockListRepository;
+use Customize\Service\Common\MyCommonService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Eccube\Entity\Cart;
@@ -372,9 +373,11 @@ class CartService extends Service
 
         if ($this->getUser()) {
             $Customer = $this->getUser();
+            $commonS = new MyCommonService($this->entityManager);
+            $customer_code = $commonS->getMstCustomer($Customer->getId())["customer_code"];
             $priceClass = $this->entityManager
                 ->getRepository(Price::class)
-                ->findOneBy(['product_code'=>$mstProductClass->getProductCode(),'customer_code'=>$Customer->getId() ]);
+                ->findOneBy(['product_code'=>$mstProductClass->getProductCode(),'customer_code'=>$customer_code ]);
             if($priceClass!==null){
                 $price = $priceClass->getPriceS01();
             }

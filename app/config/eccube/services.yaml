@@ -154,6 +154,10 @@ services:
         class: Monolog\Formatter\LineFormatter
         arguments:
             - "[%%datetime%%] %%channel%%.%%level_name%% [%%extra.session_id%%] [%%extra.uid%%] [%%extra.user_id%%] [%%extra.class%%:%%extra.function%%:%%extra.line%%] - %%message%% %%context%% [%%extra.http_method%%, %%extra.url%%, %%extra.ip%%, %%extra.referrer%%, %%extra.user_agent%%]\n"
+    eccube.log.formatter.line_nvtrong:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "[%%datetime%%][%%extra.class%%:] - %%message%% %%context%% []\n"
 
     Eccube\Log\Processor\SessionProcessor:
         tags:
