@@ -561,4 +561,90 @@ class MyCommonService extends AbstractRepository
         $this->entityManager->persist($orderItem);
         $this->entityManager->flush();
     }
+
+    /**
+     * @param
+     */
+    public function getTaxInfo()
+    {
+        $sql = "
+                SELECT
+                    *
+                FROM
+				    dtb_tax_rule
+			    ";
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery();
+            $rows = $result->fetchAllAssociative();
+            return $rows[0];
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param
+     */
+    public function getMstShippingOrder($customerId,$pre_order_id)
+    {
+        $sql = "
+        SELECT mst_customer.*,mst_shipping.*
+        FROM  mst_customer
+        JOIN mst_shipping
+        ON mst_shipping.customer_code = mst_customer.customer_code
+        WHERE ec_customer_id=?
+        AND mst_shipping.order_no = ?
+        LIMIT 1
+        ";
+        $param = [$customerId,$pre_order_id];
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            return $rows[0];
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param
+     */
+    public function getMstProductsOrderCustomer($order_no)
+    {
+
+        $sql = "
+         SELECT
+            a.id AS 	 order_no,
+            a.customer_id customer_id,
+            d.customer_code customer_code,
+            b.product_id AS product_id,
+            c.product_code AS product_code,
+            c.product_name AS product_name,
+            c.unit_price AS unit_price,
+            b.quantity AS quantity,
+            e.price_s01 AS price_s01,
+            IFNULL(e.price_s01,c.unit_price) AS price
+        FROM dtb_order a
+        JOIN dtb_order_item b ON a.id = b.order_id
+        JOIN mst_product c ON c.ec_product_id = b.product_id
+        JOIN mst_customer d ON d.ec_customer_id = a.customer_id
+        LEFT JOIN dt_price e ON e.product_code = c.product_code AND e.customer_code = d.customer_code
+        WHERE order_no=?
+        ORDER BY b.id ASC
+         ";
+        $param = [$order_no];
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            return $rows;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
 }

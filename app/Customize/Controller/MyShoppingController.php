@@ -24,7 +24,7 @@ use Eccube\Form\Type\Front\CustomerLoginType;
 use Eccube\Form\Type\Shopping\OrderType;
 use Eccube\Repository\OrderRepository;
 use Eccube\Service\CartService;
-use Eccube\Service\MailService;
+use Customize\Service\MailService;
 use Eccube\Service\OrderHelper;
 use Eccube\Service\Payment\PaymentDispatcher;
 use Eccube\Service\Payment\PaymentMethodInterface;
@@ -495,7 +495,40 @@ class MyShoppingController extends AbstractShoppingController
 
             // メール送信
             log_info('[注文処理] 注文メールの送信を行います.', [$Order->getId()]);
-            $this->mailService->sendOrderMail($Order);
+            // Get info order
+            $newOrder = null;
+            // Get info customer
+            $commonService = new MyCommonService($this->entityManager);
+            $user = $this->getUser();
+            $customer = $commonService->getMstCustomer($user->getId());
+            $newOrder['name'] = $customer['name01'];
+            // Get info order
+            $newOrder['subtotal'] = $Order['subtotal'];
+            $newOrder['charge'] = $Order['charge'];
+            $newOrder['discount'] = $Order['discount'];
+            $newOrder['delivery_fee_total'] = $Order['delivery_fee_total'];
+            $newOrder['tax'] = $Order['tax'];
+            $newOrder['total'] = $Order['total'];
+            $newOrder['payment_total'] = $Order['payment_total'];
+            // Get info tax
+            $newOrder['rate'] = $commonService->getTaxInfo()['tax_rate'];
+            // Get Customer
+            $newOrder['company_name'] = $customer['company_name'];
+            $newOrder['postal_code'] = $customer['postal_code'];
+            $newOrder['addr01'] = $customer['addr01'];
+            $newOrder['addr02'] = $customer['addr02'];
+            $newOrder['addr03'] = $customer['addr03'];
+            $newOrder['phone_number'] = $customer['phone_number'];
+            $newOrder['email'] = $customer['email'];
+            // Get Product
+            $goods = $commonService->getMstProductsOrderCustomer($Order->getId());
+            $newOrder['ProductOrderItems'] = $goods;
+            // Get Shipping
+            $shipping = $commonService->getMstShippingOrder($user->getId(),$Order->getId());
+            $newOrder['Shipping'] = $shipping;
+
+            $this->mailService->sendOrderMail($newOrder, $Order);
+
             $this->entityManager->flush();
 
             log_info('[注文処理] 注文処理が完了しました. 購入完了画面へ遷移します.', [$Order->getId()]);

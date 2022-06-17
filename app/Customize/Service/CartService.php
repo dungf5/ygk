@@ -365,6 +365,10 @@ class CartService extends Service
             ->findOneBy(['ec_product_id'=>$ProductClass->getProduct()->getId()]);
         $priceClass = null;
         $price = $mstProductClass->getUnitPrice();
+        $lot = $mstProductClass->getQuantity();
+        if ($lot < 1) {
+            $lot = 1;
+        }
 
         if ($this->getUser()) {
             $Customer = $this->getUser();
@@ -378,7 +382,7 @@ class CartService extends Service
         }
 
         $newItem = new CartItem();
-        $newItem->setQuantity($quantity);
+        $newItem->setQuantity($quantity / $lot);
         // 標準単価 || 価格
         //$newItem->setPrice($ProductClass->getPrice02IncTax());
         $newItem->setPrice($price);
