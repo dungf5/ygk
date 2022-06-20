@@ -539,6 +539,8 @@ class MyCommonService extends AbstractRepository
             $orderItem->setCustomerCode($itemSave['customer_code']);
             $orderItem->setProductCode($itemSave['product_code']);
             $orderItem->setOtodokeCode($itemSave['otodoke_code']);
+            $orderItem->setOrderPrice($itemSave['order_price']);
+            $orderItem->setDemandQuantity($itemSave['demand_quantity']);
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
         }
