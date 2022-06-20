@@ -720,4 +720,33 @@ class MyCommonService extends AbstractRepository
         $this->entityManager->persist($order);
         $this->entityManager->flush();
     }
+
+    /**
+     * @param
+     */
+    public function getMoreOrderCustomer($pre_order_id)
+    {
+        $sql = "
+         SELECT
+            pre_order_id,
+            seikyu_code,
+            otodoke_code,
+            date_want_delivery AS shipping_plan_date,
+            mst_customer.*
+            FROM more_order
+            JOIN mst_customer
+            ON otodoke_code = customer_code
+            WHERE pre_order_id = ?
+         ";
+        $param = [$pre_order_id];
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            return $rows[0];
+        } catch (Exception $e) {
+            return null;
+        }
+    }
 }

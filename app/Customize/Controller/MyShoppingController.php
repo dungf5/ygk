@@ -561,7 +561,8 @@ class MyShoppingController extends AbstractShoppingController
             $goods = $commonService->getMstProductsOrderCustomer($Order->getId());
             $newOrder['ProductOrderItems'] = $goods;
             // Get Shipping
-            $shipping = $commonService->getMstShippingOrder($user->getId(),$Order->getId());
+            //$shipping = $commonService->getMstShippingOrder($user->getId(),$Order->getId());
+            $shipping = $commonService->getMoreOrderCustomer($Order->getPreOrderId());
             $newOrder['Shipping'] = $shipping;
 
             $this->mailService->sendOrderMail($newOrder, $Order);
