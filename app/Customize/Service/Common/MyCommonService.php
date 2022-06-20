@@ -20,6 +20,7 @@ use Customize\Entity\Order;
 use Customize\Repository\MoreOrderRepository;
 use Doctrine\DBAL\Driver\Exception;
 use Doctrine\ORM\EntityManagerInterface;
+use Eccube\Entity\CartItem;
 use Eccube\Repository\AbstractRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -214,6 +215,62 @@ class MyCommonService extends AbstractRepository
         } catch (Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * @param
+     */
+    public function getdtPriceFromCart($myCart,$customer_code)
+    {
+        $subWhere = "";
+        $c = count($myCart);
+        for ($i = 0;$i<$c;$i++) {
+            if($i ==$c-1){
+                $subWhere .="?";
+            }else{
+                $subWhere .="?,";
+            }
+        }
+        if(count($myCart)==0){
+            return  [];
+        }
+
+        $sql = " SELECT b.id,c.product_code,c.unit_price,c.ec_product_id,dtPrice.price_s01
+                FROM  dtb_product_class AS a JOIN dtb_cart_item b ON b.product_class_id =a.id
+                JOIN mst_product AS c ON a.product_id = c.ec_product_id
+               LEFT join dt_price AS dtPrice ON dtPrice.product_code = c.product_code
+                WHERE b.cart_id in({$subWhere}) and dtPrice.customer_code ='{$customer_code}' ";
+        $param = [];
+        $param =$myCart;
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+
+            return $rows;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    public function updateCartItem($hsPrice,$arCarItemId,$Cart)
+    {
+
+        $objList = $this->entityManager->getRepository(CartItem::class)->findBy(['Cart' => $Cart]);
+        $myDb = $this->entityManager->createQueryBuilder();
+        //$resSult = $myDb->select([])->from('CartItem','cartItem')->where('cartItem.id in(:ids)')->setParameter('ids',$arCarItemId)->getQuery()->getArrayResult();
+        //var_dump($resSult);die();
+        foreach ($objList as $carItem ){
+
+            if(isset($hsPrice[$carItem->getId()])){
+                $carItem->setPrice($hsPrice[$carItem->getId()]);
+                $this->entityManager->persist($carItem);
+                $this->entityManager->flush();
+            }
+
+        }
+
+
     }
 
     /**

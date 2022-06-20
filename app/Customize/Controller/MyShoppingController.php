@@ -126,10 +126,11 @@ class MyShoppingController extends AbstractShoppingController
     public function index(PurchaseFlow $cartPurchaseFlow)
     {
         // ログイン状態のチェック.
-
+        $commonService = new MyCommonService($this->entityManager);
         if ($this->orderHelper->isLoginRequired()) {
             log_info('[注文手続] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
 
+            $this->session->set("is_update_cart",1);
             return $this->redirectToRoute('shopping_login');
         }
 
@@ -141,13 +142,36 @@ class MyShoppingController extends AbstractShoppingController
             return $this->redirectToRoute('cart');
         }
 
+
+
         // 受注の初期化.
         log_info('[注文手続] 受注の初期化処理を開始します.');
         $Customer = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
-        $Order = $this->orderHelper->initializeOrder($Cart, $Customer);
-        $commonService = new MyCommonService($this->entityManager);
-        $mstShip = $commonService->getMstShippingCustomer($Customer->getId());
         $arCusLogin = $commonService->getMstCustomer($Customer->getId());
+
+        $is_update_cart = $this->session->get("is_update_cart","");
+        //************** update cart when login
+        $arCarItemId =[];
+        if($is_update_cart==1){
+            $cartId = $Cart->getId();
+            $productCart = $commonService->getdtPriceFromCart([$cartId],$arCusLogin["customer_code"]);
+            $hsPriceUp =[];
+            foreach ($productCart as $itemCart){
+                if($itemCart["price_s01"] != null && ($itemCart["price_s01"]!="") ){
+                    $hsPriceUp[$itemCart["id"]] = $itemCart["price_s01"];
+                    $arCarItemId[] =$itemCart["id"];
+                }
+            }
+            $commonService->updateCartItem($hsPriceUp,$arCarItemId,$Cart);
+            $this->session->set("is_update_cart",0);
+        }
+        //*****************
+
+
+        $Order = $this->orderHelper->initializeOrder($Cart, $Customer);
+
+        $mstShip = $commonService->getMstShippingCustomer($Customer->getId());
+
 
        $Order->arCusLogin =$arCusLogin;
         $dtBillSeikyuCode = $commonService->getCustomerBillSeikyuCode($Customer->getId());
@@ -379,7 +403,7 @@ class MyShoppingController extends AbstractShoppingController
         // ログイン状態のチェック.
         if ($this->orderHelper->isLoginRequired()) {
             log_info('[注文処理] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
-
+            $this->session->set("is_update_cart",1);
             return $this->redirectToRoute('shopping_login');
         }
 
@@ -545,7 +569,7 @@ class MyShoppingController extends AbstractShoppingController
             $this->entityManager->flush();
 
             log_info('[注文処理] 注文処理が完了しました. 購入完了画面へ遷移します.', [$Order->getId()]);
-
+            $this->session->set("is_update_cart",0);
             return $this->redirectToRoute('shopping_complete');
         }
 
