@@ -16,6 +16,7 @@ namespace Customize\Service\Common;
 use Customize\Entity\DtOrderStatus;
 use Customize\Entity\MoreOrder;
 use Customize\Entity\MstShipping;
+use Customize\Entity\Order;
 use Customize\Repository\MoreOrderRepository;
 use Doctrine\DBAL\Driver\Exception;
 use Doctrine\ORM\EntityManagerInterface;
@@ -646,5 +647,20 @@ class MyCommonService extends AbstractRepository
         } catch (Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * @param $order_id
+     */
+    public function updateOrderNo($order_id)
+    {
+        $obj = $this->entityManager->getRepository(Order::class)->findOneBy(['id' => $order_id]);
+        $order = new Order();
+        if ($obj !== null) {
+            $order = $obj;
+        }
+        $order->setOrderNo($order_id);
+        $this->entityManager->persist($order);
+        $this->entityManager->flush();
     }
 }

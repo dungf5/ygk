@@ -120,59 +120,59 @@ class PurchaseFlow
 
         $flowResult = new PurchaseFlowResult($itemHolder);
 
-        foreach ($itemHolder->getItems() as $item) {
-            foreach ($this->itemValidators as $itemValidator) {
-                $result = $itemValidator->execute($item, $context);
-                $flowResult->addProcessResult($result);
-            }
-        }
-
-        $this->calculateAll($itemHolder);
-
-        foreach ($this->itemHolderValidators as $itemHolderValidator) {
-            $result = $itemHolderValidator->execute($itemHolder, $context);
-            $flowResult->addProcessResult($result);
-        }
-
-        $this->calculateAll($itemHolder);
-
-        foreach ($itemHolder->getItems() as $item) {
-            foreach ($this->itemPreprocessors as $itemPreprocessor) {
-                $itemPreprocessor->process($item, $context);
-            }
-        }
-
-        $this->calculateAll($itemHolder);
-
-        foreach ($this->itemHolderPreprocessors as $holderPreprocessor) {
-            $result = $holderPreprocessor->process($itemHolder, $context);
-            if ($result) {
-                $flowResult->addProcessResult($result);
-            }
-
-            $this->calculateAll($itemHolder);
-        }
-
-        foreach ($this->discountProcessors as $discountProcessor) {
-            $discountProcessor->removeDiscountItem($itemHolder, $context);
-        }
-
-        $this->calculateAll($itemHolder);
-
-        foreach ($this->discountProcessors as $discountProcessor) {
-            $result = $discountProcessor->addDiscountItem($itemHolder, $context);
-            if ($result) {
-                $flowResult->addProcessResult($result);
-            }
-            $this->calculateAll($itemHolder);
-        }
-
-        foreach ($this->itemHolderPostValidators as $itemHolderPostValidator) {
-            $result = $itemHolderPostValidator->execute($itemHolder, $context);
-            $flowResult->addProcessResult($result);
-
-            $this->calculateAll($itemHolder);
-        }
+//        foreach ($itemHolder->getItems() as $item) {
+//            foreach ($this->itemValidators as $itemValidator) {
+//                $result = $itemValidator->execute($item, $context);
+//                $flowResult->addProcessResult($result);
+//            }
+//        }
+//
+//        $this->calculateAll($itemHolder);
+//
+//        foreach ($this->itemHolderValidators as $itemHolderValidator) {
+//            $result = $itemHolderValidator->execute($itemHolder, $context);
+//            $flowResult->addProcessResult($result);
+//        }
+//
+//        $this->calculateAll($itemHolder);
+//
+//        foreach ($itemHolder->getItems() as $item) {
+//            foreach ($this->itemPreprocessors as $itemPreprocessor) {
+//                $itemPreprocessor->process($item, $context);
+//            }
+//        }
+//
+//        $this->calculateAll($itemHolder);
+//
+//        foreach ($this->itemHolderPreprocessors as $holderPreprocessor) {
+//            $result = $holderPreprocessor->process($itemHolder, $context);
+//            if ($result) {
+//                $flowResult->addProcessResult($result);
+//            }
+//
+//            $this->calculateAll($itemHolder);
+//        }
+//
+//        foreach ($this->discountProcessors as $discountProcessor) {
+//            $discountProcessor->removeDiscountItem($itemHolder, $context);
+//        }
+//
+//        $this->calculateAll($itemHolder);
+//
+//        foreach ($this->discountProcessors as $discountProcessor) {
+//            $result = $discountProcessor->addDiscountItem($itemHolder, $context);
+//            if ($result) {
+//                $flowResult->addProcessResult($result);
+//            }
+//            $this->calculateAll($itemHolder);
+//        }
+//
+//        foreach ($this->itemHolderPostValidators as $itemHolderPostValidator) {
+//            $result = $itemHolderPostValidator->execute($itemHolder, $context);
+//            $flowResult->addProcessResult($result);
+//
+//            $this->calculateAll($itemHolder);
+//        }
 
         return $flowResult;
     }

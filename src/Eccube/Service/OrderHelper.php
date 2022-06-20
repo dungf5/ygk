@@ -392,7 +392,7 @@ class OrderHelper
                 ->setProductClass($ProductClass)
                 ->setProductName($Product->getName())
                 ->setProductCode($ProductClass->getCode())
-                ->setPrice($ProductClass->getPrice02())
+                ->setPrice($item->getPrice())
                 ->setQuantity($item->getQuantity())
                 ->setOrderItemType($ProductItemType);
 

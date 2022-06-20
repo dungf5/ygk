@@ -126,6 +126,7 @@ class MyShoppingController extends AbstractShoppingController
     public function index(PurchaseFlow $cartPurchaseFlow)
     {
         // ログイン状態のチェック.
+
         if ($this->orderHelper->isLoginRequired()) {
             log_info('[注文手続] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
 
@@ -156,24 +157,24 @@ class MyShoppingController extends AbstractShoppingController
         // 集計処理.
         log_info('[注文手続] 集計処理を開始します.', [$Order->getId()]);
         $flowResult = $this->executePurchaseFlow($Order, false);
-        $this->entityManager->flush();
-
-        if ($flowResult->hasError()) {
-            log_info('[注文手続] Errorが発生したため購入エラー画面へ遷移します.', [$flowResult->getErrors()]);
-
-            return $this->redirectToRoute('shopping_error');
-        }
-
-        if ($flowResult->hasWarning()) {
-            log_info('[注文手続] Warningが発生しました.', [$flowResult->getWarning()]);
-
-            // 受注明細と同期をとるため, CartPurchaseFlowを実行する
-            $cartPurchaseFlow->validate($Cart, new PurchaseContext($Cart, $this->getUser()));
-
-            // 注文フローで取得されるカートの入れ替わりを防止する
-            // @see https://github.com/EC-CUBE/ec-cube/issues/4293
-            $this->cartService->setPrimary($Cart->getCartKey());
-        }
+//        $this->entityManager->flush();
+//
+//        if ($flowResult->hasError()) {
+//            log_info('[注文手続] Errorが発生したため購入エラー画面へ遷移します.', [$flowResult->getErrors()]);
+//
+//            return $this->redirectToRoute('shopping_error');
+//        }
+//
+//        if ($flowResult->hasWarning()) {
+//            log_info('[注文手続] Warningが発生しました.', [$flowResult->getWarning()]);
+//
+//            // 受注明細と同期をとるため, CartPurchaseFlowを実行する
+//            $cartPurchaseFlow->validate($Cart, new PurchaseContext($Cart, $this->getUser()));
+//
+//            // 注文フローで取得されるカートの入れ替わりを防止する
+//            // @see https://github.com/EC-CUBE/ec-cube/issues/4293
+//            $this->cartService->setPrimary($Cart->getCartKey());
+//        }
 
         // マイページで会員情報が更新されていれば, Orderの注文者情報も更新する.
         if ($Customer->getId()) {
@@ -227,6 +228,10 @@ class MyShoppingController extends AbstractShoppingController
         $Order->shipping_no_checked = $shipping_no_checked;
 
         $Order->seikyu_code_checked = isset($moreOrder['seikyu_code'])??'' ;
+
+        $Order->rate = $commonService->getTaxInfo()['tax_rate'];
+        $Order->setPaymentTotal((float)$Order->getTotal() + ((float)$Order->getTotal()/(float)$Order->rate));
+
         $form = $this->createForm(OrderType::class, $Order);
 
         return [
@@ -319,6 +324,12 @@ class MyShoppingController extends AbstractShoppingController
             $Order->mstShips = $mstShip;
             $Order->dtBillSeikyuCode = $dtBillSeikyuCode;
             $Order->dtCustomerOtodoke = $arrOtoProductOrder;
+            $Order->rate = $commonService->getTaxInfo()['tax_rate'];
+            $Order->setPaymentTotal((float)$Order->getTotal() + ((float)$Order->getTotal()/(float)$Order->rate));
+
+            // Update order_no
+            $commonService->updateOrderNo($Order->getId());
+
             //nvtrong end
 
             return [
@@ -449,6 +460,8 @@ class MyShoppingController extends AbstractShoppingController
 
                 $ship_code = $moreOrder->getShippingCode();
                 $shipping_plan_date = $moreOrder->getDateWantDelivery();
+
+                //dd($itemList);
                 foreach ($itemList as $itemOr) {
                     if ($itemOr->isProduct()) {
                         $arEcLData[] = ['ec_order_no' => $orderNo,
