@@ -483,7 +483,9 @@ class MyShoppingController extends AbstractShoppingController
                 $moreOrder = $comS->getMoreOrder($Order->getPreOrderId());
 
                 $ship_code = $moreOrder->getShippingCode();
+                $seikyu_code = $moreOrder->getSeikyuCode();
                 $shipping_plan_date = $moreOrder->getDateWantDelivery();
+                $otodoke_code = $moreOrder->getOtodokeCode();
 
                 //dd($itemList);
                 foreach ($itemList as $itemOr) {
@@ -495,6 +497,11 @@ class MyShoppingController extends AbstractShoppingController
                             ,'shipping_code'=> $ship_code,
                             'order_remain_num'=>$hsArrRemmain[$itemOr->getId()],
                             'shipping_plan_date'=>$shipping_plan_date,
+                            'seikyu_code'=>$seikyu_code,
+                            //dtorder
+                            'order_price'=>$itemOr->getPrice(),
+                            'demand_quantity'=>$itemOr->getQuantity(),
+                            'otodoke_code'=>$otodoke_code,
                             ];
 
                     }
@@ -503,6 +510,7 @@ class MyShoppingController extends AbstractShoppingController
                 $comS->saveOrderStatus($arEcLData);
 
                 $comS->saveOrderShiping($arEcLData);
+                $comS->savedtOrder($arEcLData);
 
                 log_info('[注文処理] 注文処理が完了しました.', [$Order->getId()]);
             } catch (ShoppingException $e) {

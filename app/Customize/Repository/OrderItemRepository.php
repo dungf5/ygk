@@ -46,7 +46,7 @@ class OrderItemRepository extends AbstractRepository
             ordStatus.order_status,ordStatus.reserve_stock_num,ordStatus.update_date,ordStatus.order_remain_num,mstShip.shipping_status,mstShip.inquiry_no,mstShip.shipping_date,mstShip.shipping_no')
             ->from('Customize\Entity\DtOrderStatus', 'ordStatus')
             ->innerJoin('Customize\Entity\MstProduct', 'mstp', Join::WITH, 'ordStatus.product_code=mstp.product_code')
-            ->innerJoin('Customize\Entity\MstShipping', 'mstShip', Join::WITH, 'mstShip.ec_order_no=ordStatus.ec_order_no and mstShip.ec_order_lineno=ordStatus.ec_order_lineno')
+            ->leftJoin('Customize\Entity\MstShipping', 'mstShip', Join::WITH, 'mstShip.ec_order_no=ordStatus.ec_order_no and mstShip.ec_order_lineno=ordStatus.ec_order_lineno')
             ->where('ordStatus.customer_code  = :customerCode')
             ->setParameter('customerCode', $customerCode);
 

@@ -13,6 +13,7 @@
 
 namespace Customize\Service\Common;
 
+use Customize\Entity\DtOrder;
 use Customize\Entity\DtOrderStatus;
 use Customize\Entity\MoreOrder;
 use Customize\Entity\MstShipping;
@@ -497,7 +498,7 @@ class MyCommonService extends AbstractRepository
             $orderItem->setEcOrderNo($ec_order);
             $orderItem->setShippingStatus(0);
             $orderItem->setShippingNum(0);
-            $orderItem->setShippingPlanDate('');
+
             $orderItem->setShippingDate('');
             $orderItem->setInquiryNo('');
             $orderItem->setShippingCompanyCode('');
@@ -514,7 +515,34 @@ class MyCommonService extends AbstractRepository
             $this->entityManager->flush();
         }
     }
+    public function savedtOrder($arEcLData)
+    {
 
+        $lineNo = 0;
+        foreach ($arEcLData as $itemSave) {
+            $lineNo++;
+            $ec_order = $itemSave['ec_order_no'];
+            $ec_order_lineno = $lineNo;//$itemSave['ec_order_lineno'];
+            $keyFind = ['order_no' => $ec_order, 'order_lineno' => $ec_order_lineno];
+            $objRep = $this->entityManager->getRepository(DtOrder::class)->findOneBy($keyFind);
+            $orderItem = new DtOrder();
+            if ($objRep !== null) {
+                $orderItem = $objRep;
+            }
+
+            $orderItem->setOrderLineno($ec_order_lineno);
+            $orderItem->setOrderNo($ec_order);
+            $orderItem->setShippingCode($itemSave["shipping_code"]);
+            $orderItem->setSeikyuCode($itemSave["seikyu_code"]);
+            $orderItem->setShipingPlanDate($itemSave['shipping_plan_date']??'');
+            $orderItem->setRequestFlg(1);
+            $orderItem->setCustomerCode($itemSave['customer_code']);
+            $orderItem->setProductCode($itemSave['product_code']);
+            $orderItem->setOtodokeCode($itemSave['otodoke_code']);
+            $this->entityManager->persist($orderItem);
+            $this->entityManager->flush();
+        }
+    }
     public function saveOrderStatus($arEcLData)
     {
         //dt_order_status
