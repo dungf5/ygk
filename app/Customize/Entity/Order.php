@@ -21,6 +21,14 @@ if (!class_exists('\Customize\Entity\Order', false)) {
          * @ORM\GeneratedValue(strategy="IDENTITY")
          */
         private $id;
+
+        /**
+         * @var float
+         *
+         * @ORM\Column(name="payment_total", type="decimal", precision=12, scale=2, options={"unsigned":true,"default":0})
+         */
+        private $payment_total = 0;
+
         /**
          * @ORM\Column(name="customer_id",type="integer",nullable=true, options={"comment":""  })
          */
@@ -581,6 +589,29 @@ if (!class_exists('\Customize\Entity\Order', false)) {
         public function setDiscriminatorType(string $discriminator_type): void
         {
             $this->discriminator_type = $discriminator_type;
+        }
+        /**
+         * Set paymentTotal.
+         *
+         * @param string $paymentTotal
+         *
+
+         */
+        public function setPaymentTotal($paymentTotal)
+        {
+            $this->payment_total = $paymentTotal;
+
+
+        }
+
+        /**
+         * Get paymentTotal.
+         *
+         * @return float
+         */
+        public function getPaymentTotal()
+        {
+            return $this->payment_total;
         }
     }
 }

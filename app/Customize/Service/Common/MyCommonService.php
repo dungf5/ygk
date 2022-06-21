@@ -739,16 +739,41 @@ class MyCommonService extends AbstractRepository
     /**
      * @param $order_id
      */
-    public function updateOrderNo($order_id)
+    public function updateOrderNo($order_id,$paymentTotal)
     {
         $obj = $this->entityManager->getRepository(Order::class)->findOneBy(['id' => $order_id]);
         $order = new Order();
         if ($obj !== null) {
             $order = $obj;
         }
+        log_info($order_id."xxxxxxxxx".$paymentTotal);
         $order->setOrderNo($order_id);
+        $order->setPaymentTotal($paymentTotal);
+
         $this->entityManager->persist($order);
         $this->entityManager->flush();
+
+
+        log_info("updateOrderNo".json_encode($order));
+    }
+    public function updatePaymentTotalOrder($order_id,$payment_total){
+        $sql = "
+         update
+             dtb_order
+            set payment_total=?
+
+            WHERE id = ?
+         ";
+        $param = [$payment_total,$order_id];
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeStatement($param);
+            return $result;
+        } catch (Exception $e) {
+            log_info("updatePaymentTotalOrder ".$e->getMessage());
+            return null;
+        }
     }
 
     /**

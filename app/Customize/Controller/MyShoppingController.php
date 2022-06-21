@@ -286,6 +286,7 @@ class MyShoppingController extends AbstractShoppingController
         // 受注の存在チェック
         $preOrderId = $this->cartService->getPreOrderId();
         $Order = $this->orderHelper->getPurchaseProcessingOrder($preOrderId);
+
         if (!$Order) {
             log_info('[注文確認] 購入処理中の受注が存在しません.', [$preOrderId]);
 
@@ -336,6 +337,10 @@ class MyShoppingController extends AbstractShoppingController
             //nvtrong start
             $Customer = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
             $commonService = new MyCommonService($this->entityManager);
+            $rate = $commonService->getTaxInfo()['tax_rate'] ;
+            $paymentTotal = (float)$Order->getTotal() + ((float)$Order->getTotal()/(float)$rate);
+
+
             $moreOrder = $commonService->getMoreOrder($Order->getPreOrderId());
 
             $mstShip = $commonService->getMstShippingCustomer($Customer->getId(), $moreOrder);
@@ -348,12 +353,15 @@ class MyShoppingController extends AbstractShoppingController
             $Order->mstShips = $mstShip;
             $Order->dtBillSeikyuCode = $dtBillSeikyuCode;
             $Order->dtCustomerOtodoke = $arrOtoProductOrder;
-            $Order->rate = $commonService->getTaxInfo()['tax_rate'];
-            $Order->setPaymentTotal((float)$Order->getTotal() + ((float)$Order->getTotal()/(float)$Order->rate));
+            $Order->rate =$rate;
+
+            $Order->setPaymentTotal($paymentTotal);
+
 
             // Update order_no
-            $commonService->updateOrderNo($Order->getId());
+            $commonService->updateOrderNo($Order->getId(),$paymentTotal);
 
+            log_info('[注文確認] フォームエラーのため, 注文手続画面を表示します.', [$Order->getId()]);
             //nvtrong end
 
             return [
@@ -537,13 +545,17 @@ class MyShoppingController extends AbstractShoppingController
 
             // 受注IDをセッションにセット
             $this->session->set(OrderHelper::SESSION_ORDER_ID, $Order->getId());
-
+            $commonService = new MyCommonService($this->entityManager);
+            $rate = $commonService->getTaxInfo()['tax_rate'] ;
+            $paymentTotal = (float)$Order->getTotal() + ((float)$Order->getTotal()/(float)$rate);
+            $commonService->updateOrderNo($Order->getId(),$paymentTotal);
+            $Order->setPaymentTotal($paymentTotal);
             // メール送信
             log_info('[注文処理] 注文メールの送信を行います.', [$Order->getId()]);
             // Get info order
             $newOrder = null;
             // Get info customer
-            $commonService = new MyCommonService($this->entityManager);
+
             $user = $this->getUser();
             $customer = $commonService->getMstCustomer($user->getId());
             $newOrder['name'] = $customer['name01'];
