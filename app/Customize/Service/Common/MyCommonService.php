@@ -85,7 +85,21 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
-
+    public function getMstCustomerCode($customer_code)
+    {
+        $column = "customer_code as shipping_no,customer_code, ec_customer_id,customer_name, customer_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date";
+        $sql = " SELECT $column   FROM mst_customer a WHERE customer_code=?";
+        $param = [];
+        $param[] = $customer_code;
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            return $rows[0];
+        } catch (Exception $e) {
+            return null;
+        }
+    }
     public function getShipList($customer_code,$shipping_no,$order_no)
     {
 
@@ -251,6 +265,36 @@ class MyCommonService extends AbstractRepository
             return $rows;
         } catch (Exception $e) {
             return null;
+        }
+    }
+
+    public function getPriceFromDtPriceOfCus($customer_code="")
+    {
+        $arR = [];
+        if($customer_code=="") {
+            return [];
+        }
+
+
+        $sql = "select pri.product_code,pri.customer_code,pri.valid_date from dt_price pri WHERE customer_code=?
+                and pri.valid_date = DATE_FORMAT(NOW(),'%Y/%m/%d')  AND DATE_FORMAT(NOW(),'%Y/%m/%d') <= pri.expire_date
+                GROUP BY pri.product_code,pri.customer_code,pri.valid_date
+                HAVING COUNT(*)=1
+                ; ";
+        $param = [$customer_code];
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+
+            foreach ($rows as $item){
+                $arR[] = $item["product_code"];
+            }
+
+            return $arR;
+        } catch (\Exception $e) {
+            log_info($e->getMessage());
+            return [];
         }
     }
 
@@ -741,20 +785,17 @@ class MyCommonService extends AbstractRepository
      */
     public function updateOrderNo($order_id,$paymentTotal)
     {
-        $obj = $this->entityManager->getRepository(Order::class)->findOneBy(['id' => $order_id]);
-        $order = new Order();
+        $obj = $this->entityManager->getRepository(\Eccube\Entity\Order::class)->findOneBy(['id' => $order_id]);
+        $order = new \Eccube\Entity\Order();
         if ($obj !== null) {
             $order = $obj;
         }
-        log_info($order_id."xxxxxxxxx".$paymentTotal);
         $order->setOrderNo($order_id);
         $order->setPaymentTotal($paymentTotal);
 
         $this->entityManager->persist($order);
         $this->entityManager->flush();
 
-
-        log_info("updateOrderNo".json_encode($order));
     }
     public function updatePaymentTotalOrder($order_id,$payment_total){
         $sql = "
@@ -798,6 +839,8 @@ class MyCommonService extends AbstractRepository
         $statement = $this->entityManager->getConnection()->prepare($sql);
         try {
             $result = $statement->executeQuery($param);
+            //getMoreOrderCustomer
+
             $rows = $result->fetchAllAssociative();
             return $rows[0];
         } catch (Exception $e) {

@@ -14,6 +14,7 @@ use Customize\Service\Common\MyCommonService;
 use Doctrine\DBAL\Types\Type;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
+use Eccube\Entity\Master\CustomerStatus;
 use Eccube\Entity\Master\ProductStatus;
 use Eccube\Entity\Product;
 use Eccube\Event\EccubeEvents;
@@ -24,6 +25,7 @@ use Eccube\Form\Type\Master\ProductListOrderByType;
 use Eccube\Form\Type\SearchProductType;
 use Eccube\Repository\BaseInfoRepository;
 use Eccube\Repository\CustomerFavoriteProductRepository;
+use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\Master\ProductListMaxRepository;
 use Eccube\Repository\ProductRepository;
 use Eccube\Service\CartService;
@@ -37,6 +39,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -99,6 +102,11 @@ class MyProductController extends AbstractController
      */
     protected $productCustomizeRepository;
 
+    /**
+     * @var EncoderFactoryInterface
+     */
+    protected $encoderFactory;
+
     /***
      * MyProductController constructor.
      * @param PurchaseFlow $cartPurchaseFlow
@@ -122,7 +130,7 @@ class MyProductController extends AbstractController
         PriceRepository $priceRepository,
         StockListRepository $stockListRepository,
         MstProductRepository $mstProductRepository,
-        ProductCustomizeRepository $productCustomizeRepository
+        EncoderFactoryInterface $encoderFactory,ProductCustomizeRepository $productCustomizeRepository
     ) {
         $this->purchaseFlow = $cartPurchaseFlow;
         $this->customerFavoriteProductRepository = $customerFavoriteProductRepository;
@@ -136,6 +144,8 @@ class MyProductController extends AbstractController
         $this->mstProductRepository = $mstProductRepository;
         $this->productCustomizeRepository = $productCustomizeRepository;
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $this->encoderFactory = $encoderFactory;
+
     }
 
     /**
@@ -376,6 +386,35 @@ class MyProductController extends AbstractController
     {
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+//        $customerRepository = $this->entityManager->getRepository(\Eccube\Entity\Customer::class);
+//
+//        /** @var $Customer \Eccube\Entity\Customer */
+//        $Customer = $customerRepository->newCustomer();
+//        $CustomerStatus = $this->entityManager
+//            ->find(CustomerStatus::class, CustomerStatus::REGULAR);
+//        $Customer->setStatus($CustomerStatus);
+//        $Customer->setPassword("111111111");
+//        $Customer->setName01("name01");
+//        $Customer->setName02("name02");
+//        $Customer->setPoint("0");
+//        $Customer->setEmail("tuongquan12www@gmail.com");
+
+//        $encoder = $this->encoderFactory->getEncoder($Customer);
+//        $salt = $encoder->createSalt();
+//        $password = $encoder->encodePassword($Customer->getPassword(), $salt);
+//        $secretKey = $customerRepository->getUniqueSecretKey();
+
+//        $Customer
+//            ->setSalt($salt)
+//            ->setPassword($password)
+//            ->setSecretKey($secretKey)
+//            ->setPoint(0);
+//
+//        $this->entityManager->persist($Customer);
+//        $this->entityManager->flush();
+
+
+
         // Doctrine SQLFilter
         if ($this->BaseInfo->isOptionNostockHidden()) {
             $this->entityManager->getFilters()->enable('option_nostock_hidden');
@@ -420,8 +459,9 @@ class MyProductController extends AbstractController
         // paginator
         $searchData = $searchForm->getData();
 
-
-        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user ,$customer_code);
+        $arProductCodeInDtPrice  =[];
+        $arProductCodeInDtPrice = $commonService->getPriceFromDtPriceOfCus($customer_code);
+        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user ,$customer_code,$arProductCodeInDtPrice);
 
         $event = new EventArgs(
             [
@@ -450,6 +490,7 @@ class MyProductController extends AbstractController
         foreach ($pagination as $Product) {
             $ids[] = $Product["id"];
         }
+
         $ProductsAndClassCategories = $this->productRepository->findProductsWithSortedClassCategories($ids, 'p.id');
         $listImgs = $commonService->getImageFromEcProductId($ids);
         $hsKeyImg = [];

@@ -166,8 +166,12 @@ file that was distributed with this source code.
                         {% set form = forms[Product.id] %}
                                 <tr>
                                     <td rowspan="2" style="width: 100px">
-                                        <div >
+                                        <div >a
+                                            {% if hsKeyImg[Product.id] is defined %}
                                             <img  style="width: 150px;height: 150px" src="{{ asset(hsKeyImg[Product.id]|no_image_product, 'save_image') }}" alt="{{ Product.product_name }}" loading="lazy">
+                                                {% else %}
+
+                                            {% endif %}
                                         </div>
 
 
