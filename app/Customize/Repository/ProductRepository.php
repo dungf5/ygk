@@ -164,7 +164,8 @@ class ProductRepository extends AbstractRepository
         // category
         $categoryJoin = false;
         if (!empty($searchData['category_id']) && $searchData['category_id']) {
-            $Categories = $searchData['category_id']->getSelfAndDescendants();
+            $Categories = $searchData['category_id'];//->getescendant();//getSelfAndDescendants
+           // var_dump($Categories);
             if ($Categories) {
                 $qb
                     ->innerJoin('p.ProductCategories', 'pct')
@@ -244,7 +245,7 @@ class ProductRepository extends AbstractRepository
         }
 
         $qb->innerJoin('Customize\Entity\MstProduct', 'mstProduct',Join::WITH,'mstProduct.ec_product_id = p.id');
-        $curentDate = date('Y/m/d');
+        $curentDate = date('Y-m-d');
         $stringCon='price.product_code = mstProduct.product_code AND price.customer_code = :customer_code  ';
         $stringCon .="and price.valid_date = '$curentDate'  AND '$curentDate' <= price.expire_date  and price.product_code in(:product_code)";
 

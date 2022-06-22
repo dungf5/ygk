@@ -472,9 +472,11 @@ class MyProductController extends AbstractController
         );
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_SEARCH, $event);
         $searchData = $event->getArgument('searchData');
-        error_reporting(E_ALL ^ E_DEPRECATED);
+
         $query = $qb->getQuery()
             ->useResultCache(true, $this->eccubeConfig['eccube_result_cache_lifetime_short']);
+
+
 
         /** @var SlidingPagination $pagination */
         $pagination = $paginator->paginate(
