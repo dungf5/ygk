@@ -227,15 +227,15 @@ if (!class_exists('\Customize\Entity\MstDelivery', false)) {
         /**
          * @var string
          *
-         * @ORM\Column(name="shiping_code",nullable=true, type="string", length=10, options={"comment":"出荷先"})
+         * @ORM\Column(name="shiping_name",nullable=true, type="string", length=100, options={"comment":"出荷先"})
          */
-        private $shiping_code;
+        private $shiping_name;
         /**
          * @var string
          *
-         * @ORM\Column(name="otodoke_code",nullable=true, type="string", length=10, options={"comment":"届け先"})
+         * @ORM\Column(name="otodoke_name",nullable=true, type="string", length=100, options={"comment":"届け先"})
          */
-        private $otodoke_code;
+        private $otodoke_name;
         /**
          * @var \DateTime
          *
@@ -700,33 +700,33 @@ if (!class_exists('\Customize\Entity\MstDelivery', false)) {
         /**
          * @return string
          */
-        public function getShipingCode(): string
+        public function getShipingName(): string
         {
-            return $this->shiping_code;
+            return $this->shiping_name;
         }
 
         /**
-         * @param string $shiping_code
+         * @param string $shiping_name
          */
-        public function setShipingCode(string $shiping_code): void
+        public function setShipingName(string $shiping_name): void
         {
-            $this->shiping_code = $shiping_code;
+            $this->shiping_name = $shiping_name;
         }
 
         /**
          * @return string
          */
-        public function getOtodokeCode(): string
+        public function getOtodokeName(): string
         {
-            return $this->otodoke_code;
+            return $this->otodoke_name;
         }
 
         /**
-         * @param string $otodoke_code
+         * @param string $otodoke_name
          */
-        public function setOtodokeCode(string $otodoke_code): void
+        public function setOtodokeName(string $otodoke_name): void
         {
-            $this->otodoke_code = $otodoke_code;
+            $this->otodoke_name = $otodoke_name;
         }
 
         /**

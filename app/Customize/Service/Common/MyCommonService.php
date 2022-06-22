@@ -525,11 +525,12 @@ class MyCommonService extends AbstractRepository
         //$arEcLData[] = ['ec_order_no'=>$orderNo,'ec_order_lineno'=>$itemOr->getId()];
         $keyS = date('mdHis');
         $keyTem = (int) $keyS;
-        $lineNo = 0;
+        $total = count($arEcLData);
         foreach ($arEcLData as $itemSave) {
-            $lineNo++;
+            $cusOrderLineno = $total;
+            $total--;
             $ec_order = $itemSave['ec_order_no'];
-            $ec_order_lineno = $lineNo;//$itemSave['ec_order_lineno'];
+            $ec_order_lineno = $cusOrderLineno;//$itemSave['ec_order_lineno'];
             $keyFind = ['ec_order_no' => $ec_order, 'ec_order_lineno' => $ec_order_lineno];
             $objRep = $this->entityManager->getRepository(MstShipping::class)->findOneBy($keyFind);
             $orderItem = new MstShipping();
@@ -547,7 +548,7 @@ class MyCommonService extends AbstractRepository
             $orderItem->setInquiryNo('');
             $orderItem->setShippingCompanyCode('');
             $orderItem->setOrderNo($ec_order);
-            $orderItem->setOrderLineno($lineNo);
+            $orderItem->setOrderLineno($ec_order_lineno);
 
             $orderItem->setCustomerCode($itemSave['customer_code']);
             $orderItem->setShippingCode($itemSave['shipping_code']);
@@ -562,11 +563,12 @@ class MyCommonService extends AbstractRepository
     public function savedtOrder($arEcLData)
     {
 
-        $lineNo = 0;
+        $total = count($arEcLData);
         foreach ($arEcLData as $itemSave) {
-            $lineNo++;
+            $cusOrderLineno = $total;
+            $total--;
             $ec_order = $itemSave['ec_order_no'];
-            $ec_order_lineno = $lineNo;//$itemSave['ec_order_lineno'];
+            $ec_order_lineno = $cusOrderLineno;//$itemSave['ec_order_lineno'];
             $keyFind = ['order_no' => $ec_order, 'order_lineno' => $ec_order_lineno];
             $objRep = $this->entityManager->getRepository(DtOrder::class)->findOneBy($keyFind);
             $orderItem = new DtOrder();
@@ -594,8 +596,10 @@ class MyCommonService extends AbstractRepository
         //dt_order_status
         //$arEcLData[] = ['ec_order_no'=>$orderNo,'ec_order_lineno'=>$itemOr->getId()];
         $cusOrderLineno=0;
+        $total = count($arEcLData);
         foreach ($arEcLData as $itemSave) {
-            $cusOrderLineno++;
+            $cusOrderLineno = $total;
+            $total--;
             $ec_order = $itemSave['ec_order_no'];
             $ec_order_lineno = $cusOrderLineno;//$itemSave['ec_order_lineno'];
             $keyFind = ['ec_order_no' => $ec_order, 'ec_order_lineno' => $ec_order_lineno];

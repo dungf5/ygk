@@ -21,7 +21,9 @@
         <td>{{item.shipping_status }}</td>
         <td>{{item.shipping_num }}</td>
         <td>{{item.shipping_plan_date }}</td>
-        <td>{{item.inquiry_no }}</td>
+        <td>
+            <a target="_blank" href="/mypage/exportOrderPdf?inquiry_no={{item.inquiry_no}}">{{item.inquiry_no}}</a>
+           </td>
         <td>{{item.shipping_company_code }}</td>
 
 

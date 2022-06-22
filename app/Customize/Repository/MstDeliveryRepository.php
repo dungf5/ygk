@@ -52,8 +52,8 @@ class MstDeliveryRepository extends AbstractRepository
                     ,mstDeli.item_remark
                     ,mstDeli.total_amount
                     ,mstDeli.footer_remark1
-                    ,mstDeli.shiping_code
-                    ,mstDeli.otodoke_code";
+                    ,mstDeli.shiping_name as shiping_code
+                    ,mstDeli.otodoke_name as otodoke_code";
         $qb =  $this->getEntityManager()->createQueryBuilder();
 
         $qb ->select($sqlColumns)
