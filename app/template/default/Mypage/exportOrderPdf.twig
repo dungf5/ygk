@@ -225,7 +225,7 @@
             border-collapse: collapse;
         }
         .tblFooterLeft{ height: 159px;
-            width: 72.1591%;
+            width: 98.1591%;
             border-color: black;
             border-style: solid;
             height: 159px;
@@ -253,7 +253,7 @@
         <div>{{ myData[0].deli_addr01 }}</div>
         <div>{{ myData[0].deli_addr02 }}</div>
         <div>{{ myData[0].deli_addr03 }}</div>
-        <div>{{ myData[0].deli_company_name }}</div>
+        <div>{{ myData[0].deli_company_name }}  御中</div>
         <div>{{ myData[0].deli_department }}</div>
     </div>
         <div class="header1_right">
@@ -275,8 +275,8 @@
                     <p>&nbsp;</p>
                 </td>
                 <td class="" style="height: 72px; width: 36.7344px;" contenteditable="true" rowspan="2">
-                    <p>売上15</p>
-                    <p>区分16</p>
+                    <p>売上</p>
+
                 </td>
                 <td class="" ><span class="">品目No</span></td>
                 <td class="" ><span class="">数量</span></td>
@@ -307,11 +307,11 @@
                             <p><span class="">{{ deli.item_no }}</span></p>
                             <p><span class="">{{ deli.item_name }}</span></p>
                         </td>
-                        <td style="text-align: right"  >{{ deli.quanlity }}</td>
+                        <td style="text-align: right"  >{{ deli.quanlity|number_format }}</td>
                         <td>{{ deli.unit }}</td>
-                        <td style="text-align: right"  >{{ deli.unit_price }}</td>
-                        <td title="amount" style="text-align: right" >{{ deli.amount }}</td>
-                        <td title="tax" style="text-align: right"  >{{ deli.tax }}</td>
+                        <td style="text-align: right"  >{{ deli.unit_price|number_format }}</td>
+                        <td title="amount" style="text-align: right" >{{ deli.amount|number_format }}</td>
+                        <td title="tax" style="text-align: right"  >{{ deli.tax|number_format }}</td>
                         <td>{{ deli.lot_no }}</td>
 
                     </tr>
@@ -325,8 +325,8 @@
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
-                        <td style="text-align: right" title="totalaAmount">{{ deli.totalaAmount }}</td>
-                        <td  style="text-align: right" title="totalTax" >{{ deli.totalTax }}</td>
+                        <td style="text-align: right" title="totalaAmount">{{ deli.totalaAmount|number_format }}</td>
+                        <td  style="text-align: right" title="totalTax" >{{ deli.totalTax|number_format }}</td>
                         <td>&nbsp;</td>
                     </tr>
                 {% endif %}
@@ -350,7 +350,7 @@
                         <tr class="tr-content">
                             <td style="width: 32.0866%;">※は軽減税率対象品目です。</td>
                             <td style="width: 29.3307%;">納品書合計金額:</td>
-                            <td style="width: 21.6535%;text-align: right" >{{ OrderTotal }}</td>
+                            <td style="width: 21.6535%;text-align: right" >{{ totalaAmountTax|number_format }}</td>
                         </tr>
                         <tr>
                             <td style="width: 32.0866%;" colspan="3">備考 {{ myData[0].footer_remark1}} </td>

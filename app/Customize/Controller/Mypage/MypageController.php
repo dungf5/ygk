@@ -148,9 +148,11 @@ class MypageController extends AbstractController
         //add special line
         $totalTax = 0;
         $totalaAmount = 0;
+        $totalaAmountTax = 0;
         foreach ($arRe as  &$item){
             $totalTax = $totalTax + $item["tax"];
             $totalaAmount = $totalaAmount + $item["amount"];
+            $totalaAmountTax = $totalaAmountTax +$item["amount"]+$item["tax"];
             $item['is_total'] = 0;
         }
         $arSpecial = ["is_total"=>1,'totalaAmount'=>$totalaAmount,'totalTax'=>$totalTax];
@@ -159,7 +161,7 @@ class MypageController extends AbstractController
         $inquiry_no = MyCommon::getPara("inquiry_no");
         $dirPdf = MyCommon::getHtmluserDataDir()."/pdf";
         FileUtil::makeDirectory($dirPdf);
-        $arReturn = ["myData"=>$arRe,"OrderTotal"=>$totalaAmount];
+        $arReturn = ["myData"=>$arRe,"OrderTotal"=>$totalaAmount,"totalaAmountTax"=>$totalaAmountTax ];
         $namePdf = "ship_".$inquiry_no.".pdf";
         $file = $dirPdf."/".$namePdf;
         if(getenv("APP_IS_LOCAL")==0){
