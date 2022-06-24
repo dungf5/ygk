@@ -581,7 +581,7 @@ class MyCommonService extends AbstractRepository
             $orderItem->setShippingCode($itemSave["shipping_code"]);
             $orderItem->setSeikyuCode($itemSave["seikyu_code"]);
             $orderItem->setShipingPlanDate($itemSave['shipping_plan_date']??'');
-            $orderItem->setRequestFlg(1);
+            $orderItem->setRequestFlg('Y');
             $orderItem->setCustomerCode($itemSave['customer_code']);
             $orderItem->setProductCode($itemSave['product_code']);
             $orderItem->setOtodokeCode($itemSave['otodoke_code']);
@@ -590,12 +590,18 @@ class MyCommonService extends AbstractRepository
             // No41 注文情報送信I/F start
             $time = new \DateTime();
             $orderItem->setOrderDate($time);                                                                // ・受注日←受注日(購入日)
-            $orderItem->setDeliPlanDate($itemSave['deli_plan_date']);                                       // ・希望納期（納入予定日）←配送日指定
+            if(!is_null($itemSave['deli_plan_date']))  {
+                $orderItem->setDeliPlanDate($itemSave['deli_plan_date']);                                       // ・希望納期（納入予定日）←配送日指定
+            }
             $orderItem->setItemNo($itemSave['item_no']);                                                    // ・客先品目No←JANコード
             $orderItem->setDemandUnit($itemSave['demand_unit']);                                            // ・需要単位←商品情報の入り数が‘1’の場合、‘PC’、入り数が‘1’以外の場合、‘CS’
             $orderItem->setDynaModelSeg2($itemSave['dyna_model_seg2']);                                     // ・ダイナ規格セグメント02←EC注文番号
             $orderItem->setDynaModelSeg4($itemSave['dyna_model_seg4']);                                     // ・ダイナ規格セグメント04←EC注文番号
-            $orderItem->setDynaModelSeg5($itemSave['dyna_model_seg5']);                                     // ・ダイナ規格セグメント05←EC注文明細番号
+            $orderItem->setDynaModelSeg5($ec_order_lineno);                                                 // ・ダイナ規格セグメント05←EC注文明細番号
+            $orderItem->setUnitPriceStatus('FOR');
+            $orderItem->setDeploy('G');
+            $orderItem->setCompanyId('6000');
+            $orderItem->setDynaModelSeg3($itemSave['customer_code'] == '6000' ? '1' : '2');
             // No41 注文情報送信I/F end
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
@@ -772,13 +778,21 @@ class MyCommonService extends AbstractRepository
             c.product_name AS product_name,
             c.unit_price AS unit_price,
             b.quantity AS quantity,
-            e.price_s01 AS price_s01,
-            IFNULL(e.price_s01,c.unit_price) AS price
+            IF(e.count_price = 1, (SELECT price_s01 FROM dt_price WHERE product_code = c.product_code AND customer_code = d.customer_code), c.unit_price) AS price
         FROM dtb_order a
         JOIN dtb_order_item b ON a.id = b.order_id
         JOIN mst_product c ON c.ec_product_id = b.product_id
         JOIN mst_customer d ON d.ec_customer_id = a.customer_id
-        LEFT JOIN dt_price e ON e.product_code = c.product_code AND e.customer_code = d.customer_code
+        LEFT JOIN
+		   ( SELECT
+		   	product_code,
+		   	customer_code,
+				COUNT(price_s01) AS count_price
+			  FROM  dt_price
+			  GROUP BY
+			  	product_code,
+		   	customer_code
+			  ) e ON e.product_code = c.product_code AND e.customer_code = d.customer_code
         WHERE order_no=?
         ORDER BY b.id ASC
          ";

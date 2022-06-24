@@ -90,7 +90,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
          */
         private $order_price;
         /**
-         * @ORM\Column(name="unit_price_status",type="integer",nullable=true, options={"comment":"単価ステイタス"  })
+         * @ORM\Column(name="unit_price_status",type="string",nullable=true, options={"comment":"単価ステイタス"  })
          */
         private $unit_price_status;
         /**
@@ -184,7 +184,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
          */
         private $dyna_model_seg12;
         /**
-         * @ORM\Column(name="request_flg",type="integer",nullable=false, options={"comment":"申請フラグ,固定（1:Y,0:No）" ,"default":1 })
+         * @ORM\Column(name="request_flg",type="string",nullable=false, options={"comment":"申請フラグ,固定（1:Y,0:No）" ,"default":1 })
          */
         private $request_flg;
 
@@ -397,7 +397,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         }
 
         /**
-         * @return mixed
+         * @return string
          */
         public function getUnitPriceStatus()
         {
@@ -405,7 +405,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         }
 
         /**
-         * @param mixed $unit_price_status
+         * @param string $unit_price_status
          */
         public function setUnitPriceStatus($unit_price_status): void
         {
@@ -653,7 +653,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         }
 
         /**
-         * @return mixed
+         * @return string
          */
         public function getRequestFlg()
         {
@@ -661,7 +661,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         }
 
         /**
-         * @param mixed $request_flg
+         * @param string $request_flg
          */
         public function setRequestFlg($request_flg): void
         {
