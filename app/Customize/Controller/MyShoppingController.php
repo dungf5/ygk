@@ -523,7 +523,7 @@ class MyShoppingController extends AbstractShoppingController
                             'demand_unit'=>$hsArrProductQuantity[$itemOr->getId()] > 1 ? 'CS' : 'PC',        // ・需要単位←商品情報の入り数が‘1’の場合、‘PC’、入り数が‘1’以外の場合、‘CS’
                             'dyna_model_seg2'=>$orderNo,                                    // ・ダイナ規格セグメント02←EC注文番号
                             'dyna_model_seg4'=>$orderNo,                                    // ・ダイナ規格セグメント04←EC注文番号
-                            'dyna_model_seg5'=>$itemOr->getId()                            // ・ダイナ規格セグメント05←EC注文明細番号
+                            'dyna_model_seg5'=>count($itemList)                            // ・ダイナ規格セグメント05←EC注文明細番号
                             // No41 注文情報送信I/F end
                             ];
 
