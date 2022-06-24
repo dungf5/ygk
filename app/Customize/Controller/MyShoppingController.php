@@ -14,7 +14,9 @@
 namespace Customize\Controller;
 
 use Customize\Common\MyCommon;
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Service\Common\MyCommonService;
+use Doctrine\DBAL\Types\Type;
 use Eccube\Controller\AbstractShoppingController;
 use Eccube\Entity\Order;
 use Eccube\Event\EccubeEvents;
@@ -407,6 +409,7 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function checkout(Request $request)
     {
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         // ログイン状態のチェック.
         if ($this->orderHelper->isLoginRequired()) {
             log_info('[注文処理] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');

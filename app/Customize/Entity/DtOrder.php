@@ -54,7 +54,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @var \DateTime
          *
-         * @ORM\Column(name="order_date", type="datetimetz",options={"comment":"受注日"})
+         * @ORM\Column(name="order_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT '受注日'")
          */
         private $order_date;
         /**

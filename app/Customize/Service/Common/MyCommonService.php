@@ -588,7 +588,8 @@ class MyCommonService extends AbstractRepository
             $orderItem->setOrderPrice($itemSave['order_price']);
             $orderItem->setDemandQuantity($itemSave['demand_quantity']);
             // No41 注文情報送信I/F start
-            //'order_date'=>'',   // ・受注日←受注日(購入日)
+            $time = new \DateTime();
+            $orderItem->setOrderDate($time);                                                                // ・受注日←受注日(購入日)
             $orderItem->setDeliPlanDate($itemSave['deli_plan_date']);                                       // ・希望納期（納入予定日）←配送日指定
             $orderItem->setItemNo($itemSave['item_no']);                                                    // ・客先品目No←JANコード
             $orderItem->setDemandUnit($itemSave['demand_unit']);                                            // ・需要単位←商品情報の入り数が‘1’の場合、‘PC’、入り数が‘1’以外の場合、‘CS’
