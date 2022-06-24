@@ -254,6 +254,7 @@ class ProductRepository extends AbstractRepository
         $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH,$stringCon)
             ->setParameter(':customer_code', $customer_code)
             ->setParameter(':product_code', $arProductCodeInDtPrice);;
+            var_dump('vvvvvvvvv',$arProductCodeInDtPrice,$customer_code);
         //valid_date = '2022/06/14'  AND '2022/06/14'<= expire_date and customer_code='9901'
         if($user) {
            // $curentDate = date('Y/m/d');

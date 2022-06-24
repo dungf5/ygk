@@ -277,7 +277,7 @@ class MyCommonService extends AbstractRepository
 
 
         $sql = "select pri.product_code,pri.customer_code,pri.valid_date from dt_price pri WHERE customer_code=?
-                and pri.valid_date = DATE_FORMAT(NOW(),'%Y/%m/%d')  AND DATE_FORMAT(NOW(),'%Y/%m/%d') <= pri.expire_date
+                and pri.valid_date = DATE_FORMAT(NOW(),'%Y-%m-%d')  AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
                 GROUP BY pri.product_code,pri.customer_code,pri.valid_date
                 HAVING COUNT(*)=1
                 ; ";
@@ -851,4 +851,39 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
+    public function getPriceFromDtPriceOfCusProductcode($customer_code="",$productCode)
+    {
+        $arR = [];
+        if($customer_code=="") {
+            return [];
+        }
+
+
+        $sql = "select pri.product_code,pri.customer_code,pri.price_s01,pri.valid_date
+                 from dt_price pri
+                 WHERE customer_code=?
+                    and pri.valid_date = DATE_FORMAT(NOW(),'%Y-%m-%d')  AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
+                    and pri.product_code=?
+                    GROUP BY pri.product_code,pri.customer_code,pri.valid_date
+                    HAVING COUNT(*)=1
+                ; ";
+        $param = [$customer_code,$productCode];
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+
+            if(count($rows)==1){
+                return $rows[0]["price_s01"];
+            }
+           return "";
+
+
+        } catch (\Exception $e) {
+            log_info($e->getMessage());
+            var_dump("xxxxxxxx",$sql,$e->getMessage());
+            return "";
+        }
+    }
+
 }

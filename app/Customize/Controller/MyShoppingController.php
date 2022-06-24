@@ -357,7 +357,6 @@ class MyShoppingController extends AbstractShoppingController
 
             $Order->setPaymentTotal($paymentTotal);
 
-
             // Update order_no
             $commonService->updateOrderNo($Order->getId(),$paymentTotal);
 
@@ -495,8 +494,6 @@ class MyShoppingController extends AbstractShoppingController
                 $shipping_plan_date = $moreOrder->getDateWantDelivery();
                 $otodoke_code = $moreOrder->getOtodokeCode();
 
-                $otodoke_name = $comS->getMstCustomerCode($otodoke_code)["customer_name"];
-                $shiping_name = $comS->getMstCustomerCode($ship_code)["customer_name"];
                 //dd($itemList);
                 foreach ($itemList as $itemOr) {
                     if ($itemOr->isProduct()) {
@@ -512,8 +509,7 @@ class MyShoppingController extends AbstractShoppingController
                             'order_price'=>$itemOr->getPrice(),
                             'demand_quantity'=>$itemOr->getQuantity(),
                             'otodoke_code'=>$otodoke_code,
-                            'shiping_name'=>$shiping_name,
-                            'otodoke_name'=>$otodoke_name
+
                             ];
 
                     }

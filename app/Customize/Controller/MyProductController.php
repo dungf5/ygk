@@ -384,37 +384,7 @@ class MyProductController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
-
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-//        $customerRepository = $this->entityManager->getRepository(\Eccube\Entity\Customer::class);
-//
-//        /** @var $Customer \Eccube\Entity\Customer */
-//        $Customer = $customerRepository->newCustomer();
-//        $CustomerStatus = $this->entityManager
-//            ->find(CustomerStatus::class, CustomerStatus::REGULAR);
-//        $Customer->setStatus($CustomerStatus);
-//        $Customer->setPassword("111111111");
-//        $Customer->setName01("name01");
-//        $Customer->setName02("name02");
-//        $Customer->setPoint("0");
-//        $Customer->setEmail("tuongquan12www@gmail.com");
-
-//        $encoder = $this->encoderFactory->getEncoder($Customer);
-//        $salt = $encoder->createSalt();
-//        $password = $encoder->encodePassword($Customer->getPassword(), $salt);
-//        $secretKey = $customerRepository->getUniqueSecretKey();
-
-//        $Customer
-//            ->setSalt($salt)
-//            ->setPassword($password)
-//            ->setSecretKey($secretKey)
-//            ->setPoint(0);
-//
-//        $this->entityManager->persist($Customer);
-//        $this->entityManager->flush();
-
-
-
         // Doctrine SQLFilter
         if ($this->BaseInfo->isOptionNostockHidden()) {
             $this->entityManager->getFilters()->enable('option_nostock_hidden');

@@ -375,11 +375,13 @@ class CartService extends Service
             $Customer = $this->getUser();
             $commonS = new MyCommonService($this->entityManager);
             $customer_code = $commonS->getMstCustomer($Customer->getId())["customer_code"];
-            $priceClass = $this->entityManager
-                ->getRepository(Price::class)
-                ->findOneBy(['product_code'=>$mstProductClass->getProductCode(),'customer_code'=>$customer_code ]);
-            if($priceClass!==null){
-                $price = $priceClass->getPriceS01();
+//            $priceClass = $this->entityManager
+//                ->getRepository(Price::class)
+//                ->findOneBy(['product_code'=>$mstProductClass->getProductCode(),'customer_code'=>$customer_code ]);
+            $priceR = $commonS->getPriceFromDtPriceOfCusProductcode($customer_code,$mstProductClass->getProductCode());
+
+            if($priceR!==""){
+                $price = $priceR;//$priceClass->getPriceS01();
             }
 
         }
