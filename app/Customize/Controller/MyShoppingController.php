@@ -483,10 +483,12 @@ class MyShoppingController extends AbstractShoppingController
                 $arMstProduct = $comS->getMstProductsOrderNo($orderNo);
                 $hsArrRemmain=[];
                 $hsArrJanCode=[];
+                $hsArrProductQuantity=[];
                 foreach ($arMstProduct as $itemPro) {
                     $hsArrEcProductCusProduct[$itemPro["ec_order_lineno"]] = $itemPro["product_code"];
                     $hsArrRemmain[$itemPro["ec_order_lineno"]] = $itemPro["quantity"];
                     $hsArrJanCode[$itemPro["ec_order_lineno"]] = $itemPro["jan_code"];
+                    $hsArrProductQuantity[$itemPro["ec_order_lineno"]] = $itemPro["product_quantity"];
                 }
                 //customer_code
 
@@ -518,10 +520,10 @@ class MyShoppingController extends AbstractShoppingController
                             //'order_date'=>'',   // ・受注日←受注日(購入日)
                             'deli_plan_date'=>$shipping_plan_date,                          // ・希望納期（納入予定日）←配送日指定
                             'item_no'=>$hsArrJanCode[$itemOr->getId()],                     // ・客先品目No←JANコード
-                            'demand_unit'=>$itemOr->getQuantity() > 1 ? 'CS' : 'PC',        // ・需要単位←商品情報の入り数が‘1’の場合、‘PC’、入り数が‘1’以外の場合、‘CS’
+                            'demand_unit'=>$hsArrProductQuantity[$itemOr->getId()] > 1 ? 'CS' : 'PC',        // ・需要単位←商品情報の入り数が‘1’の場合、‘PC’、入り数が‘1’以外の場合、‘CS’
                             'dyna_model_seg2'=>$orderNo,                                    // ・ダイナ規格セグメント02←EC注文番号
                             'dyna_model_seg4'=>$orderNo,                                    // ・ダイナ規格セグメント04←EC注文番号
-                            'dyna_model_seg6'=>$itemOr->getId()                            // ・ダイナ規格セグメント05←EC注文明細番号
+                            'dyna_model_seg5'=>$itemOr->getId()                            // ・ダイナ規格セグメント05←EC注文明細番号
                             // No41 注文情報送信I/F end
                             ];
 

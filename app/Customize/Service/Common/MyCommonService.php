@@ -177,7 +177,7 @@ class MyCommonService extends AbstractRepository
 
 
 
-        $sql = " 	select b.id AS ec_order_lineno,a.order_no,b.product_id,c.product_code,c.jan_code,b.quantity	 from
+        $sql = " 	select b.id AS ec_order_lineno,a.order_no,b.product_id,c.product_code,c.jan_code,c.quantity as product_quantity ,b.quantity	 from
 				dtb_order as a  join dtb_order_item b on a.id = b.order_id
 				join mst_product as c   on c.ec_product_id = b.product_id
 			WHERE order_no='$order_no'
@@ -595,7 +595,7 @@ class MyCommonService extends AbstractRepository
             $orderItem->setDemandUnit($itemSave['demand_unit']);                                            // ・需要単位←商品情報の入り数が‘1’の場合、‘PC’、入り数が‘1’以外の場合、‘CS’
             $orderItem->setDynaModelSeg2($itemSave['dyna_model_seg2']);                                     // ・ダイナ規格セグメント02←EC注文番号
             $orderItem->setDynaModelSeg4($itemSave['dyna_model_seg4']);                                     // ・ダイナ規格セグメント04←EC注文番号
-            $orderItem->setDynaModelSeg6($itemSave['dyna_model_seg6']);                                     // ・ダイナ規格セグメント05←EC注文明細番号
+            $orderItem->setDynaModelSeg5($itemSave['dyna_model_seg5']);                                     // ・ダイナ規格セグメント05←EC注文明細番号
             // No41 注文情報送信I/F end
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
