@@ -247,14 +247,14 @@ class ProductRepository extends AbstractRepository
         $qb->innerJoin('Customize\Entity\MstProduct', 'mstProduct',Join::WITH,'mstProduct.ec_product_id = p.id');
         $curentDate = date('Y-m-d');
         $stringCon='price.product_code = mstProduct.product_code AND price.customer_code = :customer_code  ';
-        $stringCon .="and price.valid_date = '$curentDate'  AND '$curentDate' <= price.expire_date  and price.product_code in(:product_code)";
+        $stringCon .="and '$curentDate' >= price.valid_date    AND '$curentDate' <= price.expire_date  and price.product_code in(:product_code)";
 
         //$arProductCode=["200000-150-150-0.8-1","200000-150-200-1-22-"];
 
         $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH,$stringCon)
             ->setParameter(':customer_code', $customer_code)
             ->setParameter(':product_code', $arProductCodeInDtPrice);;
-            var_dump('vvvvvvvvv',$arProductCodeInDtPrice,$customer_code);
+         // var_dump($arProductCodeInDtPrice);
         //valid_date = '2022/06/14'  AND '2022/06/14'<= expire_date and customer_code='9901'
         if($user) {
            // $curentDate = date('Y/m/d');

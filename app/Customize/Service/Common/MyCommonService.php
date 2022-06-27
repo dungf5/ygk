@@ -72,8 +72,9 @@ class MyCommonService extends AbstractRepository
      */
     public function getMstCustomer($customerId)
     {
-        $column = "customer_code as shipping_no,customer_code, ec_customer_id, customer_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date";
-        $sql = " SELECT $column   FROM mst_customer a WHERE ec_customer_id=?";
+        $column = "a.customer_code as shipping_no,a.customer_code, a.ec_customer_id, a.customer_name as name01, a.company_name, a.company_name_abb,
+         a.department, a.postal_code, a.addr01, a.addr02, a.addr03, a.email, a.phone_number, a.create_date, a.update_date";
+        $sql = " SELECT $column   FROM mst_customer a join `dtb_customer` `dtcus` on((`dtcus`.`id` = `a`.`ec_customer_id`))  WHERE ec_customer_id=?";
         $param = [];
         $param[] = $customerId;
         $statement = $this->entityManager->getConnection()->prepare($sql);
@@ -250,6 +251,7 @@ class MyCommonService extends AbstractRepository
             return  [];
         }
 
+
         $sql = " SELECT b.id,c.product_code,c.unit_price,c.ec_product_id,dtPrice.price_s01
                 FROM  dtb_product_class AS a JOIN dtb_cart_item b ON b.product_class_id =a.id
                 JOIN mst_product AS c ON a.product_id = c.ec_product_id
@@ -276,9 +278,9 @@ class MyCommonService extends AbstractRepository
         }
 
 
-        $sql = "select pri.product_code,pri.customer_code,pri.valid_date from dt_price pri WHERE customer_code=?
-                and pri.valid_date = DATE_FORMAT(NOW(),'%Y-%m-%d')  AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
-                GROUP BY pri.product_code,pri.customer_code,pri.valid_date
+        $sql = "select pri.product_code,pri.customer_code  from dt_price pri WHERE customer_code=?
+                and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
+                GROUP BY pri.product_code,pri.customer_code
                 HAVING COUNT(*)=1
                 ; ";
         $param = [$customer_code];
@@ -886,7 +888,7 @@ class MyCommonService extends AbstractRepository
         $sql = "select pri.product_code,pri.customer_code,pri.price_s01,pri.valid_date
                  from dt_price pri
                  WHERE customer_code=?
-                    and pri.valid_date = DATE_FORMAT(NOW(),'%Y-%m-%d')  AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
+                    and DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date    AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
                     and pri.product_code=?
                     GROUP BY pri.product_code,pri.customer_code,pri.valid_date
                     HAVING COUNT(*)=1

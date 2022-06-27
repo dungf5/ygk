@@ -127,11 +127,11 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function index(PurchaseFlow $cartPurchaseFlow)
     {
+
         // ログイン状態のチェック.
         $commonService = new MyCommonService($this->entityManager);
         if ($this->orderHelper->isLoginRequired()) {
             log_info('[注文手続] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
-
             $this->session->set("is_update_cart",1);
             return $this->redirectToRoute('shopping_login');
         }
@@ -152,16 +152,26 @@ class MyShoppingController extends AbstractShoppingController
         $arCusLogin = $commonService->getMstCustomer($Customer->getId());
 
         $is_update_cart = $this->session->get("is_update_cart","");
+
         //************** update cart when login
         $arCarItemId =[];
         if($is_update_cart==1){
             $cartId = $Cart->getId();
             $productCart = $commonService->getdtPriceFromCart([$cartId],$arCusLogin["customer_code"]);
+            $arPCode = $commonService->getPriceFromDtPriceOfCus($arCusLogin["customer_code"]);
+            $hsHsProductCodeIndtPrice =[];
+            foreach ($arPCode as $hasKey){
+                $hsHsProductCodeIndtPrice[$hasKey]=1;
+            }
+
             $hsPriceUp =[];
             foreach ($productCart as $itemCart){
                 if($itemCart["price_s01"] != null && ($itemCart["price_s01"]!="") ){
-                    $hsPriceUp[$itemCart["id"]] = $itemCart["price_s01"];
-                    $arCarItemId[] =$itemCart["id"];
+                    if(isset($hsHsProductCodeIndtPrice[$itemCart['product_code']])){
+                        $hsPriceUp[$itemCart["id"]] = $itemCart["price_s01"];
+                        $arCarItemId[] =$itemCart["id"];
+                    }
+
                 }
             }
             $commonService->updateCartItem($hsPriceUp,$arCarItemId,$Cart);
