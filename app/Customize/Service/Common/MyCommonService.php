@@ -770,7 +770,35 @@ class MyCommonService extends AbstractRepository
     public function getMstProductsOrderCustomer($order_no)
     {
 
-        $sql = "
+//        $sql = "
+//         SELECT
+//            a.id AS 	 order_no,
+//            a.customer_id customer_id,
+//            d.customer_code customer_code,
+//            b.product_id AS product_id,
+//            c.product_code AS product_code,
+//            c.product_name AS product_name,
+//            c.unit_price AS unit_price,
+//            b.quantity AS quantity,
+//             IF(e.count_price = 1, (SELECT price_s01 FROM dt_price WHERE product_code = c.product_code AND customer_code = d.customer_code), c.unit_price) AS price
+//        FROM dtb_order a
+//        JOIN dtb_order_item b ON a.id = b.order_id
+//        JOIN mst_product c ON c.ec_product_id = b.product_id
+//        JOIN mst_customer d ON d.ec_customer_id = a.customer_id
+//        LEFT JOIN
+//		   ( SELECT
+//		   	product_code,
+//		   	customer_code,
+//				COUNT(price_s01) AS count_price
+//			  FROM  dt_price
+//			  GROUP BY
+//			  	product_code,
+//		   	customer_code
+//			  ) e ON e.product_code = c.product_code AND e.customer_code = d.customer_code
+//        WHERE order_no=?
+//        ORDER BY b.id ASC
+//         ";
+       $sql = "
          SELECT
             a.id AS 	 order_no,
             a.customer_id customer_id,
@@ -780,7 +808,7 @@ class MyCommonService extends AbstractRepository
             c.product_name AS product_name,
             c.unit_price AS unit_price,
             b.quantity AS quantity,
-            IF(e.count_price = 1, (SELECT price_s01 FROM dt_price WHERE product_code = c.product_code AND customer_code = d.customer_code), c.unit_price) AS price
+            b.price
         FROM dtb_order a
         JOIN dtb_order_item b ON a.id = b.order_id
         JOIN mst_product c ON c.ec_product_id = b.product_id
