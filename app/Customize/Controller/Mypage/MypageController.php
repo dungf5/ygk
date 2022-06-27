@@ -139,11 +139,12 @@ class MypageController extends AbstractController
     {
 
         $htmlFileName = "Mypage/exportOrderPdf.twig";
-        $inquiry_no =MyCommon::getPara("inquiry_no");
+        $delivery_no =MyCommon::getPara("delivery_no");
         $myData  =(object)[];
 
         $mstDelivery = $this->entityManager->getRepository(MstDelivery::class);
-        $arRe = $mstDelivery->getQueryBuilderByDeli($inquiry_no);
+        $arRe = $mstDelivery->getQueryBuilderByDeli($delivery_no);
+
 
         //add special line
         $totalTax = 0;
@@ -158,11 +159,11 @@ class MypageController extends AbstractController
         $arSpecial = ["is_total"=>1,'totalaAmount'=>$totalaAmount,'totalTax'=>$totalTax];
         $arRe[] =$arSpecial;
 
-        $inquiry_no = MyCommon::getPara("inquiry_no");
+
         $dirPdf = MyCommon::getHtmluserDataDir()."/pdf";
         FileUtil::makeDirectory($dirPdf);
         $arReturn = ["myData"=>$arRe,"OrderTotal"=>$totalaAmount,"totalaAmountTax"=>$totalaAmountTax ];
-        $namePdf = "ship_".$inquiry_no.".pdf";
+        $namePdf = "ship_".$delivery_no.".pdf";
         $file = $dirPdf."/".$namePdf;
         if(getenv("APP_IS_LOCAL")==0){
           $htmlBody = $this->twig->render($htmlFileName, $arReturn);
