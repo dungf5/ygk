@@ -602,7 +602,7 @@ class MyCommonService extends AbstractRepository
             $orderItem->setDynaModelSeg4($itemSave['dyna_model_seg4']);                                     // ・ダイナ規格セグメント04←EC注文番号
             $orderItem->setDynaModelSeg5($ec_order_lineno);                                                 // ・ダイナ規格セグメント05←EC注文明細番号
             $orderItem->setUnitPriceStatus('FOR');
-            $orderItem->setDeploy('G');
+            $orderItem->setDeploy('XB');
             $orderItem->setCompanyId('XB');
             $orderItem->setDynaModelSeg3($itemSave['customer_code'] == '6000' ? '1' : '2');
             // No41 注文情報送信I/F end
