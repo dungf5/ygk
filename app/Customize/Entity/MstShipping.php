@@ -44,12 +44,59 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
          */
         private $order_no;
 
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="cus_order_no", type="string", length=15)
+         */
+        private $cus_order_no;
+
+        /**
+         * @return string
+         */
+        public function getCusOrderNo(): string
+        {
+            return $this->cus_order_no;
+        }
+
+        /**
+         * @param string $cus_order_no
+         */
+        public function setCusOrderNo(string $cus_order_no): void
+        {
+            $this->cus_order_no = $cus_order_no;
+        }
+
         /**
          * @var string
          *
          * @ORM\Column(name="order_lineno", type="string", length=8)
          */
         private $order_lineno;
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="cus_order_lineno", type="string", length=18)
+         */
+        private $cus_order_lineno;
+
+        /**
+         * @return string
+         */
+        public function getCusOrderLineno(): string
+        {
+            return $this->cus_order_lineno;
+        }
+
+        /**
+         * @param string $cus_order_lineno
+         */
+        public function setCusOrderLineno(string $cus_order_lineno): void
+        {
+            $this->cus_order_lineno = $cus_order_lineno;
+        }
 
         /**
          * @var string
@@ -223,6 +270,8 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         {
             $this->order_no = $order_no;
         }
+
+
 
         /**
          * @return string

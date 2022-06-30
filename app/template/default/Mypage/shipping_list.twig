@@ -3,6 +3,8 @@
     <tr>
         <th title="inquiry_no">出荷指示№</th>
         <th title="customer_name">顧客</th>
+        <th title="shipping_customer_name">出荷先</th>
+
         <th title="product_code">製品コード</th>
         <th title="shipping_status">出荷ステータス</th>
         <th title="shipping_num">出荷数</th>
@@ -15,16 +17,22 @@
     <tbody>
     {% for item in myData %}
     <tr>
-        <td>{{item.inquiry_no }}</td>
+        <td>{{item.shipping_no }}</td>
         <td>{{item.customer_name }}</td>
+        <td>{{item.shipping_customer_name }}</td>
         <td>{{item.product_code }}</td>
         <td>{{item.shipping_status }}</td>
         <td>{{item.shipping_num }}</td>
         <td>{{item.shipping_plan_date }}</td>
         <td>
 {#            <a target="_blank" href="/mypage/exportOrderPdf?inquiry_no={{item.inquiry_no}}">{{item.inquiry_no}}</a>#}
-            <a target="_blank" href="/mypage/exportOrderPdf?delivery_no={{item.delivery_no}}">{{item.inquiry_no}}</a>
 
+            {% if item.delivery_no %}
+
+                <a target="_blank" href="/mypage/exportOrderPdf?delivery_no={{item.delivery_no}}">{{item.inquiry_no}}</a>
+            {% else %}
+                {{item.inquiry_no}}
+            {% endif %}
            </td>
         <td>{{item.shipping_company_code }}</td>
 

@@ -155,6 +155,7 @@ class MypageController extends AbstractController
             $totalaAmount = $totalaAmount + $item["amount"];
             $totalaAmountTax = $totalaAmountTax +$item["amount"]+$item["tax"];
             $item['is_total'] = 0;
+            $item['delivery_date'] = explode(" ",$item['delivery_date'])[0] ;
         }
         $arSpecial = ["is_total"=>1,'totalaAmount'=>$totalaAmount,'totalTax'=>$totalTax];
         $arRe[] =$arSpecial;

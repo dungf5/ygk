@@ -104,18 +104,19 @@ class MyCommonService extends AbstractRepository
     public function getShipList($customer_code,$shipping_no,$order_no)
     {
 
-        $sql = " select f.delivery_no ,c.inquiry_no ,c.shipping_no,d.customer_name ,c.product_code,
+        $sql = " select f.delivery_no ,c.inquiry_no ,c.shipping_no,cus2.customer_name as shipping_customer_name,c.shipping_code,d.customer_name ,c.product_code,
                     case when c.shipping_status = 1 then '出荷指示済'  else '出荷済' end as shipping_status,c.shipping_num
                     ,c.shipping_plan_date ,c.inquiry_no,c.shipping_company_code
                     from dt_order_status as a
                     join mst_product as b
                     on a.product_code = b.product_code
                     join mst_shipping as c
-                    on a.ec_order_no = c.ec_order_no
-                    and a.ec_order_lineno = c.ec_order_lineno
+                    on a.order_no = c.order_no
+                    and a.order_line_no = c.order_lineno
                     join mst_customer as d
                     on c.customer_code = d.customer_code
-                     join mst_delivery  as f   on c.cus_order_no = f.order_no
+                     left join mst_customer AS cus2 ON  cus2.customer_code=c.shipping_code
+                     left join mst_delivery  as f   on c.cus_order_no = f.order_no
                     -- join dt_customer_relation as e   on c.shipping_code = e.shipping_code
                     where a.customer_code = ? and c.shipping_no=? and a.ec_order_no=?";
         $param = [];
@@ -279,8 +280,10 @@ class MyCommonService extends AbstractRepository
         }
 
 
-        $sql = "select pri.product_code,pri.customer_code  from dt_price pri WHERE customer_code=?
+        $sql = "select pri.product_code,pri.customer_code  from dt_price pri
+                WHERE pri.customer_code=?
                 and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
+                and pri.customer_code = pri.shipping_no
                 GROUP BY pri.product_code,pri.customer_code
                 HAVING COUNT(*)=1
                 ; ";
@@ -548,11 +551,12 @@ class MyCommonService extends AbstractRepository
             $orderItem->setShippingNum(0);
 
             $orderItem->setShippingDate('');
-            $orderItem->setInquiryNo('');
+            $orderItem->setInquiryNo($ec_order.'-'.$ec_order_lineno);
             $orderItem->setShippingCompanyCode('');
             $orderItem->setOrderNo($ec_order);
             $orderItem->setOrderLineno($ec_order_lineno);
-
+            $orderItem->setCusOrderNo($ec_order);
+            $orderItem->setCusOrderLineno($ec_order_lineno);
             $orderItem->setCustomerCode($itemSave['customer_code']);
             $orderItem->setShippingCode($itemSave['shipping_code']);
             $orderItem->setProductCode($itemSave['product_code']);
@@ -633,6 +637,8 @@ class MyCommonService extends AbstractRepository
             // $orderItem->setPropertiesFromArray($keyFind,['create_date']);
             $orderItem->setEcOrderLineno($ec_order_lineno);
             $orderItem->setEcOrderNo($ec_order);
+            $orderItem->setOrderNo($ec_order);
+            $orderItem->setOrderLineNo($ec_order_lineno);
             //"cus_order_no"=>$ec_order,"cus_order_lineno"=>$ec_order_lineno
             $orderItem->setCusOrderNo($ec_order);
             $orderItem->setCusOrderLineno($cusOrderLineno);
@@ -916,12 +922,14 @@ class MyCommonService extends AbstractRepository
 
         $sql = "select pri.product_code,pri.customer_code,pri.price_s01,pri.valid_date
                  from dt_price pri
-                 WHERE customer_code=?
+                 WHERE pri.customer_code=?
                     and DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date    AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
                     and pri.product_code=?
+                    and pri.customer_code = pri.shipping_no
                     GROUP BY pri.product_code,pri.customer_code,pri.valid_date
                     HAVING COUNT(*)=1
                 ; ";
+
         $param = [$customer_code,$productCode];
         $statement = $this->entityManager->getConnection()->prepare($sql);
         try {
@@ -935,8 +943,8 @@ class MyCommonService extends AbstractRepository
 
 
         } catch (\Exception $e) {
-            log_info($e->getMessage());
-            var_dump("xxxxxxxx",$sql,$e->getMessage());
+            log_info('getPriceFromDtPriceOfCusProductcode '.$e->getMessage());
+
             return "";
         }
     }
