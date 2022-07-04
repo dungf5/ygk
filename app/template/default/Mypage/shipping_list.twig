@@ -1,40 +1,56 @@
+<div style="    display: flex;
+    justify-content: space-between;">
+    <div>
+        出荷指示№：<b>{{myData[0].shipping_no }}</b>
+    </div>
+    <div>
+        {% if myData[0].delivery_no %}
+
+            <a class=" btn btn-primary"  target="_blank" href="/mypage/exportOrderPdf?delivery_no={{myData[0].delivery_no}}">納品書</a>
+        {% else %}
+            <div class=" btn btn-primary disabled"> 納品書</div>
+        {% endif %}
+
+    </div>
+
+</div>
 <table class="table myTable">
     <thead>
     <tr>
-        <th title="inquiry_no">出荷指示№</th>
-        <th title="customer_name">顧客</th>
-        <th title="shipping_customer_name">出荷先</th>
+{#        <th title="shipping_no">出荷指示№</th>#}
+{#        <th title="customer_name">顧客</th>#}
+{#        <th title="shipping_customer_name">出荷先</th>#}
 
-        <th title="product_code">製品コード</th>
+        <th title="product_code ">商品コード</th>
+        <th title="product_name"> 商品名</th>
         <th title="shipping_status">出荷ステータス</th>
         <th title="shipping_num">出荷数</th>
         <th title="shipping_plan_date">出荷指示日</th>
-        <th title="inquiry_no" >荷送伝票番号</th>
+        <th title="shipping_date">出荷日</th>
+
         <th title="shipping_company_code">運送会社</th>
+{#        <th title="inquiry_no" >荷送伝票番号</th>#}
 
     </tr>
     </thead>
     <tbody>
     {% for item in myData %}
     <tr>
-        <td>{{item.shipping_no }}</td>
-        <td>{{item.customer_name }}</td>
-        <td>{{item.shipping_customer_name }}</td>
+{#        <td>{{item.shipping_no }}</td>#}
+{#        <td>{{item.customer_name }}</td>#}
+{#        <td>{{item.shipping_customer_name }}</td>#}
         <td>{{item.product_code }}</td>
+        <td>{{item.product_name }}</td>
         <td>{{item.shipping_status }}</td>
         <td>{{item.shipping_num }}</td>
         <td>{{item.shipping_plan_date }}</td>
-        <td>
-{#            <a target="_blank" href="/mypage/exportOrderPdf?inquiry_no={{item.inquiry_no}}">{{item.inquiry_no}}</a>#}
-
-            {% if item.delivery_no %}
-
-                <a target="_blank" href="/mypage/exportOrderPdf?delivery_no={{item.delivery_no}}">{{item.inquiry_no}}</a>
-            {% else %}
-                {{item.inquiry_no}}
-            {% endif %}
-           </td>
+        <td>{{item.shipping_date }}</td>
         <td>{{item.shipping_company_code }}</td>
+
+            {#            <a target="_blank" href="/mypage/exportOrderPdf?inquiry_no={{item.inquiry_no}}">{{item.inquiry_no}}</a>#}
+
+
+
 
 
 

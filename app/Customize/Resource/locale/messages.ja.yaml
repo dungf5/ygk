@@ -25,7 +25,7 @@ front.order.product_name: 商品
 front.order.product_code: コード
 front.order.order_status: 受注<br/>ステータス
 front.order.shipping_status: 出荷</br>ステータス
-front.order.order_plus: 数量
+front.order.order_plus: 注文数
 front.order.reserve_stock_num: 引当数
 front.order.order_remain_num: 注文残
 front.order.update_date: 引当日
@@ -46,8 +46,9 @@ front.mypage.shipping_num: 出荷数
 front.mypage.shipping_plan_date: 出荷指示日
 front.mypage.inquiry_no: 荷送伝票番号
 front.mypage.shipping_company_code: 運送会社
-front.mypage.shipping_no_no: 出荷指示№
-
+front.mypage.shipping_no_no: 出荷進展
+#login
+common.mail_address: mail or id
 
 
 

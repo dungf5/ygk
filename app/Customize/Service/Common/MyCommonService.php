@@ -104,9 +104,9 @@ class MyCommonService extends AbstractRepository
     public function getShipList($customer_code,$shipping_no,$order_no)
     {
 
-        $sql = " select f.delivery_no ,c.inquiry_no ,c.shipping_no,cus2.customer_name as shipping_customer_name,c.shipping_code,d.customer_name ,c.product_code,
+        $sql = " select b.product_name,f.delivery_no ,c.inquiry_no ,c.shipping_no,cus2.customer_name as shipping_customer_name,c.shipping_code,d.customer_name ,c.product_code,
                     case when c.shipping_status = 1 then '出荷指示済'  else '出荷済' end as shipping_status,c.shipping_num
-                    ,c.shipping_plan_date ,c.inquiry_no,c.shipping_company_code
+                    ,c.shipping_plan_date ,c.inquiry_no,c.shipping_company_code,c.shipping_date
                     from dt_order_status as a
                     join mst_product as b
                     on a.product_code = b.product_code

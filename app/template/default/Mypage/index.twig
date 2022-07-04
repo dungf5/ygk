@@ -47,8 +47,8 @@ file that was distributed with this source code.
                         <th title="order_no">{{ 'front.order.order_no'|trans| raw }}</th>
                         <th title="order_lineno">{{ 'front.order.order_lineno'|trans| raw }}</th>
                         <th title="image">{{ 'front.order.image'|trans| raw }}</th>
-                        <th title="product_name">{{ 'front.order.product_name'|trans| raw }}</th>
-                        <th title="product_code">{{ 'front.order.product_code'|trans| raw }}</th>
+                        <th style="text-align: left;" title="product_code product_name">{{ 'front.order.product_code'|trans| raw }}<br/>{{ 'front.order.product_name'|trans| raw }}</th>
+
 
                         <th title="order_status" style="text-align: center;">{{ 'front.order.order_status'|trans| raw }}</th>
                         <th  title="shipping_status"  class="hide" style="text-align: center;" >{{ 'front.order.shipping_status'|trans| raw }}</th>
@@ -59,7 +59,7 @@ file that was distributed with this source code.
 
                         <th title="update_date">{{ 'front.order.update_date'|trans| raw }}</th>
                         <th class="hide" title="shipping_date">{{ 'front.order.shipping_date'|trans| raw }}</th>
-                        <th title="shipping_no"  style="text-align: center;" >{{ 'front.mypage.shipping_no_no'|trans| raw }}</th>
+                        <th title="shipping_no"  style="" >{{ 'front.mypage.shipping_no_no'|trans| raw }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -80,8 +80,8 @@ file that was distributed with this source code.
                                         <img  style="width: 100px"  src="{{ asset(Order.main_img|no_image_product, 'save_image') }}">
                                     {% endif %}
                                 </td>
-                                <td>{{Order.product_name}}</td>
-                                <td>{{Order.product_code}}</td>
+
+                                <td >{{Order.product_code}}<br/>{{Order.product_name}}</td>
                                 <td>{{Order.order_status}}</td>
                                 <td class="hide">{{Order.shipping_status}}</td>
 
@@ -98,8 +98,16 @@ file that was distributed with this source code.
 {#                                    <a target="_blank" href="/mypage/exportOrderPdf?inquiry_no={{Order.shipping_no}}">{{Order.shipping_no}}</a>#}
 {#                                    <a  onclick="loadDataFor('{{ Order.shipping_no }}')"  href="javascript:loadDataFor('{{ Order.shipping_no }}');"   >{{Order.shipping_no}}</a>#}
 
+                                    {% if Order.shipping_no %}
 
-                                    <a onclick="loadDataFor('{{Order.ec_order_no}}','{{ Order.shipping_no }}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest" >{{Order.shipping_no}}</a>
+                                        <a class=" btn btn-primary " onclick="loadDataFor('{{Order.ec_order_no}}','{{ Order.shipping_no }}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest" >
+                                            出荷状況
+                                        </a>
+
+                                    {% else %}
+                                        <div class=" btn btn-primary disabled">    出荷状況</div>
+                                    {% endif %}
+
 
                                 </td>
 

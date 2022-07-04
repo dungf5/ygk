@@ -122,6 +122,7 @@ class MypageController extends AbstractController
         $order_no = $request->get("order_no");
 
         $arRe = $comS->getShipList($customer_code,$shipping_no,$order_no);
+
         $arReturn = ["myData"=>$arRe];
 
         return $arReturn;
