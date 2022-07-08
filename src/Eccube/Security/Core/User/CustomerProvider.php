@@ -47,10 +47,12 @@ class CustomerProvider implements UserProviderInterface
      */
     public function loadUserByUsername($username)
     {
-        $Customer = $this->customerRepository->findOneBy([
-            'email' => $username,
-            'Status' => CustomerStatus::REGULAR,
-        ]);
+//        $Customer = $this->customerRepository->findOneBy([
+//            'email' => $username,
+//            'Status' => CustomerStatus::REGULAR,
+//        ]);
+
+        $Customer = $this->customerRepository->getUserByCode($username);
 
         if (null === $Customer) {
             throw new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $username));

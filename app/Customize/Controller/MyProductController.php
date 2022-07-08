@@ -439,6 +439,7 @@ class MyProductController extends AbstractController
 
         $arProductCodeInDtPrice  =[];
         $arProductCodeInDtPrice = $commonService->getPriceFromDtPriceOfCus($customer_code);
+
         $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user ,$customer_code,$arProductCodeInDtPrice);
 
         $event = new EventArgs(
@@ -481,6 +482,7 @@ class MyProductController extends AbstractController
 
         // addCart form
         $forms = [];
+
         foreach ($pagination as $Product) {
             /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
             $builder = $this->formFactory->createNamedBuilder(

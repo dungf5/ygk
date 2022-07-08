@@ -48,7 +48,7 @@ front.mypage.inquiry_no: 荷送伝票番号
 front.mypage.shipping_company_code: 運送会社
 front.mypage.shipping_no_no: 出荷進展
 #login
-common.mail_address: mail or id
+common.mail_address: ユーザーコードまたはメールアドレス
 
 
 

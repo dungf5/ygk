@@ -73,7 +73,7 @@ class MyCommonService extends AbstractRepository
     public function getMstCustomer($customerId)
     {
         $column = "a.customer_code as shipping_no,a.customer_code, a.ec_customer_id, a.customer_name as name01, a.company_name, a.company_name_abb,
-         a.department, a.postal_code, a.addr01, a.addr02, a.addr03, a.email, a.phone_number, a.create_date, a.update_date";
+         a.department, a.postal_code, a.addr01, a.addr02, a.addr03, dtcus.email, a.phone_number, a.create_date, a.update_date";
         $sql = " SELECT $column   FROM mst_customer a join `dtb_customer` `dtcus` on((`dtcus`.`id` = `a`.`ec_customer_id`))  WHERE ec_customer_id=?";
         $param = [];
         $param[] = $customerId;
@@ -86,6 +86,24 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
+    public function getEmailFromUserCode($customer_code)
+    {
+        $column = "a.customer_code as shipping_no,a.customer_code, a.ec_customer_id, a.customer_name as name01, a.company_name, a.company_name_abb,
+         a.department, a.postal_code, a.addr01, a.addr02, a.addr03, dtcus.email, a.phone_number, a.create_date, a.update_date";
+        $sql = " SELECT $column   FROM mst_customer a join `dtb_customer` `dtcus` on((`dtcus`.`id` = `a`.`ec_customer_id`))  WHERE a.customer_code=? or dtcus.email =?";
+        $param = [];
+        $param[] = $customer_code;
+        $param[] = $customer_code;
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            return $rows;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
     public function getMstCustomerCode($customer_code)
     {
         $column = "customer_code as shipping_no,customer_code, ec_customer_id,customer_name, customer_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date";
@@ -279,7 +297,7 @@ class MyCommonService extends AbstractRepository
             return [];
         }
 
-
+       //pri.customer_code = pri.shipping_no cho giao hang phai giong de co gia tot
         $sql = "select pri.product_code,pri.customer_code  from dt_price pri
                 WHERE pri.customer_code=?
                 and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
@@ -287,6 +305,7 @@ class MyCommonService extends AbstractRepository
                 GROUP BY pri.product_code,pri.customer_code
                 HAVING COUNT(*)=1
                 ; ";
+
         $param = [$customer_code];
         $statement = $this->entityManager->getConnection()->prepare($sql);
         try {

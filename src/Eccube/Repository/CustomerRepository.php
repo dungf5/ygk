@@ -13,6 +13,7 @@
 
 namespace Eccube\Repository;
 
+use Customize\Service\Common\MyCommonService;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Common\EccubeConfig;
 use Eccube\Doctrine\Query\Queries;
@@ -99,7 +100,22 @@ class CustomerRepository extends AbstractRepository
 
         return $Customer;
     }
+    public function getUserByCode($login_code)
+    {
+        $myCommon = new MyCommonService($this->getEntityManager());
 
+        $dataGet = $myCommon->getEmailFromUserCode($login_code);
+        $strRe ="";
+        if(count($dataGet)==1){
+            $strRe =  $dataGet[0]["email"];
+        }
+        $Customer = $this->findOneBy([
+            'email' => $strRe,
+            'Status' => CustomerStatus::REGULAR,
+        ]);
+
+        return $Customer;
+    }
     public function getQueryBuilderBySearchData($searchData)
     {
         $qb = $this->createQueryBuilder('c')

@@ -240,6 +240,7 @@ class ProductRepository extends AbstractRepository
 
             }
         }
+       // $qb->andWhere("mstProduct.product_code = '100000-12-5-35-RD'");
         if(!$user) {
             $customer_code = '';
         }
@@ -266,7 +267,7 @@ class ProductRepository extends AbstractRepository
         $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');
 
-       // var_dump($qb->getQuery()->getSQL(),$arProductCodeInDtPrice,$customer_code);
+       //var_dump($qb->getQuery()->getSQL(),$arProductCodeInDtPrice,$customer_code);die();
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 

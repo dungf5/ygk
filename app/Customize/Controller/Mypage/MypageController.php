@@ -41,6 +41,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class MypageController extends AbstractController
@@ -303,7 +304,28 @@ class MypageController extends AbstractController
             'pagination' => $pagination, 'hsProductImgMain' => $hsProductImgMain,
         ];
     }
+    /**
+     * ログイン画面.
+     *
+     * @Route("/mypage/login_check", name="mypage_login_check", methods={"GET", "POST"})
+     * @Template("Mypage/login.twig")
+     */
+    public function login_check(Request $request, AuthenticationUtils $utils)
+    {
 
+
+        $login_code = $request->get('login_code');
+        $myC = new MyCommonService($this->entityManager);
+        $strRe = 'FAIL';
+        $dataGet = $myC->getEmailFromUserCode($login_code);
+        if(count($dataGet)==1){
+            $strRe =  $dataGet[0]["email"];
+        }
+        echo json_encode(["email"=>$strRe]) ;
+        die();
+
+        //return $this->redirectToRoute('mypage');
+    }
     /**
      * ログイン画面.
      *
@@ -312,6 +334,7 @@ class MypageController extends AbstractController
      */
     public function login(Request $request, AuthenticationUtils $utils)
     {
+
         if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
             log_info('認証済のためログイン処理をスキップ');
 

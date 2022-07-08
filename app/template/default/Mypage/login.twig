@@ -12,6 +12,34 @@ file that was distributed with this source code.
 
 {% set body_class = 'mypage' %}
 
+
+{% block javascript %}
+<script>
+function checkLogin(){
+    $.ajax({
+        url: '{{ url('mypage_login_check') }}',
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    'login_code': $('#login_code').val(),
+                    '_csrf_token': '{{ csrf_token('authenticate') }}'
+                }
+            }).done(function(data) {
+               let objR = $.parseJSON(data);
+               $('#login_email').val( objR.email);
+               $('#login_mypage').submit();
+
+            }).fail(function(data) {
+                alert('search product failed.');
+            });
+
+
+}
+
+
+    </script>
+
+{% endblock javascript %}
 {% block main %}
     <div class="ec-role">
         <div class="ec-pageHeader">
@@ -31,7 +59,9 @@ file that was distributed with this source code.
                         </div>
                         <div class="ec-login__input">
                             <div class="ec-input">
-                                {{ form_widget(form.login_email, {'attr': {'style' : 'ime-mode: disabled;', 'placeholder' : 'common.mail_address', 'autofocus': true}}) }}
+{#                                {{ form_widget(form.login_email, {'attr': {'style' : 'ime-mode: disabled;', 'placeholder' : 'common.mail_address', 'autofocus': true}}) }}#}
+                                <input type="text" id="login_email" name="login_email" required="required" maxlength="255" style="ime-mode: disabled;" placeholder="{{ 'common.mail_address'|trans }}" autofocus="autofocus" class="form-control" >
+{#                                <input type="text" id="login_code" name="login_code" required="required" maxlength="255" style="ime-mode: disabled;" placeholder="{{ 'common.mail_address'|trans }}" autofocus="autofocus" class="form-control" >#}
                                 {{ form_widget(form.login_pass,  {'attr': {'placeholder' : 'common.password' }}) }}
                             </div>
                             {% if BaseInfo.option_remember_me %}
@@ -55,6 +85,8 @@ file that was distributed with this source code.
                         <div class="ec-grid2">
                             <div class="ec-grid2__cell">
                                 <div class="ec-login__actions">
+{#                                    <button type="button" onclick="checkLogin()"#}
+{#                                            class="ec-blockBtn--cancel">{{ 'common.login'|trans }}</button>#}
                                     <button type="submit"
                                             class="ec-blockBtn--cancel">{{ 'common.login'|trans }}</button>
                                 </div>
