@@ -364,7 +364,7 @@ class MypageController extends AbstractController
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_MYPAGE_MYPAGE_LOGIN_INITIALIZE, $event);
 
         $form = $builder->getForm();
-
+        $this->session->set("is_update_cart",1);
         return [
             'error' => $utils->getLastAuthenticationError(),
             'form' => $form->createView(),

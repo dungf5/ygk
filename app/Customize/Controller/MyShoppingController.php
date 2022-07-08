@@ -104,7 +104,7 @@ class MyShoppingController extends AbstractShoppingController
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_SHOPPING_LOGIN_INITIALIZE, $event);
 
         $form = $builder->getForm();
-
+        $this->session->set("is_update_cart",1);
         return [
             'error' => $authenticationUtils->getLastAuthenticationError(),
             'form' => $form->createView(),
@@ -158,16 +158,24 @@ class MyShoppingController extends AbstractShoppingController
         if($is_update_cart==1){
             $cartId = $Cart->getId();
             $productCart = $commonService->getdtPriceFromCart([$cartId],$arCusLogin["customer_code"]);
-            $arPCode = $commonService->getPriceFromDtPriceOfCus($arCusLogin["customer_code"]);
+            $arPCodeTankaNumber = $commonService->getPriceFromDtPriceOfCusV2($arCusLogin["customer_code"]);
+            $arPCode = $arPCodeTankaNumber[0];
+            $arTanaka = $arPCodeTankaNumber[1];
             $hsHsProductCodeIndtPrice =[];
+            $hsTanaka =[];
             foreach ($arPCode as $hasKey){
                 $hsHsProductCodeIndtPrice[$hasKey]=1;
+            }
+            foreach ($arTanaka as $hasKey){
+                $hsTanaka[$hasKey]=1;
             }
 
             $hsPriceUp =[];
             foreach ($productCart as $itemCart){
                 if($itemCart["price_s01"] != null && ($itemCart["price_s01"]!="") ){
-                    if(isset($hsHsProductCodeIndtPrice[$itemCart['product_code']])){
+                    $isPro = isset($hsHsProductCodeIndtPrice[$itemCart['product_code']]);
+                    $isTana= isset($hsTanaka[$itemCart['tanka_number']]);
+                    if($isPro && $isTana){
                         $hsPriceUp[$itemCart["id"]] = $itemCart["price_s01"];
                         $arCarItemId[] =$itemCart["id"];
                     }

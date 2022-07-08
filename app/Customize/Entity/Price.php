@@ -35,6 +35,30 @@ if (!class_exists('\Customize\Entity\Price', false)) {
         /**
          * @var string
          *
+         * @ORM\Column(name="tanka_number", type="string", length=10, nullable=false, options={"comment":"tanka_number"})
+         * @ORM\Id
+         */
+        private $tanka_number;
+
+        /**
+         * @return string
+         */
+        public function getTankaNumber(): string
+        {
+            return $this->tanka_number;
+        }
+
+        /**
+         * @param string $tanka_number
+         */
+        public function setTankaNumber(string $tanka_number): void
+        {
+            $this->tanka_number = $tanka_number;
+        }
+
+        /**
+         * @var string
+         *
          * @ORM\Column(name="customer_code", type="string", length=10, nullable=false, options={"comment":"顧客コード"})
          * @ORM\Id
          */

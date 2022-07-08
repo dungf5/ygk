@@ -378,7 +378,7 @@ class CartService extends Service
 //            $priceClass = $this->entityManager
 //                ->getRepository(Price::class)
 //                ->findOneBy(['product_code'=>$mstProductClass->getProductCode(),'customer_code'=>$customer_code ]);
-            $priceR = $commonS->getPriceFromDtPriceOfCusProductcode($customer_code,$mstProductClass->getProductCode());
+            $priceR = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProductClass->getProductCode());
 
             if($priceR!==""){
                 $price = $priceR;//$priceClass->getPriceS01();

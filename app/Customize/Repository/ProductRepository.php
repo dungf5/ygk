@@ -150,7 +150,7 @@ class ProductRepository extends AbstractRepository
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 
-    public function getQueryBuilderBySearchDataNewCustom($searchData, $user = false, $customer_code = '', $arProductCodeInDtPrice=[])
+    public function getQueryBuilderBySearchDataNewCustom($searchData, $user = false, $customer_code = '', $arProductCodeInDtPrice=[],$arTanakaNumber=[])
     {
         $defaultSortLoginorderPrice =" (CASE
                        WHEN price.price_s01  is null THEN mstProduct.unit_price
@@ -249,12 +249,15 @@ class ProductRepository extends AbstractRepository
         $curentDate = date('Y-m-d');
         $stringCon='price.product_code = mstProduct.product_code AND price.customer_code = :customer_code  ';
         $stringCon .="and '$curentDate' >= price.valid_date    AND '$curentDate' <= price.expire_date  and price.product_code in(:product_code)";
+        $stringCon .="and price.tanka_number in(:tanka_number)";
 
         //$arProductCode=["200000-150-150-0.8-1","200000-150-200-1-22-"];
 
         $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH,$stringCon)
             ->setParameter(':customer_code', $customer_code)
-            ->setParameter(':product_code', $arProductCodeInDtPrice);;
+            ->setParameter(':product_code', $arProductCodeInDtPrice)
+            ->setParameter(':tanka_number', $arTanakaNumber);;
+
          // var_dump($arProductCodeInDtPrice);
         //valid_date = '2022/06/14'  AND '2022/06/14'<= expire_date and customer_code='9901'
         if($user) {

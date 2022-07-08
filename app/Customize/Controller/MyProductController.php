@@ -197,7 +197,7 @@ class MyProductController extends AbstractController
             $customer_code = $cmS->getMstCustomer($Customer->getId())["customer_code"];
             $is_favorite = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
 
-            $priceTxt = $cmS->getPriceFromDtPriceOfCusProductcode($customer_code,$mstProduct->getProductCode());
+            $priceTxt = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProduct->getProductCode());
             $myPriceRe = (object)["price_s01"=>$priceTxt];
             if($priceTxt==""){
                 $myPriceRe =null;
@@ -438,9 +438,12 @@ class MyProductController extends AbstractController
         $searchData = $searchForm->getData();
 
         $arProductCodeInDtPrice  =[];
-        $arProductCodeInDtPrice = $commonService->getPriceFromDtPriceOfCus($customer_code);
+        $arPriceAndTanaka = $commonService->getPriceFromDtPriceOfCusV2($customer_code);
 
-        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user ,$customer_code,$arProductCodeInDtPrice);
+        $arProductCodeInDtPrice = $arPriceAndTanaka[0];
+        $arTanakaNumber = $arPriceAndTanaka[1];
+
+        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user ,$customer_code,$arProductCodeInDtPrice,$arTanakaNumber);
 
         $event = new EventArgs(
             [

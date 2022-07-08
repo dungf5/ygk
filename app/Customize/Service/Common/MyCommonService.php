@@ -21,6 +21,7 @@ use Customize\Entity\Order;
 use Customize\Repository\MoreOrderRepository;
 use Doctrine\DBAL\Driver\Exception;
 use Doctrine\ORM\EntityManagerInterface;
+use Eccube\Entity\Cart;
 use Eccube\Entity\CartItem;
 use Eccube\Repository\AbstractRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -272,7 +273,7 @@ class MyCommonService extends AbstractRepository
         }
 
 
-        $sql = " SELECT b.id,c.product_code,c.unit_price,c.ec_product_id,dtPrice.price_s01
+        $sql = " SELECT b.id,c.product_code,c.unit_price,c.ec_product_id,dtPrice.price_s01,dtPrice.tanka_number
                 FROM  dtb_product_class AS a JOIN dtb_cart_item b ON b.product_class_id =a.id
                 JOIN mst_product AS c ON a.product_id = c.ec_product_id
                LEFT join dt_price AS dtPrice ON dtPrice.product_code = c.product_code
@@ -322,7 +323,42 @@ class MyCommonService extends AbstractRepository
             return [];
         }
     }
+    public function getPriceFromDtPriceOfCusV2($customer_code="")
+    {
+        $arR = [];
+        $arRTana = [];
+        if($customer_code=="") {
+            return [[],[]];
+        }
 
+        //pri.customer_code = pri.shipping_no cho giao hang phai giong de co gia tot
+        $sql = "select pri.product_code,MIN(pri.tanka_number) AS min_tanka_number from dt_price pri
+                WHERE pri.customer_code=?
+                and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
+                and pri.customer_code = pri.shipping_no
+                GROUP BY product_code
+
+                ORDER BY pri.tanka_number asc
+                ; ";
+
+        $param = [$customer_code];
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+
+            foreach ($rows as $item){
+                $arR[] = $item["product_code"];
+                $arRTana[] = $item["min_tanka_number"];
+
+            }
+
+            return [$arR,$arRTana];
+        } catch (\Exception $e) {
+            log_info($e->getMessage());
+            return [[],[]];
+        }
+    }
     public function updateCartItem($hsPrice,$arCarItemId,$Cart)
     {
 
@@ -330,16 +366,23 @@ class MyCommonService extends AbstractRepository
         $myDb = $this->entityManager->createQueryBuilder();
         //$resSult = $myDb->select([])->from('CartItem','cartItem')->where('cartItem.id in(:ids)')->setParameter('ids',$arCarItemId)->getQuery()->getArrayResult();
         //var_dump($resSult);die();
+        $totalPrice = 0;
         foreach ($objList as $carItem ){
 
             if(isset($hsPrice[$carItem->getId()])){
                 $carItem->setPrice($hsPrice[$carItem->getId()]);
+
                 $this->entityManager->persist($carItem);
                 $this->entityManager->flush();
             }
+            $totalPrice += $carItem->getPrice()*$carItem->getQuantity();
 
         }
+        $obC= $this->entityManager->getRepository(Cart::class)->findOneBy(['id' => $Cart->getId()]);
+        $obC->setTotalPrice( $totalPrice);
 
+        $this->entityManager->persist($obC);
+        $this->entityManager->flush();
 
     }
 
@@ -929,6 +972,43 @@ class MyCommonService extends AbstractRepository
             return $rows[0];
         } catch (Exception $e) {
             return null;
+        }
+    }
+    public function getPriceFromDtPriceOfCusProductcodeV2($customer_code="",$productCode)
+    {
+        $arR = [];
+        $arRTana = [];
+        if($customer_code=="") {
+            return "";
+        }
+
+        //pri.customer_code = pri.shipping_no cho giao hang phai giong de co gia tot
+        $sql = " SELECT  a.price_s01 FROM  dt_price a
+			 JOIN
+( select pri.product_code,MIN(pri.tanka_number) AS min_tanka_number from dt_price pri
+                WHERE pri.customer_code=?
+                and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
+                and pri.customer_code = pri.shipping_no
+AND          pri.product_code=?
+                GROUP BY product_code ) AS b ON b.min_tanka_number = a.tanka_number AND a.product_code=b.product_code
+                ; ";
+
+        $param = [$customer_code,$productCode];
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $price_s01 ="";
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+
+           if(count($rows)>0){
+                $price_s01 = $rows[0]["price_s01"];
+           }
+
+            return $price_s01;
+
+        } catch (\Exception $e) {
+            log_info($e->getMessage());
+            return "";
         }
     }
     public function getPriceFromDtPriceOfCusProductcode($customer_code="",$productCode)

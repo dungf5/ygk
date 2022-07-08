@@ -33,7 +33,8 @@ file that was distributed with this source code.
                         </div>
                         <div class="ec-login__input">
                             <div class="ec-input">
-                                {{ form_widget(form.login_email, { attr: { 'style' : 'ime-mode: disabled;', placeholder: 'common.mail_address'|trans, 'autofocus': true }}) }}
+{#                                {{ form_widget(form.login_email, { attr: { 'style' : 'ime-mode: disabled;', placeholder: 'common.mail_address'|trans, 'autofocus': true }}) }}#}
+                                <input type="text" id="login_email" name="login_email" required="required" maxlength="255" style="ime-mode: disabled;" placeholder="{{ 'common.mail_address'|trans }}" autofocus="autofocus" class="form-control" >
                                 {{ form_widget(form.login_pass, { attr: { placeholder: 'common.password'|trans }}) }}
                             </div>
                             {% if BaseInfo.option_remember_me %}
