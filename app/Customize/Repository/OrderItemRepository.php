@@ -6,6 +6,7 @@ namespace Customize\Repository;
 use Customize\Entity\MstShipping;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use DoctrineExtensions\Query\Mysql\Cast;
 use Eccube\Doctrine\Query\Queries;
 use Eccube\Entity\Customer;
 use Eccube\Repository\AbstractRepository;
@@ -38,6 +39,7 @@ class OrderItemRepository extends AbstractRepository
      */
     public function getQueryBuilderByCustomer($customerCode)
     {
+
         //ordStatus.update_date,
         $qb = $this->getEntityManager()->createQueryBuilder();
         //$qb = $this->createQueryBuilder('i');
@@ -52,9 +54,11 @@ class OrderItemRepository extends AbstractRepository
 
         // Order By
         $qb->addOrderBy('ordStatus.ec_order_no', 'DESC');
-        //var_dump( $qb->getQuery()->getSQL());die();
+        $qb->addOrderBy('ordStatus.order_line_no ', 'asc');
 
-        return $this->queries->customize("", $qb, []);
+     //  var_dump( $qb->getQuery()->getSQL(),$customerCode);die();
+
+        return $qb;//$this->queries->customize("", $qb, []);
     }
 
 

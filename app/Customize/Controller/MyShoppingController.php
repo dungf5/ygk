@@ -504,7 +504,7 @@ class MyShoppingController extends AbstractShoppingController
                 $hsArrProductQuantity=[];
                 foreach ($arMstProduct as $itemPro) {
                     $hsArrEcProductCusProduct[$itemPro["ec_order_lineno"]] = $itemPro["product_code"];
-                    $hsArrRemmain[$itemPro["ec_order_lineno"]] = $itemPro["quantity"];
+                    $hsArrRemmain[$itemPro["ec_order_lineno"]] = $itemPro["product_quantity"]*$itemPro["quantity"];
                     $hsArrJanCode[$itemPro["ec_order_lineno"]] = $itemPro["jan_code"];
                     $hsArrProductQuantity[$itemPro["ec_order_lineno"]] = $itemPro["product_quantity"];
                 }
@@ -550,7 +550,7 @@ class MyShoppingController extends AbstractShoppingController
                 log_info('[saveOrderStatussaveOrderStatussaveOrderStatus', $arEcLData);
                 $comS->saveOrderStatus($arEcLData);
 
-                $comS->saveOrderShiping($arEcLData);
+                //$comS->saveOrderShiping($arEcLData);
                 $comS->savedtOrder($arEcLData);
 
                 log_info('[注文処理] 注文処理が完了しました.', [$Order->getId()]);

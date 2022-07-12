@@ -25,7 +25,7 @@ file that was distributed with this source code.
 <div class="ec-welcomeMsg">
 
     {% if app.MyDataMstCustomer is  defined %}
-        <p>{{ 'front.mypage.welcome'|trans({ '%last_name%': app.MyDataMstCustomer["name01"],'%first_name%':'' }) }}</p>
+        <p>{{ 'front.mypage.welcome_company'|trans({ '%company_name%': app.MyDataMstCustomer["company_name"] }) }}</p>
     {% endif %}
 
 

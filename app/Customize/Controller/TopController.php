@@ -17,6 +17,7 @@ namespace Customize\Controller;
 use Customize\Service\Common\MyCommonService;
 
 
+use Eccube\Controller\AbstractController;
 use Eccube\Service\CartService;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -49,6 +50,8 @@ class TopController extends AbstractController
     public function index()
     {
 
+
+
         $this->updateCart();
 
         return [];
@@ -62,6 +65,7 @@ class TopController extends AbstractController
         if ($Cart == null) {
             return;
         }
+        $arCarItemId =[];
         $commonService = new  MyCommonService($this->entityManager);
         $Customer = $this->getUser() ? $this->getUser() : null;
         if ($Customer != null) {

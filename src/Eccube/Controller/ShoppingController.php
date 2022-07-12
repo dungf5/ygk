@@ -414,7 +414,7 @@ class ShoppingController extends AbstractShoppingController
                 $moreOrder = $comS->getMoreOrder($Order->getPreOrderId());
 
                 $ship_code = $moreOrder->getShippingCode();
-                $comS->saveOrderShiping($arEcLData);
+               // $comS->saveOrderShiping($arEcLData);
 
 
 

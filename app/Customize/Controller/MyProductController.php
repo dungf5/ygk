@@ -392,6 +392,9 @@ class MyProductController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
+
+
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         // Doctrine SQLFilter
         if ($this->BaseInfo->isOptionNostockHidden()) {
