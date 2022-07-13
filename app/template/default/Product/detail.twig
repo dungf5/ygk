@@ -93,8 +93,8 @@ file that was distributed with this source code.
 {% endblock %}
 
 {% block javascript %}
-    <script>
-        eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
+<script>
+eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
 
         // 規格2に選択肢を割り当てる。
         function fnSetClassCategories(form, classcat_id2_selected) {
@@ -176,6 +176,7 @@ file that was distributed with this source code.
 
                 event.preventDefault();
                 $form = $('#form1');
+
                 $.ajax({
                     url: $form.attr('action'),
                     type: $form.attr('method'),
@@ -247,6 +248,7 @@ file that was distributed with this source code.
 {% endblock %}
 
 {% block main %}
+    <form action="{{ url('product_add_cart', {id:Product.id}) }}" method="post" id="form1" name="form1">
     <div class="ec-productRole">
         <div class="ec-grid2">
             <div class="ec-grid2__cell">
@@ -287,6 +289,13 @@ file that was distributed with this source code.
                             {# 標準単価 #}
                             <div class="ec-price">
                                 <span class="ec-price__price price02-default">
+
+                                     {% if MstProduct.quantity>1 %}
+                                         販売単位：{{ MstProduct.quantity }}個/箱～
+                                     {% else %}
+                                         販売単位：{{ MstProduct.quantity }}個～
+                                     {% endif %}
+ 販売単価:
                                     {% if Price is defined and Price is not null %}
                                         {{ Price.price_s01|price }}
                                     {% else %}
@@ -294,7 +303,9 @@ file that was distributed with this source code.
                                             {{ MstProduct.unit_price|price }}
                                         {% endif %}
                                     {% endif %}
+
                                 </span>
+
                             </div>
                         {% else %}
                             {# 価格 #}
@@ -302,22 +313,32 @@ file that was distributed with this source code.
                                 <span class="ec-price__price">{{ MstProduct.unit_price|price }}</span>
                             </div>
                         {% endif %}
+
+                        <div style="padding-left: 0.3em">
+                            <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}:</span>
+                                {{ form_widget(form.quantity,{'attr': {'value': MstProduct.quantity|number_format
+                                    ,'min':MstProduct.quantity
+                                    ,'step':MstProduct.quantity}}) }}
+                                {{ form_errors(form.quantity) }}
+                            </div>
+                        </div>
+
                     </div>
                     {# 商品コード #}
                     <div class="ec-productRole__code">
                         {% if MstProduct is defined and MstProduct is not null %}
-                        <div class="product-code-default">{{ 'front.product.code'|trans }}： {{ MstProduct.product_code }}</div>
-                        <div class="product-name-default">{{ 'front.product.name'|trans }}： {{ MstProduct.product_name }}</div>
-                        <div class="product-jan-code-default">{{ 'front.product.jan_code'|trans }}： {{ MstProduct.jan_code }}</div>
-                        <div class="product-product-name-abb-default">{{ 'front.product.product_name_abb'|trans }}： {{ MstProduct.product_name_abb }}</div>
-                        <div class="product-unit-price-default">{{ 'front.product.unit_price'|trans }}： {{ MstProduct.unit_price }}</div>
-                        <div class="product-series-name-default">{{ 'front.product.series_name'|trans }}： {{ MstProduct.series_name }}</div>
-                        <div class="product-line-no-default">{{ 'front.product.line_no'|trans }}： {{ MstProduct.line_no }}</div>
-                        <div class="product-quantity-default">{{ 'front.product.quantity'|trans }}： {{ MstProduct.quantity }}</div>
-                        <div class="product-size-default">{{ 'front.product.size'|trans }}： {{ MstProduct.size }}</div>
-                        <div class="product-color-default">{{ 'front.product.color'|trans }}： {{ MstProduct.color }}</div>
-                        <div class="product-material-default">{{ 'front.product.material'|trans }}： {{ MstProduct.material }}</div>
-                        <div class="product-model-default">{{ 'front.product.model'|trans }}： {{ MstProduct.model }}</div>
+                            <div class="product-code-default">{{ 'front.product.code'|trans }}： {{ MstProduct.product_code }}</div>
+                            <div class="product-name-default">{{ 'front.product.name'|trans }}： {{ MstProduct.product_name }}</div>
+                            <div class="product-jan-code-default">{{ 'front.product.jan_code'|trans }}： {{ MstProduct.jan_code }}</div>
+                            <div class="product-product-name-abb-default">{{ 'front.product.product_name_abb'|trans }}： {{ MstProduct.product_name_abb }}</div>
+                            <div class="product-unit-price-default hidden">{{ 'front.product.unit_price'|trans }}： {{ MstProduct.unit_price }}</div>
+                            <div class="product-series-name-default">{{ 'front.product.series_name'|trans }}： {{ MstProduct.series_name }}</div>
+                            <div class="product-line-no-default">{{ 'front.product.line_no'|trans }}： {{ MstProduct.line_no }}</div>
+                            <div class="product-quantity-default hidden">{{ 'front.product.quantity'|trans }}： {{ MstProduct.quantity }}</div>
+                            <div class="product-size-default">{{ 'front.product.size'|trans }}： {{ MstProduct.size }}</div>
+                            <div class="product-color-default">{{ 'front.product.color'|trans }}： {{ MstProduct.color }}</div>
+                            <div class="product-material-default">{{ 'front.product.material'|trans }}： {{ MstProduct.material }}</div>
+                            <div class="product-model-default">{{ 'front.product.model'|trans }}： {{ MstProduct.model }}</div>
                         {% endif %}
                     </div>
                     {# 在庫 #}
@@ -359,7 +380,7 @@ file that was distributed with this source code.
                             {% endfor %}
                         </div>
                     {% endif %}
-                    <form action="{{ url('product_add_cart', {id:Product.id}) }}" method="post" id="form1" name="form1">
+{#                    startform#}
                         {% if Product.stock_find %}
                             <div class="ec-productRole__actions ">
                                 {% if form.classcategory_id1 is defined %}
@@ -374,12 +395,12 @@ file that was distributed with this source code.
                                         </div>
                                     {% endif %}
                                 {% endif %}
-                                <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}</span>
-                                    {{ form_widget(form.quantity,{'attr': {'value': MstProduct.quantity|number_format
-                                        ,'min':MstProduct.quantity
-                                        ,'step':MstProduct.quantity}}) }}
-                                    {{ form_errors(form.quantity) }}
-                                </div>
+{#                                <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}</span>#}
+{#                                    {{ form_widget(form.quantity,{'attr': {'value': MstProduct.quantity|number_format#}
+{#                                        ,'min':MstProduct.quantity#}
+{#                                        ,'step':MstProduct.quantity}}) }}#}
+{#                                    {{ form_errors(form.quantity) }}#}
+{#                                </div>#}
                             </div>
                             <div class="ec-productRole__btn">
                                 <button type="submit" class="ec-blockBtn--action add-cart">
@@ -393,9 +414,9 @@ file that was distributed with this source code.
                                 </button>
                             </div>
                         {% endif %}
-
-                        {{ form_rest(form) }}
-                    </form>
+{#endform#}
+                    {{ form_rest(form) }}
+    </form>
                     <div class="ec-modal">
                         <div class="ec-modal-overlay">
                             <div class="ec-modal-wrap">
@@ -431,9 +452,11 @@ file that was distributed with this source code.
             </div>
         </div>
         {% if Product.freearea %}
-             <div class="ec-productRole__description">
-                 {{ include(template_from_string(Product.freearea)) }}
+            <div class="ec-productRole__description">
+                {{ include(template_from_string(Product.freearea)) }}
             </div>
         {% endif %}
     </div>
+
+
 {% endblock %}
