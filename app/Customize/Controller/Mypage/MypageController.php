@@ -218,21 +218,13 @@ class MypageController extends AbstractController
         $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
         $qb = $this->orderItemRepository->getQueryBuilderByCustomer($customer_code);
 
-//        $event = new EventArgs(
-//            [
-//                'qb' => $qb,
-//                'Customer' => $Customer,
-//            ],
-//            $request
-//        );
-//
-//        $this->eventDispatcher->dispatch(EccubeEvents::FRONT_MYPAGE_MYPAGE_INDEX_SEARCH, $event);
-
         $pagination = $paginator->paginate(
             $qb,
             $request->get('pageno', 1),
-            7
+            $this->eccubeConfig['eccube_search_pmax'],
+            ['distinct' => false]
         );
+
 
         $listItem = [];
         $listItem = $pagination->getItems();
@@ -301,7 +293,7 @@ class MypageController extends AbstractController
         $pagination->setItems($listItem);
 
         return [
-            'pagination' => $pagination, 'hsProductImgMain' => $hsProductImgMain,
+            'pagination' => $pagination, 'hsProductImgMain' => $hsProductImgMain
         ];
     }
     /**

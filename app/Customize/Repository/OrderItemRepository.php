@@ -54,9 +54,10 @@ class OrderItemRepository extends AbstractRepository
 
         // Order By
         $qb->addOrderBy('ordStatus.ec_order_no', 'DESC');
-        $qb->addOrderBy('ordStatus.order_line_no ', 'asc');
+       $qb->addOrderBy('ordStatus.order_line_no ', 'asc');
 
      //  var_dump( $qb->getQuery()->getSQL(),$customerCode);die();
+
 
         return $qb;//$this->queries->customize("", $qb, []);
     }

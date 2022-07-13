@@ -73,7 +73,7 @@ class MyCommonService extends AbstractRepository
      */
     public function getMstCustomer($customerId)
     {
-        $column = "a.customer_code as shipping_no,a.customer_code, a.ec_customer_id, a.customer_name as name01, a.company_name, a.company_name_abb,
+        $column = "a.customer_code as shipping_no,a.customer_code, a.ec_customer_id, a.company_name as name01, a.company_name, a.company_name_abb,
          a.department, a.postal_code, a.addr01, a.addr02, a.addr03, dtcus.email, a.phone_number, a.create_date, a.update_date";
         $sql = " SELECT $column   FROM mst_customer a join `dtb_customer` `dtcus` on((`dtcus`.`id` = `a`.`ec_customer_id`))  WHERE ec_customer_id=?";
         $param = [];
@@ -89,7 +89,7 @@ class MyCommonService extends AbstractRepository
     }
     public function getEmailFromUserCode($customer_code)
     {
-        $column = "a.customer_code as shipping_no,a.customer_code, a.ec_customer_id, a.customer_name as name01, a.company_name, a.company_name_abb,
+        $column = "a.customer_code as shipping_no,a.customer_code, a.ec_customer_id, a.company_name as name01, a.company_name, a.company_name_abb,
          a.department, a.postal_code, a.addr01, a.addr02, a.addr03, dtcus.email, a.phone_number, a.create_date, a.update_date";
         $sql = " SELECT $column   FROM mst_customer a join `dtb_customer` `dtcus` on((`dtcus`.`id` = `a`.`ec_customer_id`))  WHERE a.customer_code=? or dtcus.email =?";
         $param = [];
@@ -107,7 +107,7 @@ class MyCommonService extends AbstractRepository
 
     public function getMstCustomerCode($customer_code)
     {
-        $column = "customer_code as shipping_no,customer_code, ec_customer_id,customer_name, customer_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date";
+        $column = "customer_code as shipping_no,customer_code, ec_customer_id,customer_name, company_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date";
         $sql = " SELECT $column   FROM mst_customer a WHERE customer_code=?";
         $param = [];
         $param[] = $customer_code;
@@ -124,7 +124,7 @@ class MyCommonService extends AbstractRepository
     {
 
         $sql = " select b.product_name,f.delivery_no ,c.inquiry_no ,c.shipping_no,cus2.customer_name as shipping_customer_name,c.shipping_code,d.customer_name ,c.product_code,
-                    case when c.shipping_status = 1 then '出荷指示済'  else '出荷済' end as shipping_status,c.shipping_num
+                    case when c.shipping_status = 1 then '出荷指示済' WHEN shipping_status = 2 then '出荷済' else '未出荷' end as shipping_status,c.shipping_num
                     ,c.shipping_plan_date ,c.inquiry_no,c.shipping_company_code,c.shipping_date
                     from dt_order_status as a
                     join mst_product as b
@@ -159,7 +159,7 @@ class MyCommonService extends AbstractRepository
      */
     public function getMstShippingCustomer($customerId, MoreOrder $moreOrder = null)
     {
-        $column = "customer_code as shipping_no,b.shipping_code, ec_customer_id, customer_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date";
+        $column = "customer_code as shipping_no,b.shipping_code, ec_customer_id, company_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date";
         $sql = " SELECT $column   FROM mst_customer a  join
                 (
                 SELECT b.shipping_code from dt_customer_relation b
@@ -334,7 +334,7 @@ class MyCommonService extends AbstractRepository
         //pri.customer_code = pri.shipping_no cho giao hang phai giong de co gia tot
         $sql = "select pri.product_code,MIN(pri.tanka_number) AS min_tanka_number from dt_price pri
                 WHERE pri.customer_code=?
-                and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
+                and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
                 and pri.customer_code = pri.shipping_no
                 GROUP BY product_code
 
@@ -463,7 +463,7 @@ class MyCommonService extends AbstractRepository
      */
     public function getCustomerBillSeikyuCode($customer_id, $moreOrder = null)
     {
-        $column = "a.customer_code as seikyu_code, ec_customer_id, customer_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number";
+        $column = "a.customer_code as seikyu_code, ec_customer_id, company_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number";
 
         //seikyu_code  noi nhan hoa don
         $sql = " SELECT {$column}   FROM mst_customer a  join
@@ -505,7 +505,7 @@ class MyCommonService extends AbstractRepository
     public function getCustomerOtodoke($customer_id, $shipping_code, $moreOrder = null)
     {
         //otodoke_code dia chi nhan hang
-        $column = "a.customer_code as otodoke_code, ec_customer_id, customer_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number";
+        $column = "a.customer_code as otodoke_code, ec_customer_id, company_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number";
 
         $sql = "  SELECT {$column}  FROM mst_customer a  join
                 (
@@ -987,7 +987,7 @@ class MyCommonService extends AbstractRepository
 			 JOIN
 ( select pri.product_code,MIN(pri.tanka_number) AS min_tanka_number from dt_price pri
                 WHERE pri.customer_code=?
-                and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
+                and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
                 and pri.customer_code = pri.shipping_no
 AND          pri.product_code=?
                 GROUP BY product_code ) AS b ON b.min_tanka_number = a.tanka_number AND a.product_code=b.product_code
@@ -1047,5 +1047,7 @@ AND          pri.product_code=?
             return "";
         }
     }
+
+
 
 }

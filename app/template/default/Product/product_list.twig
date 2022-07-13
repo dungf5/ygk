@@ -188,11 +188,12 @@ file that was distributed with this source code.
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {{ 'front.product.quantity'|trans }}：
-
-                                        {{ Product.mst_quantity }}
-                                    </td>
-                                    <td >
+                                        {% if Product.mst_quantity>1 %}
+                                            販売単位：{{ Product.mst_quantity }}個/箱～
+                                            {% else %}
+                                                販売単位：{{ Product.mst_quantity }}個～
+                                        {% endif %}
+                                        販売単価:
                                         {% if app.user -%}
 
                                             {% if Product.price_s01 is not empty %}
@@ -204,6 +205,9 @@ file that was distributed with this source code.
 
                                             {{ Product.mst_unit_price|price }}
                                         {% endif %}
+
+                                    </td>
+                                    <td >
                                     </td>
                                     <td >
 
@@ -233,7 +237,7 @@ file that was distributed with this source code.
                                                 </div>
                                                 {% endif %}
                                                 {% endif %}
-                                                <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}</span>
+                                                <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}:</span>
                                                     {{ form_widget(form.quantity, {'attr': {'class': 'quantity','value': Product.mst_quantity|number_format
                                                         ,'min':Product.mst_quantity
                                                         ,'step':Product.mst_quantity}}) }}

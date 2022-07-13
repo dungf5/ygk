@@ -5,10 +5,10 @@
     </div>
     <div>
         {% if myData[0].delivery_no %}
-
-            <a class=" btn btn-primary"  target="_blank" href="/mypage/exportOrderPdf?delivery_no={{myData[0].delivery_no}}">納品書</a>
+         
+            <a class=" btn btn-primary actBg"  target="_blank" href="/mypage/exportOrderPdf?delivery_no={{myData[0].delivery_no}}">納品書</a>
         {% else %}
-            <div class=" btn btn-primary disabled"> 納品書</div>
+            <div class=" btn btn-primary disabled disBg"> 納品書</div>
         {% endif %}
 
     </div>
