@@ -35,10 +35,10 @@ file that was distributed with this source code.
 ************************************************
 　ご注文者情報
 ************************************************
-お名前：{{ Order.name }} 様
 {% if Order.company_name %}
 会社名：{{ Order.company_name }}
 {% endif %}
+担当者：{{ Order.name }} 様
 郵便番号：〒{{ Order.postal_code }}
 住所：{{ Order.addr01 }}{{ Order.addr02 }}{{ Order.addr03 }}
 電話番号：{{ Order.phone_number }}
@@ -49,10 +49,10 @@ file that was distributed with this source code.
 ************************************************
 ◎お届け先
 
-お名前：{{ Order.Shipping.customer_name }} 様
 {% if Order.Shipping.company_name %}
 会社名：{{ Order.Shipping.company_name }}
 {% endif %}
+担当者：{{ Order.Shipping.customer_name }} 様
 郵便番号：〒{{ Order.Shipping.postal_code }}
 住所：{{ Order.Shipping.addr01 }}{{ Order.Shipping.addr02 }}{{ Order.Shipping.addr03 }}
 電話番号：{{ Order.Shipping.phone_number }}
