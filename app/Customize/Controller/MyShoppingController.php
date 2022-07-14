@@ -271,10 +271,25 @@ class MyShoppingController extends AbstractShoppingController
         $Order->setPaymentTotal((float) $Order->getTotal() + ((float) $Order->getTotal() / (float) $Order->rate));
 
         $form = $this->createForm(OrderType::class, $Order);
+        //show quantity
+        $myCart = $this->cartService->getCarts(true);
+        //Mapping cart product with mst product
+        $comSer = new MyCommonService($this->entityManager);
+        $cartList = [];
+        foreach ($myCart as $cartT) {
+            $cartList[] = $cartT['id'];
+        }
+
+        $mstProduct = $comSer->getMstProductsFromCart($cartList);
+        $hsProductId = [];
+        foreach ($mstProduct as $itemP) {
+            $hsProductId[$itemP['ec_product_id']] = $itemP;
+        }
+
 
         return [
             'form' => $form->createView(),
-            'Order' => $Order,
+            'Order' => $Order, 'hsProductId' => $hsProductId,
         ];
     }
 
@@ -375,10 +390,23 @@ class MyShoppingController extends AbstractShoppingController
 
             log_info('[注文確認] フォームエラーのため, 注文手続画面を表示します.', [$Order->getId()]);
             //nvtrong end
+            //show quantity
+            $myCart = $this->cartService->getCarts(true);
+            //Mapping cart product with mst product
+            $comSer = new MyCommonService($this->entityManager);
+            $cartList = [];
+            foreach ($myCart as $cartT) {
+                $cartList[] = $cartT['id'];
+            }
 
+            $mstProduct = $comSer->getMstProductsFromCart($cartList);
+            $hsProductId = [];
+            foreach ($mstProduct as $itemP) {
+                $hsProductId[$itemP['ec_product_id']] = $itemP;
+            }
             return [
                 'form' => $form->createView(),
-                'Order' => $Order,
+                'Order' => $Order,'hsProductId'=>$hsProductId
             ];
         }
 
@@ -386,10 +414,25 @@ class MyShoppingController extends AbstractShoppingController
 
         // FIXME @Templateの差し替え.
         $request->attributes->set('_template', new Template(['template' => 'Shopping/index.twig']));
+        //show quantity
+        $myCart = $this->cartService->getCarts(true);
+        //Mapping cart product with mst product
+        $comSer = new MyCommonService($this->entityManager);
+        $cartList = [];
+        foreach ($myCart as $cartT) {
+            $cartList[] = $cartT['id'];
+        }
 
+        $mstProduct = $comSer->getMstProductsFromCart($cartList);
+        $hsProductId = [];
+        foreach ($mstProduct as $itemP) {
+            $hsProductId[$itemP['ec_product_id']] = $itemP;
+        }
+var_dump($hsProductId);
         return [
             'form' => $form->createView(),
             'Order' => $Order,
+            'hsProductId' => $hsProductId,
         ];
     }
 
@@ -498,7 +541,7 @@ class MyShoppingController extends AbstractShoppingController
                 $hsArrProductQuantity = [];
                 foreach ($arMstProduct as $itemPro) {
                     $hsArrEcProductCusProduct[$itemPro['ec_order_lineno']] = $itemPro['product_code'];
-                    $hsArrRemmain[$itemPro['ec_order_lineno']] = $itemPro['product_quantity'] * $itemPro['quantity'];
+                    $hsArrRemmain[$itemPro['ec_order_lineno']] = $itemPro['quantity']; //$itemPro['product_quantity']
                     $hsArrJanCode[$itemPro['ec_order_lineno']] = $itemPro['jan_code'];
                     $hsArrProductQuantity[$itemPro['ec_order_lineno']] = $itemPro['product_quantity'];
                 }
@@ -581,7 +624,7 @@ class MyShoppingController extends AbstractShoppingController
 
             $user = $this->getUser();
             $customer = $commonService->getMstCustomer($user->getId());
-            $newOrder['name'] =  $customer['name01'];
+            $newOrder['name'] = $customer['name01'];
             // Get info order
             $newOrder['subtotal'] = $Order['subtotal'];
             $newOrder['charge'] = $Order['charge'];

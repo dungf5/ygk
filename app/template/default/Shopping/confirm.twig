@@ -74,9 +74,10 @@ file that was distributed with this source code.
                     <h2>{{ 'front.shopping.customer_info'|trans }}</h2>
                 </div>
                 <div class="ec-orderAccount__account">
+                    <p class="ec-input">{{ Order.arCusLogin.company_name }}</p>
                     <p class="ec-halfInput">{{ 'common.name.prefix'|trans }}{{ Order.arCusLogin.name01 }} {{ 'common.name.suffix'|trans }}</p>
 {#                    <p class="ec-halfInput">{{ Order.kana01 }} {{ Order.kana02 }}</p>#}
-                    <p class="ec-input">{{ Order.arCusLogin.company_name }}</p>
+
                     <p class="ec-zipInput">{{ 'common.postal_symbol'|trans }}{{ Order.arCusLogin.postal_code }}</p>
                     <p class="ec-input"> {{ Order.arCusLogin.addr01 }} {{ Order.arCusLogin.addr02 }} {{ Order.arCusLogin.addr03 }}</p>
                     <p class="ec-telInput">{{ Order.arCusLogin.phone_number }}</p>
@@ -93,6 +94,7 @@ file that was distributed with this source code.
                     <div class="ec-orderDelivery__item">
                         <ul class="ec-borderedList">
                             {% for orderItem in shipping.productOrderItems %}
+                                {% set MstProduct = hsProductId[orderItem.Product.id] %}
                             <li>
                                 <div class="ec-imageGrid">
                                     <div class="ec-imageGrid__img"><img src="{{ asset((orderItem.product is null ? null : orderItem.product.MainListImage)|no_image_product, 'save_image') }}" alt="{{ orderItem.productName }}"></div>
@@ -104,7 +106,13 @@ file that was distributed with this source code.
                                         {% if orderItem.productClass is not null and orderItem.productClass.classCategory2 %}
                                             <p>{{ orderItem.productClass.classCategory2.className.name }}：{{ orderItem.productClass.classCategory2 }}</p>
                                         {% endif %}
-                                        <p>{{ orderItem.priceIncTax|price }} × {{ orderItem.quantity|number_format }}<span>{{ 'common.subtotal__with_separator'|trans }}{{ orderItem.totalPrice|price }}</span></p>
+                                        <p>{{ orderItem.priceIncTax|price }} × {{ orderItem.quantity|number_format }}
+                                            {% if MstProduct.quantity>1 %}
+                                                箱({{ orderItem.quantity*MstProduct.quantity }}個)
+                                            {% else %}
+                                                個
+                                            {% endif %}
+                                            <span>{{ 'common.subtotal__with_separator'|trans }}{{ orderItem.totalPrice|price }}</span></p>
                                     </div>
                                 </div>
                             </li>
@@ -321,13 +329,13 @@ file that was distributed with this source code.
 {#                </dl>#}
 {#                {% endif %}#}
 {#                <div class="ec-totalBox__total">{{ 'common.total'|trans }}<span class="ec-totalBox__price">{{ Order.taxable_total|price }}</span><span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>#}
-                <div class="ec-totalBox__total">{{ 'common.total'|trans }}<span class="ec-totalBox__price">{{ Order.payment_total|price }}</span><span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>
+                <div class="ec-totalBox__total hidden">{{ 'common.total'|trans }}<span class="ec-totalBox__price">{{ Order.payment_total|price }}</span><span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>
 {#                {% for rate, total in Order.taxable_total_by_tax_rate %}#}
 {#                    <dl class="ec-totalBox__taxRate">#}
 {#                        <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': rate }) }}</dt>#}
 {#                        <dd>{{ total|price }}</dd>#}
 {#                    </dl>#}
-                <dl class="ec-totalBox__taxRate">
+                <dl class="ec-totalBox__taxRate hidden">
                     <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': Order.rate }) }}</dt>
                     <dd>{{ Order.total|price }}</dd>
                 </dl>

@@ -587,6 +587,7 @@ $(function () {
                     {% for shipping in Order.shippings %}
                         {% set idx = loop.index0 %}
                         {% set isShowReducedTaxMess = false %}
+
                         <div
                             class="ec-orderDelivery__title nvtrong hidden">{{ 'front.shopping.delivery_to'|trans }}{% if Order.multiple %}({{ loop.index }}){% endif %}
                             <div class="ec-orderDelivery__change">
@@ -602,6 +603,8 @@ $(function () {
                         <div class="ec-orderDelivery__item">
                             <ul class="ec-borderedList">
                                 {% for orderItem in shipping.productOrderItems %}
+                                    {% set MstProduct = hsProductId[orderItem.Product.id] %}
+
                                     <li>
                                         <div class="ec-imageGrid">
                                             <div class="ec-imageGrid__img"><img
@@ -615,8 +618,19 @@ $(function () {
                                                 {% if orderItem.productClass is not null and orderItem.productClass.classCategory2 %}
                                                     {{ orderItem.productClass.classCategory2.className.name }}：{{ orderItem.productClass.classCategory2 }}
                                                 {% endif %}
+
                                                 {{ orderItem.priceIncTax|price }}
-                                                × {{ orderItem.quantity|number_format }} {{ 'common.subtotal__with_separator'|trans }}{{ orderItem.totalPrice|price }}
+                                                × {{ orderItem.quantity|number_format }}
+{#                                                trongadd#}
+                                                {% if MstProduct.quantity>1 %}
+                                                    箱({{ orderItem.quantity*MstProduct.quantity }}個)
+                                                {% else %}
+                                                    個
+                                                {% endif %}
+
+{#                                                rongadd#}
+
+                                                {{ 'common.subtotal__with_separator'|trans }}{{ orderItem.totalPrice|price }}
                                             </div>
                                         </div>
                                     </li>
@@ -947,7 +961,7 @@ $(function () {
 {#                            <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': rate }) }}</dt>#}
 {#                            <dd>{{ total|price }}</dd>#}
 {#                        </dl>#}
-                        <dl class="ec-totalBox__taxRate">
+                        <dl class="ec-totalBox__taxRate hidden">
                             <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': Order.rate }) }}</dt>
                             <dd>{{ Order.total|price }}</dd>
                         </dl>
@@ -960,7 +974,7 @@ $(function () {
 {#                            <dd>{{ item.total_price|price }}</dd>#}
 {#                        </dl>#}
 {#                    {% endfor %}#}
-                    <div class="ec-totalBox__paymentTotal">{{ 'common.payment_total'|trans }}<span
+                    <div class="ec-totalBox__paymentTotal hidden">{{ 'common.payment_total'|trans }}<span
                             class="ec-totalBox__price">{{ Order.payment_total|price }}</span><span
                             class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>
                     {% if BaseInfo.isOptionPoint and Order.Customer is not null %}

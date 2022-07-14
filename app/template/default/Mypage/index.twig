@@ -66,7 +66,7 @@ file that was distributed with this source code.
                         <th title="order_remain_num" style="text-align: right">{{ 'front.order.order_remain_num'|trans| raw }}</th>
 
 
-                        <th title="update_date">{{ 'front.order.update_date'|trans| raw }}</th>
+                        <th title="update_date" class="hide">{{ 'front.order.update_date'|trans| raw }}</th>
                         <th class="hide" title="shipping_date">{{ 'front.order.shipping_date'|trans| raw }}</th>
                         <th title="shipping_no"  style="" >{{ 'front.mypage.shipping_no_no'|trans| raw }}</th>
                     </tr>
@@ -101,7 +101,7 @@ file that was distributed with this source code.
 
                                 <td style="text-align: right">{{Order.order_remain_num}}</td>
 
-                                <td>{{Order.update_date}}</td>
+                                <td class="hide" >>{{Order.update_date}}</td>
                                 <td class="hide" >{{Order.shipping_date}}</td>
                                 <td>
 {#                                    <a target="_blank" href="/mypage/exportOrderPdf?inquiry_no={{Order.shipping_no}}">{{Order.shipping_no}}</a>#}

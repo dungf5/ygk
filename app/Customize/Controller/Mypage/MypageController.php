@@ -248,6 +248,7 @@ class MypageController extends AbstractController
             if (isset(MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']])) {
                 $myItem['shipping_status'] = MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']];
             }
+            $myItem['order_remain_num'] = $myItem['order_remain_num']*$myItem['quantity'];
 
             // if (isset($myItem['shipping_status'])) {
             $myItem['order_type'] = 'EC';
