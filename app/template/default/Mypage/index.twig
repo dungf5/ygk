@@ -94,12 +94,12 @@ file that was distributed with this source code.
                                 <td>{{Order.order_status}}</td>
                                 <td class="hide">{{Order.shipping_status}}</td>
 
-                                <td style="text-align: right">{{Order.reserve_stock_num+Order.order_remain_num}}</td>
+                                <td style="text-align: right">{{Order.order_remain_num}}</td>
 
 
                                 <td style="text-align: right">{{Order.reserve_stock_num}}</td>
 
-                                <td style="text-align: right">{{Order.order_remain_num}}</td>
+                                <td style="text-align: right">{{Order.order_remain_num-Order.reserve_stock_num}}</td>
 
                                 <td class="hide" >>{{Order.update_date}}</td>
                                 <td class="hide" >{{Order.shipping_date}}</td>

@@ -73,7 +73,7 @@ class MyCommonService extends AbstractRepository
      */
     public function getMstCustomer($customerId)
     {
-        $column = "a.customer_code as shipping_no,a.customer_code, a.ec_customer_id, a.company_name as name01, a.company_name, a.company_name_abb,
+        $column = "a.customer_code as shipping_no,a.customer_code, a.ec_customer_id, a.customer_name as name01, a.company_name, a.company_name_abb,
          a.department, a.postal_code, a.addr01, a.addr02, a.addr03, dtcus.email, a.phone_number, a.create_date, a.update_date";
         $sql = " SELECT $column   FROM mst_customer a join `dtb_customer` `dtcus` on((`dtcus`.`id` = `a`.`ec_customer_id`))  WHERE ec_customer_id=?";
         $param = [];
@@ -875,6 +875,7 @@ class MyCommonService extends AbstractRepository
             b.product_id AS product_id,
             c.product_code AS product_code,
             c.product_name AS product_name,
+            c.quantity as mst_quantity,
             c.unit_price AS unit_price,
             b.quantity AS quantity,
             b.price

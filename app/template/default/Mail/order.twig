@@ -9,7 +9,7 @@ For the full copyright and license information, please view the LICENSE
 file that was distributed with this source code.
 #}
 {% autoescape 'safe_textmail' %}
-{{ Order.name }} 様
+    {{ Order.company_name }} 
 
 この度はご注文いただき誠にありがとうございます。下記ご注文内容にお間違えがないかご確認下さい。
 
@@ -20,17 +20,19 @@ file that was distributed with this source code.
 商品コード：{{ OrderItem.product_code }}
 商品名：{{ OrderItem.product_name }}
 単価：{{ OrderItem.price|price }}
-数量：{{ OrderItem.quantity|number_format }}
+数量：{{ OrderItem.quantity|number_format }}{% if OrderItem.mst_quantity>1 %}
+箱/({{ OrderItem.mst_quantity*OrderItem.quantity}}個)
+{% else %}
+個
+{% endif %}
 
 {% endfor %}
 -------------------------------------------------
 小　計：{{ Order.subtotal|price }}
 手数料：{{ Order.charge|price }}
--------------------------------------------------
-合　計：{{ Order.payment_total|price }}
-    ({{ Order.rate }} %対象：{{ Order.total|price }})
+
 ============================================
-お支払い合計：{{ Order.payment_total|price }}
+お支払い合計：{{ Order.payment_total|price }}(税込)
 
 ************************************************
 　ご注文者情報

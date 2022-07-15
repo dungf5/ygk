@@ -583,7 +583,7 @@ var_dump($hsProductId);
                 log_info('[saveOrderStatussaveOrderStatussaveOrderStatus', $arEcLData);
                 $comS->saveOrderStatus($arEcLData);
 
-                //$comS->saveOrderShiping($arEcLData);
+               //$comS->saveOrderShiping($arEcLData);
                 $comS->savedtOrder($arEcLData);
 
                 log_info('[注文処理] 注文処理が完了しました.', [$Order->getId()]);
@@ -650,7 +650,8 @@ var_dump($hsProductId);
             //$shipping = $commonService->getMstShippingOrder($user->getId(),$Order->getId());
             $shipping = $commonService->getMoreOrderCustomer($Order->getPreOrderId());
             $newOrder['Shipping'] = $shipping;
-
+            $Order->setName01($customer['name01']);
+            $Order->setCompanyName( $customer['company_name']);
             $this->mailService->sendOrderMail($newOrder, $Order);
 
             $this->entityManager->flush();
