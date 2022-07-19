@@ -4,12 +4,13 @@
         出荷指示№：<b>{{myData[0].shipping_no }}</b>
     </div>
     <div>
-        {% if myData[0].delivery_no %}
-         
-            <a class=" btn btn-primary actBg"  target="_blank" href="/mypage/exportOrderPdf?delivery_no={{myData[0].delivery_no}}">納品書</a>
+        {% if myData[0].deli_order_no %}
+
+            <a class=" btn btn-primary actBg"  target="_blank" href="/mypage/exportOrderPdf?order_no_line_no={{myData[0].ec_order_no}}-{{myData[0].ec_order_lineno}}&delivery_no={{myData[0].delivery_no}}">納品書</a>
         {% else %}
             <div class=" btn btn-primary disabled disBg"> 納品書</div>
         {% endif %}
+        <button class=" btn  " onclick="javascript:$('.closeBtn').click()"> Close</button>
 
     </div>
 
@@ -24,7 +25,7 @@
         <th title="product_code ">商品コード</th>
         <th title="product_name"> 商品名</th>
         <th title="shipping_status">出荷ステータス</th>
-        <th title="shipping_num">出荷数</th>
+        <th style="text-align: right" title="shipping_num">出荷数</th>
         <th title="shipping_plan_date">出荷指示日</th>
         <th title="shipping_date">出荷日</th>
 
@@ -42,7 +43,7 @@
         <td>{{item.product_code }}</td>
         <td>{{item.product_name }}</td>
         <td>{{item.shipping_status }}</td>
-        <td>{{item.shipping_num }}</td>
+        <td style="text-align: right" >{{item.shipping_num }}</td>
         <td>{{item.shipping_plan_date }}</td>
         <td>{{item.shipping_date }}</td>
         <td>{{item.shipping_company_code }}</td>

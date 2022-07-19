@@ -356,7 +356,7 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getShippingPlanDate(): string
+        public function getShippingPlanDate()
         {
             return $this->shipping_plan_date;
         }

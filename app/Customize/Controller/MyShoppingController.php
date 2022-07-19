@@ -370,6 +370,18 @@ class MyShoppingController extends AbstractShoppingController
             $paymentTotal = (float) $Order->getTotal() + ((float) $Order->getTotal() / (float) $rate);
 
             $moreOrder = $commonService->getMoreOrder($Order->getPreOrderId());
+            //add default day delivery
+            if($moreOrder->getDateWantDelivery()==null || $moreOrder->getDateWantDelivery()==""){
+                $newDate = MyCommon::getNextDayNoWeekend();
+                $comS = new MyCommonService($this->entityManager);
+                $arrDayOff = $comS->getDayOff();
+                $newDate  =MyCommon::getDayAfterDayOff($newDate,$arrDayOff);
+                $moreOrder->setDateWantDelivery($newDate);
+                $this->entityManager->persist($moreOrder);
+                $this->entityManager->flush();
+
+            }
+
 
             $mstShip = $commonService->getMstShippingCustomer($Customer->getId(), $moreOrder);
 
@@ -428,7 +440,7 @@ class MyShoppingController extends AbstractShoppingController
         foreach ($mstProduct as $itemP) {
             $hsProductId[$itemP['ec_product_id']] = $itemP;
         }
-var_dump($hsProductId);
+
         return [
             'form' => $form->createView(),
             'Order' => $Order,
@@ -555,6 +567,7 @@ var_dump($hsProductId);
                 $seikyu_code = $moreOrder->getSeikyuCode();
                 $shipping_plan_date = $moreOrder->getDateWantDelivery();
                 $otodoke_code = $moreOrder->getOtodokeCode();
+
 
                 //dd($itemList);
                 foreach ($itemList as $itemOr) {

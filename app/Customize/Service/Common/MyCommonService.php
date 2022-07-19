@@ -123,7 +123,7 @@ class MyCommonService extends AbstractRepository
     public function getShipList($customer_code,$shipping_no,$order_no)
     {
 
-        $sql = " select b.product_name,f.delivery_no ,c.inquiry_no ,c.shipping_no,cus2.customer_name as shipping_customer_name,c.shipping_code,d.customer_name ,c.product_code,
+        $sql = " select  f.order_no as deli_order_no,c.ec_order_no, c.ec_order_lineno,b.product_name,f.delivery_no ,c.inquiry_no ,c.shipping_no,cus2.customer_name as shipping_customer_name,c.shipping_code,d.customer_name ,c.product_code,
                     case when c.shipping_status = 1 then '出荷指示済' WHEN shipping_status = 2 then '出荷済' else '未出荷' end as shipping_status,c.shipping_num
                     ,c.shipping_plan_date ,c.inquiry_no,c.shipping_company_code,c.shipping_date
                     from dt_order_status as a
@@ -135,14 +135,14 @@ class MyCommonService extends AbstractRepository
                     join mst_customer as d
                     on c.customer_code = d.customer_code
                      left join mst_customer AS cus2 ON  cus2.customer_code=c.shipping_code
-                     left join mst_delivery  as f   on c.cus_order_no = f.order_no
-                    -- join dt_customer_relation as e   on c.shipping_code = e.shipping_code
+                     left join mst_delivery  as f   on concat(c.ec_order_no,'-', c.ec_order_lineno) = f.order_no
+
                     where a.customer_code = ? and c.shipping_no=? and a.ec_order_no=?";
         $param = [];
         $param[] = $customer_code;
         $param[] = $shipping_no;
         $param[] = $order_no;
-
+//var_dump($sql,$param);
 
         $statement = $this->entityManager->getConnection()->prepare($sql);
         try {
@@ -648,7 +648,7 @@ class MyCommonService extends AbstractRepository
             $orderItem->setOrderLineno($ec_order_lineno);
             $orderItem->setOrderNo($ec_order);
             $orderItem->setShippingCode($itemSave["shipping_code"]);
-            $orderItem->setSeikyuCode($itemSave["seikyu_code"]);
+            $orderItem->setSeikyuCode($itemSave["seikyu_code"]??'');
             $orderItem->setShipingPlanDate($itemSave['shipping_plan_date']??'');
             $orderItem->setRequestFlg('Y');
             $orderItem->setCustomerCode($itemSave['customer_code']);
@@ -1048,6 +1048,32 @@ AND          pri.product_code=?
             return "";
         }
     }
+
+    public function getDayOff()
+    {
+
+        $sql = " SELECT  DATE_FORMAT( holiday,'%Y-%m-%d')  as holiday from dtb_calendar where holiday>now() order by holiday asc
+                ; ";
+
+        $param = [];
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $arRe = [];
+
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            foreach ($rows as $item){
+                $arRe[] =$item["holiday"];
+            }
+
+            return $arRe;
+
+        } catch (\Exception $e) {
+            log_info($e->getMessage());
+            return "";
+        }
+    }
+
 
 
 

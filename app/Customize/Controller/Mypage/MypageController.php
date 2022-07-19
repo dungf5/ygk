@@ -142,10 +142,11 @@ class MypageController extends AbstractController
 
         $htmlFileName = "Mypage/exportOrderPdf.twig";
         $delivery_no =MyCommon::getPara("delivery_no");
+        $order_no_line_no =MyCommon::getPara("order_no_line_no");
         $myData  =(object)[];
 
         $mstDelivery = $this->entityManager->getRepository(MstDelivery::class);
-        $arRe = $mstDelivery->getQueryBuilderByDeli($delivery_no);
+        $arRe = $mstDelivery->getQueryBuilderByDeli($delivery_no,$order_no_line_no);
 
 
         //add special line

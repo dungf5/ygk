@@ -1,11 +1,32 @@
 <?php
 namespace Customize\Twig\Extension;
+use Customize\Common\MyCommon;
 use Customize\Common\MyConstant;
+use Customize\Service\Common\MyCommonService;
+use Doctrine\ORM\EntityManagerInterface;
+use Eccube\Common\EccubeConfig;
+use Eccube\Repository\ProductRepository;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class MyEccubeExtension extends AbstractExtension
 {
+    /**
+     * @var EntityManagerInterface
+     */
+    protected $entityManager;
+
+
+    /**
+     * EccubeExtension constructor.
+     *
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+
+    }
     public function getFunctions()
     {
         return [
@@ -21,6 +42,7 @@ class MyEccubeExtension extends AbstractExtension
       return $newDate;
     }
     public function getMinDate(){
+
         $newDate = date("Y-m-d");
         return $newDate;
     }

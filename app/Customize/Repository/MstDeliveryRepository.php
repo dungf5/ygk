@@ -20,7 +20,7 @@ class MstDeliveryRepository extends AbstractRepository
     {
         parent::__construct($registry, MstDelivery::class);
     }
-    public function getQueryBuilderByDeli($delivery_no)
+    public function getQueryBuilderByDeli($delivery_no,$order_no_line_no)
     {
 
         //ordStatus.update_date,
@@ -55,11 +55,13 @@ class MstDeliveryRepository extends AbstractRepository
                     ,mstDeli.shiping_name as shiping_code
                     ,mstDeli.otodoke_name as otodoke_code";
         $qb =  $this->getEntityManager()->createQueryBuilder();
-
+//order_no
         $qb ->select($sqlColumns)
             ->from('Customize\Entity\MstDelivery', 'mstDeli')
-            ->where('mstDeli.delivery_no = :delivery_no')
-            ->setParameter('delivery_no', $delivery_no);
+            ->where('mstDeli.order_no =:order_no_line_no')
+            ->setParameter('order_no_line_no', $order_no_line_no);
+        //  ->setParameter('delivery_no', $delivery_no)
+        //  ->where('mstDeli.delivery_no = :delivery_no and mstDeli.order_no =:order_no_line_no')
 
         // Order By
         $qb->addOrderBy('mstDeli.delivery_lineno', 'asc');

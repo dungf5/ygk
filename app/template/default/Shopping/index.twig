@@ -289,7 +289,8 @@ $(function () {
        var minDate = "{{ getMinDate() }}";
        let defaultDate='';
            {% if Order.hasMoreOrder == 1 %}
-           defaultDate = '{{ Order.moreOrder.date_want_delivery }}';
+          defaultDate = '{{ Order.moreOrder.date_want_delivery }}';
+
            {% endif %}
         $('#date_picker_delivery').datetimepicker({
             locale: 'ja',
@@ -611,7 +612,9 @@ $(function () {
                                                     src="{{ asset((orderItem.product is null ? null : orderItem.product.MainListImage)|no_image_product, 'save_image') }}"
                                                     alt="{{ orderItem.productName }}"></div>
                                             <div class="ec-imageGrid__content">
-                                                <p>{{ orderItem.productName }}{% if is_reduced_tax_rate(orderItem) %}{{ 'common.reduced_tax_rate_symbol'|trans }}{% set isShowReducedTaxMess = true %}{% endif %}</p>
+                                                <p>{{ orderItem.productName }}
+{#                                                    {% if is_reduced_tax_rate(orderItem) %}{{ 'common.reduced_tax_rate_symbol'|trans }}{% set isShowReducedTaxMess = true %}{% endif %}#}
+                                                </p>
                                                 {% if orderItem.productClass is not null and orderItem.productClass.classCategory1 %}
                                                     {{ orderItem.productClass.classCategory1.className.name }}：{{ orderItem.productClass.classCategory1 }}
                                                 {% endif %}
@@ -636,7 +639,7 @@ $(function () {
                                     </li>
                                 {% endfor %}
                             </ul>
-                            <p>{{ isShowReducedTaxMess ? 'common.reduced_tax_rate_messeage'|trans }}</p>
+{#                            <p>{{ isShowReducedTaxMess ? 'common.reduced_tax_rate_messeage'|trans }}</p>#}
                         </div>
                         <div class="ec-orderDelivery__address nvtrong hidden">
                             <p>{{ 'common.name.prefix'|trans }}{{ shipping.name01 }} {{ shipping.name02 }}
@@ -713,10 +716,10 @@ $(function () {
                     <div class="shipping_destination_left">
                         <div>お客様情報</div>
                     </div>
-                    <div class="shipping_destination_right">f
+                    <div class="shipping_destination_right">
                         <div class="shipping_row">
                             <div class="shipping_col1 Order.name01 Order.name02">
-                                {{ Order.arCusLogin.name01 }} {{ 'common.name.suffix'|trans }}
+                                {{ Order.arCusLogin.company_name }}
                             </div>
                             <div class="shipping_col2">
                                 〒 {{ Order.arCusLogin.postal_code }}
