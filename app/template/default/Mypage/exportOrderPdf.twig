@@ -258,7 +258,7 @@
         <div>{{ myData[0].deli_addr02 }}</div>
         <div>{{ myData[0].deli_addr03 }}</div>
         <div>{{ myData[0].deli_company_name }}  御中</div>
-        <div>{{ myData[0].deli_department }}</div>
+        <div>{{ myData[0].deli_department_name }}</div>
     </div>
         <div class="header1_right">
             <div class="text_right_header">
@@ -274,51 +274,67 @@
     <div class="top_table">以下の通りに納品申し上げます。</div>
     <div class="product-info">
         <table style="width: 100%;">
-            <tr style="" class="tr-header">
-                <td style="" rowspan="2">
-                    <p>&nbsp;</p>
+
+
+            <tr class="tr-header" style="">
+                <td style="text-align: right;">
+                    No.
                 </td>
-                <td class="" style="height: 72px; width: 36.7344px;" contenteditable="true" rowspan="2">
-                    <p>売上</p>
-
+                <td class="" style="" >
+                   売上
                 </td>
-                <td class="" ><span class="">品目No</span></td>
-                <td class="" ><span class="">数量</span></td>
-                <td class="" ><span class="">単位</span></td>
-                <td class=""><span class="">単価</span></td>
-                <td class="" ><span class="">金額</span></td>
-                <td class="" ><span class="">消費税</span></td>
-                <td class="" ><span class="">ロットNo</span></td>
-
+                <td class="" style="">商品コード<br />商品名</td>
+                <td class="" title="soluong" style="text-align: right;">数量</td>
+                <td class="" style="">単位</td>
+                <td class="" title="dongia" style="text-align: right;">単価</td>
+                <td class="" title="thanhtien" style="text-align: right;">金額</td>
+                <td class="" title="thue" style="text-align: right;">消費税</td>
+                <td class=""  title="order_orderlineo" style="">御社注文№</td>
+                <td style="" title="item_remark" >備考</td>
             </tr>
-            <tr style="" class="tr-header">
-                <td class="" ><span class="">品目名称</span></td>
-                <td class="" ><span class="">&nbsp;</span></td>
-                <td class=""  colspan="2"><span class="">御社注文No</span></td>
-                <td class="" ><span class="">備考</span></td>
-                <td class="" ><span class="">&nbsp;</span></td>
-                <td class="" ><span class=""></span></td>
 
-            </tr>
             {% for deli in myData %}
 
 
                 {% if deli.is_total == 0 %}
-                    <tr class="tr-content">
-                        <td><span class="">{{ deli.delivery_lineno }} </span></td>
-                        <td class=""><span class="">{{ deli.sale_type }}</span></td>
-                        <td class="">
-                            <p><span class="">{{ deli.item_no }}</span></p>
-                            <p><span class="">{{ deli.item_name }}</span></p>
-                        </td>
-                        <td style="text-align: right"  >{{ deli.quanlity|number_format }}</td>
-                        <td>{{ deli.unit }}</td>
-                        <td style="text-align: right"  >{{ deli.unit_price|number_format }}</td>
-                        <td title="amount" style="text-align: right" >{{ deli.amount|number_format }}</td>
-                        <td title="tax" style="text-align: right"  >{{ deli.tax|number_format }}</td>
-                        <td>{{ deli.lot_no }}</td>
 
-                    </tr>
+
+                    <tr class="tr-content">
+
+{#                        <td rowspan="2"><span class="">{{ deli.delivery_lineno }} </span></td>#}
+{#                        <td class="" rowspan="2"><span class="">{{ deli.sale_type }}</span></td>#}
+{#                        <td class="" rowspan="2">#}
+{#                            <p><span class="">{{ deli.item_no }}</span></p>#}
+{#                            <p><span class="">{{ deli.item_name }}</span></p>#}
+
+{#                        </td>#}
+{#                        <td style="text-align: right;" rowspan="2">{{ deli.quanlity|number_format }}</td>#}
+{#                        <td>{{ deli.unit }}</td>#}
+{#                        <td style="text-align: right;">{{ deli.unit_price|number_format }}</td>#}
+{#                        <td style="text-align: right;" title="amount" rowspan="2">{{ deli.amount|number_format }}</td>#}
+{#                        <td style="text-align: right;" title="tax" rowspan="2">{{ deli.tax|number_format }}</td>#}
+{#                        <td rowspan="2">{{ deli.lot_no }}</td>#}
+{#                    </tr>#}
+{#                    <tr style="border-top: 1px solid;text-align: center" class="tr-content">#}
+{#                        <td colspan="2">{{ deli.order_no }}</td>#}
+{#                    </tr>#}
+{#                    --------#}
+                    <td style="text-align: right;">
+                        {{ deli.delivery_lineno }}
+                    </td>
+                    <td class="" style="" >
+                        {{ deli.sale_type }}
+                    </td>
+                    <td class="" style="">{{ deli.item_no }}<br />{{ deli.item_name }}</td>
+                    <td class="" title="soluong" style="text-align: right;">{{ deli.quanlity|number_format }}</td>
+                    <td class="" style="">{{ deli.unit }}</td>
+                    <td class="" title="dongia" style="text-align: right;">{{ deli.unit_price|number_format }}</td>
+                    <td class="" title="thanhtien" style="text-align: right;">{{ deli.amount|number_format }}</td>
+                    <td class="" title="thue" style="text-align: right;">{{ deli.tax|number_format }}</td>
+                    <td class=""  title="order_orderlineo" style="">{{ deli.order_no }}</td>
+                    <td style="" title="item_remark" >{{ deli.item_remark }}</td>
+
+
                 {% else %}
 
                 {% endif %}

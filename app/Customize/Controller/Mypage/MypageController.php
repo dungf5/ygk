@@ -252,10 +252,12 @@ class MypageController extends AbstractController
             $myItem['order_remain_num'] = $myItem['order_remain_num']*$myItem['quantity'];
             $myItem['reserve_stock_num'] = $myItem['reserve_stock_num']*$myItem['quantity'];
 
-
-            // if (isset($myItem['shipping_status'])) {
-            $myItem['order_type'] = 'EC';
-            //}
+            $myItem['order_type'] = '';
+             if (isset($myItem['flow_type'])) {
+                 if($myItem['flow_type']=="2"){
+                     $myItem['order_type'] = 'EC';
+                 }
+            }
         }
 
         //auto fill lino

@@ -80,8 +80,8 @@ file that was distributed with this source code.
 
                             <tr>
                                 <td>{{Order.order_type}}</td>
-                                <td>{{Order.ec_order_no}}</td>
-                                <td>{{Order.ec_order_lineno}}</td>
+                                <td>{{Order.cus_order_no}}</td>
+                                <td>{{Order.cus_order_lineno}}</td>
                                 <td>
                                     {% if Order.main_img is null %}
                                     <img style="width: 100px" src="{{ asset(''|no_image_product, 'save_image') }}"/>

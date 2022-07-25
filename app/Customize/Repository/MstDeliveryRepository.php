@@ -5,6 +5,7 @@ namespace Customize\Repository;
 
 use Customize\Entity\MstDelivery;
 use Customize\Entity\MstShipping;
+use Doctrine\ORM\Query\Expr\Join;
 use Eccube\Repository\AbstractRepository;
 use Customize\Entity\MstProduct;
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -53,13 +54,17 @@ class MstDeliveryRepository extends AbstractRepository
                     ,mstDeli.total_amount
                     ,mstDeli.footer_remark1
                     ,mstDeli.shiping_name as shiping_code
-                    ,mstDeli.otodoke_name as otodoke_code";
+                    ,mstDeli.otodoke_name as otodoke_code
+                    ,mstCus.department as deli_department_name
+                    ";
         $qb =  $this->getEntityManager()->createQueryBuilder();
 //order_no
+        $orderNo = explode("-",$order_no_line_no)[0];
         $qb ->select($sqlColumns)
             ->from('Customize\Entity\MstDelivery', 'mstDeli')
-            ->where('mstDeli.order_no =:order_no_line_no')
-            ->setParameter('order_no_line_no', $order_no_line_no);
+            ->leftJoin('Customize\Entity\MstCustomer', 'mstCus',Join::WITH, 'mstCus.customer_code=mstDeli.deli_department')
+            ->where('mstDeli.order_no like :order_no')
+            ->setParameter('order_no', "%{$orderNo}-%");
         //  ->setParameter('delivery_no', $delivery_no)
         //  ->where('mstDeli.delivery_no = :delivery_no and mstDeli.order_no =:order_no_line_no')
 
