@@ -442,6 +442,7 @@ class MyProductController extends AbstractController
 
         $arProductCodeInDtPrice  =[];
         $arPriceAndTanaka = $commonService->getPriceFromDtPriceOfCusV2($customer_code);
+        //var_dump($customer_code);
 
         $arProductCodeInDtPrice = $arPriceAndTanaka[0];
         $arTanakaNumber = $arPriceAndTanaka[1];

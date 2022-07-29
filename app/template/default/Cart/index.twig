@@ -157,13 +157,15 @@ file that was distributed with this source code.
                                         </div>
                                         <div class="ec-cartRow__summary">
                                             <div class="ec-cartRow__name">
-                                                <a target="_blank" href="{{ url('product_detail', {id : Product.id} ) }}">{{ Product.name }}</a>
-                                                {% if ProductClass.ClassCategory1 and ProductClass.ClassCategory1.id %}
-                                                    <br>{{ ProductClass.ClassCategory1.ClassName.name }}：{{ ProductClass.ClassCategory1 }}
-                                                {% endif %}
-                                                {% if ProductClass.ClassCategory2 and ProductClass.ClassCategory2.id %}
-                                                    <br>{{ ProductClass.ClassCategory2.ClassName.name }}：{{ ProductClass.ClassCategory2 }}
-                                                {% endif %}
+                                                <a target="_blank" href="{{ url('product_detail', {id : Product.id} ) }}">{{ MstProduct.product_name }}</a>
+{#                                                {% if ProductClass.ClassCategory1 and ProductClass.ClassCategory1.id %}#}
+{#                                                    <br>{{ ProductClass.ClassCategory1.ClassName.name }}：{{ ProductClass.ClassCategory1 }}#}
+{#                                                {% endif %}#}
+{#                                                {% if ProductClass.ClassCategory2 and ProductClass.ClassCategory2.id %}#}
+{#                                                    <br>{{ ProductClass.ClassCategory2.ClassName.name }}：{{ ProductClass.ClassCategory2 }}#}
+{#                                                {% endif %}#}
+                                                <br>
+                                                {{ MstProduct.jan_code}}
                                             </div>
                                             <div class="ec-cartRow__unitPrice">
                                                 {% if MstProduct.quantity>1 %}

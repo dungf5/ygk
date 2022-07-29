@@ -66,10 +66,16 @@ file that was distributed with this source code.
             _createShowAllButton: function() {
                 var input = this.input,
                     wasOpen = false;
+                 input.on( "focusout", function(objI) {
+                     if(this.value==""){
+                       $('.delivery_address_main').html('');
+                       $("select[name='shipping_radio']").val('');
+                     }
 
+                 });
                 $( "<a>" )
                     .attr( "tabIndex", -1 )
-                    .attr( "title", "Show All Items" )
+                    .attr( "title", "すべて表示" )
                     .tooltip()
                     .appendTo( this.wrapper )
                     .button({
@@ -135,13 +141,14 @@ file that was distributed with this source code.
                 // Remove invalid value
                 this.input
                     .val( "" )
-                    .attr( "title", value + " didn't match any item" )
+                    .attr( "title", value + " お届け先が不在でございます。" )
                     .tooltip( "open" );
                 this.element.val( "" );
                 this._delay(function() {
                     this.input.tooltip( "close" ).attr( "title", "" );
                 }, 500 );
                 this.input.autocomplete( "instance" ).term = "";
+                 $('.delivery_address_main').html('');
 
             },
 
@@ -162,6 +169,9 @@ file that was distributed with this source code.
 
 
     } );
+
+
+
 </script>
 
 <script>
@@ -488,6 +498,7 @@ $(function () {
             }
 
 </script>
+
 {% endblock javascript %}
 
 {% block main %}
@@ -787,9 +798,11 @@ $(function () {
                                                     src="{{ asset((orderItem.product is null ? null : orderItem.product.MainListImage)|no_image_product, 'save_image') }}"
                                                     alt="{{ MstProduct.product_name }}"></div>
                                             <div class="ec-imageGrid__content">
-                                                <p>{{ MstProduct.product_name }}
+                                                {{ MstProduct.jan_code}}
+                                                <p> {{ MstProduct.product_name }}
 {#                                                    {% if is_reduced_tax_rate(orderItem) %}{{ 'common.reduced_tax_rate_symbol'|trans }}{% set isShowReducedTaxMess = true %}{% endif %}#}
                                                 </p>
+
                                                 {% if orderItem.productClass is not null and orderItem.productClass.classCategory1 %}
                                                     {{ orderItem.productClass.classCategory1.className.name }}：{{ orderItem.productClass.classCategory1 }}
                                                 {% endif %}

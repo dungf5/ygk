@@ -142,7 +142,7 @@ class ProductRepository extends AbstractRepository
             ->setParameter(':customer_code', $customer_code);
 
         $listSelectMstProduct = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name";
-        $listSelectMstProduct.=",mstProduct.quantity as mst_quantity ";
+        $listSelectMstProduct.=",mstProduct.quantity as mst_quantity,mstProduct.jan_code ";
         $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');
 
@@ -252,18 +252,24 @@ class ProductRepository extends AbstractRepository
 
         $qb->innerJoin('Customize\Entity\MstProduct', 'mstProduct',Join::WITH,'mstProduct.ec_product_id = p.id');
         $curentDate = date('Y-m-d');
-        $stringCon='price.product_code = mstProduct.product_code AND price.customer_code = :customer_code  ';
-        $stringCon .="and '$curentDate' >= price.valid_date    AND '$curentDate' <= price.expire_date  and price.product_code in(:product_code)";
-        $stringCon .="and price.tanka_number in(:tanka_number)";
+        $stringCon=' price.product_code = mstProduct.product_code AND price.customer_code = :customer_code  ';
+        $stringCon .=" and '$curentDate' >= price.valid_date    AND '$curentDate' <= price.expire_date  and price.product_code in(:product_code)";
+        if(count($arTanakaNumber)>0){
+            $stringCon .=" and price.tanka_number in(:tanka_number)";
+        }
+
 
         //$arProductCode=["200000-150-150-0.8-1","200000-150-200-1-22-"];
 
         $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH,$stringCon)
             ->setParameter(':customer_code', $customer_code)
-            ->setParameter(':product_code', $arProductCodeInDtPrice)
-            ->setParameter(':tanka_number', $arTanakaNumber);;
+            ->setParameter(':product_code', $arProductCodeInDtPrice);
+        if(count($arTanakaNumber)>0){
+            $qb->setParameter(':tanka_number', $arTanakaNumber);
+        }
 
-         // var_dump($arProductCodeInDtPrice);
+
+
         //valid_date = '2022/06/14'  AND '2022/06/14'<= expire_date and customer_code='9901'
         if($user) {
            // $curentDate = date('Y/m/d');
@@ -271,7 +277,7 @@ class ProductRepository extends AbstractRepository
 
         }
         $listSelectMstProduct = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name";
-        $listSelectMstProduct.=",mstProduct.quantity as mst_quantity ";
+        $listSelectMstProduct.=",mstProduct.quantity as mst_quantity,mstProduct.jan_code ";
         $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');
 
