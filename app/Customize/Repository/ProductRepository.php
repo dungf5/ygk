@@ -178,17 +178,22 @@ class ProductRepository extends AbstractRepository
 
         // name
         if (isset($searchData['name']) && StringUtil::isNotBlank($searchData['name'])) {
-            $keywords = preg_split('/[\s　]+/u', str_replace(['%', '_'], ['\\%', '\\_'], $searchData['name']), -1, PREG_SPLIT_NO_EMPTY);
+//            $keywords = preg_split('/[\s　]+/u', str_replace(['%', '_'], ['\\%', '\\_'], $searchData['name']), -1, PREG_SPLIT_NO_EMPTY);
+//
+//            foreach ($keywords as $index => $keyword) {
+//                $key = sprintf('keyword%s', $index);
+//                $qb
+//                    ->andWhere(sprintf('NORMALIZE(p.name) LIKE NORMALIZE(:%s) OR
+//                        NORMALIZE(p.search_word) LIKE NORMALIZE(:%s) OR
+//                        EXISTS (SELECT wpc%d FROM \Eccube\Entity\ProductClass wpc%d WHERE p = wpc%d.Product AND NORMALIZE(wpc%d.code) LIKE NORMALIZE(:%s))',
+//                        $key, $key, $index, $index, $index, $index, $key))
+//                    ->setParameter($key, '%'.$keyword.'%');
+//            }
+            $key = $searchData['name'];
 
-            foreach ($keywords as $index => $keyword) {
-                $key = sprintf('keyword%s', $index);
-                $qb
-                    ->andWhere(sprintf('NORMALIZE(p.name) LIKE NORMALIZE(:%s) OR
-                        NORMALIZE(p.search_word) LIKE NORMALIZE(:%s) OR
-                        EXISTS (SELECT wpc%d FROM \Eccube\Entity\ProductClass wpc%d WHERE p = wpc%d.Product AND NORMALIZE(wpc%d.code) LIKE NORMALIZE(:%s))',
-                        $key, $key, $index, $index, $index, $index, $key))
-                    ->setParameter($key, '%'.$keyword.'%');
-            }
+            $qb->andWhere('mstProduct.series_name like :product_name or mstProduct.product_name_abb like :product_name  or mstProduct.product_name like :product_name or mstProduct.jan_code like :product_name or mstProduct.product_code like :product_name')->setParameter(':product_name','%'. $key.'%');
+
+
         }
 
         // Order By

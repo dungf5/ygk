@@ -223,7 +223,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
     {
         "@context": "https://schema.org/",
         "@type": "Product",
-        "name": "{{ Product.name }}",
+        "name": "{{ MstProduct.product_name }}",
         "image": [
             {% for img in Product.ProductImage %}
                 "{{ app.request.schemeAndHttpHost }}{{ asset(img, 'save_image') }}"{% if not loop.last %},{% endif %}
@@ -256,9 +256,9 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
 
                     <div class="item_visual">
                         {% for ProductImage in Product.ProductImage %}
-                            <div class="slide-item"><img src="{{ asset(ProductImage, 'save_image') }}" alt="{{ loop.first ? Product.name : '' }}"></div>
+                            <div class="slide-item"><img src="{{ asset(ProductImage, 'save_image') }}" alt="{{ loop.first ? MstProduct.product_name : '' }}"></div>
                         {% else %}
-                            <div class="slide-item"><img src="{{ asset(''|no_image_product, 'save_image') }}" alt="{{ loop.first ? Product.name : '' }}" /></div>
+                            <div class="slide-item"><img src="{{ asset(''|no_image_product, 'save_image') }}" alt="{{ loop.first ? MstProduct.product_name : '' }}" /></div>
                         {% endfor %}
                     </div>
                     <div class="item_nav">
@@ -272,7 +272,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                 <div class="ec-productRole__profile">
                     {# 商品名 #}
                     <div class="ec-productRole__title">
-                        <h2 class="ec-headingTitle">{{ Product.name }}</h2>
+                        <h2 class="ec-headingTitle">{{ MstProduct.product_name }}</h2>
                     </div>
                     {# タグ #}
                     <ul class="ec-productRole__tags">
