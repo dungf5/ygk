@@ -129,6 +129,9 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
     </script>
     <script>
         $(function() {
+                    $(document).on("keydown", "form", function(event) {
+                       return event.key != "Enter";
+                     });
             // bfcache無効化
             $(window).bind('pageshow', function(event) {
                 if (event.originalEvent.persisted) {
@@ -283,8 +286,10 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
         function checkInput(idQuantity){
 
 
+
                 var valInput = $('#'+idQuantity).val().trim();
                   let input1 =document.getElementById(idQuantity);
+                  let myid = $('#'+idQuantity).attr('myid');
                   input1.setCustomValidity('');
              if (valInput == "") {
 
@@ -312,7 +317,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                     $('#'+idQuantity)[0].reportValidity();
                      return false;
              }
-                $.cookie( idQuantity,valInput, { path: '/' });
+                $.cookie( myid,valInput, { path: '/' });
                  console.log('keyde#'+idQuantity);
              return true;
         }

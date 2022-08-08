@@ -22,7 +22,9 @@ file that was distributed with this source code.
         {#};#}
 
         $(function() {
-
+                    $(document).on("keydown", "form", function(event) {
+                       return event.key != "Enter";
+                     });
             // 表示件数を変更
             $('.disp-number').change(function() {
                 var dispNumber = $(this).val();
