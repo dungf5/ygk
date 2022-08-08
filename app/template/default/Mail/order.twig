@@ -4,12 +4,12 @@ This file is part of EC-CUBE
 Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
 
 http://www.ec-cube.co.jp/
-
+MyShoppingController.php 643 order.twig
 For the full copyright and license information, please view the LICENSE
 file that was distributed with this source code.
 #}
 {% autoescape 'safe_textmail' %}
-    {{ Order.company_name }} 
+    {{ Order.company_name }}
 
 この度はご注文いただき誠にありがとうございます。下記ご注文内容にお間違えがないかご確認下さい。
 
@@ -17,7 +17,7 @@ file that was distributed with this source code.
 　ご注文商品明細
 ************************************************
 {% for OrderItem in Order.ProductOrderItems %}
-商品コード：{{ OrderItem.product_code }}
+JANコード：{{ OrderItem.jan_code }}
 商品名：{{ OrderItem.product_name }}
 単価：{{ OrderItem.price|price }}
 数量：{{ OrderItem.quantity|number_format }}{% if OrderItem.mst_quantity>1 %}

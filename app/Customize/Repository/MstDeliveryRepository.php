@@ -25,7 +25,7 @@ class MstDeliveryRepository extends AbstractRepository
     {
 
         //ordStatus.update_date,
-        $sqlColumns="mstDeli.delivery_no
+        $sqlColumns="SUBSTRING(m0_.order_no, POSITION(\"-\" IN m0_.order_no)+1) AS koduoc,mstDeli.delivery_no
                     ,mstDeli.delivery_date
                     ,mstDeli.deli_post_code
                     ,mstDeli.deli_addr01
@@ -41,7 +41,7 @@ class MstDeliveryRepository extends AbstractRepository
                     ,mstDeli.department
                     ,mstDeli.delivery_lineno
                     ,mstDeli.sale_type
-                    ,mstDeli.item_no
+                    ,mstProduct.jan_code as item_no
                     ,mstDeli.item_name
                     ,mstDeli.quanlity
                     ,mstDeli.unit
@@ -63,14 +63,15 @@ class MstDeliveryRepository extends AbstractRepository
         $qb ->select($sqlColumns)
             ->from('Customize\Entity\MstDelivery', 'mstDeli')
             ->leftJoin('Customize\Entity\MstCustomer', 'mstCus',Join::WITH, 'mstCus.customer_code=mstDeli.deli_department')
+            ->leftJoin('Customize\Entity\MstProduct', 'mstProduct',Join::WITH, 'mstProduct.product_code=mstDeli.item_no')
             ->where('mstDeli.order_no like :order_no')
             ->setParameter('order_no', "%{$orderNo}-%");
         //  ->setParameter('delivery_no', $delivery_no)
         //  ->where('mstDeli.delivery_no = :delivery_no and mstDeli.order_no =:order_no_line_no')
 
         // Order By
-        $qb->addOrderBy('mstDeli.delivery_lineno', 'asc');
-        //var_dump( $qb->getQuery()->getSQL());
+        $qb->addOrderBy('mstDeli.order_no', 'asc');
+        //var_dump( $qb->getQuery()->getSQL());die();
        $arResult = $qb->getQuery()->getArrayResult();
         return $arResult;
     }

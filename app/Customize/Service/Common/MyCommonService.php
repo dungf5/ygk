@@ -123,7 +123,7 @@ class MyCommonService extends AbstractRepository
     public function getShipList($customer_code,$shipping_no,$order_no)
     {
 
-        $sql = " select  f.order_no as deli_order_no,c.ec_order_no, c.ec_order_lineno,b.product_name,f.delivery_no ,c.inquiry_no ,c.shipping_no,cus2.customer_name as shipping_customer_name,c.shipping_code,d.customer_name ,c.product_code,
+        $sql = " select d.company_name as user_created_company_name, b.jan_code,f.order_no as deli_order_no,c.ec_order_no, c.ec_order_lineno,b.product_name,f.delivery_no ,c.inquiry_no ,c.shipping_no,cus2.customer_name as shipping_customer_name,c.shipping_code,d.customer_name ,c.product_code,
                     case when c.shipping_status = 1 then '出荷指示済' WHEN shipping_status = 2 then '出荷済' else '未出荷' end as shipping_status,c.shipping_num
                     ,c.shipping_plan_date ,c.inquiry_no,c.shipping_company_code,c.shipping_date
                     from dt_order_status as a
@@ -153,6 +153,37 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
+    public function getShipListExtend($order_no)
+    {
+
+
+        $sql = " SELECT m.seikyu_code,m.pre_order_id,
+                    m.otodoke_code
+                    ,(SELECT company_name  FROM mst_customer ccc WHERE ccc.customer_code= m.shipping_code) as shipping_company_name
+                    ,(SELECT company_name  FROM mst_customer ccc WHERE ccc.customer_code= m.otodoke_code) as otodoke_company_name
+                     FROM more_order m  WHERE pre_order_id IN(
+                    SELECT pre_order_id FROM dtb_order WHERE id=?)
+                ";
+        $param = [];
+
+        $param[] = $order_no;
+//var_dump($sql,$param);
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            if(count($rows)==0){
+                $rows[] =["shipping_company_name"=>"","otodoke_company_name"=>""];
+            }
+
+            return $rows;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+
 
     /**
      * @param MoreOrder $moreOrder
@@ -529,6 +560,30 @@ class MyCommonService extends AbstractRepository
 
         return $rows;
     }
+    public function getPdfDelivery($orderNo){
+        $sql = "SELECT SUBSTRING(m0_.order_no, POSITION(\"-\" IN m0_.order_no)+1) AS orderByAs ,m0_.delivery_no, m0_.delivery_date, m0_.deli_post_code,
+                     m0_.deli_addr01, m0_.deli_addr02, m0_.deli_addr03, m0_.deli_company_name
+                      , m0_.deli_department, m0_.postal_code, m0_.addr01 , m0_.addr02, m0_.addr03,
+                       m0_.company_name, m0_.department, m0_.delivery_lineno, m0_.sale_type, m1_.jan_code as item_no ,
+                       m0_.item_name, m0_.quanlity, m0_.unit
+                       , m0_.unit_price, m0_.amount, m0_.tax , m0_.lot_no, m0_.order_no, m0_.item_remark, m0_.total_amount,
+                        m0_.footer_remark1, m0_.shiping_name as shiping_code, m0_.otodoke_name  as otodoke_code, m2_.department as deli_department_name
+                         FROM mst_delivery m0_ LEFT JOIN mst_customer m2_ ON (m2_.customer_code = m0_.deli_department) LEFT JOIN mst_product m1_ ON (m1_.product_code = m0_.item_no)
+                    WHERE m0_.order_no LIKE ?
+                    ORDER BY  CONVERT(orderByAs, SIGNED INTEGER) ASC";
+
+
+        $myPara = [ $orderNo."-%"];
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery($myPara);
+        $rows = $result->fetchAllAssociative();
+
+        return $rows;
+
+        //'603-%'
+
+    }
 
 //    /***
 //     * seikyu_code  noi nhan hoa don
@@ -875,6 +930,7 @@ class MyCommonService extends AbstractRepository
             b.product_id AS product_id,
             c.product_code AS product_code,
             c.product_name AS product_name,
+            c.jan_code AS jan_code,
             c.quantity as mst_quantity,
             c.unit_price AS unit_price,
             b.quantity AS quantity,

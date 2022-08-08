@@ -283,12 +283,12 @@
                 <td class="" style="" >
                    売上
                 </td>
-                <td class="" style="">商品コード<br />商品名</td>
+                <td class="" style="">JAN コード<br />商品名</td>
                 <td class="" title="soluong" style="text-align: right;">数量</td>
                 <td class="" style="">単位</td>
                 <td class="" title="dongia" style="text-align: right;">単価</td>
                 <td class="" title="thanhtien" style="text-align: right;">金額</td>
-                <td class="" title="thue" style="text-align: right;">消費税</td>
+{#                <td class="" title="thue" style="text-align: right;">消費税</td>#}
                 <td class=""  title="order_orderlineo" style="">御社注文№</td>
                 <td style="" title="item_remark" >備考</td>
             </tr>
@@ -320,7 +320,7 @@
 {#                    </tr>#}
 {#                    --------#}
                     <td style="text-align: right;">
-                        {{ deli.delivery_lineno }}
+                        {{ deli.autoIncr }}
                     </td>
                     <td class="" style="" >
                         {{ deli.sale_type }}
@@ -330,7 +330,7 @@
                     <td class="" style="">{{ deli.unit }}</td>
                     <td class="" title="dongia" style="text-align: right;">{{ deli.unit_price|number_format }}</td>
                     <td class="" title="thanhtien" style="text-align: right;">{{ deli.amount|number_format }}</td>
-                    <td class="" title="thue" style="text-align: right;">{{ deli.tax|number_format }}</td>
+{#                    <td class="" title="thue" style="text-align: right;">{{ deli.tax|number_format }}</td>#}
                     <td class=""  title="order_orderlineo" style="">{{ deli.order_no }}</td>
                     <td style="" title="item_remark" >{{ deli.item_remark }}</td>
 
@@ -355,10 +355,23 @@
 
                     <table style=" " class="tblFooterLeft">
                         <tbody>
+
+                        <tr class="tr-content">
+                            <td style="width: 32.0866%;"></td>
+                            <td style="width: 29.3307%;"> 小計：</td>
+                            <td style="width: 21.6535%;text-align: right" >{{ OrderTotal|number_format }}円</td>
+                        </tr>
+
+                        <tr class="tr-content">
+                            <td style="width: 32.0866%;"></td>
+                            <td style="width: 29.3307%;"> 消費税金額：</td>
+                            <td style="width: 21.6535%;text-align: right" >{{ totalTaxRe|number_format }}円</td>
+                        </tr>
+
                         <tr class="tr-content">
                             <td style="width: 32.0866%;"></td>
                             <td style="width: 29.3307%;">納品書合計金額:</td>
-                            <td style="width: 21.6535%;text-align: right" >{{ totalaAmountTax|number_format }}</td>
+                            <td style="width: 21.6535%;text-align: right" >{{ totalaAmountTax|number_format }}円</td>
                         </tr>
                         <tr>
                             <td style="width: 32.0866%;" colspan="3">備考: {{ myData[0].footer_remark1}} </td>

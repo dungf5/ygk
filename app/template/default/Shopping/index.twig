@@ -52,8 +52,15 @@ file that was distributed with this source code.
                         ui.item.option.selected = true;
 
 
+//shipping_destination_right shipping_radio_is_shipping_code
+                     let shipping_radio_is_shipping_code =  $(this.input).parent().parent().attr("class");
+                     if(shipping_radio_is_shipping_code=="shipping_destination_right shipping_radio_is_shipping_code"){
+                          updateShipingAddress(ui.item.option.value);
+                     }else{
 
-                        updateShipingAddress(ui.item.option.value);
+                         updateDeliverydAdress(ui.item.option.value);
+                     }
+
                         this._trigger( "select", event, {
                             item: ui.item.option
                         });
@@ -68,6 +75,7 @@ file that was distributed with this source code.
                     wasOpen = false;
                  input.on( "focusout", function(objI) {
                      if(this.value==""){
+                         debugger;
                        $('.delivery_address_main').html('');
                        $("select[name='shipping_radio']").val('');
                      }
@@ -105,13 +113,16 @@ file that was distributed with this source code.
             _source: function( request, response ) {
                 var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
                 response( this.element.children( "option" ).map(function() {
+                 var value2 = $( this ).val()
                     var text = $( this ).text();
-                    if ( this.value && ( !request.term || matcher.test(text) ) )
+                    if ( this.value && ( !request.term || matcher.test(text) || matcher.test(value2) ) )
                         return {
                             label: text,
                             value: text,
                             option: this
                         };
+
+
                 }) );
             },
 
@@ -148,7 +159,8 @@ file that was distributed with this source code.
                     this.input.tooltip( "close" ).attr( "title", "" );
                 }, 500 );
                 this.input.autocomplete( "instance" ).term = "";
-                 $('.delivery_address_main').html('');
+                 debugger;
+               //  $('.delivery_address_main').html('');
 
             },
 
@@ -163,9 +175,11 @@ file that was distributed with this source code.
         $( "#shipping_radio" ).combobox({
 
         });
-        $( "#toggle" ).on( "click", function() {
-            $( "#shipping_radio" ).toggle();
-        });
+
+
+        // $( "#toggle" ).on( "click", function() {
+        //     $( "#shipping_radio" ).toggle();
+        // });
 
 
     } );
@@ -1054,6 +1068,7 @@ $(function () {
                 </p>
                 {#                dtCusAddress#}
                 <div class="delivery_address_main">
+
                 </div>
 
 

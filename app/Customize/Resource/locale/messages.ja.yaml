@@ -23,6 +23,7 @@ front.order.order_lineno: 明細
 front.order.image: 画像
 front.order.product_name: 商品名
 front.order.product_code: 商品コード
+front.order.jan_code: JAN コード
 front.order.order_status: 受注<br/>ステータス
 front.order.shipping_status: 出荷</br>ステータス
 front.order.order_plus: 注文数

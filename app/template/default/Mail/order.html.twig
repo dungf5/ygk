@@ -4,7 +4,7 @@ This file is part of EC-CUBE
 Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
 
 http://www.ec-cube.co.jp/
-
+MyShoppingController.php 643 order.twig
 For the full copyright and license information, please view the LICENSE
 file that was distributed with this source code.
 #}
@@ -37,7 +37,7 @@ file that was distributed with this source code.
                             <hr style="border-top: 3px double #8c8b8b;">
 
                             {% for OrderItem in Order.ProductOrderItems %}
-                                商品コード：{{ OrderItem.product_code }}<br/>
+                                JANコード：{{ OrderItem.jan_code }}<br/>
                                 商品名：{{ OrderItem.product_name }}<br/>
                                 単価：{{ OrderItem.price|price }}<br/>
                                 数量：{{ OrderItem.quantity|number_format }}{% if OrderItem.mst_quantity>1 %}

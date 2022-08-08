@@ -57,6 +57,9 @@
             {% if data.shipping|length == 1 %}
             updateDeliverydAdress('{{ data.shipping[0]["otodoke_code"] }}') ;
             {% endif %}
+            $( "#delivery_address" ).combobox({
+
+            });
         </script>
 
 
