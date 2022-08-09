@@ -1,16 +1,13 @@
 
 
-<div class="delivery_address shipping_destination">
-    <div class="shipping_destination_left">
-        <div>届け先 </div>
-    </div>
-    <div class="shipping_destination_right">
+
+
 
         {% if data.shipping|length == 1 %}
             <div class="shipping_row otodoke_code">
 
                 <div class="shipping_col1 otodoke_code">
-                                    <span>
+                                    <span class="hidden">
                                         {% if data.shipping|length|length == 1 %}
                                             <input type="radio" class="hidden otodoke_code " checked name="delivery_address"
                                                    value="{{ data.shipping[0]["otodoke_code"] }}" id="{{ data.shipping[0]["otodoke_code"] }}">
@@ -66,14 +63,9 @@
 
 
 
-    </div>
-
-</div>
-<p class="error_delivery_address" style="color: red;font-size: larger;font-weight: bold;display: none">
-    {{ 'front.shopping.error_delivery_address'|trans }}
 
 
-</p>
+
 
 
 

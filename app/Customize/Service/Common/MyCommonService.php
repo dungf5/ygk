@@ -410,10 +410,13 @@ class MyCommonService extends AbstractRepository
 
         }
         $obC= $this->entityManager->getRepository(Cart::class)->findOneBy(['id' => $Cart->getId()]);
-        $obC->setTotalPrice( $totalPrice);
+        if($obC!=null){
+            $obC->setTotalPrice( $totalPrice);
 
-        $this->entityManager->persist($obC);
-        $this->entityManager->flush();
+            $this->entityManager->persist($obC);
+            $this->entityManager->flush();
+        }
+
 
     }
 
@@ -561,7 +564,14 @@ class MyCommonService extends AbstractRepository
         return $rows;
     }
     public function getPdfDelivery($orderNo){
-        $sql = "SELECT SUBSTRING(m0_.order_no, POSITION(\"-\" IN m0_.order_no)+1) AS orderByAs ,m0_.delivery_no, m0_.delivery_date, m0_.deli_post_code,
+    $subQuantity =" CASE
+                       WHEN m1_.quantity > 1 THEN m1_.quantity*m0_.quanlity
+                        ELSE m0_.quanlity
+                    END AS quanlity_total, ";
+
+
+
+        $sql = "SELECT {$subQuantity},SUBSTRING(m0_.order_no, POSITION(\"-\" IN m0_.order_no)+1) AS orderByAs ,m0_.delivery_no, m0_.delivery_date, m0_.deli_post_code,
                      m0_.deli_addr01, m0_.deli_addr02, m0_.deli_addr03, m0_.deli_company_name
                       , m0_.deli_department, m0_.postal_code, m0_.addr01 , m0_.addr02, m0_.addr03,
                        m0_.company_name, m0_.department, m0_.delivery_lineno, m0_.sale_type, m1_.jan_code as item_no ,
@@ -570,7 +580,7 @@ class MyCommonService extends AbstractRepository
                         m0_.footer_remark1, m0_.shiping_name as shiping_code, m0_.otodoke_name  as otodoke_code, m2_.department as deli_department_name
                          FROM mst_delivery m0_ LEFT JOIN mst_customer m2_ ON (m2_.customer_code = m0_.deli_department) LEFT JOIN mst_product m1_ ON (m1_.product_code = m0_.item_no)
                     WHERE m0_.order_no LIKE ?
-                    ORDER BY  CONVERT(orderByAs, SIGNED INTEGER) ASC";
+                    ORDER BY  CONVERT(orderByAs, SIGNED INTEGER) ASC";//4988494205186
 
 
         $myPara = [ $orderNo."-%"];

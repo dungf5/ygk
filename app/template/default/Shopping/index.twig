@@ -75,9 +75,22 @@ file that was distributed with this source code.
                     wasOpen = false;
                  input.on( "focusout", function(objI) {
                      if(this.value==""){
-                         debugger;
-                       $('.delivery_address_main').html('');
-                       $("select[name='shipping_radio']").val('');
+
+                       //$('.delivery_address_main').html('');
+                       let clasCheck = $(this).parent().parent().attr("class");
+                       if(clasCheck=='shipping_destination_right combo_add_list'){
+                           //  $('.combo_add_list').html('');
+                            $("select[name='delivery_address']").val('');
+                       }else{
+
+                           $('.error_delivery_address').hide();
+                           let Temp ='<span class="custom-combobox"><input title="" class="custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left ui-autocomplete-input" autocomplete="off" data-dashlane-rid="c17f3366f0c61f3d" data-form-type="other"><a tabindex="-1" title="すべて表示" class="ui-button ui-widget ui-button-icon-only custom-combobox-toggle ui-corner-right" role="button" data-dashlane-label="true" data-dashlane-rid="a9ea447d28e61422" data-form-type="other"><span class="ui-button-icon ui-icon ui-icon-triangle-1-s"></span><span class="ui-button-icon-space"> </span></a></span>';
+                            $('.combo_add_list').html(Temp);
+                            $("select[name='shipping_radio']").val('');
+                       }
+
+
+
                      }
 
                  });
@@ -340,8 +353,8 @@ $(function () {
 
             });//end validate sumit
 
-                 //delivery_address is otoke_code
-            $('.delivery_address_main').delegate("select[name='delivery_address']", 'change', function() {
+                 //delivery_address is otoke_code delivery_address_main
+            $('.combo_add_list').delegate("select[name='delivery_address']", 'change', function() {
               let delivery_code =  $(this).val();
                //delivery_address is otoke_code
                updateDeliverydAdress(delivery_code);
@@ -381,7 +394,7 @@ $(function () {
             });
 
         function updateShipingAddress(shipping_code) {
-
+                $('.error_delivery_address').hide();
                 $('.errorshipping_radio').hide();
                 $.ajax({
                         url: '{{ url('cart_save_temp') }}',
@@ -395,7 +408,8 @@ $(function () {
                         }
                     }).done(function(htmlRe, statusText, jqXHR) {
 
-                        $('.delivery_address_main').html(htmlRe);
+                        // delivery_address_main
+                        $('.combo_add_list').html(htmlRe);
 
                     }).fail(function(jqXHR, statusText, errorThrown) {
              });
@@ -516,7 +530,7 @@ $(function () {
 {% endblock javascript %}
 
 {% block main %}
-{#    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">#}
+    {#    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">#}
     <link rel="stylesheet" href="{{ asset('assets/selectbox/jquery_ui_1_13_2.css') }}">
     <style>
         .custom-combobox {
@@ -814,7 +828,7 @@ $(function () {
                                             <div class="ec-imageGrid__content">
                                                 {{ MstProduct.jan_code}}
                                                 <p> {{ MstProduct.product_name }}
-{#                                                    {% if is_reduced_tax_rate(orderItem) %}{{ 'common.reduced_tax_rate_symbol'|trans }}{% set isShowReducedTaxMess = true %}{% endif %}#}
+                                                    {#                                                    {% if is_reduced_tax_rate(orderItem) %}{{ 'common.reduced_tax_rate_symbol'|trans }}{% set isShowReducedTaxMess = true %}{% endif %}#}
                                                 </p>
 
                                                 {% if orderItem.productClass is not null and orderItem.productClass.classCategory1 %}
@@ -826,14 +840,14 @@ $(function () {
 
                                                 {{ orderItem.priceIncTax|price }}
                                                 × {{ orderItem.quantity|number_format }}
-{#                                                trongadd#}
+                                                {#                                                trongadd#}
                                                 {% if MstProduct.quantity>1 %}
                                                     箱({{ orderItem.quantity*MstProduct.quantity }}個)
                                                 {% else %}
                                                     個
                                                 {% endif %}
 
-{#                                                rongadd#}
+                                                {#                                                rongadd#}
 
                                                 {{ 'common.subtotal__with_separator'|trans }}{{ orderItem.totalPrice|price }}
                                             </div>
@@ -841,7 +855,7 @@ $(function () {
                                     </li>
                                 {% endfor %}
                             </ul>
-{#                            <p>{{ isShowReducedTaxMess ? 'common.reduced_tax_rate_messeage'|trans }}</p>#}
+                            {#                            <p>{{ isShowReducedTaxMess ? 'common.reduced_tax_rate_messeage'|trans }}</p>#}
                         </div>
                         <div class="ec-orderDelivery__address nvtrong hidden">
                             <p>{{ 'common.name.prefix'|trans }}{{ shipping.name01 }} {{ shipping.name02 }}
@@ -1068,7 +1082,20 @@ $(function () {
                 </p>
                 {#                dtCusAddress#}
                 <div class="delivery_address_main">
+                    <div class="delivery_address shipping_destination">
+                        <div class="shipping_destination_left">
+                            <div>届け先 </div>
+                        </div>
+                        <div class="shipping_destination_right combo_add_list">
+                            <span class="custom-combobox"><input title="" class="custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left ui-autocomplete-input" autocomplete="off" data-dashlane-rid="c17f3366f0c61f3d" data-form-type="other"><a tabindex="-1" title="すべて表示" class="ui-button ui-widget ui-button-icon-only custom-combobox-toggle ui-corner-right" role="button" data-dashlane-label="true" data-dashlane-rid="a9ea447d28e61422" data-form-type="other"><span class="ui-button-icon ui-icon ui-icon-triangle-1-s"></span><span class="ui-button-icon-space"> </span></a></span>
+                        </div>
+                    </div>
 
+                    <p class="error_delivery_address" style="color: red;font-size: larger;font-weight: bold;display: none">
+                        {{ 'front.shopping.error_delivery_address'|trans }}
+
+
+                    </p>
                 </div>
 
 
@@ -1148,36 +1175,36 @@ $(function () {
                         <dt>{{ 'common.delivery_fee'|trans }}</dt>
                         <dd>{{ Order.deliveryFeeTotal|price }}</dd>
                     </dl>
-{#                    {% if Order.taxable_discount < 0 %}#}
-{#                        <dl class="ec-totalBox__spec">#}
-{#                            <dt>{{ 'common.discount'|trans }}</dt>#}
-{#                            <dd>{{ Order.taxable_discount|price }}</dd>#}
-{#                        </dl>#}
-{#                    {% endif %}#}
-{#                    <div class="ec-totalBox__total">{{ 'common.total'|trans }}<span#}
-{#                            class="ec-totalBox__price">{{ Order.taxable_total|price }}</span><span#}
-{#                            class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>#}
+                    {#                    {% if Order.taxable_discount < 0 %}#}
+                    {#                        <dl class="ec-totalBox__spec">#}
+                    {#                            <dt>{{ 'common.discount'|trans }}</dt>#}
+                    {#                            <dd>{{ Order.taxable_discount|price }}</dd>#}
+                    {#                        </dl>#}
+                    {#                    {% endif %}#}
+                    {#                    <div class="ec-totalBox__total">{{ 'common.total'|trans }}<span#}
+                    {#                            class="ec-totalBox__price">{{ Order.taxable_total|price }}</span><span#}
+                    {#                            class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>#}
                     <div class="ec-totalBox__total">{{ 'common.total'|trans }}<span
                             class="ec-totalBox__price">{{ Order.payment_total|price }}</span><span
                             class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>
-{#                    {% for rate, total in Order.taxable_total_by_tax_rate %}#}
-{#                        <dl class="ec-totalBox__taxRate">#}
-{#                            <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': rate }) }}</dt>#}
-{#                            <dd>{{ total|price }}</dd>#}
-{#                        </dl>#}
-                        <dl class="ec-totalBox__taxRate hidden">
-                            <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': Order.rate }) }}</dt>
-                            <dd>{{ Order.total|price }}</dd>
-                        </dl>
-{#                    {% endfor %}#}
-{#                    {% for item in Order.tax_free_discount_items %}#}
-{#                        {% if loop.first %}#}
-{#                            <div class="ec-totalBox__total"></div>{% endif %}#}
-{#                        <dl class="ec-totalBox__spec">#}
-{#                            <dt>{{ item.product_name }}</dt>#}
-{#                            <dd>{{ item.total_price|price }}</dd>#}
-{#                        </dl>#}
-{#                    {% endfor %}#}
+                    {#                    {% for rate, total in Order.taxable_total_by_tax_rate %}#}
+                    {#                        <dl class="ec-totalBox__taxRate">#}
+                    {#                            <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': rate }) }}</dt>#}
+                    {#                            <dd>{{ total|price }}</dd>#}
+                    {#                        </dl>#}
+                    <dl class="ec-totalBox__taxRate hidden">
+                        <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': Order.rate }) }}</dt>
+                        <dd>{{ Order.total|price }}</dd>
+                    </dl>
+                    {#                    {% endfor %}#}
+                    {#                    {% for item in Order.tax_free_discount_items %}#}
+                    {#                        {% if loop.first %}#}
+                    {#                            <div class="ec-totalBox__total"></div>{% endif %}#}
+                    {#                        <dl class="ec-totalBox__spec">#}
+                    {#                            <dt>{{ item.product_name }}</dt>#}
+                    {#                            <dd>{{ item.total_price|price }}</dd>#}
+                    {#                        </dl>#}
+                    {#                    {% endfor %}#}
                     <div class="ec-totalBox__paymentTotal hidden">{{ 'common.payment_total'|trans }}<span
                             class="ec-totalBox__price">{{ Order.payment_total|price }}</span><span
                             class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>
