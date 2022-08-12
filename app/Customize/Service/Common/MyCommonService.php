@@ -123,7 +123,7 @@ class MyCommonService extends AbstractRepository
     public function getShipList($customer_code,$shipping_no,$order_no)
     {
 
-        $sql = " select d.company_name as user_created_company_name, b.jan_code,f.order_no as deli_order_no,c.ec_order_no, c.ec_order_lineno,b.product_name,f.delivery_no ,c.inquiry_no ,c.shipping_no,cus2.customer_name as shipping_customer_name,c.shipping_code,d.customer_name ,c.product_code,
+        $sql = " select c.otodoke_code,d.company_name as user_created_company_name, b.jan_code,f.order_no as deli_order_no,c.ec_order_no, c.ec_order_lineno,b.product_name,f.delivery_no ,c.inquiry_no ,c.shipping_no,cus2.customer_name as shipping_customer_name,c.shipping_code,d.customer_name ,c.product_code,
                     case when c.shipping_status = 1 then '出荷指示済' WHEN shipping_status = 2 then '出荷済' else '未出荷' end as shipping_status,c.shipping_num
                     ,c.shipping_plan_date ,c.inquiry_no,c.shipping_company_code,c.shipping_date
                     from dt_order_status as a
@@ -153,7 +153,35 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
-    public function getShipListExtend($order_no)
+    public function getShipListExtend($otodoke_code,$shipping_code)
+    {
+
+
+        $sql = " SELECT
+                    (SELECT company_name  FROM mst_customer ccc WHERE ccc.customer_code= ?) as shipping_company_name
+                    ,(SELECT company_name  FROM mst_customer ccc WHERE ccc.customer_code= ?) as otodoke_company_name
+
+                ";
+        $param = [$shipping_code,$otodoke_code];
+
+
+
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            if(count($rows)==0){
+                $rows[] =["shipping_company_name"=>"","otodoke_company_name"=>""];
+            }
+
+            return $rows;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    public function getShipListExtendBk($order_no)
     {
 
 
@@ -564,18 +592,17 @@ class MyCommonService extends AbstractRepository
         return $rows;
     }
     public function getPdfDelivery($orderNo){
-    $subQuantity =" CASE
+        $subQuantity =" CASE
                        WHEN m1_.quantity > 1 THEN m1_.quantity*m0_.quanlity
                         ELSE m0_.quanlity
-                    END AS quanlity_total, ";
+                    END AS quanlity ";
 
-
-
+//m0_.quanlity,
         $sql = "SELECT {$subQuantity},SUBSTRING(m0_.order_no, POSITION(\"-\" IN m0_.order_no)+1) AS orderByAs ,m0_.delivery_no, m0_.delivery_date, m0_.deli_post_code,
                      m0_.deli_addr01, m0_.deli_addr02, m0_.deli_addr03, m0_.deli_company_name
                       , m0_.deli_department, m0_.postal_code, m0_.addr01 , m0_.addr02, m0_.addr03,
                        m0_.company_name, m0_.department, m0_.delivery_lineno, m0_.sale_type, m1_.jan_code as item_no ,
-                       m0_.item_name, m0_.quanlity, m0_.unit
+                       m0_.item_name,  m0_.unit
                        , m0_.unit_price, m0_.amount, m0_.tax , m0_.lot_no, m0_.order_no, m0_.item_remark, m0_.total_amount,
                         m0_.footer_remark1, m0_.shiping_name as shiping_code, m0_.otodoke_name  as otodoke_code, m2_.department as deli_department_name
                          FROM mst_delivery m0_ LEFT JOIN mst_customer m2_ ON (m2_.customer_code = m0_.deli_department) LEFT JOIN mst_product m1_ ON (m1_.product_code = m0_.item_no)
@@ -1139,6 +1166,21 @@ AND          pri.product_code=?
             return "";
         }
     }
+
+    public function checkExistPreOrder($preOrderId){
+
+        $sql = "SELECT pre_order_id FROM `egk_dev`.`dtb_cart` WHERE pre_order_id =?";
+        $myPara = [ $preOrderId];
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery($myPara);
+        $rows = $result->fetchAllAssociative();
+        if(count($rows)==1){
+            return  1;
+        }else{
+            return 0;
+        }
+    }
+
 
 
 

@@ -106,6 +106,12 @@ class MyCartController extends AbstractController
             $pre_order_id = $request->get('pre_order_id');
             $customer_id = $request->get('customer_id');
             $date_want_delivery = $request->get('date_want_delivery');
+            $is_check_exist  = $request->get('is_check_exist');
+            if($is_check_exist==1){
+
+               echo $commonService->checkExistPreOrder($pre_order_id);
+                die();
+            }
 
             $commonService->saveTempCart($shipping_code, $pre_order_id);
             $arrOtoProductOrder = $commonService->getCustomerOtodoke($customer_id, $shipping_code);

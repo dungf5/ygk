@@ -12,6 +12,47 @@ file that was distributed with this source code.
 
 {% form_theme form 'Form/form_div_layout.twig' %}
 
+{% block javascript %}
+
+
+<script>
+
+$(function () {
+
+console.log(Math.random());
+    console.log("{{Order.pre_order_id }}");
+
+
+    let preOrderId = "{{Order.pre_order_id }}";
+
+
+    $.ajax({
+                        url: '{{ url('cart_save_temp') }}',
+                        type: 'POST',
+                        data: {
+                            pre_order_id: preOrderId,
+                            is_check_exist: 1,
+                            '_token':'{{ csrf_token('_token') }}'
+                        }
+                    }).done(function(htmlRe, statusText, jqXHR) {
+
+                       if(htmlRe=="0"){
+                           window.location.href='/';
+
+                       }
+
+                    }).fail(function(jqXHR, statusText, errorThrown) {
+
+             });
+
+
+});
+
+
+
+</script>
+
+{% endblock javascript %}
 {% block main %}
     <style type="text/css">
 
@@ -67,6 +108,7 @@ file that was distributed with this source code.
 
     <form id="shopping-form" method="post" action="{{ url('shopping_checkout') }}">
     {{ form_widget(form._token) }}
+
     <div class="ec-orderRole">
         <div class="ec-orderRole__detail">
             <div class="ec-orderAccount">
@@ -364,7 +406,7 @@ file that was distributed with this source code.
                 </div>
                 {% endif %}
                 <div class="ec-totalBox__btn">
-                    <button type="submit" class="ec-blockBtn--action">{{ 'front.shopping.checkout'|trans }}</button>
+                    <button type="submit"  class="ec-blockBtn--action">{{ 'front.shopping.checkout'|trans }}</button>
                     <a href="{{ url('shopping') }}" class="ec-blockBtn--cancel">{{ 'front.shopping.back_to_order'|trans }}</a>
                 </div>
             </div>

@@ -527,6 +527,41 @@ $(function () {
 
 </script>
 
+<script>
+
+$(function () {
+
+console.log(Math.random());
+    console.log("{{Order.pre_order_id }}");
+    //9c4eca4b799deba87f49a2fe6d8898aac090ee4b
+
+    let preOrderId = "{{Order.pre_order_id }}";
+    $.ajax({
+                        url: '{{ url('cart_save_temp') }}',
+                        type: 'POST',
+                        data: {
+                            pre_order_id: preOrderId,
+                            is_check_exist: 1,
+                            '_token':'{{ csrf_token('_token') }}'
+                        }
+                    }).done(function(htmlRe, statusText, jqXHR) {
+
+                       if(htmlRe=="0"){
+                           window.location.href='/';
+
+                       }
+
+                    }).fail(function(jqXHR, statusText, errorThrown) {
+
+             });
+
+
+});
+
+
+
+</script>
+
 {% endblock javascript %}
 
 {% block main %}

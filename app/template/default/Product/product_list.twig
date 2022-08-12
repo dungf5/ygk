@@ -160,82 +160,89 @@ file that was distributed with this source code.
         <div class="ec-shelfRole">
         {% if pagination.totalItemCount > 0 %}
                     <div class="w-100" >
-                    <table class="table w-100" >
-                    {% for Product in pagination %}
 
-                        {% set form = forms[Product.id] %}
+
+                        <table class="ec-productList">
+                            <thead>
+                            <tr>
+                                <th class="item">商品内容</th>
+                                <th class="cart">カート</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for Product in pagination %}
+
+                                {% set form = forms[Product.id] %}
+
                                 <tr>
-                                    <td rowspan="2" style="width: 100px">
-                                        <div >
-                                            {% if hsKeyImg[Product.id] is defined %}
-                                            <img  style="width: 150px;height: 150px" src="{{ asset(hsKeyImg[Product.id]|no_image_product, 'save_image') }}" alt="{{ Product.product_name }}" loading="lazy">
+                                    <td class="item spec">
+                                        <a href="http://dev.xbraid.net/products/detail/1420">
+                                            <div class="itemImage">
+                                                {% if hsKeyImg[Product.id] is defined %}
+                                                    <img  style="width: 150px;height: 150px" src="{{ asset(hsKeyImg[Product.id]|no_image_product, 'save_image') }}" alt="{{ Product.product_name }}" loading="lazy">
                                                 {% else %}
 
-                                            {% endif %}
-                                        </div>
+                                                {% endif %}
 
 
-                                    </td>
-                                    <td colspan="3">
-                                        <a href="{{ url('product_detail', {'id': Product.id}) }}">
-                                        {{ Product.product_name }}
+                                            </div>
+                                            <ul class="itemName">
+                                                <li class="sku">  {{ Product.jan_code }}</li>
+                                                <li class="name"> {{ Product.product_name }}</li>
+                                                <li class="numPrice">
+                                                    {% if Product.mst_quantity>1 %}
+                                                        販売単位：{{ Product.mst_quantity }}個/箱～
+                                                    {% else %}
+                                                        販売単位：{{ Product.mst_quantity }}個～
+                                                    {% endif %}
+                                                    <br> 販売単価:
+                                                    {% if app.user -%}
 
+                                                        {% if Product.price_s01 is not empty %}
+                                                            {{ Product.price_s01|price }}
+                                                        {% else %}
+                                                            {{ Product.mst_unit_price|price }}
+                                                        {% endif %}
+                                                    {% else %}
+
+                                                        {{ Product.mst_unit_price|price }}
+                                                    {% endif %}
+                                                    <span>（税抜）</span></li>
+                                            </ul>
                                         </a>
+                                        <div class="itemSpec">
+                                            <dl>
+                                                <dt>サイズ</dt>
+                                                <dd> {{ Product.size }}</dd>
+                                            </dl>
+                                            <dl>
+                                                <dt>カラー</dt>
+                                                <dd>{{ Product.color }}</dd>
+                                            </dl>
+                                            <dl>
+                                                <dt>素材</dt>
+                                                <dd>{{ Product.material }}</dd>
+                                            </dl>
+                                            <dl>
+                                                <dt>規格<span>（m）</span></dt>
+                                                <dd>{{ Product.model }} </dd>
+                                            </dl>
+                                        </div>
                                     </td>
-                                    <td >
-                                        {% if Product.description_list %}
-                                        <p>{{ Product.description_list|raw|nl2br }}</p>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if Product.mst_quantity>1 %}
-                                            販売単位：{{ Product.mst_quantity }}個/箱～
-                                            {% else %}
-                                                販売単位：{{ Product.mst_quantity }}個～
-                                        {% endif %}
-                                        販売単価:
-                                        {% if app.user -%}
-
-                                            {% if Product.price_s01 is not empty %}
-                                                {{ Product.price_s01|price }}
-                                            {% else %}
-                                                {{ Product.mst_unit_price|price }}
-                                            {% endif %}
-                                        {% else %}
-
-                                            {{ Product.mst_unit_price|price }}
-                                        {% endif %}
-
-                                    </td>
-                                    <td >
-                                    </td>
-                                    <td >
-
-                                    </td>
-                                </tr>
-                                <tr style="border-bottom: 1px dotted #ccc;">
-
-                                    <td colspan="2">
-                                       {{ Product.jan_code }}
-                                    </td>
-                                    <td colspan="2">
-                                        {{ Product.free_area }}
-                                    </td>
-
-                                    <td colspan="2">
+                                    <td class="cart">
                                         <form name="form{{ Product.id }}" id="productForm{{ Product.id }}" action="{{ url('product_add_cart', {id:Product.id}) }}" method="post">
                                             <div class="ec-productRole__actions">
                                                 {% if form.classcategory_id1 is defined %}
-                                                <div class="ec-select ">
-                                                    {{ form_widget(form.classcategory_id1) }}
-                                                    {{ form_errors(form.classcategory_id1) }}
-                                                </div>
-                                                {% if form.classcategory_id2 is defined %}
-                                                <div class="ec-select ">
-                                                    {{ form_widget(form.classcategory_id2) }}
-                                                    {{ form_errors(form.classcategory_id2) }}
-                                                </div>
-                                                {% endif %}
+                                                    <div class="ec-select ">
+                                                        {{ form_widget(form.classcategory_id1) }}
+                                                        {{ form_errors(form.classcategory_id1) }}
+                                                    </div>
+                                                    {% if form.classcategory_id2 is defined %}
+                                                        <div class="ec-select ">
+                                                            {{ form_widget(form.classcategory_id2) }}
+                                                            {{ form_errors(form.classcategory_id2) }}
+                                                        </div>
+                                                    {% endif %}
                                                 {% endif %}
                                                 <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}:</span>
                                                     {{ form_widget(form.quantity, {'attr': {'class': 'quantity','value': Product.mst_quantity|number_format
@@ -245,21 +252,23 @@ file that was distributed with this source code.
                                                 </div>
                                                 <input type="hidden" id="checkQuantity{{ Product.id }}" class="checkQuantity"  value="{{ Product.mst_quantity }}">
                                             </div>
+
                                             {{ form_rest(form) }}
                                         </form>
-                                    </td>
-                                    <td >
+
+
                                         <div class="ec-productRole__btn">
-                                            <button type="button" class="ec-blockBtn--action add-cart" data-cartid="{{ Product.id }}" form="productForm{{ Product.id }}">
-                                                {{ 'front.product.add_cart'|trans }}
+                                            <button type="button" class="ec-blockBtn--action add-cart" data-cartid="1420" form="productForm1420">
+                                                <i class="fas fa-shopping-cart"></i>カート追加
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
 
+                            {% endfor %}
 
-                    {% endfor %}
-                    </table>
+                            </tbody>
+                        </table>
                     </div>
 
             <div class="ec-modal">
