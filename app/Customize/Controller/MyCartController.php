@@ -341,5 +341,11 @@ class MyCartController extends AbstractController
         log_info('カート演算処理終了', ['operation' => $operation, 'product_class_id' => $productClassId]);
 
         return $this->redirectToRoute('cart');
+//        $myComS = new MyCommonService($this->entityManager);
+//        $totalNew=0;
+//        if(count($Carts)>0){
+//            $cartId = $Carts[0]->getId();
+//            $totalNew = $myComS->getTotalItemCart($cartId);
+//        }
     }
 }

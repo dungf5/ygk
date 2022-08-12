@@ -39,7 +39,7 @@ file that was distributed with this source code.
             });
 
             $('.add-cart').on('click', function(e) {
-             ;
+
                 var $form = $(this).parents('tr').find('form');
 
                 {#// 個数フォームのチェック#}
@@ -75,8 +75,8 @@ file that was distributed with this source code.
                         $('#ec-modal-header').html(this);
                     });
 
-                    $('.ec-modal').show()
-
+                    $('.ec-modal').show();
+                    $('.fnDIN').html(data.totalNew);
                     // カートブロックを更新する
                     $.ajax({
                         url: '{{ url('block_cart') }}',
@@ -176,7 +176,7 @@ file that was distributed with this source code.
 
                                 <tr>
                                     <td class="item spec">
-                                        <a href="http://dev.xbraid.net/products/detail/1420">
+                                        <a href="/products/detail/{{ Product.id }}">
                                             <div class="itemImage">
                                                 {% if hsKeyImg[Product.id] is defined %}
                                                     <img  style="width: 150px;height: 150px" src="{{ asset(hsKeyImg[Product.id]|no_image_product, 'save_image') }}" alt="{{ Product.product_name }}" loading="lazy">
@@ -258,8 +258,9 @@ file that was distributed with this source code.
 
 
                                         <div class="ec-productRole__btn">
-                                            <button type="button" class="ec-blockBtn--action add-cart" data-cartid="1420" form="productForm1420">
-                                                <i class="fas fa-shopping-cart"></i>カート追加
+
+                                            <button type="button" class="ec-blockBtn--action add-cart" data-cartid="{{ Product.id }}" form="productForm{{ Product.id }}">
+                                                {{ 'front.product.add_cart'|trans }}
                                             </button>
                                         </div>
                                     </td>

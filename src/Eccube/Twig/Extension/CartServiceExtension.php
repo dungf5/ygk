@@ -13,6 +13,8 @@
 
 namespace Eccube\Twig\Extension;
 
+use Customize\Service\Common\MyCommonService;
+use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Entity\Cart;
 use Eccube\Service\CartService;
 use Twig\Extension\AbstractExtension;
@@ -23,10 +25,15 @@ class CartServiceExtension extends AbstractExtension
      * @var CartService
      */
     protected $cartService;
+    /**
+     * @var \Doctrine\ORM\EntityManagerInterface
+     */
+    protected $entityManager;
 
-    public function __construct(CartService $cartService)
+    public function __construct(CartService $cartService,  EntityManagerInterface $entityManager)
     {
         $this->cartService = $cartService;
+        $this->entityManager = $entityManager;
     }
 
     public function getFunctions()
@@ -64,12 +71,16 @@ class CartServiceExtension extends AbstractExtension
     public function get_carts_total_quantity()
     {
         $Carts = $this->cartService->getCarts();
-        $totalQuantity = array_reduce($Carts, function ($total, Cart $Cart) {
-            $total += $Cart->getTotalQuantity();
-
-            return $total;
-        }, 0);
-
+//        $totalQuantity = array_reduce($Carts, function ($total, Cart $Cart) {
+//            $total += $Cart->getTotalQuantity();
+//
+//            return $total;
+//        }, 0);
+//
+//        return $totalQuantity;
+        $myComS = new MyCommonService($this->entityManager);
+        $cartId = $Carts[0]->getId();
+        $totalQuantity = $myComS->getTotalItemCart($cartId);
         return $totalQuantity;
     }
 }

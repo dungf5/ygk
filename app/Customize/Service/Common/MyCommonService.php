@@ -1180,6 +1180,26 @@ AND          pri.product_code=?
             return 0;
         }
     }
+    public function getTotalItemCart($cart_id)
+    {
+        $sql = " SELECT sum(b.quantity*c.quantity) AS total_quantity
+                FROM  dtb_product_class AS a JOIN dtb_cart_item b ON b.product_class_id =a.id
+                JOIN mst_product AS c ON a.product_id = c.ec_product_id
+                WHERE b.cart_id =? ";
+        $param = [$cart_id];
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            if(count($rows)>0){
+                return $rows[0]["total_quantity"];
+            }
+
+            return 0;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
 
 
 

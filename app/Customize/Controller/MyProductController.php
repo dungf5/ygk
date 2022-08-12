@@ -321,18 +321,21 @@ class MyProductController extends AbstractController
 //                $errorMessages[] = $warning->getMessage();
 //            }
 //        }
-//dd($Carts);
+
+        $cartId =0;
         // set total price
         foreach ($Carts as $Cart) {
             $totalPrice = 0;
             foreach($Cart['CartItems'] as $CartItem){
                 $totalPrice += $CartItem['price'] * $CartItem['quantity'];
+
             }
 
             $Cart->setTotalPrice($totalPrice);
             $Cart->setDeliveryFeeTotal(0);
         }
         $this->cartService->saveCustomize();
+
 
         log_info(
             'カート追加処理完了',
@@ -356,9 +359,14 @@ class MyProductController extends AbstractController
             return $event->getResponse();
         }
 
+
+
+
         if ($request->isXmlHttpRequest()) {
             // ajaxでのリクエストの場合は結果をjson形式で返す。
-
+            $myComS = new MyCommonService($this->entityManager);
+            $cartId = $Carts[0]->getId();
+            $totalNew = $myComS->getTotalItemCart($cartId);
             // 初期化
             $done = null;
             $messages = [];
@@ -373,7 +381,7 @@ class MyProductController extends AbstractController
                 $messages = $errorMessages;
             }
 
-            return $this->json(['done' => $done, 'messages' => $messages]);
+            return $this->json(['done' => $done, 'messages' => $messages,"totalNew"=>$totalNew]);
         } else {
             // ajax以外でのリクエストの場合はカート画面へリダイレクト
             foreach ($errorMessages as $errorMessage) {
