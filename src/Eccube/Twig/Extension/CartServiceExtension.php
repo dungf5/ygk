@@ -79,6 +79,9 @@ class CartServiceExtension extends AbstractExtension
 //
 //        return $totalQuantity;
         $myComS = new MyCommonService($this->entityManager);
+        if(count($Carts)==0){
+            return  0;
+        }
         $cartId = $Carts[0]->getId();
         $totalQuantity = $myComS->getTotalItemCart($cartId);
         return $totalQuantity;

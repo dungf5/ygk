@@ -190,8 +190,10 @@ class ProductRepository extends AbstractRepository
 //                    ->setParameter($key, '%'.$keyword.'%');
 //            }
             $key = $searchData['name'];
+            $whereMore ='mstProduct.series_name like :product_name or mstProduct.product_name_abb like :product_name  or mstProduct.product_name like :product_name or mstProduct.jan_code like :product_name or mstProduct.product_code like :product_name';
+            $whereMore .=" or mstProduct.catalog_code like :product_name   ";
 
-            $qb->andWhere('mstProduct.series_name like :product_name or mstProduct.product_name_abb like :product_name  or mstProduct.product_name like :product_name or mstProduct.jan_code like :product_name or mstProduct.product_code like :product_name')->setParameter(':product_name','%'. $key.'%');
+            $qb->andWhere($whereMore)->setParameter(':product_name','%'. $key.'%');
 
 
         }

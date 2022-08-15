@@ -838,18 +838,18 @@ console.log(Math.random());
                         {% set idx = loop.index0 %}
                         {% set isShowReducedTaxMess = false %}
 
-                        <div
-                            class="ec-orderDelivery__title nvtrong hidden">{{ 'front.shopping.delivery_to'|trans }}{% if Order.multiple %}({{ loop.index }}){% endif %}
-                            <div class="ec-orderDelivery__change">
-                                {% if is_granted('ROLE_USER') %}
-                                    <button class="ec-inlineBtn" data-id="{{ shipping.id }}" data-trigger="click"
-                                            data-path="{{ path('shopping_shipping', {'id': shipping.id}) }}">{{ 'common.change'|trans }}</button>
-                                {% else %}
-                                    <button class="ec-inlineBtn" data-id="{{ shipping.id }}" data-trigger="click"
-                                            data-path="{{ path('shopping_shipping_edit', {'id': shipping.id}) }}">{{ 'common.change'|trans }}</button>
-                                {% endif %}
-                            </div>
-                        </div>
+{#                        <div#}
+{#                            class="ec-orderDelivery__title nvtrong hidden">{{ 'front.shopping.delivery_to'|trans }}{% if Order.multiple %}({{ loop.index }}){% endif %}#}
+{#                            <div class="ec-orderDelivery__change">#}
+{#                                {% if is_granted('ROLE_USER') %}#}
+{#                                    <button class="ec-inlineBtn nvtrong hidden" data-id="{{ shipping.id }}" data-trigger="click"#}
+{#                                            data-path="{{ path('shopping_shipping', {'id': shipping.id}) }}">{{ 'common.change'|trans }}</button>#}
+{#                                {% else %}#}
+{#                                    <button class="ec-inlineBtn nvtrong hidden" data-id="{{ shipping.id }}" data-trigger="click"#}
+{#                                            data-path="{{ path('shopping_shipping_edit', {'id': shipping.id}) }}">{{ 'common.change'|trans }}</button>#}
+{#                                {% endif %}#}
+{#                            </div>#}
+{#                        </div>#}
                         <div class="ec-orderDelivery__item">
                             <ul class="ec-borderedList">
                                 {% for orderItem in shipping.productOrderItems %}

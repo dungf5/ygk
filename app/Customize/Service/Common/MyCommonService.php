@@ -1169,7 +1169,7 @@ AND          pri.product_code=?
 
     public function checkExistPreOrder($preOrderId){
 
-        $sql = "SELECT pre_order_id FROM `egk_dev`.`dtb_cart` WHERE pre_order_id =?";
+        $sql = "SELECT pre_order_id FROM `dtb_cart` WHERE pre_order_id =?";
         $myPara = [ $preOrderId];
         $statement = $this->entityManager->getConnection()->prepare($sql);
         $result = $statement->executeQuery($myPara);

@@ -32,6 +32,29 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @var string
          *
+         * @ORM\Column(name="catalog_code", type="string", length=30, nullable=true)
+         */
+        private $catalog_code;
+
+        /**
+         * @return string
+         */
+        public function getCatalogCode(): string
+        {
+            return $this->catalog_code;
+        }
+
+        /**
+         * @param string $catalog_code
+         */
+        public function setCatalogCode(string $catalog_code): void
+        {
+            $this->catalog_code = $catalog_code;
+        }
+
+        /**
+         * @var string
+         *
          * @ORM\Column(name="product_name_abb", type="string", length=50, nullable=true)
          */
         private $product_name_abb;
