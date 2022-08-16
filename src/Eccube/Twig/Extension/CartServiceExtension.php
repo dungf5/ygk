@@ -13,10 +13,11 @@
 
 namespace Eccube\Twig\Extension;
 
+use Customize\Service\CartService;
 use Customize\Service\Common\MyCommonService;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Entity\Cart;
-use Eccube\Service\CartService;
+
 use Twig\Extension\AbstractExtension;
 
 class CartServiceExtension extends AbstractExtension
@@ -43,6 +44,8 @@ class CartServiceExtension extends AbstractExtension
             new \Twig_Function('get_all_carts', [$this, 'get_all_carts'], ['is_safe' => ['all']]),
             new \Twig_Function('get_carts_total_price', [$this, 'get_carts_total_price'], ['is_safe' => ['all']]),
             new \Twig_Function('get_carts_total_quantity', [$this, 'get_carts_total_quantity'], ['is_safe' => ['all']]),
+            new \Twig_Function('getUserCode', [$this, 'getUserCode'], ['is_safe' => ['all']]),
+
         ];
     }
 
@@ -56,6 +59,7 @@ class CartServiceExtension extends AbstractExtension
         return $this->cartService->getCarts();
     }
 
+
     public function get_carts_total_price()
     {
         $Carts = $this->cartService->getCarts();
@@ -67,7 +71,16 @@ class CartServiceExtension extends AbstractExtension
 
         return $totalPrice;
     }
+    public function getUserCode()
+    {
+       $userCheck = $this->cartService->getUser();
+        if ($userCheck) {
+           $userCode = $userCheck->getCustomerCode();
 
+           return $userCode;
+        }
+        return "";
+    }
     public function get_carts_total_quantity()
     {
         $Carts = $this->cartService->getCarts();

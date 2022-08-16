@@ -87,6 +87,8 @@ class MyCartController extends AbstractController
         $this->baseInfo = $baseInfoRepository->get();
         $this->priceRepository = $priceRepository;
         $this->mstProductRepository = $mstProductRepository;
+
+
     }
 
     /**
@@ -259,8 +261,20 @@ class MyCartController extends AbstractController
         }
         //end mapping
 
+        $isHideNext =false;
+        if ($this->getUser()) {
+            $Customer = $this->getUser();
+            $commonS = new MyCommonService($this->entityManager);
+            $customer_code = $commonS->getMstCustomer($Customer->getId())["customer_code"];
+            if($customer_code=="6000"){
+                $isHideNext = true;
+            }
+
+        }
+
         return [
             'totalPrice' => $totalPrice,
+            'isHideNext'=>$isHideNext,
             'totalQuantity' => $totalQuantity,
             // 空のカートを削除し取得し直す
             'Carts' => $myCart,

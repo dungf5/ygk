@@ -553,7 +553,7 @@ class CartService extends Service
         $this->save();
     }
 
-    protected function getUser()
+    public function getUser()
     {
         if (null === $token = $this->tokenStorage->getToken()) {
             return;

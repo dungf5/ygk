@@ -1,0 +1,76 @@
+{% set Carts = get_all_carts() %}
+{% set totalPrice = get_carts_total_price() %}
+{% set totalQuantity = get_carts_total_quantity() %}
+    {% set userCode= getUserCode() %}
+    {% set urlCart= url('cart') %}
+    {% if userCode=="6000" %}
+        <script>
+            let messAl =  "{{ 'messge.cannotcart.all'|trans }}";
+        </script>
+        {%  set urlCart= "javascript:alert(messAl);"%}
+
+    {% else %}
+    {% endif %}
+
+<div class="header">
+
+    <div class="headerLogo">
+        <div class="logo">
+            <div class="ttl">ショップキャッチショップキャッチショップキチ</div>
+            <ul class="menu">
+                <li class="itemNav">{{ include('Block/nav_sp.twig') }}</li>
+{% if is_granted('ROLE_USER') %}
+                <li class="mypage"><a href="{{ url('mypage') }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>
+{% else %}
+                <li class="mypage"><a href="{{ url('mypage_login') }}"><i class="fas fa-lock"></i><div>ログイン</div></a></li>
+{% endif %}
+                <li class="logo"><a href="{{ url('homepage') }}"><img src="/html/user_data/assets/img/common/logo_R+W.svg" alt="{{ BaseInfo.shop_name }}"></a></li>
+                <li class="contact"><a href="{{ url('contact') }}"><i class="fas fa-envelope"></i><div>メール</div></a></li>
+{% if totalQuantity > 0 %}
+                <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div><span class="fnDIN">{{ totalQuantity|number_format }}</span></a></li>
+            </ul>
+{% else %}
+                <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div></a></li>
+            </ul>
+            <div class="ec-cartNaviNull">
+                <div class="ec-cartNaviNull__message">
+                    <p>{{ 'front.block.cart.no_item'|trans }}</p>
+                </div>
+            </div>
+{% endif %}
+
+        </div>
+        <div class="headerInfo">
+            <div class="delivery">
+                <div class="ttl"><i class="fas fa-shipping-fast"></i><span>平日10時</span>まで<span>当日発送</span></div>
+                <div class="notice">※ 在庫がない場合は入荷次第の発送</div>
+            </div>
+            <div class="tel">
+                <div class="ttl"><i class="fas fa-phone-volume"></i><span class="fnDIN">050-0000-0000</span></div>
+                <div class="notice">受付：平日10:00〜18:00 (土日祝休み)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="headerMenu">
+        <div class="search">
+            {{ render(path('block_search_product')) }}
+        </div>
+        <ul class="menu">
+{#            <li><a href="{{ url('help_about') }}"><i class="fas fa-chalkboard-teacher"></i><div>当店について</div></a></li>   #}
+{#            <li><a href="{{ url('help_tradelaw') }}"><i class="fas fa-city"></i><div>会社概要</div></a></li>    #}
+{% if is_granted('ROLE_USER') %}
+            <li class="mypage"><a href="{{ url('mypage') }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>
+{% else %}
+            <li class="mypage"><a href="{{ url('mypage_login') }}"><i class="fas fa-lock"></i><div>ログイン</div></a></li>
+{% endif %}
+            <li class="contact"><a href="{{ url('contact') }}"><i class="fas fa-envelope"></i><div>メール</div></a></li>
+{% if totalQuantity > 0 %}
+            <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div><span class="fnDIN">{{ totalQuantity|number_format }}</span></a></li>
+{% else %}
+            <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div></a></li>
+{% endif %}
+        </ul>
+    </div>
+
+</div>

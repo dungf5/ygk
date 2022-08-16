@@ -1,0 +1,29 @@
+{% set Categories = repository('Eccube\\Entity\\Category').getList() %}
+
+{% macro tree(Category) %}
+{% from _self import tree %}
+            <li class="categoryID{{ Category.id }}">
+                <a href="{{ url('product_list') }}?category_id={{ Category.id }}">
+                    <div class="inner">
+                        <span class="fnDIN">{{ Category.name }}</span>
+                    </div>
+                </a>
+            </li>{% endmacro %}
+
+{# @see https://github.com/bolt/bolt/pull/2388 #}
+{% from _self import tree %}
+<div class="topContentColumn topCategory">
+    <div class="topContentInner">
+        <div class="titleArea">
+            <h2 class="fnDIN">CATEGORY</h2>
+            <span>商品カテゴリ</span>
+        </div>
+        <ul>
+{% for Category in Categories %}
+{% if Category.id is not same as(20) %}
+{{ tree(Category) }}
+{% endif %}
+{% endfor %}
+        </ul>
+    </div>
+</div>

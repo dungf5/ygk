@@ -39,6 +39,12 @@ file that was distributed with this source code.
             });
 
             $('.add-cart').on('click', function(e) {
+                let userCode='{{getUserCode()}}';
+                if(userCode=="6000"){
+                    alert("{{ 'messge.cannotcart.all'|trans }}");
+
+                    return ;
+                }
 
                 var $form = $(this).parents('tr').find('form');
 
@@ -76,7 +82,10 @@ file that was distributed with this source code.
                     });
 
                     $('.ec-modal').show();
-                    $('.fnDIN').html(data.totalNew);
+
+                   $('.num>.fnDIN').html(data.totalNew);
+
+                   $('.cart>a>.fnDIN').html(data.totalNew);
                     // カートブロックを更新する
                     $.ajax({
                         url: '{{ url('block_cart') }}',

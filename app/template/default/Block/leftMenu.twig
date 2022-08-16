@@ -1,0 +1,62 @@
+<div class="loginCartMenu">
+    <ul class="login">
+{% if is_granted('ROLE_USER') %}
+        <li class="mypage"><a href="{{ url('mypage') }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>
+        <li class="contact"><a href="{{ url('contact') }}"><i class="fas fa-envelope"></i><div>メール</div></a></li>
+    </ul>
+    <div class="logout"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i>ログアウト</a></div>
+{% else %}
+        <li class="mypage"><a href="{{ url('mypage_login') }}"><i class="fas fa-lock"></i><div>ログイン</div></a></li>
+        <li class="contact"><a href="{{ url('contact') }}"><i class="fas fa-envelope"></i><div>メール</div></a></li>
+    </ul>
+{% endif %}
+{% set totalPrice = get_carts_total_price() %}
+{% set totalQuantity = get_carts_total_quantity() %}
+    <div class="cart">
+        {% set userCode= getUserCode() %}
+        {% set urlCart= url('cart') %}
+        {% if userCode=="6000" %}
+            <script>
+              let messAl =  "{{ 'messge.cannotcart.all'|trans }}";
+            </script>
+        {%  set urlCart= "javascript:alert(messAl);"%}
+
+        {% else %}
+        {% endif %}
+        <a href="{{ urlCart }}">
+{% if totalQuantity > 0 %}
+            <div class="num"><i class="fas fa-shopping-cart"></i><div>カート</div><span class="fnDIN">{{ totalQuantity|number_format }}</span></div>
+{% else %}
+            <div class="num"><i class="fas fa-shopping-cart"></i><div>カート</div></div>
+{% endif %}
+            <div class="price">{{ totalPrice|price }}</div>
+        </a>
+    </div>
+</div>
+
+{% set Categories = repository('Eccube\\Entity\\Category').getList() %}
+
+{% macro tree(Category) %}
+{% from _self import tree %}<a href="{{ url('product_list') }}?category_id={{ Category.id }}" class="categoryID{{ Category.id }}"><span>{{ Category.name }}</span></a>{% if Category.children|length > 0 %}
+
+                <ul>
+{% for ChildCategory in Category.children %}
+                    <li>{{ tree(ChildCategory) }}</li>
+{% endfor %}
+                </ul>
+            {% endif %}
+{% endmacro %}
+{# @see https://github.com/bolt/bolt/pull/2388 #}
+{% from _self import tree %}
+
+<div class="ec-categoryNaviRole">
+    <div class="ec-itemNav">
+        <ul class="ec-itemNav__nav fnDIN">
+{% for Category in Categories %}
+{% if Category.id is not same as(20) %}
+            <li>{{ tree(Category) }}</li>
+{% endif %}
+{% endfor %}
+        </ul>
+    </div>
+</div>

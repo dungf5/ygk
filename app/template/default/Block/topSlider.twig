@@ -1,0 +1,21 @@
+<script>
+    $(function() {
+        $('.main_visual').slick({
+            dots: true,
+            arrows: true,
+            autoplay: true,
+            autoplaySpeed: 2500,
+            speed: 500,
+            centerMode: true,
+            centerPadding: '20%',
+            dots: true,
+            focusOnSelect: true,
+        });
+    });
+</script>
+
+<div class="main_visual">
+    <div class="item slick-slide"><img src="{{ asset('https://placehold.jp/cccccc/ffffff/1200x300.png') }}"></div>
+    <div class="item slick-slide"><img src="{{ asset('https://placehold.jp/ff0000/ffffff/1200x300.png') }}"></div>
+    <div class="item slick-slide"><img src="{{ asset('https://placehold.jp/99cc00/ffffff/1200x300.png') }}"></div>
+</div>

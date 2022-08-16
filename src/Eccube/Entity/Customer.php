@@ -49,6 +49,14 @@ if (!class_exists('\Eccube\Entity\Customer')) {
         /**
          * @var string
          *
+         * @ORM\Column(name="customer_code",nullable=false, type="string", length=25, options={"comment":"顧客コード"})
+         */
+        private $customer_code;
+
+
+        /**
+         * @var string
+         *
          * @ORM\Column(name="name02", type="string", length=255)
          */
         private $name02;
@@ -1190,6 +1198,22 @@ if (!class_exists('\Eccube\Entity\Customer')) {
                 $this->email,
                 $this->password,
                 $this->salt) = unserialize($serialized);
+        }
+
+        /**
+         * @return string
+         */
+        public function getCustomerCode(): string
+        {
+            return $this->customer_code;
+        }
+
+        /**
+         * @param string $customer_code
+         */
+        public function setCustomerCode(string $customer_code): void
+        {
+            $this->customer_code = $customer_code;
         }
     }
 }

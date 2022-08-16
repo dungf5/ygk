@@ -1182,7 +1182,8 @@ AND          pri.product_code=?
     }
     public function getTotalItemCart($cart_id)
     {
-        $sql = " SELECT sum(b.quantity*c.quantity) AS total_quantity
+        //$sql = " SELECT count(b.quantity*c.quantity) AS total_quantity
+        $sql = " SELECT count(b.quantity) AS total_quantity
                 FROM  dtb_product_class AS a JOIN dtb_cart_item b ON b.product_class_id =a.id
                 JOIN mst_product AS c ON a.product_id = c.ec_product_id
                 WHERE b.cart_id =? ";

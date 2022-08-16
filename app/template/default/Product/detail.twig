@@ -142,6 +142,12 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
     <script>
         $(function() {
             $('.add-cart').on('click', function(event) {
+                 let userCode='{{getUserCode()}}';
+                if(userCode=="6000"){
+                      alert("{{ 'messge.cannotcart.all'|trans }}");
+                    return ;
+                }
+                $('#form1').submit();
                 {% if form.classcategory_id1 is defined %}
                 // 規格1フォームの必須チェック
                 if ($('#classcategory_id1').val() == '__unselected' || $('#classcategory_id1').val() == '') {
@@ -403,7 +409,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
 {#                                </div>#}
                             </div>
                             <div class="ec-productRole__btn">
-                                <button type="submit" class="ec-blockBtn--action add-cart">
+                                <button type="button" class="ec-blockBtn--action add-cart">
                                     {{ 'front.product.add_cart'|trans }}
                                 </button>
                             </div>
