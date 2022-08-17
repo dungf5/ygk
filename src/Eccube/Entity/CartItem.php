@@ -37,6 +37,29 @@ if (!class_exists('\Eccube\Entity\CartItem')) {
          * @ORM\GeneratedValue(strategy="IDENTITY")
          */
         private $id;
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="key_eccube",nullable=true, type="string", length=100, options={"comment":"key_eccube"})
+         */
+
+        private $key_eccube;
+
+        /**
+         * @return string
+         */
+        public function getKeyEccube(): string
+        {
+            return $this->key_eccube;
+        }
+
+        /**
+         * @param string $key_eccube
+         */
+        public function setKeyEccube(string $key_eccube): void
+        {
+            $this->key_eccube = $key_eccube;
+        }
 
         /**
          * @var string
@@ -218,7 +241,7 @@ if (!class_exists('\Eccube\Entity\CartItem')) {
             $this->ProductClass = $ProductClass;
 
             $this->product_class_id = is_object($ProductClass) ?
-            $ProductClass->getId() : null;
+                $ProductClass->getId() : null;
 
             return $this;
         }

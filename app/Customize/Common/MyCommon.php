@@ -13,6 +13,10 @@
 
 namespace Customize\Common;
 
+
+
+use Faker\Provider\Uuid;
+
 class MyCommon
 {
     /***
@@ -89,7 +93,35 @@ class MyCommon
 
         return '';
     }
+    public static function getSession($key)
+    {
 
+        if (isset($_SESSION[$key])) {
+           return $_SESSION[$key];
+        }
+
+        return null;
+    }
+    public static function setSession($key,$val)
+    {
+        $_SESSION[$key] = $val;
+    }
+
+    public static function genRanDom(){
+        return Uuid::uuid();
+    }
+    public static function getCarSession(){
+        if(static::getSession("CART_SESSION")==null){
+            static::setSession("CART_SESSION",static::genRanDom());
+        }
+        return static::getSession("CART_SESSION");
+
+    }
+    public static function deleteCarSession(){
+        static::setSession("CART_SESSION",null);
+        $_SESSION["CART_SESSION"]=null;
+        unset($_SESSION["CART_SESSION"]);
+    }
     public static function checkExistText($source, $key)
     {
         if (strpos($source, $key) !== false) {

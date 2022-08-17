@@ -128,6 +128,8 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function index(PurchaseFlow $cartPurchaseFlow)
     {
+
+
         // ログイン状態のチェック.
         $commonService = new MyCommonService($this->entityManager);
         if ($this->orderHelper->isLoginRequired()) {
