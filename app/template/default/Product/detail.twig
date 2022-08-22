@@ -147,7 +147,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                       alert("{{ 'messge.cannotcart.all'|trans }}");
                     return ;
                 }
-                $('#form1').submit();
+
                 {% if form.classcategory_id1 is defined %}
                 // 規格1フォームの必須チェック
                 if ($('#classcategory_id1').val() == '__unselected' || $('#classcategory_id1').val() == '') {
@@ -199,7 +199,9 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                     });
 
                     $('.ec-modal').show()
+                   $('.num>.fnDIN').html(data.totalNew);
 
+                   $('.cart>a>.fnDIN').html(data.totalNew);
                     // カートブロックを更新する
                     $.ajax({
                         url: "{{ url('block_cart') }}",
@@ -224,6 +226,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
         $('.ec-modal-overlay, .ec-modal, .ec-modal-close, .ec-inlineBtn--cancel').on('click', function() {
             $('.ec-modal').hide()
         });
+        // $('#form1').submit();
     </script>
     <script type="application/ld+json">
     {

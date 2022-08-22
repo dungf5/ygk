@@ -597,15 +597,22 @@ class MyCommonService extends AbstractRepository
                         ELSE m0_.quanlity
                     END AS quanlity ";
 
-//m0_.quanlity,
-        $sql = "SELECT {$subQuantity},SUBSTRING(m0_.order_no, POSITION(\"-\" IN m0_.order_no)+1) AS orderByAs ,m0_.delivery_no, m0_.delivery_date, m0_.deli_post_code,
+//mst_delivery.unit_price / mst_product.quantity m0_.unit_price,
+        $subUnitPrice =" CASE
+                       WHEN m1_.quantity > 1 THEN m0_.unit_price /m1_.quantity
+                        ELSE m0_.unit_price
+                    END AS unit_price ";
+        //m0_.unit
+        $sql = "SELECT {$subUnitPrice},{$subQuantity},SUBSTRING(m0_.order_no, POSITION(\"-\" IN m0_.order_no)+1) AS orderByAs ,m0_.delivery_no, m0_.delivery_date, m0_.deli_post_code,
                      m0_.deli_addr01, m0_.deli_addr02, m0_.deli_addr03, m0_.deli_company_name
                       , m0_.deli_department, m0_.postal_code, m0_.addr01 , m0_.addr02, m0_.addr03,
                        m0_.company_name, m0_.department, m0_.delivery_lineno, m0_.sale_type, m1_.jan_code as item_no ,
-                       m0_.item_name,  m0_.unit
-                       , m0_.unit_price, m0_.amount, m0_.tax , m0_.lot_no, m0_.order_no, m0_.item_remark, m0_.total_amount,
+                       m0_.item_name,  'PC' as unit
+                       ,  m0_.amount, m0_.tax , m0_.lot_no, m0_.order_no, m0_.item_remark, m0_.total_amount,
                         m0_.footer_remark1, m0_.shiping_name as shiping_code, m0_.otodoke_name  as otodoke_code, m2_.department as deli_department_name
-                         FROM mst_delivery m0_ LEFT JOIN mst_customer m2_ ON (m2_.customer_code = m0_.deli_department) LEFT JOIN mst_product m1_ ON (m1_.product_code = m0_.item_no)
+                         FROM mst_delivery m0_
+                         LEFT JOIN mst_customer m2_ ON (m2_.customer_code = m0_.deli_department)
+                         LEFT JOIN mst_product m1_ ON (m1_.product_code = m0_.item_no)
                     WHERE m0_.order_no LIKE ?
                     ORDER BY  CONVERT(orderByAs, SIGNED INTEGER) ASC";//4988494205186
 
