@@ -86,6 +86,30 @@ if (!class_exists('\Eccube\Entity\Cart')) {
         /**
          * @var string
          *
+         * @ORM\Column(name="key_eccube",nullable=true, type="string", length=100, options={"comment":"key_eccube"})
+         */
+
+        private $key_eccube;
+
+        /**
+         * @return string
+         */
+        public function getKeyEccube(): string
+        {
+            return $this->key_eccube;
+        }
+
+        /**
+         * @param string $key_eccube
+         */
+        public function setKeyEccube(string $key_eccube): void
+        {
+            $this->key_eccube = $key_eccube;
+        }
+
+        /**
+         * @var string
+         *
          * @ORM\Column(name="total_price", type="decimal", precision=12, scale=2, options={"unsigned":true,"default":0})
          */
         private $total_price;

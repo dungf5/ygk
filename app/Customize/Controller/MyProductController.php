@@ -3,6 +3,7 @@
 
 namespace Customize\Controller;
 
+use Customize\Common\MyCommon;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Repository\MstProductRepository;
 use Customize\Repository\PriceRepository;
@@ -301,9 +302,9 @@ class MyProductController extends AbstractController
                 'quantity' => $addCartData['quantity'],
             ]
         );
-
+        $carSession = MyCommon::getCarSession();
         // カートへ追加
-        $this->cartService->addProductCustomize($addCartData['product_class_id'], $addCartData['quantity']);
+        $this->cartService->addProductCustomize2022($addCartData['product_class_id'], $addCartData['quantity'],$carSession);
 
         // 明細の正規化
         $Carts = $this->cartService->getCarts();
@@ -321,6 +322,7 @@ class MyProductController extends AbstractController
 //                $errorMessages[] = $warning->getMessage();
 //            }
 //        }
+
 
         $cartId =0;
         // set total price
@@ -400,6 +402,7 @@ class MyProductController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
+
 
 
 

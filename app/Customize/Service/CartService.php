@@ -13,6 +13,7 @@
 
 namespace Customize\Service;
 
+use Customize\Common\MyCommon;
 use Customize\Entity\MstProduct;
 use Customize\Entity\Price;
 use Customize\Repository\MstProductRepository;
@@ -162,7 +163,8 @@ class CartService extends Service
      */
     public function getPersistedCarts()
     {
-        return $this->cartRepository->findBy(['Customer' => $this->getUser()]);
+        $myS = MyCommon::getCarSession();
+        return $this->cartRepository->findBy(['Customer' => $this->getUser(),'key_eccube'=>$myS]);
     }
 
     /**
@@ -311,7 +313,7 @@ class CartService extends Service
             } else {
 
                 /** @var Cart $Cart */
-                $Cart = $this->cartRepository->findOneBy(['cart_key' => $cartKey]);
+                $Cart = $this->cartRepository->findOneBy(['cart_key' => $cartKey,'key_eccube'=>MyCommon::getCarSession()]);
                 if ($Cart) {
                     foreach ($Cart->getCartItems() as $i) {
                         $this->entityManager->remove($i);
@@ -324,6 +326,8 @@ class CartService extends Service
                 $Cart = new Cart();
                 $Cart->setCartKey($cartKey);
                 $Cart->addCartItem($item);
+                //nvtrong add
+                $Cart->setKeyEccube(MyCommon::getCarSession());
                 $item->setCart($Cart);
                 $Carts[$cartKey] = $Cart;
             }
@@ -391,6 +395,65 @@ class CartService extends Service
         // 標準単価 || 価格
         //$newItem->setPrice($ProductClass->getPrice02IncTax());
         $newItem->setPrice($price);
+        $newItem->setProductClass($ProductClass);
+        $allCartItems = $this->mergeAllCartItems([$newItem]);
+        $this->restoreCarts($allCartItems);
+
+        return true;
+    }
+
+    public function addProductCustomize2022($ProductClass, $quantity = 1,$carSession)
+    {
+        if (!$ProductClass instanceof ProductClass) {
+            $ProductClassId = $ProductClass;
+            $ProductClass = $this->entityManager
+                ->getRepository(ProductClass::class)
+                ->find($ProductClassId);
+            if (is_null($ProductClass)) {
+                return false;
+            }
+        }
+
+        $ClassCategory1 = $ProductClass->getClassCategory1();
+        if ($ClassCategory1 && !$ClassCategory1->isVisible()) {
+            return false;
+        }
+        $ClassCategory2 = $ProductClass->getClassCategory2();
+        if ($ClassCategory2 && !$ClassCategory2->isVisible()) {
+            return false;
+        }
+
+        $mstProductClass = $this->entityManager
+            ->getRepository(MstProduct::class)
+            ->findOneBy(['ec_product_id'=>$ProductClass->getProduct()->getId()]);
+        $priceClass = null;
+        $price = $mstProductClass->getUnitPrice();
+        $lot = $mstProductClass->getQuantity();
+        if ($lot < 1) {
+            $lot = 1;
+        }
+
+        if ($this->getUser()) {
+            $Customer = $this->getUser();
+            $commonS = new MyCommonService($this->entityManager);
+            $customer_code = $commonS->getMstCustomer($Customer->getId())["customer_code"];
+//            $priceClass = $this->entityManager
+//                ->getRepository(Price::class)
+//                ->findOneBy(['product_code'=>$mstProductClass->getProductCode(),'customer_code'=>$customer_code ]);
+            $priceR = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProductClass->getProductCode());
+
+            if($priceR!==""){
+                $price = $priceR;//$priceClass->getPriceS01();
+            }
+
+        }
+
+        $newItem = new CartItem();
+        $newItem->setQuantity($quantity / $lot);
+        // 標準単価 || 価格
+        //$newItem->setPrice($ProductClass->getPrice02IncTax());
+        $newItem->setPrice($price);
+        $newItem->setKeyEccube($carSession);
         $newItem->setProductClass($ProductClass);
         $allCartItems = $this->mergeAllCartItems([$newItem]);
         $this->restoreCarts($allCartItems);
