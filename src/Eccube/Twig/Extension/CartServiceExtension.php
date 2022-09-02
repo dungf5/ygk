@@ -69,6 +69,7 @@ class CartServiceExtension extends AbstractExtension
             return $total;
         }, 0);
 
+
         return $totalPrice;
     }
     public function getUserCode()

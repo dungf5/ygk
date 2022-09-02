@@ -102,7 +102,7 @@ file that was distributed with this source code.
         {% if totalQuantity > 0 %}
             <div class="ec-cartRole__totalText">
                 <p>
-                    {{ 'front.cart.total_price'|trans({ '%price%': totalPrice|price })|raw }}
+                    {{ 'front.cart.total_price'|trans({ '%price%': roundPrice(totalPrice) })|raw }}
                 </p>
             </div>
             {% if Carts|length > 1 %}
@@ -172,8 +172,8 @@ file that was distributed with this source code.
                                                     販売単位：{{ MstProduct.quantity }}個/箱～
                                                 {% else %}
                                                     販売単位：{{ MstProduct.quantity }}個～
-                                                {% endif %} {{ CartItem.price|price }}</div>
-                                            <div class="ec-cartRow__sutbtotalSP">{{ 'common.subtotal__with_separator'|trans }}{{ CartItem.total_price|price }}</div>
+                                                {% endif %} {{ roundPrice(CartItem.price) }}</div>
+                                            <div class="ec-cartRow__sutbtotalSP">{{ 'common.subtotal__with_separator'|trans }}{{ roundPrice(CartItem.total_price) }}</div>
                                         </div>
                                     </li>
                                     <li class="ec-cartRow__amountColumn">
@@ -195,7 +195,7 @@ file that was distributed with this source code.
                                         </div>
                                     </li>
                                     <li class="ec-cartRow__subtotalColumn">
-                                        <div class="ec-cartRow__sutbtotal">{{ CartItem.total_price|price }}</div>
+                                        <div class="ec-cartRow__sutbtotal">{{ roundPrice(CartItem.total_price) }}</div>
                                     </li>
                                 </ul>
                             {% endfor %}
@@ -207,14 +207,14 @@ file that was distributed with this source code.
                             {% if is_delivery_free[cartKey] %}
                                 {{ 'front.cart.delivery_fee_free__now'|trans }}
                             {% else %}
-                                {{ 'front.cart.delivery_fee_free__price_and_quantity'|trans({ '%price%': least[cartKey]|price, '%quantity%': quantity[cartKey]|number_format })|raw }}
+                                {{ 'front.cart.delivery_fee_free__price_and_quantity'|trans({ '%price%': roundPrice(least[cartKey]), '%quantity%': quantity[cartKey]|number_format })|raw }}
                             {% endif %}
                         {% elseif BaseInfo.delivery_free_amount %}
                             <br/>
                             {% if is_delivery_free[cartKey] %}
                                 {{ 'front.cart.delivery_fee_free__now'|trans }}
                             {% else %}
-                                {{ 'front.cart.delivery_fee_free__price'|trans({ '%price%': least[cartKey]|price })|raw }}
+                                {{ 'front.cart.delivery_fee_free__price'|trans({ '%price%': roundPrice(least[cartKey]) })|raw }}
                             {% endif %}
                         {% elseif BaseInfo.delivery_free_quantity %}
                             <br/>
@@ -226,7 +226,7 @@ file that was distributed with this source code.
                         {% endif %}
                     </div>
                     <div class="ec-cartRole__actions">
-                        <div class="ec-cartRole__total">{{ 'common.total__with_separator'|trans }}<span class="ec-cartRole__totalAmount">{{ Cart.totalPrice|price }}</span>
+                        <div class="ec-cartRole__total">{{ 'common.total__with_separator'|trans }}<span class="ec-cartRole__totalAmount">{{ roundPrice(Cart.totalPrice) }}</span>
                         </div>
                         <a class="ec-blockBtn--action" href="{{ path('cart_buystep', {'cart_key':cartKey}) }}">{{ 'front.cart.checkout'|trans }}</a>
                         {% if loop.last %}

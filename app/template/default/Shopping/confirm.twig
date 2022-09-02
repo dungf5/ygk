@@ -151,13 +151,13 @@ console.log(Math.random());
                                         {% if orderItem.productClass is not null and orderItem.productClass.classCategory2 %}
                                             <p>{{ orderItem.productClass.classCategory2.className.name }}：{{ orderItem.productClass.classCategory2 }}</p>
                                         {% endif %}
-                                        <p>{{ orderItem.priceIncTax|price }} × {{ orderItem.quantity|number_format }}
+                                        <p>{{ roundPrice(orderItem.priceIncTax) }} × {{ orderItem.quantity|number_format }}
                                             {% if MstProduct.quantity>1 %}
                                                 箱({{ orderItem.quantity*MstProduct.quantity }}個)
                                             {% else %}
                                                 個
                                             {% endif %}
-                                            <span>{{ 'common.subtotal__with_separator'|trans }}{{ orderItem.totalPrice|price }}</span></p>
+                                            <span>{{ 'common.subtotal__with_separator'|trans }}{{ roundPrice(orderItem.totalPrice) }}</span></p>
                                     </div>
                                 </div>
                             </li>
@@ -178,7 +178,7 @@ console.log(Math.random());
                                 {% for item in shipping.order_items if item.isDeliveryFee %}
                                     {% set delivery_fee = item.total_price %}
                                 {% endfor %}
-                                {{ Order.Shippings[idx].Delivery }}({{ delivery_fee|price }})
+                                {{ Order.Shippings[idx].Delivery }}({{ roundPrice(delivery_fee) }})
                             </div>
                             <div class="ec-select ec-select__delivery">
                                 <label>{{ 'front.shopping.delivery_date'|trans }}</label>
@@ -331,7 +331,7 @@ console.log(Math.random());
                     {% for item in Order.order_items if item.isCharge %}
                         {% set charge = item.total_price %}
                     {% endfor %}
-                    {{ Order.Payment }}({{ charge|price }})
+                    {{ Order.Payment }}({{ roundPrice(charge) }})
                 </div>
             </div>
             {% if BaseInfo.isOptionPoint and Order.Customer is not null %}
@@ -357,15 +357,15 @@ console.log(Math.random());
             <div class="ec-totalBox">
                 <dl class="ec-totalBox__spec">
                     <dt>{{ 'common.subtotal'|trans }}</dt>
-                    <dd class="ec-totalBox__specTotal">{{ Order.subtotal|price }}</dd>
+                    <dd class="ec-totalBox__specTotal">{{ roundPrice(Order.subtotal) }}</dd>
                 </dl>
                 <dl class="ec-totalBox__spec">
                     <dt>{{ 'common.charge'|trans }}</dt>
-                    <dd>{{ Order.charge|price }}</dd>
+                    <dd>{{ roundPrice(Order.charge) }}</dd>
                 </dl>
                 <dl class="ec-totalBox__spec hide">
                     <dt>{{ 'common.delivery_fee'|trans }}</dt>
-                    <dd>{{ Order.deliveryFeeTotal|price }}</dd>
+                    <dd>{{ roundPrice(Order.deliveryFeeTotal) }}</dd>
                 </dl>
 {#                {% if Order.taxable_discount < 0 %}#}
 {#                <dl class="ec-totalBox__spec">#}
@@ -374,7 +374,7 @@ console.log(Math.random());
 {#                </dl>#}
 {#                {% endif %}#}
 {#                <div class="ec-totalBox__total">{{ 'common.total'|trans }}<span class="ec-totalBox__price">{{ Order.taxable_total|price }}</span><span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>#}
-                <div class="ec-totalBox__total hidden">{{ 'common.total'|trans }}<span class="ec-totalBox__price">{{ Order.payment_total|price }}</span><span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>
+                <div class="ec-totalBox__total hidden">{{ 'common.total'|trans }}<span class="ec-totalBox__price">{{ roundPrice(Order.payment_total) }}</span><span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>
 {#                {% for rate, total in Order.taxable_total_by_tax_rate %}#}
 {#                    <dl class="ec-totalBox__taxRate">#}
 {#                        <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': rate }) }}</dt>#}
@@ -382,7 +382,7 @@ console.log(Math.random());
 {#                    </dl>#}
                 <dl class="ec-totalBox__taxRate hidden">
                     <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': Order.rate }) }}</dt>
-                    <dd>{{ Order.total|price }}</dd>
+                    <dd>{{ roundPrice(Order.total) }}</dd>
                 </dl>
 {#                {% endfor %}#}
 {#                {% for item in Order.tax_free_discount_items %}#}
@@ -392,7 +392,7 @@ console.log(Math.random());
 {#                        <dd>{{ item.total_price|price }}</dd>#}
 {#                    </dl>#}
 {#                {% endfor %}#}
-                <div class="ec-totalBox__paymentTotal">{{ 'common.payment_total'|trans }}<span class="ec-totalBox__price">{{ Order.payment_total|price }}</span><span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>
+                <div class="ec-totalBox__paymentTotal">{{ 'common.payment_total'|trans }}<span class="ec-totalBox__price">{{ roundPrice(Order.payment_total) }}</span><span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>
                 {% if BaseInfo.isOptionPoint and Order.Customer is not null %}
                 <div class="ec-totalBox__pointBlock">
                     <dl class="ec-totalBox__spec">

@@ -306,10 +306,11 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                                      {% endif %}
  販売単価:
                                     {% if Price is defined and Price is not null %}
-                                        {{ Price.price_s01|price }}
+                                        {{ roundPrice(Price.price_s01)}}
                                     {% else %}
                                         {% if MstProduct is defined and MstProduct is not null %}
-                                            {{ MstProduct.unit_price|price }}
+                                            {{ roundPrice(MstProduct.unit_price) }}
+
                                         {% endif %}
                                     {% endif %}
 
@@ -319,7 +320,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                         {% else %}
                             {# 価格 #}
                             <div class="ec-price">
-                                <span class="ec-price__price">{{ MstProduct.unit_price|price }}</span>
+                                <span class="ec-price__price">{{ roundPrice(MstProduct.unit_price) }}</span>
                             </div>
                         {% endif %}
 

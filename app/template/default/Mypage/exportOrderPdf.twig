@@ -326,10 +326,10 @@
                         {{ deli.sale_type }}
                     </td>
                     <td class="" style="">{{ deli.item_no }}<br />{{ deli.item_name }}</td>
-                    <td class="" title="soluong" style="text-align: right;">{{ deli.quanlity|number_format }}</td>
+                    <td class="" title="soluong" style="text-align: right;">{{ roundPrice(deli.quanlity) }}</td>
                     <td class="" style="">{{ deli.unit }}</td>
-                    <td class="" title="dongia" style="text-align: right;">{{ deli.unit_price|number_format }}</td>
-                    <td class="" title="thanhtien" style="text-align: right;">{{ deli.amount|number_format }}</td>
+                    <td class="" title="dongia" style="text-align: right;">{{ roundPrice(deli.unit_price) }}</td>
+                    <td class="" title="thanhtien" style="text-align: right;">{{ roundPrice(deli.amount) }}</td>
 {#                    <td class="" title="thue" style="text-align: right;">{{ deli.tax|number_format }}</td>#}
                     <td class=""  title="order_orderlineo" style="">{{ deli.order_no }}</td>
                     <td style="" title="item_remark" >{{ deli.item_remark }}</td>
@@ -359,19 +359,19 @@
                         <tr class="tr-content">
                             <td style="width: 32.0866%;"></td>
                             <td style="width: 29.3307%;"> 小計：</td>
-                            <td style="width: 21.6535%;text-align: right" >{{ OrderTotal|number_format }}円</td>
+                            <td style="width: 21.6535%;text-align: right" >{{ roundPrice(OrderTotal) }}円</td>
                         </tr>
 
                         <tr class="tr-content">
                             <td style="width: 32.0866%;"></td>
                             <td style="width: 29.3307%;"> 消費税金額：</td>
-                            <td style="width: 21.6535%;text-align: right" >{{ totalTaxRe|number_format }}円</td>
+                            <td style="width: 21.6535%;text-align: right" >{{ roundPrice(totalTaxRe) }}円</td>
                         </tr>
 
                         <tr class="tr-content">
                             <td style="width: 32.0866%;"></td>
                             <td style="width: 29.3307%;">納品書合計金額:</td>
-                            <td style="width: 21.6535%;text-align: right" >{{ totalaAmountTax|number_format }}円</td>
+                            <td style="width: 21.6535%;text-align: right" >{{ roundPrice(totalaAmountTax) }}円</td>
                         </tr>
                         <tr>
                             <td style="width: 32.0866%;" colspan="3">備考: {{ myData[0].footer_remark1}} </td>

@@ -29,7 +29,7 @@
 {% else %}
             <div class="num"><i class="fas fa-shopping-cart"></i><div>カート</div></div>
 {% endif %}
-            <div class="price">{{ totalPrice|price }}</div>
+            <div class="price">{{ roundPrice(totalPrice) }}</div>
         </a>
     </div>
 </div>

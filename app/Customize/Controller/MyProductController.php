@@ -502,6 +502,11 @@ class MyProductController extends AbstractController
         $forms = [];
 
         foreach ($pagination as $Product) {
+
+            if(!isset($ProductsAndClassCategories[$Product["id"]])){
+              // var_dump($Product["id"]);die();
+                continue;
+            }
             /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
             $builder = $this->formFactory->createNamedBuilder(
                 '',

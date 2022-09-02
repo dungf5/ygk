@@ -208,13 +208,13 @@ file that was distributed with this source code.
                                                     {% if app.user -%}
 
                                                         {% if Product.price_s01 is not empty %}
-                                                            {{ Product.price_s01|price }}
+                                                            {{ roundPrice(Product.price_s01) }}
                                                         {% else %}
-                                                            {{ Product.mst_unit_price|price }}
+                                                            {{ roundPrice(Product.mst_unit_price )}}
                                                         {% endif %}
                                                     {% else %}
 
-                                                        {{ Product.mst_unit_price|price }}
+                                                        {{ roundPrice(Product.mst_unit_price) }}
                                                     {% endif %}
                                                     <span>（税抜）</span></li>
                                             </ul>

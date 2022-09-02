@@ -19,7 +19,7 @@ file that was distributed with this source code.
 {% for OrderItem in Order.ProductOrderItems %}
 JANコード：{{ OrderItem.jan_code }}
 商品名：{{ OrderItem.product_name }}
-単価：{{ OrderItem.price|price }}
+単価：{{ roundPrice(OrderItem.price) }}
 数量：{{ OrderItem.quantity|number_format }}{% if OrderItem.mst_quantity>1 %}
 箱/({{ OrderItem.mst_quantity*OrderItem.quantity}}個)
 {% else %}
@@ -28,11 +28,11 @@ JANコード：{{ OrderItem.jan_code }}
 
 {% endfor %}
 -------------------------------------------------
-小　計：{{ Order.subtotal|price }}
-手数料：{{ Order.charge|price }}
+小　計：{{ roundPrice(Order.subtotal) }}
+手数料：{{ roundPrice(Order.charge) }}
 
 ============================================
-お支払い合計：{{ Order.payment_total|price }}(税込)
+お支払い合計：{{ roundPrice(Order.payment_total) }}(税込)
 
 ************************************************
 　ご注文者情報

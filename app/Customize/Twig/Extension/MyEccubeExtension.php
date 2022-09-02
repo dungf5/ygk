@@ -33,6 +33,8 @@ class MyEccubeExtension extends AbstractExtension
             new TwigFunction('getNext3Month', [$this, 'getNext3Month']),
             new TwigFunction('getMinDate', [$this, 'getMinDate']),
             new TwigFunction('getWebRootUrl', [$this, 'getWebRootUrl']),
+            new TwigFunction('roundPrice', [$this, 'roundPrice']),
+
         ];
     }
 
@@ -41,6 +43,20 @@ class MyEccubeExtension extends AbstractExtension
 
       return $newDate;
     }
+    public function roundPrice($price){
+        //$price = str_replace(",","", $price);
+
+//      if(is_float($price)){
+//        $price = round($price,2);
+//      }
+        $numAf = number_format($price,2);
+        if(MyCommon::checkExistText($numAf,".00")){
+            $numAf  = str_replace(".00","",$numAf);
+        }
+
+     return "￥".$numAf;
+    }
+
     public function getMinDate(){
 
         $newDate = date("Y-m-d");
