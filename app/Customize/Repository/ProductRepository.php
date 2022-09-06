@@ -174,6 +174,11 @@ class ProductRepository extends AbstractRepository
                     ->setParameter('Categories', $Categories);
                 $categoryJoin = true;
             }
+        }else{
+            $qb
+                ->innerJoin('p.ProductCategories', 'pct')
+                ->innerJoin('pct.Category', 'c');
+            $categoryJoin = true;
         }
 
         // name
@@ -282,8 +287,8 @@ class ProductRepository extends AbstractRepository
         $listSelectMstProduct.=",mstProduct.quantity as mst_quantity,mstProduct.jan_code,mstProduct.material,mstProduct.model ";
         $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');
-
-       //var_dump($qb->getQuery()->getSQL(),$arProductCodeInDtPrice,$customer_code);die();
+        $qb->distinct();
+       //var_dump($qb->getQuery()->getSQL(),"-------");var_dump($qb->getParameters() );die();
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 
