@@ -1,0 +1,4 @@
+[client]
+user = 'admin'
+password = '#Ygk202208'
+host = 'ygk-transport.csorc40ihjzl.ap-northeast-3.rds.amazonaws.com'
