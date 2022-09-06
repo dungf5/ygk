@@ -27,7 +27,7 @@ CLONE_TABLES="
 mst_delivery
 ";
 
-CLONE_WHERE="update_date >= NOW() - INTERVAL 15 MINUTE";
+CLONE_WHERE="update_date >= NOW() - INTERVAL 20 MINUTE";
 
 CLONE_TABLES_SQL="
 mst_delivery

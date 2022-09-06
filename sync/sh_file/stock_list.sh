@@ -15,7 +15,7 @@ CLONE_TABLES="
 stock_list
 ";
 
-CLONE_WHERE="update_date >= NOW() - INTERVAL 15 MINUTE";
+CLONE_WHERE="update_date >= NOW() - INTERVAL 20 MINUTE";
 
 CLONE_TABLES_SQL="
 stock_list

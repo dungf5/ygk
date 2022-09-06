@@ -14,10 +14,12 @@ DB_CLONE='ygk_real';
 CLONE_TABLES="
 dt_customer_relation
 dt_order_status
+dt_price
+mst_customer
 mst_delivery
+mst_product
 mst_shipping
 stock_list
-dt_price
 ";
 
 CLONE_WHERE="update_date >= NOW() - INTERVAL 1 DAY";
@@ -25,10 +27,12 @@ CLONE_WHERE="update_date >= NOW() - INTERVAL 1 DAY";
 CLONE_TABLES_SQL="
 dt_customer_relation,
 dt_order_status,
+dt_price,
+mst_customer,
 mst_delivery,
+mst_product,
 mst_shipping,
-stock_list,
-dt_price
+stock_list
 ";
 
 nowdate=`date`;
@@ -50,3 +54,14 @@ echo "unzip";
 END=$(date +%s);
 DIFF=$(( $END - $START ));
 echo "dt_customer_relation end clone in $DIFF seconds";
+
+#update
+cd /var/tmp/sync
+mysql --defaults-extra-file=.mysql/.my.real.cnf  << EOR
+use ec_tmp ;
+ call update_product_code();
+ call update_mst_customer();
+
+
+EOR
+echo "update product_code has done" ;
