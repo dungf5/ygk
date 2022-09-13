@@ -294,7 +294,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
 
                     <div class="ec-productRole__price">
 
-                        {% if app.user -%}
+                       {# {% if app.user -%}#}
                             {# 標準単価 #}
                             <div class="ec-price">
                                 <span class="ec-price__price price02-default">
@@ -317,12 +317,13 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                                 </span>
 
                             </div>
-                        {% else %}
-                            {# 価格 #}
-                            <div class="ec-price">
-                                <span class="ec-price__price">{{ roundPrice(MstProduct.unit_price) }}</span>
-                            </div>
-                        {% endif %}
+                        {#{% else %}#}
+                           {# 価格 #}
+                        {#<div class="ec-price">
+                             <span class="ec-price__price">{{ roundPrice(MstProduct.unit_price) }}
+                             </span>
+                         </div>
+                     {% endif %}#}
 
                         <div style="padding-left: 0.3em">
                             <div class="ec-numberInput"><span style="color: #000000">{{ 'common.quantity'|trans }}:</span>
