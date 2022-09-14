@@ -105,6 +105,7 @@ file that was distributed with this source code.
                     {{ 'front.cart.total_price'|trans({ '%price%': roundPrice(totalPrice) })|raw }}
                 </p>
             </div>
+
             {% if Carts|length > 1 %}
                 <div class="ec-cartRole__error">
                     <div class="ec-alert-warning">
@@ -116,7 +117,9 @@ file that was distributed with this source code.
             {% endif %}
 
             <form name="form" id="form_cart" class="ec-cartRole" method="post" action="{{ url('cart') }}">
-
+                {% if app.user==null %}
+                    <div class="ec-cartRole__cart" style="text-align: center;color:#00B050">未ログインのため、標準単価で金額を算出しています</div>
+                {% endif %}
                 {% for CartIndex,Cart in Carts %}
                     {% set cartKey = Cart.cart_key %}
                     {% for error in app.session.flashbag.get('eccube.front.cart.' ~ cartKey ~ '.request.error') %}

@@ -117,6 +117,14 @@ file that was distributed with this source code.
 {% endblock %}
 
 {% block main %}
+    <style>
+        .standar_price{
+            color: #00B050;
+        }
+        .good_price{
+            color: #FF0000;
+        }
+    </style>
     {% if search_form.category_id.vars.errors|length > 0 %}
         <div class="ec-searchnavRole">
             <p class="errormsg text-danger">{{ 'front.product.search__category_not_found'|trans }}</p>
@@ -169,8 +177,9 @@ file that was distributed with this source code.
         <div class="ec-shelfRole">
         {% if pagination.totalItemCount > 0 %}
                     <div class="w-100" >
-
-
+                         {% if app.user==null %}
+                             <div style="text-align: center;color:#00B050">未ログインのため、標準単価を表示しています</div>
+                          {% endif %}
                         <table class="ec-productList">
                             <thead>
                             <tr>
@@ -204,19 +213,34 @@ file that was distributed with this source code.
                                                     {% else %}
                                                         販売単位：{{ Product.mst_quantity }}個～
                                                     {% endif %}
-                                                    <br> 販売単価:
+                                                    <br>
+                                                    {#  set class#}
+                                                    {% set classShow="standar_price" -%}
+                                                    {% if app.user -%}
+                                                        {% if Product.price_s01 is not empty %}
+                                                            {% set classShow="good_price" -%}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    {#  set end#}
+                                                    {% if  classShow=="good_price" %}
+                                                        <span class="{{ classShow }}"> 販売単価:</span>
+                                                    {% else %}
+                                                        <span class="{{ classShow }}"> 標準単価:</span>
+                                                    {% endif %}
+
+
                                                     {% if app.user -%}
 
                                                         {% if Product.price_s01 is not empty %}
-                                                            {{ roundPrice(Product.price_s01) }}
+                                                    <span class="{{ classShow }}" > {{ roundPrice(Product.price_s01) }}</span>
                                                         {% else %}
-                                                            {{ roundPrice(Product.mst_unit_price )}}
+                                                    <span class="{{ classShow }}">    {{ roundPrice(Product.mst_unit_price )}}</span>
                                                         {% endif %}
                                                     {% else %}
-
-                                                        {{ roundPrice(Product.mst_unit_price) }}
+                                                    <span class="{{ classShow }}">
+                                                        {{ roundPrice(Product.mst_unit_price) }}</span>
                                                     {% endif %}
-                                                    <span>（税抜）</span></li>
+                                                    <span class="{{ classShow }}">（税抜）</span></li>
                                             </ul>
                                         </a>
                                         <div class="itemSpec">

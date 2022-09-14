@@ -15,6 +15,13 @@ file that was distributed with this source code.
 {% block stylesheet %}
     <style>
 
+        .standar_price{
+            color: #00B050;
+        }
+        .good_price{
+            color: #FF0000;
+        }
+
         .slick-slider {
             margin-bottom: 30px;
         }
@@ -290,7 +297,9 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                         {% endfor %}
                     </ul>
 
-
+                    {% if app.user==null %}
+                        <div style="text-align: left;color:#00B050">未ログインのため、標準単価を表示しています</div>
+                    {% endif %}
 
                     <div class="ec-productRole__price">
 
@@ -304,12 +313,26 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                                      {% else %}
                                          販売単位：{{ MstProduct.quantity }}個～
                                      {% endif %}
- 販売単価:
+
+                                    {#  set class#}
+                                    {% set classShow="standar_price" -%}
+                                    {% if app.user -%}
+                                        {% if Price is defined and Price is not null %}
+                                            {% set classShow="good_price" -%}
+                                        {% endif %}
+                                    {% endif %}
+                                    {#  set end#}
+                                    {% if  classShow=="good_price" %}
+                                        <span class="{{ classShow }}"> 販売単価:</span>
+                                                    {% else %}
+                                        <span class="{{ classShow }}"> 標準単価:</span>
+                                    {% endif %}
+
                                     {% if Price is defined and Price is not null %}
-                                        {{ roundPrice(Price.price_s01)}}
+                                        <span class="{{ classShow }}" >  {{ roundPrice(Price.price_s01)}}</span>
                                     {% else %}
                                         {% if MstProduct is defined and MstProduct is not null %}
-                                            {{ roundPrice(MstProduct.unit_price) }}
+                                        <span class="{{ classShow }}" >     {{ roundPrice(MstProduct.unit_price) }}</span>
 
                                         {% endif %}
                                     {% endif %}

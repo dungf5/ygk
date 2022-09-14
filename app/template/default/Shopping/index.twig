@@ -946,15 +946,15 @@ console.log(Math.random());
                     }
 
                     .shipping_row {
-                        display: flex;
+                        display: block;
                     }
 
                     .shipping_col1 {
-                        width: 150px;
+                        /*width: 150px;*/
                     }
 
                     .shipping_col2 {
-                        width: 350px;
+                        /*width: 350px;*/
                     }
 
                     .date_picker_row {
@@ -973,7 +973,7 @@ console.log(Math.random());
                                 {{ Order.arCusLogin.company_name }}
                             </div>
                             <div class="shipping_row">
-                                <br>
+
                                 〒 {{ Order.arCusLogin.postal_code }}
 
                                 {{ Order.arCusLogin.addr01 }}
@@ -1012,7 +1012,7 @@ console.log(Math.random());
                                         for="bill_{{ arSeikyuCode1["seikyu_code"] }}">{{ arSeikyuCode1["name01"] }} </label>
                                 </div>
                                 <div class="shipping_col2">
-                                    <br>
+
                                     〒 {{ arSeikyuCode1["postal_code"] }} {{ arSeikyuCode1["addr01"] }} {{ arSeikyuCode1["addr02"] }} {{ arSeikyuCode1["addr03"] }}
                                 </div>
 
