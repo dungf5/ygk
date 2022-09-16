@@ -29,6 +29,10 @@
             </ul>
 {% else %}
                 <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div></a></li>
+    {% if is_granted('ROLE_USER') %}
+        <li class="mypage"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i><div>  ログアウト</div></a></li>
+
+    {% endif %}
             </ul>
             <div class="ec-cartNaviNull">
                 <div class="ec-cartNaviNull__message">
@@ -36,6 +40,7 @@
                 </div>
             </div>
 {% endif %}
+
 
         </div>
         <div class="headerInfo">
@@ -68,7 +73,19 @@
 {% else %}
             <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div></a></li>
 {% endif %}
+            {% if is_granted('ROLE_USER') %}
+                <li class="mypage"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i><div>  ログアウト</div></a></li>
+
+            {% endif %}
         </ul>
     </div>
 
 </div>
+<style>
+    {% if is_granted('ROLE_USER') %}
+    .headerMenu .menu{
+        width: 330px !important;
+    }
+  {% endif %}
+
+</style>

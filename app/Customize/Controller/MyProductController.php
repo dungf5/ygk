@@ -419,7 +419,7 @@ class MyProductController extends AbstractController
 
         // searchForm
         /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
-        $builder = $this->formFactory->createNamedBuilder('', SearchProductType::class);
+        $builder = $this->formFactory->createNamedBuilder('', \Customize\Form\Type\SearchProductType::class);
 
         if ($request->getMethod() === 'GET') {
             $builder->setMethod('GET');
@@ -435,6 +435,7 @@ class MyProductController extends AbstractController
 
         /* @var $searchForm \Symfony\Component\Form\FormInterface */
         $searchForm = $builder->getForm();
+
 
         $searchForm->handleRequest($request);
         $commonService = new MyCommonService($this->entityManager);
@@ -457,6 +458,7 @@ class MyProductController extends AbstractController
 
         $arProductCodeInDtPrice = $arPriceAndTanaka[0];
         $arTanakaNumber = $arPriceAndTanaka[1];
+
 
         $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user ,$customer_code,$arProductCodeInDtPrice,$arTanakaNumber);
 

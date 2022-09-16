@@ -34,6 +34,7 @@ class MyEccubeExtension extends AbstractExtension
             new TwigFunction('getMinDate', [$this, 'getMinDate']),
             new TwigFunction('getWebRootUrl', [$this, 'getWebRootUrl']),
             new TwigFunction('roundPrice', [$this, 'roundPrice']),
+            new TwigFunction('getFromUrl', [$this, 'getFromUrl']),
 
         ];
     }
@@ -43,6 +44,13 @@ class MyEccubeExtension extends AbstractExtension
 
       return $newDate;
     }
+    public function getFromUrl($key){
+       $valGet = isset($_REQUEST[$key])?$_REQUEST[$key]:'';
+       return $valGet;
+
+
+    }
+
     public function roundPrice($price){
         //$price = str_replace(",","", $price);
 

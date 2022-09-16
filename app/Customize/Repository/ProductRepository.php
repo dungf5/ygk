@@ -165,7 +165,7 @@ class ProductRepository extends AbstractRepository
         $categoryJoin = false;
         if (!empty($searchData['category_id']) && $searchData['category_id']) {
             $Categories = $searchData['category_id'];//->getescendant();//getSelfAndDescendants
-           // var_dump($Categories);
+
             if ($Categories) {
                 $qb
                     ->innerJoin('p.ProductCategories', 'pct')
@@ -180,6 +180,84 @@ class ProductRepository extends AbstractRepository
                 ->innerJoin('pct.Category', 'c');
             $categoryJoin = true;
         }
+        //=searchLeft
+       // if(isset(mode))
+        if (isset($searchData['mode']) && $searchData['mode']=="searchLeft" ) {
+            if (StringUtil::isNotBlank($searchData['s_product_name'])) {
+                $key = $searchData['s_product_name'];
+                $arrK  = explode(' ',$key);
+                //mstProduct.product_name_abb like :product_name  or
+                $whereMulti ="";
+                $whereMore ='mstProduct.product_name like :product_name ';
+                $countKey = count($arrK);
+                foreach ($arrK as $item){
+                    $countKey--;
+                    $item= trim($item);
+                    if($item==""){
+                        continue;
+                    }
+                    if($countKey>0){
+                        $whereMulti.=" (mstProduct.product_name like :product_name_{$countKey}) or ";
+                    }else{
+                        $whereMulti.=" (mstProduct.product_name like :product_name_{$countKey}) ";
+                    }
+                    $qb->setParameter(":product_name_{$countKey}",'%'. $item.'%');
+
+                }
+                $qb->andWhere($whereMulti);
+
+                // $whereMore .=" or mstProduct.catalog_code like :product_name   ";
+
+            }
+            if (StringUtil::isNotBlank($searchData['s_jan'])) {
+//                $key = $searchData['s_jan'];
+//                $whereMore ='mstProduct.jan_code like :s_jan ';
+//                $qb->andWhere($whereMore)->setParameter(':s_jan','%'. $key.'%');
+                $whereMulti ="";
+                $key = $searchData['s_jan'];
+                $arrK  = explode(' ',$key);
+                $countKey = count($arrK);
+                foreach ($arrK as $item){
+                    $countKey--;
+                    $item= trim($item);
+                    if($item==""){
+                        continue;
+                    }
+                    if($countKey>0){
+                        $whereMulti.=" (mstProduct.jan_code like :jan_code{$countKey}) or ";
+                    }else{
+                        $whereMulti.=" (mstProduct.jan_code like :jan_code{$countKey}) ";
+                    }
+                    $qb->setParameter(":jan_code{$countKey}",'%'. $item.'%');
+
+                }
+                $qb->andWhere($whereMulti);
+            }
+            if (StringUtil::isNotBlank($searchData['s_catalog_code'])) {
+                $key = $searchData['s_catalog_code'];
+//                $whereMore ='mstProduct.catalog_code like :s_catalog_code';
+//                $qb->andWhere($whereMore)->setParameter(':s_catalog_code','%'. $key.'%');
+                $whereMulti ="";
+                $arrK  = explode(' ',$key);
+                $countKey = count($arrK);
+                foreach ($arrK as $item){
+                    $countKey--;
+                    $item= trim($item);
+                    if($item==""){
+                        continue;
+                    }
+                    if($countKey>0){
+                        $whereMulti.=" (mstProduct.catalog_code like :catalog_code{$countKey}) or ";
+                    }else{
+                        $whereMulti.=" (mstProduct.catalog_code like :catalog_code{$countKey}) ";
+                    }
+                    $qb->setParameter(":catalog_code{$countKey}",'%'. $item.'%');
+
+                }
+                $qb->andWhere($whereMulti);
+            }
+        }
+
 
         // name
         if (isset($searchData['name']) && StringUtil::isNotBlank($searchData['name'])) {
