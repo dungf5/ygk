@@ -64,6 +64,7 @@
 {#            <li><a href="{{ url('help_tradelaw') }}"><i class="fas fa-city"></i><div>会社概要</div></a></li>    #}
 {% if is_granted('ROLE_USER') %}
             <li class="mypage"><a href="{{ url('mypage') }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>
+    <li class="mypage"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i><div>  ログアウト</div></a></li>
 {% else %}
             <li class="mypage"><a href="{{ url('mypage_login') }}"><i class="fas fa-lock"></i><div>ログイン</div></a></li>
 {% endif %}
@@ -73,10 +74,7 @@
 {% else %}
             <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div></a></li>
 {% endif %}
-            {% if is_granted('ROLE_USER') %}
-                <li class="mypage"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i><div>  ログアウト</div></a></li>
 
-            {% endif %}
         </ul>
     </div>
 

@@ -1,46 +1,99 @@
-<div class="loginCartMenu">
-    <ul class="login">
-{% if is_granted('ROLE_USER') %}
-        <li class="mypage"><a href="{{ url('mypage') }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>
-        <li class="contact"><a href="{{ url('contact') }}"><i class="fas fa-envelope"></i><div>メール</div></a></li>
-    </ul>
-    <div class="logout"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i>ログアウト</a></div>
-{% else %}
-        <li class="mypage"><a href="{{ url('mypage_login') }}"><i class="fas fa-lock"></i><div>ログイン</div></a></li>
-        <li class="contact"><a href="{{ url('contact') }}"><i class="fas fa-envelope"></i><div>メール</div></a></li>
-    </ul>
-{% endif %}
-{% set totalPrice = get_carts_total_price() %}
-{% set totalQuantity = get_carts_total_quantity() %}
+{#<div class="loginCartMenu">#}
+{#    <ul class="login">#}
+{#{% if is_granted('ROLE_USER') %}#}
+{#        <li class="mypage"><a href="{{ url('mypage') }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>#}
+{#        <li class="contact"><a href="{{ url('contact') }}"><i class="fas fa-envelope"></i><div>メール</div></a></li>#}
+{#    </ul>#}
+{#    <div class="logout"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i>ログアウト</a></div>#}
+{#{% else %}#}
+{#        <li class="mypage"><a href="{{ url('mypage_login') }}"><i class="fas fa-lock"></i><div>ログイン</div></a></li>#}
+{#        <li class="contact"><a href="{{ url('contact') }}"><i class="fas fa-envelope"></i><div>メール</div></a></li>#}
+{#    </ul>#}
+{#{% endif %}#}
+{#{% set totalPrice = get_carts_total_price() %}#}
+{#{% set totalQuantity = get_carts_total_quantity() %}#}
 {#usercode 6000#}
-    {% set userCode= getUserCode() %}
-    {% set urlCart= url('cart') %}
-    {% if userCode=="6000" %}
-        <script>
-            let messAl =  "{{ 'messge.cannotcart.all'|trans }}";
-        </script>
-        {%  set urlCart= "javascript:alert(messAl);"%}
+{#    {% set userCode= getUserCode() %}#}
+{#    {% set urlCart= url('cart') %}#}
+{#    {% if userCode=="6000" %}#}
+{#        <script>#}
+{#            let messAl =  "{{ 'messge.cannotcart.all'|trans }}";#}
+{#        </script>#}
+{#        {%  set urlCart= "javascript:alert(messAl);"%}#}
 
-    {% else %}
-    {% endif %}
-    {#usercode 6000#}
-    <div class="cart">
+{#    {% else %}#}
+{#    {% endif %}#}
+{#    #}{#usercode 6000#}
+{#    <div class="cart">#}
 
-            <a href="{{ urlCart }}">
-                {% if totalQuantity > 0 %}
-                    <div class="num"><i class="fas fa-shopping-cart"></i><div>カート</div><span class="fnDIN">{{ totalQuantity|number_format }}</span></div>
-                {% else %}
-                    <div class="num"><i class="fas fa-shopping-cart"></i><div>カート</div></div>
-                {% endif %}
-                <div class="price">{{ totalPrice|price }}</div>
-            </a>
-
-
+{#            <a href="{{ urlCart }}">#}
+{#                {% if totalQuantity > 0 %}#}
+{#                    <div class="num"><i class="fas fa-shopping-cart"></i><div>カート</div><span class="fnDIN">{{ totalQuantity|number_format }}</span></div>#}
+{#                {% else %}#}
+{#                    <div class="num"><i class="fas fa-shopping-cart"></i><div>カート</div></div>#}
+{#                {% endif %}#}
+{#                <div class="price">{{ totalPrice|price }}</div>#}
+{#            </a>#}
 
 
-    </div>
+
+
+{#    </div>#}
+{#</div>#}
+<div class="loginCartMenu">
+    <form method="get" class="searchformLeft" action="{{ path('product_list') }}">
+
+        <div class="ec-borderedDefs">
+
+            <div>
+                <div>
+                    <label class="ec-label" for="s_product_name">商品名</label>
+                </div>
+                <div>
+                    <div class="ec-halfInput">
+                        <input type="text"   class="searchE" id="s_product_name" name="s_product_name" placeholder=""
+                               value="{{ getFromUrl('s_product_name') }}" >
+
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div>
+                    <label class="ec-label" for="s_jan"> JANコード</label>
+                </div>
+                <div>
+                    <div class="ec-halfInput">
+                        <input class="searchE" type="text" id="s_jan" name="s_jan" placeholder=""
+                               value="{{ getFromUrl('s_jan') }}" >
+
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div>
+                    <label class="ec-label" for="s_catalog_code">  カタログコード</label>
+                </div>
+                <div>
+                    <div class="ec-halfInput">
+                        <input type="text"  class="searchE" id="s_catalog_code" name="s_catalog_code" placeholder=""
+                               value="{{ getFromUrl('s_catalog_code') }}" >
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="ec-RegisterRole__actions">
+            <div class="">
+                <div class="ec-off4Grid__cell">
+                    <button type="submit" class="ec-blockBtn--action" name="mode" value="searchLeft" >
+                        絞り込み
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
-
 
 {{ render(path('block_search_product')) }}
 

@@ -21,6 +21,7 @@
                 <li class="itemNav">{{ include('Block/nav_sp.twig') }}</li>
 {% if is_granted('ROLE_USER') %}
                 <li class="mypage"><a href="{{ url('mypage') }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>
+    <li class="mypage"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i><div>  ログアウト</div></a></li>
 {% else %}
                 <li class="mypage"><a href="{{ url('mypage_login') }}"><i class="fas fa-lock"></i><div>ログイン</div></a></li>
 {% endif %}
@@ -61,6 +62,7 @@
 {#            <li><a href="{{ url('help_tradelaw') }}"><i class="fas fa-city"></i><div>会社概要</div></a></li>    #}
 {% if is_granted('ROLE_USER') %}
             <li class="mypage"><a href="{{ url('mypage') }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>
+    <li class="mypage"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i><div>  ログアウト</div></a></li>
 {% else %}
             <li class="mypage"><a href="{{ url('mypage_login') }}"><i class="fas fa-lock"></i><div>ログイン</div></a></li>
 {% endif %}
@@ -74,3 +76,11 @@
     </div>
 
 </div>
+<style>
+    {% if is_granted('ROLE_USER') %}
+    .headerMenu .menu{
+        width: 330px !important;
+    }
+    {% endif %}
+
+</style>
