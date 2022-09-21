@@ -40,7 +40,9 @@ class MyEccubeExtension extends AbstractExtension
     }
 
     public function getNext3Month(){
-        $newDate = date('Y-m-d', strtotime(date("Y-m-d"). ' + 3 months'));
+        //quyen tu cho la chon tu ngay mai den 1 thang
+        //vi du cho ngay thu2 thi  thu 5 mac dinh (ko bao gom thu 7 cn va le)
+        $newDate = date('Y-m-d', strtotime(date("Y-m-d"). ' + 1 months'));
 
       return $newDate;
     }
@@ -66,9 +68,9 @@ class MyEccubeExtension extends AbstractExtension
     }
 
     public function getMinDate(){
-
-        $newDate = date("Y-m-d");
+        $newDate = date('Y-m-d', strtotime(date("Y-m-d"). ' + 1 days'));
         return $newDate;
+
     }
     public function getWebRootUrl(){
 

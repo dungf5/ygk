@@ -32,8 +32,72 @@ class MyCommon
 
         return MyCommon::getRootDir().'/html/user_data';
     }
+    public static function getDayWeekend(){
+        $numberofdays = 15;//find in 15 days
+        $startdate1 = date("Y-m-d");//'2022-09-23';//
+        $dayText = date('Y-m-d', strtotime($startdate1 . ' +1 day'));//ignore today
+        $startdate = $dayText;//'2022-09-23';
+
+        $d = new \DateTime( $startdate );
+        $t = $d->getTimestamp();
+        $arSatSun =[];
+        // loop for X days
+        for($i=0; $i<$numberofdays; $i++){
+
+            // add 1 day to timestamp
+            $addDay = 86400;
+
+            // get what day it is next day
+            $nextDay = date('w', ($t+$addDay));
+
+            // if it's Saturday or Sunday get $i-1
+            if($nextDay == 0 || $nextDay == 6) {
+                $t1 = $t+$addDay;
+                $arSatSun[]=  date('Y-m-d', $t1);
+                $i--;
+            }
+
+            // modify timestamp, add 1 day
+            $t = $t+$addDay;
+        }
+
+        $d->setTimestamp($t);
+        return $arSatSun;
+    }
+    public static function get3DayAfterDayOff($dayOfAr){
+
+        $startdate1 = date("Y-m-d");//'2022-09-23';//
+        $dayText = date('Y-m-d', strtotime($startdate1 . ' +1 day'));//ignore today
+        $dayStart = new \DateTime( $dayText );
+        $timeStart = $dayStart->getTimestamp();
+        $numberDayWant = 2;
+        $numberDayGet =0;
+        $addDay = 86400;
+        $dayTextOk="";
+        while (true){
+
+            // get what day it is next day
+            $timeStart = $timeStart+$addDay;
+            $dayText = date('Y-m-d', $timeStart);
+            if(in_array($dayText,$dayOfAr)){
+                continue;
+            }else{
+                $dayTextOk = date('Y-m-d', $timeStart);
+                $numberDayGet ++;
+            }
+            if($numberDayGet == $numberDayWant){
+                break;
+            }
+        }
+
+
+        return $dayTextOk;
+
+    }
+
     public static function getNextDayNoWeekend(){
-        $startdate = date("Y-m-d");
+        $startdate = date("Y-m-d");//'2022-09-23';
+
         $numberofdays = 1;
 
         $d = new \DateTime( $startdate );
@@ -85,6 +149,7 @@ class MyCommon
         return $dayText;
 
     }
+
     public static function getPara($key)
     {
         if (isset($_REQUEST[$key])) {
