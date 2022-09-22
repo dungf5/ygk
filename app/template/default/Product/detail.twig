@@ -332,7 +332,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                                         <span class="{{ classShow }}" >  {{ roundPrice(Price.price_s01)}}</span>
                                     {% else %}
                                         {% if MstProduct is defined and MstProduct is not null %}
-                                        <span class="{{ classShow }}" >     {{ roundPrice(MstProduct.unit_price) }}</span>
+                                        <span class="{{ classShow }}" >     {{ roundPriceZero(MstProduct.unit_price)|raw }}</span>
 
                                         {% endif %}
                                     {% endif %}

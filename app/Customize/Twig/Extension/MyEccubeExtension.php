@@ -35,6 +35,10 @@ class MyEccubeExtension extends AbstractExtension
             new TwigFunction('getWebRootUrl', [$this, 'getWebRootUrl']),
             new TwigFunction('roundPrice', [$this, 'roundPrice']),
             new TwigFunction('getFromUrl', [$this, 'getFromUrl']),
+            new TwigFunction('roundPriceZero', [$this, 'roundPriceZero']),
+            new TwigFunction('roundPriceZeroTotal', [$this, 'roundPriceZeroTotal']),
+            new TwigFunction('roundPriceZeroTotalAll', [$this, 'roundPriceZeroTotalAll']),
+
 
         ];
     }
@@ -64,9 +68,45 @@ class MyEccubeExtension extends AbstractExtension
             $numAf  = str_replace(".00","",$numAf);
         }
 
-     return "￥".$numAf;
+        return "￥".$numAf;
     }
+    public function roundPriceZero($price){
 
+        $numAf = number_format($price,2);
+        if(MyCommon::checkExistText($numAf,".00")){
+            $numAf  = str_replace(".00","",$numAf);
+        }
+        if($numAf == 0){
+            return "<span style='color:#f00'>オープン価格</span>";
+        }
+        return "￥".$numAf;
+    }
+    public function roundPriceZeroTotal($price){
+
+        $numAf = number_format($price,2);
+        if(MyCommon::checkExistText($numAf,".00")){
+            $numAf  = str_replace(".00","",$numAf);
+        }
+        if($numAf == 0){
+            return "";
+        }
+
+        return "￥".$numAf;
+    }
+    public function roundPriceZeroTotalAll($price){
+
+        $numAf = number_format($price,2);
+        if(MyCommon::checkExistText($numAf,".00")){
+            $numAf  = str_replace(".00","",$numAf);
+        }
+        if($numAf == 0){
+            return "";
+        }
+        $numAf  =str_replace(",","",$numAf);
+        $roundUp = round($numAf);
+        $roundUp = number_format($roundUp);
+        return "￥".$roundUp;
+    }
     public function getMinDate(){
         $newDate = date('Y-m-d', strtotime(date("Y-m-d"). ' + 1 days'));
         return $newDate;

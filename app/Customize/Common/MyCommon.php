@@ -67,10 +67,10 @@ class MyCommon
     public static function get3DayAfterDayOff($dayOfAr){
 
         $startdate1 = date("Y-m-d");//'2022-09-23';//
-        $dayText = date('Y-m-d', strtotime($startdate1 . ' +1 day'));//ignore today
+        $dayText = $startdate1;//date('Y-m-d', strtotime($startdate1 . ' +1 day'));//ignore today
         $dayStart = new \DateTime( $dayText );
         $timeStart = $dayStart->getTimestamp();
-        $numberDayWant = 2;
+        $numberDayWant = 3;
         $numberDayGet =0;
         $addDay = 86400;
         $dayTextOk="";
@@ -79,7 +79,9 @@ class MyCommon
             // get what day it is next day
             $timeStart = $timeStart+$addDay;
             $dayText = date('Y-m-d', $timeStart);
+
             if(in_array($dayText,$dayOfAr)){
+
                 continue;
             }else{
                 $dayTextOk = date('Y-m-d', $timeStart);

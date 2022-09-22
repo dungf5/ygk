@@ -234,13 +234,18 @@ file that was distributed with this source code.
                                                         {% if Product.price_s01 is not empty %}
                                                     <span class="{{ classShow }}" > {{ roundPrice(Product.price_s01) }}</span>
                                                         {% else %}
-                                                    <span class="{{ classShow }}">    {{ roundPrice(Product.mst_unit_price )}}</span>
+                                                    <span class="{{ classShow }}">    {{ roundPriceZero(Product.mst_unit_price )|raw}}</span>
                                                         {% endif %}
                                                     {% else %}
                                                     <span class="{{ classShow }}">
-                                                        {{ roundPrice(Product.mst_unit_price) }}</span>
+                                                        {{ roundPriceZero(Product.mst_unit_price)|raw }}</span>
                                                     {% endif %}
+
+                                                    {% if  classShow=="standar_price" and roundPriceZero(Product.mst_unit_price) == "<span style='color:#f00'>オープン価格</span>" %}
+                                                    {% else %}
                                                     <span class="{{ classShow }}">（税抜）</span></li>
+                                                    {% endif %}
+
                                             </ul>
                                         </a>
                                         <div class="itemSpec">

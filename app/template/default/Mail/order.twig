@@ -32,7 +32,7 @@ JANコード：{{ OrderItem.jan_code }}
 手数料：{{ roundPrice(Order.charge) }}
 
 ============================================
-お支払い合計：{{ roundPrice(Order.payment_total) }}(税込)
+お支払い合計：{{ roundPriceZeroTotalAll(Order.payment_total) }}(税込)
 
 ************************************************
 　ご注文者情報

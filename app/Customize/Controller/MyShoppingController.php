@@ -373,7 +373,7 @@ class MyShoppingController extends AbstractShoppingController
 
             $moreOrder = $commonService->getMoreOrder($Order->getPreOrderId());
             //add default day delivery
-            if($moreOrder->getDateWantDelivery()==null || $moreOrder->getDateWantDelivery()==""){
+            //if($moreOrder->getDateWantDelivery()==null || $moreOrder->getDateWantDelivery()==""){
 //                $newDate = MyCommon::getNextDayNoWeekend();
 //                $comS = new MyCommonService($this->entityManager);
 //                $arrDayOff = $comS->getDayOff();
@@ -383,14 +383,17 @@ class MyShoppingController extends AbstractShoppingController
 //                $this->entityManager->flush();
                 $comS = new MyCommonService($this->entityManager);
                 $arrDayOff = $comS->getDayOff();
+
                 $dayOffSatSun = MyCommon::getDayWeekend();
+
                 $arrDayOff = array_merge($arrDayOff,$dayOffSatSun);
+
                 $newDate =  MyCommon::get3DayAfterDayOff($arrDayOff);
                 $moreOrder->setDateWantDelivery($newDate);
                 $this->entityManager->persist($moreOrder);
                 $this->entityManager->flush();
 
-            }
+            //}
 
 
             $mstShip = $commonService->getMstShippingCustomer($Customer->getId(), $moreOrder);

@@ -53,7 +53,7 @@ file that was distributed with this source code.
                             手数料：{{ roundPrice(Order.charge) }}<br/>
 
                             <hr style="border-top: 1px dotted #8c8b8b;">
-                            お支払い合計：{{ roundPrice(Order.payment_total) }}(税込)
+                            お支払い合計：{{ roundPriceZeroTotalAll(Order.payment_total) }}(税込)
                             <br/>
                             <hr style="border-top: 3px double #8c8b8b;">
                             ご注文者情報<br/>
