@@ -4,6 +4,7 @@ namespace Customize\Repository;
 
 
 use Customize\Entity\MstShipping;
+use Customize\Service\Common\MyCommonService;
 use Doctrine\ORM\Query\Expr\Join;
 use Eccube\Common\EccubeConfig;
 use Eccube\Doctrine\Query\Queries;
@@ -12,7 +13,6 @@ use Eccube\Entity\Product;
 use Eccube\Repository\QueryKey;
 use Eccube\Util\StringUtil;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-
 class ProductRepository extends AbstractRepository
 {
 
@@ -182,39 +182,22 @@ class ProductRepository extends AbstractRepository
         }
         //=searchLeft
        // if(isset(mode))
+        $newComs = new MyCommonService($this->getEntityManager());
         if (isset($searchData['mode']) && $searchData['mode']=="searchLeft" ) {
             if (StringUtil::isNotBlank($searchData['s_product_name'])) {
                 $key = $searchData['s_product_name'];
-                $arrK  = explode(' ',$key);
-                //mstProduct.product_name_abb like :product_name  or
-                $whereMulti ="";
-                $whereMore ='mstProduct.product_name like :product_name ';
-                $countKey = count($arrK);
-                foreach ($arrK as $item){
-                    $countKey--;
-                    $item= trim($item);
-                    if($item==""){
-                        continue;
-                    }
-                    if($countKey>0){
-                        $whereMulti.=" (mstProduct.product_name like :product_name_{$countKey}) or ";
-                    }else{
-                        $whereMulti.=" (mstProduct.product_name like :product_name_{$countKey}) ";
-                    }
-                    $qb->setParameter(":product_name_{$countKey}",'%'. $item.'%');
 
-                }
-                $qb->andWhere($whereMulti);
+                $arCode = $newComs->getSearchProductName($key);
+                $whereMore2 ='mstProduct.jan_code in(:jan_code_left)';
+                $qb->setParameter(":jan_code_left",$arCode);
 
-                // $whereMore .=" or mstProduct.catalog_code like :product_name   ";
-
+                $qb->andWhere($whereMore2);
             }
             if (StringUtil::isNotBlank($searchData['s_jan'])) {
-//                $key = $searchData['s_jan'];
-//                $whereMore ='mstProduct.jan_code like :s_jan ';
-//                $qb->andWhere($whereMore)->setParameter(':s_jan','%'. $key.'%');
+
                 $whereMulti ="";
                 $key = $searchData['s_jan'];
+
                 $arrK  = explode(' ',$key);
                 $countKey = count($arrK);
                 foreach ($arrK as $item){
@@ -235,26 +218,29 @@ class ProductRepository extends AbstractRepository
             }
             if (StringUtil::isNotBlank($searchData['s_catalog_code'])) {
                 $key = $searchData['s_catalog_code'];
-//                $whereMore ='mstProduct.catalog_code like :s_catalog_code';
-//                $qb->andWhere($whereMore)->setParameter(':s_catalog_code','%'. $key.'%');
-                $whereMulti ="";
-                $arrK  = explode(' ',$key);
-                $countKey = count($arrK);
-                foreach ($arrK as $item){
-                    $countKey--;
-                    $item= trim($item);
-                    if($item==""){
-                        continue;
-                    }
-                    if($countKey>0){
-                        $whereMulti.=" (mstProduct.catalog_code like :catalog_code{$countKey}) or ";
-                    }else{
-                        $whereMulti.=" (mstProduct.catalog_code like :catalog_code{$countKey}) ";
-                    }
-                    $qb->setParameter(":catalog_code{$countKey}",'%'. $item.'%');
+                $arCode = $newComs->getSearchCatalogCode($key);
+                $whereMore2 ='mstProduct.jan_code in(:jan_code_s_catalog_code)';
+                $qb->setParameter(":jan_code_s_catalog_code",$arCode);
+                $qb->andWhere($whereMore2);
 
-                }
-                $qb->andWhere($whereMulti);
+//                $whereMulti ="";
+//                $arrK  = explode(' ',$key);
+//                $countKey = count($arrK);
+//                foreach ($arrK as $item){
+//                    $countKey--;
+//                    $item= trim($item);
+//                    if($item==""){
+//                        continue;
+//                    }
+//                    if($countKey>0){
+//                        $whereMulti.=" (mstProduct.catalog_code like :catalog_code{$countKey}) or ";
+//                    }else{
+//                        $whereMulti.=" (mstProduct.catalog_code like :catalog_code{$countKey}) ";
+//                    }
+//                    $qb->setParameter(":catalog_code{$countKey}",'%'. $item.'%');
+//
+//                }
+//                $qb->andWhere($whereMulti);
             }
         }
 

@@ -1209,7 +1209,35 @@ AND          pri.product_code=?
         }
     }
 
+    public function getSearchProductName($productName)
+    {
+        $sql = "SELECT jan_code FROM  egk_dev.mst_product a WHERE  match(a.product_name )
+                 AGAINST( ? IN natural LANGUAGE MODE) >1 ";
+        $myPara = [ $productName];
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery($myPara);
+        $rows = $result->fetchAllAssociative();
+        $arrProductCode = [];
+        foreach ($rows as $itemR){
+            $arrProductCode[] =$itemR["jan_code"];
+        }
 
+        return $arrProductCode;
+    }
+    public function getSearchCatalogCode($catalog_code)
+    {
+        $sql = "SELECT jan_code FROM  egk_dev.mst_product a WHERE  match(a.catalog_code )
+                 AGAINST( ? IN natural LANGUAGE MODE) ";
+        $myPara = [ $catalog_code];
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery($myPara);
+        $rows = $result->fetchAllAssociative();
+        $arrProductCode = [];
+        foreach ($rows as $itemR){
+            $arrProductCode[] =$itemR["jan_code"];
+        }
+        return $arrProductCode;
+    }
 
 
 
