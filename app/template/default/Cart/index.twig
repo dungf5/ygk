@@ -116,7 +116,7 @@ file that was distributed with this source code.
                 </div>
             {% endif %}
 
-            <form name="form" id="form_cart" class="ec-cartRole" method="post" action="{{ url('cart') }}">
+            <form name="form" id="form_cart"  style="width: 100%" class="" method="post" action="{{ url('cart') }}">
                 {% if app.user==null %}
                     <div class="ec-cartRole__cart" style="text-align: center;color:#00B050">未ログインのため、標準単価で金額を算出しています</div>
                 {% endif %}

@@ -52,7 +52,16 @@ file that was distributed with this source code.
                 var $quantity = $form.parent().find('.quantity');
 
                 var $checkQuantity = $form.parent().find('.checkQuantity');
+               if ($quantity.val()< 1) {
 
+                    $quantity[0].setCustomValidity('{{ 'front.product.invalid_quantity'|trans }}');
+                    $quantity[0].reportValidity();
+
+                    setTimeout(function() {
+                        loadingOverlay('hide');
+                    }, 100);
+                    return true;
+                }
                 if (parseInt($quantity.val()) % parseInt($checkQuantity.val()) !== 0) {
 
                     $quantity[0].setCustomValidity($checkQuantity.val()+'{{ 'front.product.invalid_quantity_multiples'|trans }}');
@@ -209,9 +218,9 @@ file that was distributed with this source code.
                                                 <li class="name"> {{ Product.product_name }}</li>
                                                 <li class="numPrice">
                                                     {% if Product.mst_quantity>1 %}
-                                                        販売単位：{{ Product.mst_quantity }}個/箱～
+                                                     販売単位：{{ Product.mst_quantity }}個/箱～
                                                     {% else %}
-                                                        販売単位：{{ Product.mst_quantity }}個～
+                                                    販売単位：{{ Product.mst_quantity }}個～
                                                     {% endif %}
                                                     <br>
                                                     {#  set class#}
@@ -223,9 +232,9 @@ file that was distributed with this source code.
                                                     {% endif %}
                                                     {#  set end#}
                                                     {% if  classShow=="good_price" %}
-                                                        <span class="{{ classShow }}"> 販売単価:</span>
+                                                        <span class="{{ classShow }}"> 販売単価：</span>
                                                     {% else %}
-                                                        <span class="{{ classShow }}"> 標準単価:</span>
+                                                        <span class="{{ classShow }}"> 標準単価：</span>
                                                     {% endif %}
 
 

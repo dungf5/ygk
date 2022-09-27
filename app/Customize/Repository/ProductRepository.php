@@ -198,6 +198,12 @@ class ProductRepository extends AbstractRepository
                 $whereMulti ="";
                 $key = $searchData['s_jan'];
 
+//                $arCode = $newComs->getSearchJanCode($key);
+//                $whereMore2 ='mstProduct.jan_code in(:jan_code_from_jan)';
+//                $qb->setParameter(":jan_code_from_jan",$arCode);
+//
+//                $qb->andWhere($whereMore2);
+
                 $arrK  = explode(' ',$key);
                 $countKey = count($arrK);
                 foreach ($arrK as $item){
@@ -352,7 +358,7 @@ class ProductRepository extends AbstractRepository
         $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');
         $qb->distinct();
-       //var_dump($qb->getQuery()->getSQL(),"-------");var_dump($qb->getParameters() );die();
+        //var_dump($qb->getQuery()->getSQL(),"-------");var_dump($qb->getParameters() );die();
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 
