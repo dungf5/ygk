@@ -344,9 +344,9 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                                     {% endif %}
                                     {#  set end#}
                                     {% if  classShow=="good_price" %}
-                                        <span class="{{ classShow }}"> 販売単価:</span>
+                                        <span class="{{ classShow }}"> 販売単価：</span>
                                                     {% else %}
-                                        <span class="{{ classShow }}"> 標準単価:</span>
+                                        <span class="{{ classShow }}"> 標準単価：</span>
                                     {% endif %}
 
                                     {% if Price is defined and Price is not null %}
