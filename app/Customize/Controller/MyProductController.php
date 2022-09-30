@@ -253,6 +253,23 @@ class MyProductController extends AbstractController
     /**
      * カートに追加.
      *
+     * @Route("/products/get_total_cart", name="get_total_cart", methods={"GET"})
+     */
+    public function getTotalCart(Request $request)
+    {
+        $Carts = $this->cartService->getCarts();
+        if(count($Carts)>0){
+            $cartId= $Carts[0]->getId();
+            $myComS = new MyCommonService($this->entityManager);
+            $totalNew = $myComS->getTotalItemCart($cartId);
+            return $this->json(['done' => true, 'messages' => 'Get cart Total',"totalNew"=>$totalNew]);
+        }
+        return $this->json(['done' => true, 'messages' => 'Get cart Total',"totalNew"=>0]);
+
+    }
+    /**
+     * カートに追加.
+     *
      * @Route("/products/add_cart/{id}", name="product_add_cart", methods={"POST"}, requirements={"id" = "\d+"})
      */
     public function addCart(Request $request, Product $Product)
@@ -322,7 +339,7 @@ class MyProductController extends AbstractController
 //                $errorMessages[] = $warning->getMessage();
 //            }
 //        }
-
+        $mstProduct = $this->mstProductRepository->getData($Product->getId());
 
         $cartId =0;
         // set total price
@@ -330,6 +347,7 @@ class MyProductController extends AbstractController
             $totalPrice = 0;
             foreach($Cart['CartItems'] as $CartItem){
                 $totalPrice += $CartItem['price'] * $CartItem['quantity'];
+                setcookie($Product->getId(),$CartItem['quantity']*$mstProduct->getQuantity(),0,"/");
 
             }
 

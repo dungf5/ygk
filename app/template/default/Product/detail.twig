@@ -14,7 +14,12 @@ file that was distributed with this source code.
 
 {% block stylesheet %}
     <style>
-
+        .btnBack{
+            background: beige;
+            color: black;
+            width: 50%;
+            margin-left: 10px;
+        }
         .standar_price{
             color: #00B050;
         }
@@ -100,6 +105,8 @@ file that was distributed with this source code.
 {% endblock %}
 
 {% block javascript %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <script>
 eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
 
@@ -147,23 +154,23 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
         });
     </script>
     <script>
-            $( "#quantity" ).focus(function() {
+            {#$( "#quantity" ).focus(function() {#}
 
-               if ($('#quantity').val() < 1) {
+            {#   if ($('#quantity').val() < 1) {#}
 
-                    let input1 =document.getElementById('quantity');
-                  //  $('#quantity')[0].setCustomValidity('{{ 'front.product.invalid_quantity'|trans }}');
-                    input1.setCustomValidity('{{ 'front.product.invalid_quantity'|trans }}');
-                     input1.reportValidity();
-                    return true;
-                }
-              if($('#quantity').val() % {{ MstProduct.quantity }}  !== 0) {
-                        $('#quantity')[0].setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity_multiples'|trans }}');
-                         $('#quantity')[0].reportValidity();
-                        return true;
-               }
+            {#        let input1 =document.getElementById('quantity');#}
+            {#      //  $('#quantity')[0].setCustomValidity('{{ 'front.product.invalid_quantity'|trans }}');#}
+            {#        input1.setCustomValidity('{{ 'front.product.invalid_quantity'|trans }}');#}
+            {#         input1.reportValidity();#}
+            {#        return true;#}
+            {#    }#}
+            {#  if($('#quantity').val() % {{ MstProduct.quantity }}  !== 0) {#}
+            {#            $('#quantity')[0].setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity_multiples'|trans }}');#}
+            {#             $('#quantity')[0].reportValidity();#}
+            {#            return true;#}
+            {#   }#}
 
-            });
+            {#});#}
         $(function() {
             $('.add-cart').on('click', function(event) {
 
@@ -194,14 +201,19 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                 {% endif %}
 
                 // 個数フォームのチェック
-                if ($('#quantity').val() < 1) {
+
+                if ($('#quantity').val() == "") {
                     let input1 =document.getElementById('quantity');
-                    input1.setCustomValidity('{{ 'front.product.invalid_quantity'|trans }}');
+                    input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
                     input1.reportValidity();
                     return true;
                 } else {
-                    if($('#quantity').val() % {{ MstProduct.quantity }}  !== 0) {
-                        $('#quantity')[0].setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity_multiples'|trans }}');
+                    let checkCase1 = $('#quantity').val() < {{ MstProduct.quantity }} ;
+                    let checkCase2 = $('#quantity').val() <1 ;
+                    let checkCase3 = $('#quantity').val() % {{ MstProduct.quantity }}  !== 0;
+
+                    if(checkCase1||checkCase2||checkCase3) {
+                        $('#quantity')[0].setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');
                         $('#quantity')[0].reportValidity();
                         return true;
                     }
@@ -225,11 +237,20 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                     $.each(data.messages, function() {
                         $('#ec-modal-header').html(this);
                     });
+                    //$.cookie(myStringArray[i] );
 
                     $('.ec-modal').show()
                    $('.num>.fnDIN').html(data.totalNew);
 
+
+                    //nvtrongxxx
+                let myValue =   $.cookie($('#product_id').val());
+                if( myValue!=undefined){
+                  $('#quantity').val(myValue);
+                 }
                    $('.cart>a>.fnDIN').html(data.totalNew);
+                    let cartHtml ="<span class='fnDIN'>"+data.totalNew+"</span>";
+                    $('#emptyCart').html(cartHtml);
                     // カートブロックを更新する
                     $.ajax({
                         url: "{{ url('block_cart') }}",
@@ -254,7 +275,71 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
         $('.ec-modal-overlay, .ec-modal, .ec-modal-close, .ec-inlineBtn--cancel').on('click', function() {
             $('.ec-modal').hide()
         });
-        // $('#form1').submit();
+
+
+        //nvtrong add
+ $(function() {
+
+            let myValue = $.cookie( $('#quantity').attr('myid'));
+            console.log('key#'+$('#quantity').attr('myid'));
+            if(myValue !=undefined){
+              $('#quantity').val(myValue);
+            }
+
+            // 表示件数を変更
+            $('#quantity').on("input",function(ev) {
+                var objT = this;
+                  let input1 =document.getElementById('quantity');
+                  input1.setCustomValidity('');
+             if ($('#quantity').val() == "") {
+
+
+                    input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+                    input1.reportValidity();
+                    return true;
+              }
+            if ( ($('#quantity').val() < 1) || ($('#quantity').val() < {{ MstProduct.quantity }}) ){
+
+
+                    input1.setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');
+                    input1.reportValidity();
+                    return true;
+              }
+             if($('#quantity').val() % {{ MstProduct.quantity }}  !== 0) {
+                    $('#quantity')[0].setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');
+                    $('#quantity')[0].reportValidity();
+                    return true;
+             }
+                $.cookie( $(objT).attr('myid'),objT.value, { path: '/' });
+                  console.log('keyde#'+$(objT).attr('myid'));
+
+            });
+
+        });
+
+ $('.btnBack').click(function() {
+      let input1 =document.getElementById('quantity');
+       if ($('#quantity').val() == "") {
+
+
+                        input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+                        input1.reportValidity();
+                        return true;
+        }
+  if ( ($('#quantity').val() < 1) || ($('#quantity').val() < {{ MstProduct.quantity }}) ){
+
+
+                    input1.setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');
+                    input1.reportValidity();
+                    return true;
+              }
+      if($('#quantity').val() % {{ MstProduct.quantity }}  !== 0) {
+                $('#quantity')[0].setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');
+                 $('#quantity')[0].reportValidity();
+                return true;
+       }
+     window.location.href= $.cookie( 'listUrl');
+ });
     </script>
     <script type="application/ld+json">
     {
@@ -371,7 +456,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
 
                         <div style="padding-left: 0.3em">
                             <div class="ec-numberInput"><span style="color: #000000">{{ 'common.quantity'|trans }}:</span>
-                                {{ form_widget(form.quantity,{'attr': {'value': MstProduct.quantity|number_format
+                                {{ form_widget(form.quantity,{'attr': {'myId':Product.id,'class': 'quantity','value': MstProduct.quantity|number_format
                                     ,'min':MstProduct.quantity
                                     ,'step':MstProduct.quantity}}) }}
                                 {{ form_errors(form.quantity) }}
@@ -457,9 +542,12 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
 {#                                    {{ form_errors(form.quantity) }}#}
 {#                                </div>#}
                             </div>
-                            <div class="ec-productRole__btn">
+                            <div class="ec-productRole__btn" style="display: -webkit-inline-box">
                                 <button type="button" class="ec-blockBtn--action add-cart">
                                     {{ 'front.product.add_cart'|trans }}
+                                </button>
+                                <button type="button" class="ec-blockBtn--action btnBack">
+                                    << 戻る
                                 </button>
                             </div>
                         {% else %}

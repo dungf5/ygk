@@ -13,6 +13,7 @@ file that was distributed with this source code.
 {% set body_class = 'product_page' %}
 
 {% block javascript %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         {#eccube.productsClassCategories = {#}
         {#    {% for Product in paginationExt %}#}
@@ -50,11 +51,23 @@ file that was distributed with this source code.
 
                 {#// 個数フォームのチェック#}
                 var $quantity = $form.parent().find('.quantity');
-
+                let idProduct = $quantity.attr('myid');
                 var $checkQuantity = $form.parent().find('.checkQuantity');
-               if ($quantity.val()< 1) {
 
-                    $quantity[0].setCustomValidity('{{ 'front.product.invalid_quantity'|trans }}');
+                 if ($quantity.val()=="") {
+
+                    $quantity[0].setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+                    $quantity[0].reportValidity();
+
+                    setTimeout(function() {
+                        loadingOverlay('hide');
+                    }, 100);
+                    return true;
+                }
+
+               if ( ($quantity.val()< 1)||($quantity.val()< $checkQuantity.val()) ) {
+
+                    $quantity[0].setCustomValidity($checkQuantity.val()+'{{ 'front.product.invalid_quantity'|trans }}');
                     $quantity[0].reportValidity();
 
                     setTimeout(function() {
@@ -64,7 +77,7 @@ file that was distributed with this source code.
                 }
                 if (parseInt($quantity.val()) % parseInt($checkQuantity.val()) !== 0) {
 
-                    $quantity[0].setCustomValidity($checkQuantity.val()+'{{ 'front.product.invalid_quantity_multiples'|trans }}');
+                    $quantity[0].setCustomValidity($checkQuantity.val()+'{{ 'front.product.invalid_quantity'|trans }}');
                     $quantity[0].reportValidity();
 
                     setTimeout(function() {
@@ -92,9 +105,16 @@ file that was distributed with this source code.
 
                     $('.ec-modal').show();
 
-                   $('.num>.fnDIN').html(data.totalNew);
+                   $('a>.fnDIN').html(data.totalNew);
 
-                   $('.cart>a>.fnDIN').html(data.totalNew);
+                   let cartHtml ="<span class='fnDIN'>"+data.totalNew+"</span>";
+                    $('#emptyCart').html(cartHtml);
+                     //nvtrongxxx
+                     debugger;
+                    let myValue =   $.cookie(idProduct);
+                    if( myValue!=undefined){
+                      $('#quantity'+idProduct).val(myValue);
+                     }
                     // カートブロックを更新する
                     $.ajax({
                         url: '{{ url('block_cart') }}',
@@ -120,12 +140,84 @@ file that was distributed with this source code.
             $('.ec-modal').hide()
         });
 
+//nvtrong add
+
+function initInputVal(){
 
 
+    var myStringArray = ALL_PRODUCT;
+    var arrayLength = myStringArray.length;
+    for (var i = 0; i < arrayLength; i++) {
+        let myValue =   $.cookie(myStringArray[i] );
+        if( myValue!=undefined){
+          $('#quantity'+myStringArray[i]).val(myValue);
+         }
+    }
+}
+
+ $(function() {
+            initInputVal();
+            $.cookie( 'listUrl',window.location.href);
+            // 表示件数を変更
+            $('.quantity').on("input", function(ev) {
+
+
+                var objT = this;
+                var isFail = false;
+                //href set
+                 var dtId = "link_detail"+$(objT).attr('myid');
+                     let myUrl = $("#"+dtId).attr('href');
+                     //let okmyUrl = 'myUrl.replace(/#|_/g,'')'; // result: "this is a test"
+                     let okmyUrl = '/products/detail/'+$(objT).attr('myid'); // result: "this is a test"
+
+                     //let newUrl = "#"+myUrl;
+                     let newUrl = "javascript:;";
+                      let input1 =document.getElementById(objT.id);
+                 //
+                 input1.setCustomValidity('');
+                  let mymst_quantity= $(objT).attr('mymst_quantity');
+                 if (objT.value == "") {
+
+
+                     input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+                     input1.reportValidity();
+                     $("#"+dtId).attr('href',newUrl);
+                     isFail=true;
+                    return true;
+                }
+                if ( (objT.value < 1) || (objT.value < mymst_quantity)) {
+
+
+                     input1.setCustomValidity(mymst_quantity+"{{ 'front.product.invalid_quantity'|trans }}");
+                     input1.reportValidity();
+                     $("#"+dtId).attr('href',newUrl);
+                     isFail=true;
+                    return true;
+                }
+
+                  if(objT.value % mymst_quantity  !== 0) {
+                            input1.setCustomValidity(mymst_quantity+"{{ 'front.product.invalid_quantity'|trans }}");
+                            input1.reportValidity();
+                              isFail=true;
+                          $("#"+dtId).attr('href',newUrl);
+                            return true;
+                   }
+                   console.log('keylist#'+ $(objT).attr('myid'));
+                    $.cookie( $(objT).attr('myid'),objT.value, { path: '/' });
+                    if(isFail==false){
+                         $("#"+dtId).attr('href',okmyUrl);
+                    }
+            });
+
+
+
+        });
     </script>
 {% endblock %}
 
 {% block main %}
+    <script>var ALL_PRODUCT = [];
+    </script>
     <style>
         .standar_price{
             color: #00B050;
@@ -133,6 +225,7 @@ file that was distributed with this source code.
         .good_price{
             color: #FF0000;
         }
+
     </style>
     {% if search_form.category_id.vars.errors|length > 0 %}
         <div class="ec-searchnavRole">
@@ -200,10 +293,13 @@ file that was distributed with this source code.
                             {% for Product in pagination %}
 
                                 {% set form = forms[Product.id] %}
+                                <script>
+                                    ALL_PRODUCT.push('{{ Product.id }}');
+                                </script>
 
                                 <tr>
                                     <td class="item spec">
-                                        <a href="/products/detail/{{ Product.id }}">
+                                        <a id="link_detail{{ Product.id }}" href="/products/detail/{{ Product.id }}">
                                             <div class="itemImage">
                                                 {% if hsKeyImg[Product.id] is defined %}
                                                     <img  style="width: 150px;height: 150px" src="{{ asset(hsKeyImg[Product.id]|no_image_product, 'save_image') }}" alt="{{ Product.product_name }}" loading="lazy">
@@ -292,7 +388,7 @@ file that was distributed with this source code.
                                                     {% endif %}
                                                 {% endif %}
                                                 <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}:</span>
-                                                    {{ form_widget(form.quantity, {'attr': {'class': 'quantity','value': Product.mst_quantity|number_format
+                                                    {{ form_widget(form.quantity, {'attr': {'myId':Product.id,'mymst_quantity':Product.mst_quantity,'class': 'quantity','value': Product.mst_quantity|number_format
                                                         ,'min':Product.mst_quantity
                                                         ,'step':Product.mst_quantity}}) }}
                                                     {{ form_errors(form.quantity) }}

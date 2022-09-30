@@ -70,7 +70,7 @@
 {% if totalQuantity > 0 %}
             <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div><span class="fnDIN">{{ totalQuantity|number_format }}</span></a></li>
 {% else %}
-            <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div></a></li>
+            <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div><div id="emptyCart"></div></a></li>
 {% endif %}
         </ul>
     </div>
@@ -84,3 +84,48 @@
     {% endif %}
 
 </style>
+
+<script src="https://cdn.jsdelivr.net/gh/yeikos/jquery.history/jquery.history.js"></script>
+
+<script>
+
+    $(function () {
+
+        console.log('headerheader'+Math.random());
+
+
+
+
+
+
+        $.ajax({
+            url: '{{ url('get_total_cart') }}?r'+Math.random(),
+            type: 'GET',
+            data: {
+
+                '_token':'{{ csrf_token('_token') }}'
+            }
+        }).done(function(data, statusText, jqXHR) {
+
+            if(data.totalNew>0){
+                let cartHtml ="<span class='fnDIN'>"+data.totalNew+"</span>";
+                $('#emptyCart').html(cartHtml);
+                $('a>.fnDIN').html(data.totalNew);
+                $('a>.fnDIN').show();
+            }else{
+                $('a>.fnDIN').remove();
+            }
+
+
+
+        }).fail(function(jqXHR, statusText, errorThrown) {
+
+        });
+
+
+    });
+
+
+
+
+</script>

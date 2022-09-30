@@ -569,6 +569,12 @@ class MyShoppingController extends AbstractShoppingController
                     $hsArrRemmain[$itemPro['ec_order_lineno']] = $itemPro['quantity']; //$itemPro['product_quantity']
                     $hsArrJanCode[$itemPro['ec_order_lineno']] = $itemPro['jan_code'];
                     $hsArrProductQuantity[$itemPro['ec_order_lineno']] = $itemPro['product_quantity'];
+
+                    if (isset($_COOKIE[$itemPro['product_id']])) {
+                        unset($_COOKIE[$itemPro['product_id']]);
+                        setcookie($itemPro['product_id'], null, -1, '/');
+
+                    }
                 }
                 //customer_code
 

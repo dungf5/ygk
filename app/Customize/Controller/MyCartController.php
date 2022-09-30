@@ -324,6 +324,7 @@ class MyCartController extends AbstractController
 
         $mstProduct = $this->mstProductRepository->getData($ProductClass->getProduct()->getId());
 
+        $idRemove = 0;
         // 明細の増減・削除
         switch ($operation) {
             case 'up':
@@ -332,15 +333,25 @@ class MyCartController extends AbstractController
             case 'down':
                 $this->cartService->addProductCustomize($ProductClass, -1 * $mstProduct->getQuantity());
                 break;
-            case 'remove':
+            case 'remove':{
                 $this->cartService->removeProductCustomize($ProductClass);
+                $idRemove = $ProductClass->getProduct()->getId();
                 break;
+            }
+
         }
+
+        if((int)$idRemove>0){
+            setcookie($ProductClass->getProduct()->getId(),$mstProduct->getQuantity(),0,"/");
+        }
+
         $Carts = $this->cartService->getCarts();
         foreach ($Carts as $Cart) {
             $totalPrice = 0;
             foreach ($Cart['CartItems'] as $CartItem) {
                 $totalPrice += $CartItem['price'] * $CartItem['quantity'];
+                setcookie($ProductClass->getProduct()->getId(),$CartItem['quantity']*$mstProduct->getQuantity(),0,"/");
+
             }
 
             $Cart->setTotalPrice($totalPrice);
