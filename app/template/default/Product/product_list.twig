@@ -434,7 +434,7 @@ function initInputVal(){
                                                     {% endif %}
                                                 {% endif %}
                                                 <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}:</span>
-                                                    {{ form_widget(form.quantity, {'attr': {'myId':Product.id,'mymst_quantity':Product.mst_quantity,'class': 'quantity','value': Product.mst_quantity|number_format
+                                                    {{ form_widget(form.quantity, {'attr': {'myId':Product.id,'title':'','mymst_quantity':Product.mst_quantity,'class': 'quantity','value': Product.mst_quantity|number_format
                                                         ,'min':Product.mst_quantity
                                                         ,'step':Product.mst_quantity}}) }}
                                                     {{ form_errors(form.quantity) }}

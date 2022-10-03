@@ -86,7 +86,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
          */
         private $demand_unit;
         /**
-         * @ORM\Column(name="order_price",type="integer",nullable=true, options={"comment":"受注単価"  })
+         * @ORM\Column(name="order_price",type="float",nullable=true, options={"comment":"受注単価"  })
          */
         private $order_price;
         /**

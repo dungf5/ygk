@@ -455,7 +455,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
 
                         <div style="padding-left: 0.3em">
                             <div class="ec-numberInput"><span style="color: #000000">{{ 'common.quantity'|trans }}:</span>
-                                {{ form_widget(form.quantity,{'attr': {'myId':Product.id,'class': 'quantity','value': MstProduct.quantity|number_format
+                                {{ form_widget(form.quantity,{'attr': {'myId':Product.id,'title':'','class': 'quantity','value': MstProduct.quantity|number_format
                                     ,'min':MstProduct.quantity
                                     ,'step':MstProduct.quantity}}) }}
                                 {{ form_errors(form.quantity) }}
