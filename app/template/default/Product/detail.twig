@@ -201,23 +201,25 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                 {% endif %}
 
                 // 個数フォームのチェック
-
+                if(checkInput('quantity')==false){
+                    return false;
+                }
                 if ($('#quantity').val() == "") {
-                    let input1 =document.getElementById('quantity');
-                    input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
-                    input1.reportValidity();
-                    return true;
+                    {#let input1 =document.getElementById('quantity');#}
+                    {#input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');#}
+                    {#input1.reportValidity();#}
+                    {#return true;#}
                 } else {
-                    let checkCase1 = $('#quantity').val() < {{ MstProduct.quantity }} ;
-                    let checkCase2 = $('#quantity').val() <1 ;
-                    let checkCase3 = $('#quantity').val() % {{ MstProduct.quantity }}  !== 0;
+                    {#let checkCase1 = $('#quantity').val() < {{ MstProduct.quantity }} ;#}
+                    {#let checkCase2 = $('#quantity').val() <1 ;#}
+                    {#let checkCase3 = $('#quantity').val() % {{ MstProduct.quantity }}  !== 0;#}
 
-                    if(checkCase1||checkCase2||checkCase3) {
-                        $('#quantity')[0].setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');
-                        $('#quantity')[0].reportValidity();
-                        return true;
-                    }
-                    $('#quantity')[0].setCustomValidity('');
+                    {#if(checkCase1||checkCase2||checkCase3) {#}
+                    {#    $('#quantity')[0].setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');#}
+                    {#    $('#quantity')[0].reportValidity();#}
+                    {#    return true;#}
+                    {#}#}
+                    {#$('#quantity')[0].setCustomValidity('');#}
                 }
 
                 event.preventDefault();
@@ -278,6 +280,42 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
 
 
         //nvtrong add
+        function checkInput(idQuantity){
+
+
+                var valInput = $('#'+idQuantity).val().trim();
+                  let input1 =document.getElementById(idQuantity);
+                  input1.setCustomValidity('');
+             if (valInput == "") {
+
+
+                    input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+                    input1.reportValidity();
+                    return false;
+              }
+
+             if ( (valInput == 0) && (1 == {{ MstProduct.quantity }}) ){
+
+                    input1.setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');
+                    input1.reportValidity();
+                    return false;
+              }
+
+            if ( (valInput == 0) && (1 != {{ MstProduct.quantity }}) ){
+                   //%number%
+                    input1.setCustomValidity('{{ 'front.product.invalid_quantity_big'|trans({ '%number%': MstProduct.quantity }) }}');
+                    input1.reportValidity();
+                    return false;
+              }
+             if(valInput % {{ MstProduct.quantity }}  !== 0) {
+                    $('#'+idQuantity)[0].setCustomValidity('{{ 'front.product.invalid_quantity_big'|trans({ '%number%': MstProduct.quantity }) }}');
+                    $('#'+idQuantity)[0].reportValidity();
+                     return false;
+             }
+                $.cookie( idQuantity,valInput, { path: '/' });
+                 console.log('keyde#'+idQuantity);
+             return true;
+        }
  $(function() {
 
             let myValue = $.cookie( $('#quantity').attr('myid'));
@@ -288,57 +326,18 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
 
             // 表示件数を変更
             $('#quantity').on("input",function(ev) {
-                var objT = this;
-                  let input1 =document.getElementById('quantity');
-                  input1.setCustomValidity('');
-             if ($('#quantity').val() == "") {
-
-
-                    input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
-                    input1.reportValidity();
-                    return true;
-              }
-            if ( ($('#quantity').val() < 1) || ($('#quantity').val() < {{ MstProduct.quantity }}) ){
-
-
-                    input1.setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');
-                    input1.reportValidity();
-                    return true;
-              }
-             if($('#quantity').val() % {{ MstProduct.quantity }}  !== 0) {
-                    $('#quantity')[0].setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');
-                    $('#quantity')[0].reportValidity();
-                    return true;
-             }
-                $.cookie( $(objT).attr('myid'),objT.value, { path: '/' });
-                  console.log('keyde#'+$(objT).attr('myid'));
+                  var objT = this;
+                  checkInput('quantity');
 
             });
 
         });
 
  $('.btnBack').click(function() {
-      let input1 =document.getElementById('quantity');
-       if ($('#quantity').val() == "") {
-
-
-                        input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
-                        input1.reportValidity();
-                        return true;
-        }
-  if ( ($('#quantity').val() < 1) || ($('#quantity').val() < {{ MstProduct.quantity }}) ){
-
-
-                    input1.setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');
-                    input1.reportValidity();
-                    return true;
-              }
-      if($('#quantity').val() % {{ MstProduct.quantity }}  !== 0) {
-                $('#quantity')[0].setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');
-                 $('#quantity')[0].reportValidity();
-                return true;
+       if( checkInput('quantity')==true){
+          window.location.href= $.cookie( 'listUrl');
        }
-     window.location.href= $.cookie( 'listUrl');
+
  });
     </script>
     <script type="application/ld+json">

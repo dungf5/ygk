@@ -53,40 +53,44 @@ file that was distributed with this source code.
                 var $quantity = $form.parent().find('.quantity');
                 let idProduct = $quantity.attr('myid');
                 var $checkQuantity = $form.parent().find('.checkQuantity');
-
-                 if ($quantity.val()=="") {
-
-                    $quantity[0].setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
-                    $quantity[0].reportValidity();
-
-                    setTimeout(function() {
-                        loadingOverlay('hide');
-                    }, 100);
-                    return true;
+                let rsCheck = checkInput('quantity'+idProduct);
+                if(rsCheck==false){
+                    return;
                 }
 
-               if ( ($quantity.val()< 1)||($quantity.val()< $checkQuantity.val()) ) {
+               {#  if ($quantity.val()=="") {#}
 
-                    $quantity[0].setCustomValidity($checkQuantity.val()+'{{ 'front.product.invalid_quantity'|trans }}');
-                    $quantity[0].reportValidity();
+               {#     $quantity[0].setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');#}
+               {#     $quantity[0].reportValidity();#}
 
-                    setTimeout(function() {
-                        loadingOverlay('hide');
-                    }, 100);
-                    return true;
-                }
-                if (parseInt($quantity.val()) % parseInt($checkQuantity.val()) !== 0) {
+               {#     setTimeout(function() {#}
+               {#         loadingOverlay('hide');#}
+               {#     }, 100);#}
+               {#     return true;#}
+               {# }#}
 
-                    $quantity[0].setCustomValidity($checkQuantity.val()+'{{ 'front.product.invalid_quantity'|trans }}');
-                    $quantity[0].reportValidity();
+               {#if ( ($quantity.val()< 1)||($quantity.val()< $checkQuantity.val()) ) {#}
 
-                    setTimeout(function() {
-                        loadingOverlay('hide');
-                    }, 100);
-                    return true;
-                } else {
-                    $quantity[0].setCustomValidity('');
-                }
+               {#     $quantity[0].setCustomValidity($checkQuantity.val()+'{{ 'front.product.invalid_quantity'|trans }}');#}
+               {#     $quantity[0].reportValidity();#}
+
+               {#     setTimeout(function() {#}
+               {#         loadingOverlay('hide');#}
+               {#     }, 100);#}
+               {#     return true;#}
+               {# }#}
+               {# if (parseInt($quantity.val()) % parseInt($checkQuantity.val()) !== 0) {#}
+
+               {#     $quantity[0].setCustomValidity($checkQuantity.val()+'{{ 'front.product.invalid_quantity'|trans }}');#}
+               {#     $quantity[0].reportValidity();#}
+
+               {#     setTimeout(function() {#}
+               {#         loadingOverlay('hide');#}
+               {#     }, 100);#}
+               {#     return true;#}
+               {# } else {#}
+               {#     $quantity[0].setCustomValidity('');#}
+               {# }#}
                 e.preventDefault();
                 $.ajax({
                     url: $form.attr('action'),
@@ -154,18 +158,59 @@ function initInputVal(){
          }
     }
 }
+ function checkInput(idQuantity){
 
+
+                var valInput = $('#'+idQuantity).val().trim();
+                let mymst_quantity = $('#'+idQuantity).attr('mymst_quantity');
+                  let input1 =document.getElementById(idQuantity);
+                  input1.setCustomValidity('');
+             if (valInput == "") {
+
+
+                    input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+                    input1.reportValidity();
+                    return false;
+              }
+
+             if ( (valInput == 0) && (1 == mymst_quantity) ){
+
+                    input1.setCustomValidity(mymst_quantity+'{{ 'front.product.invalid_quantity'|trans }}');
+                    input1.reportValidity();
+                    return false;
+              }
+
+            if ( (valInput == 0) && (1 != mymst_quantity) ){
+                   //%number%
+                   let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                   msgShow = msgShow.replace('%number%',mymst_quantity);
+                    input1.setCustomValidity(msgShow);
+                    input1.reportValidity();
+                    return false;
+              }
+             if(valInput % mymst_quantity  !== 0) {
+                   let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                   msgShow = msgShow.replace('%number%',mymst_quantity);
+                    $('#'+idQuantity)[0].setCustomValidity(msgShow);
+                    $('#'+idQuantity)[0].reportValidity();
+                     return false;
+             }
+                $.cookie( idQuantity,valInput, { path: '/' });
+                 console.log('keyde#'+idQuantity);
+             return true;
+        }
  $(function() {
             initInputVal();
             $.cookie( 'listUrl',window.location.href);
             // 表示件数を変更
             $('.quantity').on("input", function(ev) {
 
-
                 var objT = this;
                 var isFail = false;
                 //href set
                  var dtId = "link_detail"+$(objT).attr('myid');
+                 //quantity1421
+                let quantityId = "quantity"+$(objT).attr('myid');
                      let myUrl = $("#"+dtId).attr('href');
                      //let okmyUrl = 'myUrl.replace(/#|_/g,'')'; // result: "this is a test"
                      let okmyUrl = '/products/detail/'+$(objT).attr('myid'); // result: "this is a test"
@@ -176,37 +221,38 @@ function initInputVal(){
                  //
                  input1.setCustomValidity('');
                   let mymst_quantity= $(objT).attr('mymst_quantity');
-                 if (objT.value == "") {
+                 let resultCheck = checkInput(quantityId);
+                {# if (objT.value == "") {#}
 
 
-                     input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
-                     input1.reportValidity();
-                     $("#"+dtId).attr('href',newUrl);
-                     isFail=true;
-                    return true;
-                }
-                if ( (objT.value < 1) || (objT.value < mymst_quantity)) {
+                {#     input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');#}
+                {#     input1.reportValidity();#}
+                {#     $("#"+dtId).attr('href',newUrl);#}
+                {#     isFail=true;#}
+                {#    return true;#}
+                {#}#}
+                {#if ( (objT.value < 1) || (objT.value < mymst_quantity)) {#}
 
 
-                     input1.setCustomValidity(mymst_quantity+"{{ 'front.product.invalid_quantity'|trans }}");
-                     input1.reportValidity();
-                     $("#"+dtId).attr('href',newUrl);
-                     isFail=true;
-                    return true;
-                }
+                {#     input1.setCustomValidity(mymst_quantity+"{{ 'front.product.invalid_quantity'|trans }}");#}
+                {#     input1.reportValidity();#}
+                {#     $("#"+dtId).attr('href',newUrl);#}
+                {#     isFail=true;#}
+                {#    return true;#}
+                {#}#}
 
-                  if(objT.value % mymst_quantity  !== 0) {
-                            input1.setCustomValidity(mymst_quantity+"{{ 'front.product.invalid_quantity'|trans }}");
-                            input1.reportValidity();
-                              isFail=true;
-                          $("#"+dtId).attr('href',newUrl);
-                            return true;
-                   }
-                   console.log('keylist#'+ $(objT).attr('myid'));
+                {#  if(objT.value % mymst_quantity  !== 0) {#}
+                {#            input1.setCustomValidity(mymst_quantity+"{{ 'front.product.invalid_quantity'|trans }}");#}
+                {#            input1.reportValidity();#}
+                {#              isFail=true;#}
+                {#          $("#"+dtId).attr('href',newUrl);#}
+                {#            return true;#}
+                {#   }#}
+                {#   console.log('keylist#'+ $(objT).attr('myid'));#}
+                if(resultCheck==true){
                     $.cookie( $(objT).attr('myid'),objT.value, { path: '/' });
-                    if(isFail==false){
                          $("#"+dtId).attr('href',okmyUrl);
-                    }
+                }
             });
 
 

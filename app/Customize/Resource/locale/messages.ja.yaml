@@ -15,6 +15,7 @@ front.product.stock: 在庫
 front.product.invalid_quantity_multiples:  の倍数で入力してください。
 front.product.invalid_quantity: 以上で入力してください。
 front.product.not_input_quantity: このフィールドに入力してください
+front.product.invalid_quantity_big: 値は%number%単位にする必要があります。
 
 front.shopping.shipping_title_error: 出荷先をご指定ください。
 front.shopping.error_bill_address: 請求先を選んでください。
