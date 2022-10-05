@@ -283,6 +283,7 @@ $(function () {
 
 //nvtrong ajax
             $('.mySubmitConfirm').click(function() {
+
                 let isSubmit =1;
 
                let valbill_address = $("select[name='bill_address']").val();
@@ -340,13 +341,15 @@ $(function () {
                     $('.error_delivery_address').hide();
                }
 
-                if(isSubmit ===1){
+
+                if(checkDate() && isSubmit ===1){
                   $('#shopping-form').submit();
                 }
+
              }else{
                    $('.error_delivery_address').hide();
              }
-               if(isSubmit ===1){
+               if(checkDate() && isSubmit ===1){
                   $('#shopping-form').submit();
                 }
 
@@ -472,6 +475,61 @@ $(function () {
 <script src="{{ asset('assets/js/vendor/tempusdominus-bootstrap-4.min.js', 'admin') }}"></script>
 
 <script>
+    Date.isLeapYear = function (year) {
+            return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0));
+        };
+
+        Date.getDaysInMonth = function (year, month) {
+            return [31, (Date.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+        };
+
+        Date.prototype.isLeapYear = function () {
+            return Date.isLeapYear(this.getFullYear());
+        };
+
+        Date.prototype.getDaysInMonth = function () {
+            return Date.getDaysInMonth(this.getFullYear(), this.getMonth());
+        };
+
+        Date.prototype.addMonths = function (value) {
+            var n = this.getDate();
+            this.setDate(1);
+            this.setMonth(this.getMonth() + value);
+            this.setDate(Math.min(n, this.getDaysInMonth()));
+            return this;
+        };
+        function checkDate(){
+             $('.error_date').html('');
+              let msErSame = "{{ 'front.shopping.shipping_date_err_same'|trans }}";//same error_date
+              let msErSmal =  "{{ 'front.shopping.shipping_date_err_small'|trans }}";//smaller
+              let msErMonth =  "{{ 'front.shopping.shipping_date_err_month'|trans }}";//>1month
+              let date1Str = $('#date_picker_delivery').val();
+              if(date1Str.trim()==''){
+                  return  true;
+              }
+
+            let inputDateStr = date1Str;
+            let curDate = new Date();
+            curDate.setHours(0, 0, 0, 0);
+            let inputDate = new Date(inputDateStr);
+            inputDate.setHours(0, 0, 0, 0);
+            if(curDate.toString()==inputDate.toString()){
+                 $('.error_date').html(msErSame);
+                 return false;
+            }
+            if(inputDate<curDate){
+                 $('.error_date').html(msErSmal);
+                 return false;
+            }
+            curDate.addMonths(1);
+            if(inputDate>curDate){
+                 $('.error_date').html(msErMonth);
+                 return false;
+            }
+            return true;
+        }
+
+        var CUR_INPUT_DATE=null;
     $(function() {
 
        var maxDate = "{{ getNext3Month() }}";
@@ -493,9 +551,62 @@ $(function () {
                 showClose: true
             }
         });
+
+
+             $('#date_picker_delivery').keypress(function(){
+             //$( "#date_picker_delivery" ).datepicker({ "minDate": null});
+             // $('#date_picker_delivery').datetimepicker('toggle');
+            // $('#date_picker_delivery').val(CUR_INPUT_DATE);
+            });
+            function dateIsValid(dateStr) {
+              const regex = /^\d{4}-\d{2}-\d{2}$/;
+
+              if (dateStr.match(regex) === null) {
+                return false;
+              }
+
+              const date = new Date(dateStr);
+
+              const timestamp = date.getTime();
+
+              if (typeof timestamp !== 'number' || Number.isNaN(timestamp)) {
+                return false;
+              }
+
+              return date.toISOString().startsWith(dateStr);
+            }
          $("#date_picker_delivery").on("change.datetimepicker", function (e) {
-            let dateChoose = e.date.format('YYYY-MM-DD');
-            updateDateDeli(dateChoose);
+
+
+             if(e.date!=undefined){
+
+                let dateChoose = e.date.format('YYYY-MM-DD');
+                updateDateDeli(dateChoose);
+             }else{
+                let inputDateStr =$(this).val();
+               //  let curDate = new Date();
+               //    curDate.setHours(0, 0, 0, 0);
+               //   let inputDate = new Date(inputDateStr);
+               // let msS = "当日日時は指定できません。1";
+               // inputDate.setHours(0, 0, 0, 0);
+               // if(curDate.toString()==inputDate.toString()){
+               //     alert(msS);
+               // }
+               //
+               //  e.date=inputDate;
+               // defaultDate =inputDateStr;
+               // $( "#date_picker_delivery" ).datepicker({ defaultDate: inputDateStr });
+               // $('#date_picker_delivery').datepicker("setDate", inputDate );
+               setTimeout(function() {
+                   if(dateIsValid(inputDateStr)){
+                   $( "#date_picker_delivery" ).val(inputDateStr);
+                   }
+
+               },3)
+
+
+             }
+
 
         });
 
@@ -1136,25 +1247,32 @@ console.log(Math.random());
                 </div>
 
 
-                <div class="ec-orderAccount date_picker_row ">
-                    <div class="shipping_destination_left date_picker_delivery">
-                        <div> {{ 'front.shopping.date_picker_delivery'|trans }}</div>
-                    </div>
-                    <div class="shipping_destination_right">
-                        <div class="shipping_row">
-                            <div class="date_picker_delivery">
-                                <div class="controls" id="date_picker_delivery_p" style="position: relative">
-                                    <input type="text"
-                                           id="date_picker_delivery" name="date_picker_delivery"
-                                           class="datetimepicker-input form-control" data-target="#date_picker_delivery"
-                                           data-toggle="datetimepicker"/>
+                <div class="ec-orderAccount  ">
+                    <div class=" date_picker_row ">
+                        <div class="shipping_destination_left date_picker_delivery">
+                            <div> {{ 'front.shopping.date_picker_delivery'|trans }}</div>
+                        </div>
+                        <div class="shipping_destination_right">
+                            <div class="shipping_row">
+                                <div class="date_picker_delivery">
+                                    <div class="controls" id="date_picker_delivery_p" style="position: relative">
+                                        <input type="text"
+                                               id="date_picker_delivery" name="date_picker_delivery"
+                                               class="datetimepicker-input form-control" data-target="#date_picker_delivery"
+                                               data-toggle="datetimepicker"/>
 
+                                    </div>
                                 </div>
+
+
                             </div>
-
-
                         </div>
                     </div>
+
+                    <p class="error_date" style="color: red;font-size: larger;font-weight: bold;">
+
+                    </p>
+
                 </div>
 
 
