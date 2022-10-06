@@ -125,7 +125,7 @@ file that was distributed with this source code.
                                                     {{ form_errors(forms[Calendar.id].holiday) }}
                                                 </div>
                                                 <div class="list">
-                                                    <span>{{ Calendar.holiday|date_day }}</span>
+                                                    <span>{{ Calendar.holiday|date('d-m-Y')  }}</span>
                                                 </div>
                                             </td>
                                             <td class="align-middle">

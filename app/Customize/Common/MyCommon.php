@@ -33,7 +33,7 @@ class MyCommon
         return MyCommon::getRootDir().'/html/user_data';
     }
     public static function getDayWeekend(){
-        $numberofdays = 15;//find in 15 days
+        $numberofdays = 35;//find in 15 days
         $startdate1 = date("Y-m-d");//'2022-09-23';//
         $dayText = date('Y-m-d', strtotime($startdate1 . ' +1 day'));//ignore today
         $startdate = $dayText;//'2022-09-23';
@@ -96,6 +96,54 @@ class MyCommon
         return $dayTextOk;
 
     }
+    public static function getValidDate($dayText,$dayOfArWeekEnd,$dayOf){
+
+
+        $dayStart = new \DateTime( $dayText );
+        $timeStart = $dayStart->getTimestamp();
+        $numberDayWant = 3;
+        $numberDayGet =0;
+        $addDay = 86400;
+        $dayTextOk="";
+        $lenAr = count($dayOfArWeekEnd);
+        while ($lenAr){
+            $lenAr--;
+            $dayText = date('Y-m-d', $timeStart);
+            if(in_array($dayText,$dayOfArWeekEnd)){
+                $timeStart = $timeStart+$addDay;
+                $dayTextOk = date('Y-m-d', $timeStart);
+                continue;
+            }else{
+
+                break;
+            }
+        }
+        if($dayTextOk==""){
+            $dayTextOk = $dayText;
+        }
+        //
+        $dayStart = new \DateTime( $dayTextOk );
+        $timeStart = $dayStart->getTimestamp();
+        $lenArOf = count($dayOf);
+        while ($lenArOf){
+            $lenArOf--;
+            $dayText = date('Y-m-d', $timeStart);
+            if(in_array($dayText,$dayOf)){
+                $timeStart = $timeStart+$addDay;
+                $dayTextOk = date('Y-m-d', $timeStart);
+                continue;
+            }else{
+
+                break;
+            }
+        }
+        if($dayTextOk==""){
+            $dayTextOk = $dayText;
+        }
+        return $dayTextOk;
+
+    }
+
 
     public static function getNextDayNoWeekend(){
         $startdate = date("Y-m-d");//'2022-09-23';

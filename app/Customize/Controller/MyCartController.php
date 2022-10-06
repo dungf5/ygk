@@ -102,6 +102,7 @@ class MyCartController extends AbstractController
      */
     public function index(Request $request)
     {
+
         if ('POST' === $request->getMethod()) {
             $commonService = new MyCommonService($this->entityManager);
             $shipping_code = $request->get('shipping_code');
@@ -173,8 +174,21 @@ class MyCartController extends AbstractController
                 $result = ['is_ok' => '1', 'msg' => 'OK', 'delivery_code' => $delivery_code, 'pre_order_id' => $pre_order_id];
             }
             if (!MyCommon::isEmptyOrNull($date_want_delivery)) {
-                $commonService->saveTempCartDateWantDeli($date_want_delivery, $pre_order_id);
-                $result = ['is_ok' => '1', 'msg' => 'OK', 'date_want_delivery' => $date_want_delivery, 'pre_order_id' => $pre_order_id];
+                $result = ['is_ok' => '0', 'msg' => 'OK', 'date_want_delivery' => $date_want_delivery, 'pre_order_id' => $pre_order_id];
+                $dayTest= $date_want_delivery;
+                $comS = new MyCommonService($this->entityManager);
+                $arrDayOff = $comS->getDayOff();
+                $dayAfter = MyCommon::getValidDate($dayTest, MyCommon::getDayWeekend(),$arrDayOff);
+                $dayAfterDay =  new \DateTime($dayAfter);
+                $curDay = new \DateTime();
+                $curDay->modify('+1 month');
+                if ($dayAfterDay > $curDay){
+                    $result = ['is_ok' => '0', 'msg' => 'Over one months', 'date_want_delivery' => $dayAfter, 'pre_order_id' => $pre_order_id];
+                }else{
+                    $result = ['is_ok' => '1', 'msg' => 'OK', 'date_want_delivery' => $dayAfter, 'pre_order_id' => $pre_order_id];
+                    $commonService->saveTempCartDateWantDeli($date_want_delivery, $pre_order_id);
+                }
+
             }
 
             return $this->json($result, 200);

@@ -103,7 +103,8 @@ class MyEccubeExtension extends AbstractExtension
             return "";
         }
         $numAf  =str_replace(",","",$numAf);
-        $roundUp = round($numAf);
+        //$roundUp = round($numAf);
+        $roundUp = (int)$numAf;
         $roundUp = number_format($roundUp);
         return "￥".$roundUp;
     }

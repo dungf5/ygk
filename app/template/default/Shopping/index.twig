@@ -514,6 +514,7 @@ $(function () {
             let inputDate = new Date(inputDateStr);
             inputDate.setHours(0, 0, 0, 0);
             if(curDate.toString()==inputDate.toString()){
+                $('#date_picker_delivery').focus();
                  $('.error_date').html(msErSame);
                  return false;
             }
@@ -530,9 +531,8 @@ $(function () {
         }
 
         var CUR_INPUT_DATE=null;
-    $(function() {
-
-       var maxDate = "{{ getNext3Month() }}";
+        $( document ).ready(function() {
+             var maxDate = "{{ getNext3Month() }}";
        var minDate = "{{ getMinDate() }}";
        let defaultDate='';
            {% if Order.hasMoreOrder == 1 %}
@@ -546,18 +546,20 @@ $(function () {
             maxDate: maxDate,
             minDate: minDate,
             defaultDate:defaultDate,
+            useStrict: true,
+            keepInvalid: true,
             buttons: {
                 showToday: true,
                 showClose: true
             }
         });
 
-
-             $('#date_picker_delivery').keypress(function(){
-             //$( "#date_picker_delivery" ).datepicker({ "minDate": null});
-             // $('#date_picker_delivery').datetimepicker('toggle');
-            // $('#date_picker_delivery').val(CUR_INPUT_DATE);
-            });
+              $("#date_picker_delivery").on("keyup.datetimepicker", function (e) {
+                 checkDate()
+              });
+                 $("#date_picker_delivery").on("hide.datetimepicker", function (e) {
+                 checkDate()
+              });
             function dateIsValid(dateStr) {
               const regex = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -575,13 +577,19 @@ $(function () {
 
               return date.toISOString().startsWith(dateStr);
             }
+
+
+
          $("#date_picker_delivery").on("change.datetimepicker", function (e) {
 
 
              if(e.date!=undefined){
 
                 let dateChoose = e.date.format('YYYY-MM-DD');
+                if(checkDate()){
                 updateDateDeli(dateChoose);
+                }
+
              }else{
                 let inputDateStr =$(this).val();
                //  let curDate = new Date();
@@ -597,42 +605,43 @@ $(function () {
                // defaultDate =inputDateStr;
                // $( "#date_picker_delivery" ).datepicker({ defaultDate: inputDateStr });
                // $('#date_picker_delivery').datepicker("setDate", inputDate );
-               setTimeout(function() {
-                   if(dateIsValid(inputDateStr)){
-                   $( "#date_picker_delivery" ).val(inputDateStr);
-                   }
-
-               },3)
-
-
+               // setTimeout(function() {
+               //     if(dateIsValid(inputDateStr)){
+               //     $( "#date_picker_delivery" ).val(inputDateStr);
+               //     }
+               //
+               // },30)
              }
 
 
         });
-
-
-
-
-
-    });
+});
 
       function updateDateDeli(dateChoose){
-
+                let htmlRe1='';
+                $('.error_date').html('');
                  $.ajax({
                         url: '{{ url('cart_save_temp_order') }}',
                         type: 'POST',
+                         async:false,
                         data: {
                             'date_want_delivery': dateChoose,
                             'pre_order_id':'{{ Order.pre_order_id }}',
                              'customer_id':'{{ Order.Customer.id }}'
                         }
                     }).done(function(htmlRe, statusText, jqXHR) {
-
+                       htmlRe1=htmlRe;
                        console.log(htmlRe);
 
                     }).fail(function(jqXHR, statusText, errorThrown) {
 
                 });
+                 debugger;
+                  $("#date_picker_delivery").val(htmlRe1.date_want_delivery);
+                 if(htmlRe1.is_ok==0){
+                     $('.error_date').html(htmlRe1.msg);
+                 }
+
 
             }
 

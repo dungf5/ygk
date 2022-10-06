@@ -13,6 +13,8 @@
 
 namespace Eccube\Controller\Admin\Setting\Shop;
 
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Doctrine\DBAL\Types\Type;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\Calendar;
 use Eccube\Form\Type\Admin\CalendarType;
@@ -38,6 +40,7 @@ class CalendarController extends AbstractController
      */
     public function __construct(CalendarRepository $calendarRepository)
     {
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $this->calendarRepository = $calendarRepository;
     }
 
@@ -71,7 +74,7 @@ class CalendarController extends AbstractController
 
         // カレンダーリスト取得
         $Calendars = $this->calendarRepository->getListOrderByIdDesc();
-
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $forms = [];
         $errors = [];
         /** @var Calendar $Calendar */
@@ -89,7 +92,9 @@ class CalendarController extends AbstractController
                 $editCalendarForm->handleRequest($request);
                 if ($editCalendarForm->isValid()) {
                     $calendarData = $editCalendarForm->getData();
-
+                    $daHo =$calendarData->getHoliday();
+                    $daHo->setTimezone(new \DateTimeZone('Asia/Tokyo'));
+                    $calendarData->setHoliday($daHo);
                     $this->entityManager->persist($calendarData);
                     $this->entityManager->flush();
 
