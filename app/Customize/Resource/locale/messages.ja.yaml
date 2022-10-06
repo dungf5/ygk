@@ -41,9 +41,9 @@ front.shopping.select_one: ※届け先を選んでください。
 front.shopping.select_one_bill_address: ※請求先を選んでください。
 front.shopping.select_one_shipping_radio: ※出荷先を選んでください。
 front.shopping.select_one_delivery_address: ※届け先を選んでください。
-front.shopping.shipping_date_err_small: 過去日時は指定できません。
-front.shopping.shipping_date_err_same: 当日日時は指定できません。
-front.shopping.shipping_date_err_month: １か月を超える日時は指定できません。
+front.shopping.shipping_date_err_small: 過去日付は指定できません。
+front.shopping.shipping_date_err_same: 当日日付は指定できません。
+front.shopping.shipping_date_err_month: １か月を超える日付は指定できません。
 front.mypage.shipping_no: 出荷指示№
 front.mypage.customer_code: 顧客
 front.mypage.shipping_code: 出荷先
