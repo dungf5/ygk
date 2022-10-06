@@ -188,6 +188,7 @@ class MyCartController extends AbstractController
                     $result = ['is_ok' => '1', 'msg' => 'OK', 'date_want_delivery' => $dayAfter, 'pre_order_id' => $pre_order_id];
                     $commonService->saveTempCartDateWantDeli($date_want_delivery, $pre_order_id);
                 }
+
             }
 
             return $this->json($result, 200);
