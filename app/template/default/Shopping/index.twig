@@ -172,7 +172,7 @@ file that was distributed with this source code.
                     this.input.tooltip( "close" ).attr( "title", "" );
                 }, 500 );
                 this.input.autocomplete( "instance" ).term = "";
-                 debugger;
+
                //  $('.delivery_address_main').html('');
 
             },
@@ -546,20 +546,22 @@ $(function () {
             maxDate: maxDate,
             minDate: minDate,
             defaultDate:defaultDate,
-            useStrict: true,
-            keepInvalid: true,
+            useStrict: false,
+            keepInvalid: false,
             buttons: {
                 showToday: true,
                 showClose: true
             }
         });
 
-              $("#date_picker_delivery").on("keyup.datetimepicker", function (e) {
-                 checkDate()
-              });
-                 $("#date_picker_delivery").on("hide.datetimepicker", function (e) {
-                 checkDate()
-              });
+              // $("#date_picker_delivery").on("keyup.datetimepicker", function (e) {
+              //    checkDate()
+              // });
+              //    $("#date_picker_delivery").on("hide.datetimepicker", function (e) {
+              //
+              //    checkDate()
+              // });
+                   $("#date_picker_delivery").keydown(false);
             function dateIsValid(dateStr) {
               const regex = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -631,15 +633,17 @@ $(function () {
                         }
                     }).done(function(htmlRe, statusText, jqXHR) {
                        htmlRe1=htmlRe;
+
                        console.log(htmlRe);
 
                     }).fail(function(jqXHR, statusText, errorThrown) {
 
                 });
-                 debugger;
+
                   $("#date_picker_delivery").val(htmlRe1.date_want_delivery);
                  if(htmlRe1.is_ok==0){
-                     $('.error_date').html(htmlRe1.msg);
+                       let msErMonth =  "{{ 'front.shopping.shipping_date_err_month'|trans }}";//>1month
+                     $('.error_date').html(msErMonth);
                  }
 
 
@@ -1264,8 +1268,9 @@ console.log(Math.random());
                         <div class="shipping_destination_right">
                             <div class="shipping_row">
                                 <div class="date_picker_delivery">
+
                                     <div class="controls" id="date_picker_delivery_p" style="position: relative">
-                                        <input type="text"
+                                        <input type="text" readonly='true'
                                                id="date_picker_delivery" name="date_picker_delivery"
                                                class="datetimepicker-input form-control" data-target="#date_picker_delivery"
                                                data-toggle="datetimepicker"/>

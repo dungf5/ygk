@@ -382,25 +382,42 @@ class MyCommonService extends AbstractRepository
             return [];
         }
     }
-    public function getPriceFromDtPriceOfCusV2($customer_code="")
+    public function getPriceFromDtPriceOfCusV2($customer_code="",$arProductCode=[])
     {
         $arR = [];
         $arRTana = [];
         if($customer_code=="") {
             return [[],[]];
         }
+        $param = [$customer_code];
+
+        $subWhere = "";
+        $c = count($arProductCode);
+        for ($i = 0;$i<$c;$i++) {
+            if($i ==$c-1){
+                $subWhere .="?";
+            }else{
+                $subWhere .="?,";
+            }
+            $param[] = $arProductCode[$i];
+        }
+        $subQuereAdd="";
+        if($c>0){
+            $subQuereAdd = "and pri.product_code in({$subWhere})";
+        }
 
         //pri.customer_code = pri.shipping_no cho giao hang phai giong de co gia tot
         $sql = "select pri.product_code,MIN(pri.tanka_number) AS min_tanka_number from dt_price pri
                 WHERE pri.customer_code=?
                 and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
-                and pri.customer_code = pri.shipping_no
+                and pri.customer_code = pri.shipping_no {$subQuereAdd}
                 GROUP BY product_code
 
                 ORDER BY pri.tanka_number asc
                 ; ";
 
-        $param = [$customer_code];
+
+
         $statement = $this->entityManager->getConnection()->prepare($sql);
         try {
             $result = $statement->executeQuery($param);
@@ -418,6 +435,65 @@ class MyCommonService extends AbstractRepository
             return [[],[]];
         }
     }
+
+    public function getPriceFromDtPriceTankaProductCode($arTanka,$arProCode,$customer_code)
+    {
+        $arR = [];
+
+        if($customer_code=="") {
+            return [[],[]];
+        }
+        $param = [$customer_code];
+
+        $subWhereTanka = "";
+        $c = count($arTanka);
+        for ($i = 0;$i<$c;$i++) {
+            if($i ==$c-1){
+                $subWhereTanka .="?";
+            }else{
+                $subWhereTanka .="?,";
+            }
+            $param[] = $arTanka[$i];
+        }
+        $subWhereProductCode = "";
+        $c = count($arProCode);
+        for ($i = 0;$i<$c;$i++) {
+            if($i ==$c-1){
+                $subWhereProductCode .="?";
+            }else{
+                $subWhereProductCode .="?,";
+            }
+            $param[] = $arProCode[$i];
+        }
+        //pri.customer_code = pri.shipping_no cho giao hang phai giong de co gia tot
+        $sql = "select pri.product_code,price_s01 from dt_price pri
+                WHERE pri.customer_code=?
+                and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
+                and pri.customer_code = pri.shipping_no
+                and pri.tanka_number in ({$subWhereTanka}) and pri.product_code in ({$subWhereProductCode})
+
+                GROUP BY product_code
+
+                ORDER BY pri.tanka_number asc
+                ; ";
+
+
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+
+            foreach ($rows as $item){
+                $arR[$item["product_code"]] = $item["price_s01"];
+            }
+            return   $arR;
+        } catch (\Exception $e) {
+            log_info($e->getMessage());
+            return [];
+        }
+    }
+
     public function updateCartItem($hsPrice,$arCarItemId,$Cart)
     {
 
@@ -466,7 +542,7 @@ class MyCommonService extends AbstractRepository
             return  [];
         }
 
-        $sql = " SELECT c.*
+        $sql = " SELECT c.*,b.quantity as car_quantity,a.product_id as my_product_id
                 FROM  dtb_product_class AS a JOIN dtb_cart_item b ON b.product_class_id =a.id
                 JOIN mst_product AS c ON a.product_id = c.ec_product_id
                 WHERE b.cart_id in({$subWhere}) ";
@@ -1238,6 +1314,30 @@ AND          pri.product_code=?
         }
         return $arrProductCode;
     }
+    public function getDataQuery($query,$param)
+    {
+        $sql = $query;
+        $myPara =$param;
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery($myPara);
+        $rows = $result->fetchAllAssociative();
+        return $rows;
+    }
+
+    public function updateCartItemOne($oneCartId,$productClassId,$myQuantity){
+         $sql = "update  dtb_cart_item SET quantity=? where product_class_id =? and cart_id=?";
+         $param =[$myQuantity,$productClassId,$oneCartId];
+         $result = $this->entityManager->getConnection()->prepare($sql)->executeStatement($param);
+        $this->entityManager->flush();
+        $sqlGetTotal ="select sum(quantity*price) as totalPrice from  dtb_cart_item where cart_id={$oneCartId}";
+        $totalPrice = $this->runQuery($sqlGetTotal,[])[0]["totalPrice"];
+        $sqlTotal = "update dtb_cart set total_price= '{$totalPrice}' ,pre_order_id=null,update_date=now() where id={$oneCartId}";
+        $result = $this->entityManager->getConnection()->prepare($sqlTotal)->executeStatement();
+
+         return $result;
+    }
+
 
 
 }
+

@@ -27,6 +27,7 @@ use Eccube\Entity\CartItem;
 use Eccube\Entity\Customer;
 use Eccube\Entity\ItemHolderInterface;
 use Eccube\Entity\ProductClass;
+use Eccube\Repository\CartItemRepository;
 use Eccube\Repository\CartRepository;
 use Eccube\Repository\OrderRepository;
 use Eccube\Repository\ProductClassRepository;
@@ -241,7 +242,7 @@ class CartService extends Service
      *
      * @return CartItem[]
      */
-    protected function mergeAllCartItems($cartItems = [])
+    protected function mergeAllCartItems($cartItems = [],$is_update=0)
     {
 
         /** @var CartItem[] $allCartItems */
@@ -253,7 +254,8 @@ class CartService extends Service
 
         }
 
-        $data = $this->mergeCartItems($cartItems, $allCartItems);
+        $data = $this->mergeCartItems($cartItems, $allCartItems,$is_update);
+
         return $data;
     }
 
@@ -263,7 +265,7 @@ class CartService extends Service
      *
      * @return array
      */
-    protected function mergeCartItems($cartItems, $allCartItems)
+    protected function mergeCartItems($cartItems, $allCartItems,$is_up_date=0)
     {
 
         foreach ($cartItems as $item) {
@@ -271,7 +273,14 @@ class CartService extends Service
             foreach ($allCartItems as $itemInArray) {
                 // 同じ明細があればマージする
                 if ($this->cartItemComparator->compare($item, $itemInArray)) {
-                    $itemInArray->setQuantity($itemInArray->getQuantity() + $item->getQuantity());
+                    if($is_up_date==1){
+
+                        $itemInArray->setQuantity($item->getQuantity());
+                    }else{
+
+                        $itemInArray->setQuantity($itemInArray->getQuantity() + $item->getQuantity());
+                    }
+
                     $itemExists = true;
                     break;
                 }
@@ -402,6 +411,58 @@ class CartService extends Service
         return true;
     }
 
+
+    public function updateProductCustomize($ProductClass, $quantity = 1,$oneCartId,$productClassId)
+    {
+        if (!$ProductClass instanceof ProductClass) {
+            $ProductClassId = $ProductClass;
+            $ProductClass = $this->entityManager
+                ->getRepository(ProductClass::class)
+                ->find($ProductClassId);
+            if (is_null($ProductClass)) {
+                return false;
+            }
+        }
+
+        $ClassCategory1 = $ProductClass->getClassCategory1();
+        if ($ClassCategory1 && !$ClassCategory1->isVisible()) {
+            return false;
+        }
+        $ClassCategory2 = $ProductClass->getClassCategory2();
+        if ($ClassCategory2 && !$ClassCategory2->isVisible()) {
+            return false;
+        }
+
+        $mstProductClass = $this->entityManager
+            ->getRepository(MstProduct::class)
+            ->findOneBy(['ec_product_id'=>$ProductClass->getProduct()->getId()]);
+        $priceClass = null;
+        $price = $mstProductClass->getUnitPrice();
+        $lot = $mstProductClass->getQuantity();
+        if ($lot < 1) {
+            $lot = 1;
+        }
+
+        if ($this->getUser()) {
+            $Customer = $this->getUser();
+            $commonS = new MyCommonService($this->entityManager);
+            $customer_code = $commonS->getMstCustomer($Customer->getId())["customer_code"];
+
+            $priceR = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProductClass->getProductCode());
+
+            if($priceR!==""){
+                $price = $priceR;//$priceClass->getPriceS01();
+            }
+
+        }
+        $myQuantity = $quantity / $lot;
+
+        $cmS = new MyCommonService($this->entityManager);
+        $resultUp =  $cmS->updateCartItemOne($oneCartId,$productClassId,$myQuantity);
+
+        return $resultUp;
+    }
+
     public function addProductCustomize2022($ProductClass, $quantity = 1,$carSession)
     {
         if (!$ProductClass instanceof ProductClass) {
@@ -478,6 +539,11 @@ class CartService extends Service
             ->findOneBy(['ec_product_id'=>$ProductClass->getProduct()->getId()]);
         $priceClass = null;
         $price = $mstProductClass->getUnitPrice();
+
+        if(isset($_COOKIE[$ProductClass->getProduct()->getId()])){
+            unset($_COOKIE[$ProductClass->getProduct()->getId()]);
+        }
+        setcookie($ProductClass->getProduct()->getId(), null, -1, '/');
 
         if ($this->getUser()) {
             $Customer = $this->getUser();

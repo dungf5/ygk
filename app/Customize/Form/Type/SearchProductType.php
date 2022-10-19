@@ -87,7 +87,7 @@ class SearchProductType extends AbstractType
             'label' => false,
         ]);
         $builder->add('orderby', ProductListOrderByType::class, [
-            'label' => false,
+            'label' => false, 'choice_value' => 'sort_no',
         ]);
     }
 

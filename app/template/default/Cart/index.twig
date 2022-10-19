@@ -12,6 +12,8 @@ file that was distributed with this source code.
 
 {% set body_class = 'cart_page' %}
 {% block javascript %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script >
     function  previewUrl() {
         let urlBack = document.referrer;
@@ -26,10 +28,189 @@ file that was distributed with this source code.
 
         }
     }
+function checkInput(idQuantity){
+
+
+    var valInput = $('#'+idQuantity).val().trim();
+    let mymst_quantity = $('#'+idQuantity).attr('mymst_quantity');
+    let input1 =document.getElementById(idQuantity);
+    input1.setCustomValidity('');
+    if (valInput == "") {
+
+
+        input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+                    input1.reportValidity();
+                    return false;
+              }
+
+             if ( (valInput == 0) && (1 == mymst_quantity) ){
+
+                    input1.setCustomValidity(mymst_quantity+'{{ 'front.product.invalid_quantity'|trans }}');
+                    input1.reportValidity();
+                    return false;
+              }
+
+            if ( (valInput == 0) && (1 != mymst_quantity) ){
+                   //%number%
+                   let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                   msgShow = msgShow.replace('%number%',mymst_quantity);
+                    input1.setCustomValidity(msgShow);
+                    input1.reportValidity();
+                    return false;
+              }
+             if(valInput % mymst_quantity  !== 0) {
+                   let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                   msgShow = msgShow.replace('%number%',mymst_quantity);
+                    $('#'+idQuantity)[0].setCustomValidity(msgShow);
+                    $('#'+idQuantity)[0].reportValidity();
+                     return false;
+             }
+                $.cookie( idQuantity,valInput, { path: '/' });
+                 console.log('keyde#'+idQuantity);
+             return true;
+        }
+$('.inputCart').keyup(function(e) {
+
+     if( e.key != "Enter"){
+         if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);
+           clearTimeout($.data(this, 'timer'));
+          var wait = setTimeout(checkInputFirst, 500,this);
+          $(this).data('timer', wait);
+     }
+
+});
+$('.inputCart').click(function(e) {
+
+    let oldvalue = $(this).attr('oldvalue');
+    if( $(this).val()!=oldvalue){
+           clearTimeout($.data(this, 'timer'));
+          var wait = setTimeout(checkInputFirst, 500,this);
+          $(this).data('timer', wait);
+    }
+
+
+});
+    function checkInputFirst(objT){
+
+        //var objT = this;
+    var isFail = false;
+
+    //quantity1421
+    let quantityId = "quantity"+$(objT).attr('myid');
+
+    let input1 =document.getElementById(objT.id);
+    //
+    input1.setCustomValidity('');
+    let mymst_quantity= $(objT).attr('mymst_quantity');
+    let resultCheck = checkInput(quantityId);
+
+        if(resultCheck==true){
+
+              updateOne(objT);
+         }
+
+      }
+
+// $('.inputCart').on("input", function(ev) {
+//
+// checkInputFirst(this);
+//
+// });
+
+function updateOne(objThis){
+
+
+            let quantityId = "quantity"+$(objThis).attr('myid');
+            let productIdEc = $(objThis).attr('myid');
+            let valInput = $('#'+quantityId).val().trim();
+            let productClassId = $(objThis).attr('productclassid');
+            let resultCheck = checkInput(quantityId);
+
+            if(resultCheck==true){
+
+            }else{
+             let newUrl = "javascript:;";
+              $('#objNext').attr('href',newUrl);
+            }
+
+             $.ajax({
+                        url: '/cart/update_cart',
+                        type: 'POST',
+                        dataType: "json",
+                        timeout: 1000,
+                        async:false,
+                        data: {
+                            'quantity': valInput,
+                            '_token':'{{ csrf_token('_token') }}',
+                            'product_id':productIdEc,
+                            'productClassId':productClassId,
+                            'oneCartId':'{{ oneCartId }}',
+                            'is_update':1
+
+                        }
+                    }).done(function(htmlRe, statusText, jqXHR) {
+                        console.log(htmlRe);
+                        window.location.reload();
+
+                    }).fail(function(jqXHR, statusText, errorThrown) {
+
+                });
+
+}
+
+    $('.ec-blockBtn--action').click(function() {
+        let objNext =this;
+        let is_valid = true;
+
+          $( ".inputCart" ).each(function( index ) {
+            let quantityId = "quantity"+$(this).attr('myid');
+            let productIdEc = $(this).attr('myid');
+            let valInput = $('#'+quantityId).val().trim();
+            let productClassId = $(this).attr('productclassid');
+            let resultCheck = checkInput(quantityId);
+            if(resultCheck == false){
+                is_valid = false;
+                return;
+            }
+          });
+
+          if(is_valid==true){
+              {% if onecart_key|length > 0 %}
+               let cart_buystep = "{{ path('cart_buystep', {'cart_key':onecart_key}) }}";
+            window.location.href=cart_buystep;
+              {% endif %}
+
+          }
+
+
+    });
+
+  $(function() {
+                    $(document).on("keydown", "input", function(event) {
+                       return event.key != "Enter";
+                     });
+  })
 </script>
 {% endblock javascript %}
 {% block main %}
+    <style>
 
+        .inputCart{
+           width:100px ;
+            text-align: right;
+        }
+
+         .standar_price{
+             color: #00B050;
+             font-size: 100% !important;
+         }
+        .good_price{
+            color: #FF0000;
+            font-size: 100% !important;
+        }
+
+
+    </style>
     <div class="ec-role">
         <div class="ec-pageHeader">
             <h1>{{ 'front.cart.title'|trans }}</h1>
@@ -122,6 +303,9 @@ file that was distributed with this source code.
                 {% endif %}
                 {% for CartIndex,Cart in Carts %}
                     {% set cartKey = Cart.cart_key %}
+                    <script>
+                        CartKey ='{{ Cart.cart_key }}';
+                    </script>
                     {% for error in app.session.flashbag.get('eccube.front.cart.' ~ cartKey ~ '.request.error') %}
                         <div class="ec-cartRole__error">
                             <div class="ec-alert-warning">
@@ -175,27 +359,40 @@ file that was distributed with this source code.
                                                     販売単位：{{ MstProduct.quantity }}個/箱～
                                                 {% else %}
                                                     販売単位：{{ MstProduct.quantity }}個～
-                                                {% endif %} {{ roundPriceZero(CartItem.price)| raw }}</div>
+                                                {% endif %}
+                                                {% set classShow=hsMstProductCodeCheckShow[MstProduct.product_code] -%}
+                                                {% if  classShow=="good_price" %}
+                                                    <span class="{{ classShow }}"> 販売単価：</span>
+                                                {% else %}
+                                                    <span class="{{ classShow }}"> 標準単価：</span>
+                                                {% endif %}
+                                                <span class="{{ classShow }}">     {{ roundPriceZero(CartItem.price)| raw }}</span>
+
+                                               </div>
                                             <div class="ec-cartRow__sutbtotalSP">{{ 'common.subtotal__with_separator'|trans }}{{ roundPriceZeroTotal(CartItem.total_price) }}</div>
                                         </div>
                                     </li>
                                     <li class="ec-cartRow__amountColumn">
-                                        <div class="ec-cartRow__amount">{{ (CartItem.quantity * MstProduct.quantity)|number_format }}</div>
+{#                                        <div class="ec-cartRow__amount">{{ (CartItem.quantity * MstProduct.quantity)|number_format }}</div>#}
                                         <div class="ec-cartRow__amountSP">{{ 'common.quantity__with_separator'|trans }}{{ CartItem.quantity|number_format }}</div>
-                                        <div class="ec-cartRow__amountUpDown">
-                                            {% if (CartItem.quantity * MstProduct.quantity) > MstProduct.quantity %}
-                                                <a href="{{ url('cart_handle_item', {'operation': 'down', 'productClassId': ProductClass.id}) }}" {{ csrf_token_for_anchor() }} class="ec-cartRow__amountDownButton load-overlay" data-method="put" data-confirm="false">
-                                                    <span class="ec-cartRow__amountDownButton__icon"><img src="{{ asset('assets/icon/minus-dark.svg') }}" alt="reduce"></span>
-                                                </a>
-                                            {% else %}
-                                                <div class="ec-cartRow__amountDownButtonDisabled">
-                                                    <span class="ec-cartRow__amountDownButton__icon"><img src="{{ asset('assets/icon/minus.svg') }}" alt="reduce"></span>
-                                                </div>
-                                            {% endif %}
-                                            <a href="{{ url('cart_handle_item', {'operation': 'up', 'productClassId': ProductClass.id}) }}" {{ csrf_token_for_anchor() }} class="ec-cartRow__amountUpButton load-overlay" data-method="put" data-confirm="false">
-                                                <span class="ec-cartRow__amountUpButton__icon"><img src="{{ asset('assets/icon/plus-dark.svg') }}" alt="increase"></span>
-                                            </a>
-                                        </div>
+{#                                        <div class="ec-cartRow__amountUpDown">#}
+{#                                            {% if (CartItem.quantity * MstProduct.quantity) > MstProduct.quantity %}#}
+{#                                                <a href="{{ url('cart_handle_item', {'operation': 'down', 'productClassId': ProductClass.id}) }}" {{ csrf_token_for_anchor() }} class="ec-cartRow__amountDownButton load-overlay" data-method="put" data-confirm="false">#}
+{#                                                    <span class="ec-cartRow__amountDownButton__icon"><img src="{{ asset('assets/icon/minus-dark.svg') }}" alt="reduce"></span>#}
+{#                                                </a>#}
+{#                                            {% else %}#}
+{#                                                <div class="ec-cartRow__amountDownButtonDisabled">#}
+{#                                                    <span class="ec-cartRow__amountDownButton__icon"><img src="{{ asset('assets/icon/minus.svg') }}" alt="reduce"></span>#}
+{#                                                </div>#}
+{#                                            {% endif %}#}
+{#                                            <a href="{{ url('cart_handle_item', {'operation': 'up', 'productClassId': ProductClass.id}) }}" {{ csrf_token_for_anchor() }} class="ec-cartRow__amountUpButton load-overlay" data-method="put" data-confirm="false">#}
+{#                                                <span class="ec-cartRow__amountUpButton__icon"><img src="{{ asset('assets/icon/plus-dark.svg') }}" alt="increase"></span>#}
+{#                                            </a>#}
+{#                                        </div>#}
+
+                                        <input type="number" maxlength="5" class="inputCart" id="quantity{{ MstProduct.ec_product_id }}" productclassid="{{ ProductClass.id }}" name="quantity{{ MstProduct.ec_product_id }}" required="required" min="{{ MstProduct.quantity }}" maxlength="9" myid="{{ MstProduct.ec_product_id }}" title="" mymst_quantity="{{ MstProduct.quantity }}" class="quantity form-control" oldvalue="{{ (CartItem.quantity * MstProduct.quantity) }}" value="{{ (CartItem.quantity * MstProduct.quantity) }}" step="{{ MstProduct.quantity }}">
+
+
                                     </li>
                                     <li class="ec-cartRow__subtotalColumn">
                                         <div class="ec-cartRow__sutbtotal">{{ roundPriceZeroTotal(CartItem.total_price) }}</div>
@@ -231,7 +428,7 @@ file that was distributed with this source code.
                     <div class="ec-cartRole__actions">
                         <div class="ec-cartRole__total">{{ 'common.total__with_separator'|trans }}<span class="ec-cartRole__totalAmount">{{ roundPriceZeroTotal(Cart.totalPrice) }}</span>
                         </div>
-                        <a class="ec-blockBtn--action" href="{{ path('cart_buystep', {'cart_key':cartKey}) }}">{{ 'front.cart.checkout'|trans }}</a>
+                        <a class="ec-blockBtn--action" href="javascript:;">{{ 'front.cart.checkout'|trans }}</a>
                         {% if loop.last %}
                             <a class="ec-blockBtn--cancel" href="javascript:previewUrl()">{{ 'front.cart.continue'|trans }}</a>
                         {% endif %}

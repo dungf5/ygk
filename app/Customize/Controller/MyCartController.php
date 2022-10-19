@@ -19,6 +19,7 @@ use Customize\Repository\MstProductRepository;
 use Customize\Repository\PriceRepository;
 use Customize\Service\Common\MyCommonService;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
 use Eccube\Entity\ProductClass;
@@ -79,7 +80,7 @@ class MyCartController extends AbstractController
         PurchaseFlow $cartPurchaseFlow,
         BaseInfoRepository $baseInfoRepository,
         PriceRepository $priceRepository,
-        MstProductRepository $mstProductRepository
+        MstProductRepository $mstProductRepository,EntityManagerInterface $entityManager
     ) {
         $this->productClassRepository = $productClassRepository;
         $this->cartService = $cartService;
@@ -87,6 +88,7 @@ class MyCartController extends AbstractController
         $this->baseInfo = $baseInfoRepository->get();
         $this->priceRepository = $priceRepository;
         $this->mstProductRepository = $mstProductRepository;
+        $this->entityManager =$entityManager;
 
 
     }
@@ -163,7 +165,7 @@ class MyCartController extends AbstractController
             $pre_order_id = $request->get('pre_order_id');
             $bill_code = $request->get('bill_code');
             $date_want_delivery = $request->get('date_want_delivery');
-            $result = ['is_ok' => '1', 'msg' => 'OK', 'delivery_code' => $delivery_code];
+            $result = ['is_ok' => '1', 'msg' => 'NGNG', 'delivery_code' => $delivery_code];
 
             if (!empty($bill_code)) {
                 $commonService->saveTempCartBillSeiky($bill_code, $pre_order_id);
@@ -185,8 +187,9 @@ class MyCartController extends AbstractController
                 if ($dayAfterDay > $curDay){
                     $result = ['is_ok' => '0', 'msg' => 'Over one months', 'date_want_delivery' => $dayAfter, 'pre_order_id' => $pre_order_id];
                 }else{
-                    $result = ['is_ok' => '1', 'msg' => 'OK', 'date_want_delivery' => $dayAfter, 'pre_order_id' => $pre_order_id];
-                    $commonService->saveTempCartDateWantDeli($date_want_delivery, $pre_order_id);
+
+                    $commonService->saveTempCartDateWantDeli($dayAfter, $pre_order_id);
+                    $result = ['is_ok' => '1', 'msg' => 'OK saved', 'date_want_delivery' => $dayAfter, 'pre_order_id' => $pre_order_id];
                 }
 
             }
@@ -223,6 +226,9 @@ class MyCartController extends AbstractController
      */
     public function showCart(Request $request)
     {
+
+
+
         // カートを取得して明細の正規化を実行
         $Carts = $this->cartService->getCarts();
 
@@ -234,8 +240,12 @@ class MyCartController extends AbstractController
         $isDeliveryFree = [];
         $totalPrice = 0;
         $totalQuantity = 0;
+        $carSession = MyCommon::getCarSession();
 
         foreach ($Carts as $Cart) {
+            if($Cart["key_eccube"]!== $carSession){
+                continue;
+            }
             $quantity[$Cart->getCartKey()] = 0;
             $isDeliveryFree[$Cart->getCartKey()] = false;
 
@@ -265,15 +275,31 @@ class MyCartController extends AbstractController
         //Mapping cart product with mst product
         $comSer = new MyCommonService($this->entityManager);
         $cartList = [];
+        $oneCartId =0;
+        $onecart_key='';
         foreach ($myCart as $cartT) {
             $cartList[] = $cartT['id'];
+            $oneCartId=$cartT['id'];
+            $onecart_key=$cartT['cart_key'];
+
         }
+
+
         $mstProduct = $comSer->getMstProductsFromCart($cartList);
+        $hsMstProductPrice = [];
         $hsProductId = [];
+        $arProductCode = [];
+        $hsMstProductCodeCheckShow =[];
         foreach ($mstProduct as $itemP) {
+            //car_quantity,a.product_id as my_product_id
             $hsProductId[$itemP['ec_product_id']] = $itemP;
+            $arProductCode[] = $itemP['product_code'];
+            $hsMstProductCodeCheckShow[$itemP['product_code']] = "standar_price";
+
         }
         //end mapping
+
+
 
         $isHideNext =false;
         if ($this->getUser()) {
@@ -282,6 +308,23 @@ class MyCartController extends AbstractController
             $customer_code = $commonS->getMstCustomer($Customer->getId())["customer_code"];
             if($customer_code=="6000"){
                 $isHideNext = true;
+            }
+            if(count($arProductCode)>0){
+                $arPriceAndTanaka = $commonS->getPriceFromDtPriceOfCusV2($customer_code,$arProductCode);
+
+                $arProductCodeInDtPrice = $arPriceAndTanaka[0];
+                $arTanakaNumber = $arPriceAndTanaka[1];
+
+                if(count($arProductCodeInDtPrice)>0 && count($arTanakaNumber)>0){
+                  $hsDtPriceProductCode =    $commonS->getPriceFromDtPriceTankaProductCode($arTanakaNumber,$arProductCodeInDtPrice,$customer_code);
+
+                }
+
+                foreach ($hsMstProductCodeCheckShow as $keyCheck=>$valueCheck){
+                    if(isset($hsDtPriceProductCode[$keyCheck])){
+                        $hsMstProductCodeCheckShow[$keyCheck]="good_price";
+                    }
+                }
             }
 
         }
@@ -293,12 +336,32 @@ class MyCartController extends AbstractController
             // 空のカートを削除し取得し直す
             'Carts' => $myCart,
             'least' => $least,
+            'onecart_key' => $onecart_key,
+            'oneCartId' =>$oneCartId,
             'quantity' => $quantity,
             'hsProductId' => $hsProductId,
+            'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
             'is_delivery_free' => $isDeliveryFree,
         ];
     }
+    /**
+     * カートに追加.
+     *
+     * @Route("/cart/update_cart", name="update_cart",methods={"POST"})
+     */
+    public function upCart(Request $request)
+    {
+        $productClassId = $request->get("productClassId");
+        $ProductClass = $this->productClassRepository->find($productClassId);
+        $myQuantity = $request->get("quantity");
+        $oneCartId = $request->get("oneCartId");
+        $product_id = $ProductClass->getProduct()->getId();
+        setcookie($ProductClass->getProduct()->getId(),$myQuantity,0,"/");
 
+        $msg = $this->cartService->updateProductCustomize($ProductClass, $myQuantity,$oneCartId,$productClassId);
+        return $this->json(["is_ok"=>1,"msg"=>$msg], 200);
+
+    }
     /**
      * カート明細の加算/減算/削除を行う.
      *
@@ -355,9 +418,7 @@ class MyCartController extends AbstractController
 
         }
 
-        if((int)$idRemove>0){
-            setcookie($ProductClass->getProduct()->getId(),$mstProduct->getQuantity(),0,"/");
-        }
+
 
         $Carts = $this->cartService->getCarts();
         foreach ($Carts as $Cart) {
@@ -372,7 +433,10 @@ class MyCartController extends AbstractController
             $Cart->setDeliveryFeeTotal(0);
         }
         $this->cartService->saveCustomize();
+        if((int)$idRemove>0){
 
+            setcookie($idRemove, null, -1, '/');
+        }
         // カートを取得して明細の正規化を実行
 //        $Carts = $this->cartService->getCarts();
 //        $this->execPurchaseFlow($Carts);

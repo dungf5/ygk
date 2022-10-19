@@ -116,7 +116,7 @@ file that was distributed with this source code.
                    let cartHtml ="<span class='fnDIN'>"+data.totalNew+"</span>";
                     $('#emptyCart').html(cartHtml);
                      //nvtrongxxx
-                     debugger;
+
                     let myValue =   $.cookie(idProduct);
                     if( myValue!=undefined){
                       $('#quantity'+idProduct).val(myValue);
@@ -318,7 +318,7 @@ function initInputVal(){
                     <div class="ec-searchnavRole__actions">
                         <div class="ec-select">
                             {{ form_widget(disp_number_form, {'id': '', 'attr': {'class': 'disp-number'}}) }}
-                            {{ form_widget(order_by_form, {'id': '', 'attr': {'class': 'order-by'}}) }}
+                            {{ form_widget(order_by_form, {'id': 'order_by_form', 'attr': {'class': 'order-by'}}) }}
                         </div>
                     </div>
                 {% endif %}

@@ -23,7 +23,7 @@ use Eccube\Event\EventArgs;
 use Eccube\Form\Type\AddCartType;
 use Eccube\Form\Type\Master\ProductListMaxType;
 use Eccube\Form\Type\Master\ProductListOrderByType;
-use Eccube\Form\Type\SearchProductType;
+use Eccube\Form\Type\order_by_form;
 use Eccube\Repository\BaseInfoRepository;
 use Eccube\Repository\CustomerFavoriteProductRepository;
 use Eccube\Repository\CustomerRepository;
@@ -344,17 +344,36 @@ class MyProductController extends AbstractController
         $cartId =0;
         // set total price
         foreach ($Carts as $Cart) {
-            $totalPrice = 0;
+            if($Cart["key_eccube"]== $carSession){
+                $totalPrice = 0;
+                foreach($Cart['CartItems'] as $CartItem){
+                    $totalPrice += $CartItem['price'] * $CartItem['quantity'];
+
+
+                }
+
+                $Cart->setTotalPrice($totalPrice);
+                $Cart->setDeliveryFeeTotal(0);
+            }
+
+        }
+        $this->cartService->saveCustomize();
+        //update cookie
+        foreach ($Carts as $Cart) {
+
             foreach($Cart['CartItems'] as $CartItem){
-                $totalPrice += $CartItem['price'] * $CartItem['quantity'];
-                setcookie($Product->getId(),$CartItem['quantity']*$mstProduct->getQuantity(),0,"/");
+                if($Cart["key_eccube"]== $carSession){
+                    if($CartItem->getProductClass()->getProduct()->getId()==$Product->getId()){
+                        setcookie($Product->getId(),$CartItem['quantity']*$mstProduct->getQuantity(),0,"/");
+                    }
+
+                }
+
 
             }
 
-            $Cart->setTotalPrice($totalPrice);
-            $Cart->setDeliveryFeeTotal(0);
+
         }
-        $this->cartService->saveCustomize();
 
 
         log_info(
@@ -420,8 +439,6 @@ class MyProductController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
-
-
 
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
@@ -549,8 +566,10 @@ class MyProductController extends AbstractController
             ProductListMaxType::class,
             null,
             [
+
                 'required' => false,
                 'allow_extra_fields' => true,
+                'choice_value' => 'sort_no',
             ]
         );
         if ($request->getMethod() === 'GET') {
@@ -575,7 +594,7 @@ class MyProductController extends AbstractController
             ProductListOrderByType::class,
             null,
             [
-                'required' => false,
+                'required' => false,'choice_value' => 'sort_no',
                 'allow_extra_fields' => true,
             ]
         );
