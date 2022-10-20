@@ -1337,6 +1337,24 @@ AND          pri.product_code=?
          return $result;
     }
 
+    public function isProductEcIncart($keyCart,$ecProductId){
+        $sql ="SELECT a.product_id
+                FROM  dtb_product_class AS a JOIN dtb_cart_item b ON b.product_class_id =a.id
+        AND    b.key_eccube=? where a.product_id=?";
+        $returnData = $this->getDataQuery($sql,[$keyCart,$ecProductId]);
+        if(count($returnData)==1){
+            return 1;
+        }
+        return 0;
+    }
+    public function getCartInfo($keyCart,$ecProductId){
+        $sql ="SELECT a.id AS productClassId,b.cart_id,a.product_id
+                FROM  dtb_product_class AS a JOIN dtb_cart_item b ON b.product_class_id =a.id
+        AND    b.key_eccube=? where a.product_id=?";
+        $returnData = $this->getDataQuery($sql,[$keyCart,$ecProductId]);
+
+        return $returnData;
+    }
 
 
 }

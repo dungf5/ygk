@@ -228,6 +228,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                 event.preventDefault();
                 $form = $('#form1');
 
+
                 $.ajax({
                     url: $form.attr('action'),
                     type: $form.attr('method'),
@@ -270,6 +271,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                     // Buttonを有効にする
                     $('.add-cart').prop('disabled', false);
                 });
+
             });
         });
 

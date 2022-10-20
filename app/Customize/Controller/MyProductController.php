@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Customize\Controller;
 
@@ -9,13 +19,10 @@ use Customize\Repository\MstProductRepository;
 use Customize\Repository\PriceRepository;
 use Customize\Repository\ProductRepository as ProductCustomizeRepository;
 use Customize\Repository\StockListRepository;
-
-
 use Customize\Service\Common\MyCommonService;
 use Doctrine\DBAL\Types\Type;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
-use Eccube\Entity\Master\CustomerStatus;
 use Eccube\Entity\Master\ProductStatus;
 use Eccube\Entity\Product;
 use Eccube\Event\EccubeEvents;
@@ -23,11 +30,10 @@ use Eccube\Event\EventArgs;
 use Eccube\Form\Type\AddCartType;
 use Eccube\Form\Type\Master\ProductListMaxType;
 use Eccube\Form\Type\Master\ProductListOrderByType;
-use Eccube\Form\Type\order_by_form;
 use Eccube\Repository\BaseInfoRepository;
 use Eccube\Repository\CustomerFavoriteProductRepository;
-use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\Master\ProductListMaxRepository;
+use Eccube\Repository\ProductClassRepository;
 use Eccube\Repository\ProductRepository;
 use Eccube\Service\CartService;
 use Eccube\Service\PurchaseFlow\PurchaseContext;
@@ -37,15 +43,19 @@ use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 class MyProductController extends AbstractController
 {
+    /**
+     * @var ProductClassRepository
+     */
+    protected $productClassRepository;
+
     /**
      * @var PurchaseFlow
      */
@@ -131,8 +141,10 @@ class MyProductController extends AbstractController
         PriceRepository $priceRepository,
         StockListRepository $stockListRepository,
         MstProductRepository $mstProductRepository,
-        EncoderFactoryInterface $encoderFactory,ProductCustomizeRepository $productCustomizeRepository
+        EncoderFactoryInterface $encoderFactory, ProductCustomizeRepository $productCustomizeRepository,
+        ProductClassRepository $productClassRepository
     ) {
+        $this->productClassRepository = $productClassRepository;
         $this->purchaseFlow = $cartPurchaseFlow;
         $this->customerFavoriteProductRepository = $customerFavoriteProductRepository;
         $this->cartService = $cartService;
@@ -146,7 +158,6 @@ class MyProductController extends AbstractController
         $this->productCustomizeRepository = $productCustomizeRepository;
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $this->encoderFactory = $encoderFactory;
-
     }
 
     /**
@@ -163,7 +174,6 @@ class MyProductController extends AbstractController
      */
     public function detail(Request $request, Product $Product)
     {
-
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         if (!$this->checkVisibility($Product)) {
             throw new NotFoundHttpException();
@@ -189,35 +199,49 @@ class MyProductController extends AbstractController
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_DETAIL_INITIALIZE, $event);
 
         $is_favorite = false;
-        $price=null;
-        $stock=null;
+        $price = null;
+        $stock = null;
         $mstProduct = $this->mstProductRepository->getData($Product->getId());
+        $cmS = new MyCommonService($this->entityManager);
         if ($this->isGranted('ROLE_USER')) {
             $Customer = $this->getUser();
-            $cmS = new MyCommonService($this->entityManager);
-            $customer_code = $cmS->getMstCustomer($Customer->getId())["customer_code"];
+
+            $customer_code = $cmS->getMstCustomer($Customer->getId())['customer_code'];
             $is_favorite = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
 
-            $priceTxt = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProduct->getProductCode());
-            $myPriceRe = (object)["price_s01"=>$priceTxt];
-            if($priceTxt==""){
-                $myPriceRe =null;
+            $priceTxt = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProduct->getProductCode());
+            $myPriceRe = (object) ['price_s01' => $priceTxt];
+            if ($priceTxt == '') {
+                $myPriceRe = null;
             }
 
             $price = $myPriceRe;
-            $stock = $this->stockListRepository->getData($mstProduct->getProductCode(),$Customer->getId());
-
+            $stock = $this->stockListRepository->getData($mstProduct->getProductCode(), $Customer->getId());
+        }
+        //check in cart
+        $ecProductId = $Product->getId();
+        $product_in_cart = $cmS->isProductEcIncart(MyCommon::getCarSession(), $ecProductId);
+        $productClassId = '';
+        $oneCartId = '';
+        if ($product_in_cart == 1) {
+            //productClassId,b.cart_id,a.product_id
+            $cartInfoData = $cmS->getCartInfo(MyCommon::getCarSession(), $ecProductId);
+            $productClassId = $cartInfoData[0]['productClassId'];
+            $oneCartId = $cartInfoData[0]['cart_id'];
         }
 
         return [
             'title' => $this->title,
             'subtitle' => $Product->getName(),
             'form' => $builder->getForm()->createView(),
+            'product_in_cart' => $product_in_cart,
             'Product' => $Product,
             'is_favorite' => $is_favorite,
-            'Price'=>$price,
-            'Stock'=>$stock,
-            'MstProduct'=>$mstProduct
+            'productClassId' => $productClassId,
+            'oneCartId' => $oneCartId,
+            'Price' => $price,
+            'Stock' => $stock,
+            'MstProduct' => $mstProduct,
         ];
     }
 
@@ -258,15 +282,17 @@ class MyProductController extends AbstractController
     public function getTotalCart(Request $request)
     {
         $Carts = $this->cartService->getCarts();
-        if(count($Carts)>0){
-            $cartId= $Carts[0]->getId();
+        if (count($Carts) > 0) {
+            $cartId = $Carts[0]->getId();
             $myComS = new MyCommonService($this->entityManager);
             $totalNew = $myComS->getTotalItemCart($cartId);
-            return $this->json(['done' => true, 'messages' => 'Get cart Total',"totalNew"=>$totalNew]);
-        }
-        return $this->json(['done' => true, 'messages' => 'Get cart Total',"totalNew"=>0]);
 
+            return $this->json(['done' => true, 'messages' => 'Get cart Total', 'totalNew' => $totalNew]);
+        }
+
+        return $this->json(['done' => true, 'messages' => 'Get cart Total', 'totalNew' => 0]);
     }
+
     /**
      * カートに追加.
      *
@@ -320,8 +346,28 @@ class MyProductController extends AbstractController
             ]
         );
         $carSession = MyCommon::getCarSession();
+
+        //////////////////////////////check in cart
+        $cmS = new MyCommonService($this->entityManager);
+        $ecProductId = $Product->getId();
+        $product_in_cart = $cmS->isProductEcIncart(MyCommon::getCarSession(), $ecProductId);
+        $productClassId = '';
+        $oneCartId = '';
+        if ($product_in_cart == 1) {
+            //productClassId,b.cart_id,a.product_id
+            $cartInfoData = $cmS->getCartInfo(MyCommon::getCarSession(), $ecProductId);
+            $productClassId = $cartInfoData[0]['productClassId'];
+            $oneCartId = $cartInfoData[0]['cart_id'];
+            $ProductClass = $this->productClassRepository->find($productClassId);
+            $msg = $this->cartService->updateProductCustomize($ProductClass, $addCartData['quantity'], $oneCartId, $productClassId);
+        }
+
+        //////////////////////////////
+
         // カートへ追加
-        $this->cartService->addProductCustomize2022($addCartData['product_class_id'], $addCartData['quantity'],$carSession);
+        if ($product_in_cart ==0) {
+            $this->cartService->addProductCustomize2022($addCartData['product_class_id'], $addCartData['quantity'], $carSession);
+        }
 
         // 明細の正規化
         $Carts = $this->cartService->getCarts();
@@ -341,40 +387,30 @@ class MyProductController extends AbstractController
 //        }
         $mstProduct = $this->mstProductRepository->getData($Product->getId());
 
-        $cartId =0;
+        $cartId = 0;
         // set total price
         foreach ($Carts as $Cart) {
-            if($Cart["key_eccube"]== $carSession){
+            if ($Cart['key_eccube'] == $carSession) {
                 $totalPrice = 0;
-                foreach($Cart['CartItems'] as $CartItem){
+                foreach ($Cart['CartItems'] as $CartItem) {
                     $totalPrice += $CartItem['price'] * $CartItem['quantity'];
-
-
                 }
 
                 $Cart->setTotalPrice($totalPrice);
                 $Cart->setDeliveryFeeTotal(0);
             }
-
         }
         $this->cartService->saveCustomize();
         //update cookie
         foreach ($Carts as $Cart) {
-
-            foreach($Cart['CartItems'] as $CartItem){
-                if($Cart["key_eccube"]== $carSession){
-                    if($CartItem->getProductClass()->getProduct()->getId()==$Product->getId()){
-                        setcookie($Product->getId(),$CartItem['quantity']*$mstProduct->getQuantity(),0,"/");
+            foreach ($Cart['CartItems'] as $CartItem) {
+                if ($Cart['key_eccube'] == $carSession) {
+                    if ($CartItem->getProductClass()->getProduct()->getId() == $Product->getId()) {
+                        setcookie($Product->getId(), $CartItem['quantity'] * $mstProduct->getQuantity(), 0, '/');
                     }
-
                 }
-
-
             }
-
-
         }
-
 
         log_info(
             'カート追加処理完了',
@@ -398,9 +434,6 @@ class MyProductController extends AbstractController
             return $event->getResponse();
         }
 
-
-
-
         if ($request->isXmlHttpRequest()) {
             // ajaxでのリクエストの場合は結果をjson形式で返す。
             $myComS = new MyCommonService($this->entityManager);
@@ -420,7 +453,7 @@ class MyProductController extends AbstractController
                 $messages = $errorMessages;
             }
 
-            return $this->json(['done' => $done, 'messages' => $messages,"totalNew"=>$totalNew]);
+            return $this->json(['done' => $done, 'messages' => $messages, 'totalNew' => $totalNew]);
         } else {
             // ajax以外でのリクエストの場合はカート画面へリダイレクト
             foreach ($errorMessages as $errorMessage) {
@@ -439,8 +472,6 @@ class MyProductController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
-
-
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         // Doctrine SQLFilter
         if ($this->BaseInfo->isOptionNostockHidden()) {
@@ -471,13 +502,12 @@ class MyProductController extends AbstractController
         /* @var $searchForm \Symfony\Component\Form\FormInterface */
         $searchForm = $builder->getForm();
 
-
         $searchForm->handleRequest($request);
         $commonService = new MyCommonService($this->entityManager);
 
         $user = false;
         $customer_code = '';
-        if($this->isGranted('ROLE_USER')) {
+        if ($this->isGranted('ROLE_USER')) {
             $user = true;
             $myC = new MyCommonService($this->entityManager);
             $Customer = $this->getUser();
@@ -487,15 +517,14 @@ class MyProductController extends AbstractController
         // paginator
         $searchData = $searchForm->getData();
 
-        $arProductCodeInDtPrice  =[];
+        $arProductCodeInDtPrice = [];
         $arPriceAndTanaka = $commonService->getPriceFromDtPriceOfCusV2($customer_code);
         //var_dump($customer_code);
 
         $arProductCodeInDtPrice = $arPriceAndTanaka[0];
         $arTanakaNumber = $arPriceAndTanaka[1];
 
-
-        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user ,$customer_code,$arProductCodeInDtPrice,$arTanakaNumber);
+        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customer_code, $arProductCodeInDtPrice, $arTanakaNumber);
 
         $event = new EventArgs(
             [
@@ -510,8 +539,6 @@ class MyProductController extends AbstractController
         $query = $qb->getQuery()
             ->useResultCache(true, $this->eccubeConfig['eccube_result_cache_lifetime_short']);
 
-
-
         /** @var SlidingPagination $pagination */
         $pagination = $paginator->paginate(
             $query,
@@ -519,29 +546,26 @@ class MyProductController extends AbstractController
             !empty($searchData['disp_number']) ? $searchData['disp_number']->getId() : $this->productListMaxRepository->findOneBy([], ['sort_no' => 'ASC'])->getId()
         );
 
-
-
         $ids = [];
 
         foreach ($pagination as $Product) {
-            $ids[] = $Product["id"];
+            $ids[] = $Product['id'];
         }
 
         $ProductsAndClassCategories = $this->productRepository->findProductsWithSortedClassCategories($ids, 'p.id');
         $listImgs = $commonService->getImageFromEcProductId($ids);
         $hsKeyImg = [];
         //a.file_name,a.product_id,b.product_code
-        foreach ($listImgs as $itemImg){
-            $hsKeyImg[$itemImg["product_id"]] = $itemImg["file_name"];
+        foreach ($listImgs as $itemImg) {
+            $hsKeyImg[$itemImg['product_id']] = $itemImg['file_name'];
         }
 
         // addCart form
         $forms = [];
 
         foreach ($pagination as $Product) {
-
-            if(!isset($ProductsAndClassCategories[$Product["id"]])){
-              // var_dump($Product["id"]);die();
+            if (!isset($ProductsAndClassCategories[$Product['id']])) {
+                // var_dump($Product["id"]);die();
                 continue;
             }
             /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
@@ -550,14 +574,14 @@ class MyProductController extends AbstractController
                 AddCartType::class,
                 null,
                 [
-                    'product' => $ProductsAndClassCategories[$Product["id"]],
+                    'product' => $ProductsAndClassCategories[$Product['id']],
                     'allow_extra_fields' => true,
                 ]
             );
 
             $addCartForm = $builder->getForm();
 
-            $forms[$Product["id"]] = $addCartForm->createView();
+            $forms[$Product['id']] = $addCartForm->createView();
         }
 
         // 表示件数
@@ -566,7 +590,6 @@ class MyProductController extends AbstractController
             ProductListMaxType::class,
             null,
             [
-
                 'required' => false,
                 'allow_extra_fields' => true,
                 'choice_value' => 'sort_no',
@@ -594,7 +617,7 @@ class MyProductController extends AbstractController
             ProductListOrderByType::class,
             null,
             [
-                'required' => false,'choice_value' => 'sort_no',
+                'required' => false, 'choice_value' => 'sort_no',
                 'allow_extra_fields' => true,
             ]
         );
@@ -623,10 +646,8 @@ class MyProductController extends AbstractController
             'disp_number_form' => $dispNumberForm->createView(),
             'order_by_form' => $orderByForm->createView(),
             'forms' => $forms,
-            'hsKeyImg'=>$hsKeyImg,
-            'Category' => $Category
-
-
+            'hsKeyImg' => $hsKeyImg,
+            'Category' => $Category,
         ];
     }
 
