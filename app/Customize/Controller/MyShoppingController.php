@@ -281,17 +281,21 @@ class MyShoppingController extends AbstractShoppingController
         foreach ($myCart as $cartT) {
             $cartList[] = $cartT['id'];
         }
-
+        $customer_code = $comSer->getMstCustomer($Customer->getId())["customer_code"];
         $mstProduct = $comSer->getMstProductsFromCart($cartList);
         $hsProductId = [];
+        $hsMstProductCodeCheckShow =[];
+        $arProductCode  = [];
         foreach ($mstProduct as $itemP) {
             $hsProductId[$itemP['ec_product_id']] = $itemP;
+            $arProductCode[] = $itemP['product_code'];
+            $hsMstProductCodeCheckShow[$itemP['product_code']] = "standar_price";
         }
-
+        $hsMstProductCodeCheckShow = $comSer->setCartIndtPrice($arProductCode,$hsMstProductCodeCheckShow,$comSer,$customer_code);
 
         return [
             'form' => $form->createView(),
-            'Order' => $Order, 'hsProductId' => $hsProductId,
+            'Order' => $Order, 'hsProductId' => $hsProductId,'hsMstProductCodeCheckShow'=>$hsMstProductCodeCheckShow
         ];
     }
 
@@ -420,12 +424,18 @@ class MyShoppingController extends AbstractShoppingController
 
             $mstProduct = $comSer->getMstProductsFromCart($cartList);
             $hsProductId = [];
+            $hsMstProductCodeCheckShow =[];
+            $arProductCode  = [];
             foreach ($mstProduct as $itemP) {
                 $hsProductId[$itemP['ec_product_id']] = $itemP;
+                $arProductCode[] = $itemP['product_code'];
+                $hsMstProductCodeCheckShow[$itemP['product_code']] = "standar_price";
             }
+            $customer_code = $comSer->getMstCustomer($Customer->getId())["customer_code"];
+            $hsMstProductCodeCheckShow = $comSer->setCartIndtPrice($arProductCode,$hsMstProductCodeCheckShow,$comSer,$customer_code);
             return [
                 'form' => $form->createView(),
-                'Order' => $Order,'hsProductId'=>$hsProductId
+                'Order' => $Order,'hsProductId'=>$hsProductId,'hsMstProductCodeCheckShow'=>$hsMstProductCodeCheckShow
             ];
         }
 

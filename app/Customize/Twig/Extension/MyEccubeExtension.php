@@ -70,14 +70,16 @@ class MyEccubeExtension extends AbstractExtension
 
         return "￥".$numAf;
     }
-    public function roundPriceZero($price){
+    public function roundPriceZero($price,$classShow="standar_price"){
 
         $numAf = number_format($price,2);
         if(MyCommon::checkExistText($numAf,".00")){
             $numAf  = str_replace(".00","",$numAf);
         }
-        if($numAf == 0){
-            return "<span style='color:#f00'>オープン価格</span>";
+        if($classShow=="standar_price"){
+            if($numAf == 0){
+                return "<span style='color:#f00'>オープン価格</span>";
+            }
         }
         return "￥".$numAf;
     }

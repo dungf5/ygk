@@ -19,6 +19,7 @@ use Customize\Entity\MoreOrder;
 use Customize\Entity\MstShipping;
 use Customize\Entity\Order;
 use Customize\Repository\MoreOrderRepository;
+use Customize\Service\GlobalService;
 use Doctrine\DBAL\Driver\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Entity\Cart;
@@ -27,6 +28,7 @@ use Eccube\Repository\AbstractRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class MyCommonService extends AbstractRepository
 {
@@ -1354,6 +1356,32 @@ AND          pri.product_code=?
         $returnData = $this->getDataQuery($sql,[$keyCart,$ecProductId]);
 
         return $returnData;
+    }
+    /***
+     * @param array $arProductCode
+     * @param array $hsMstProductCodeCheckShow
+     * @var MyCommonService $commonS
+     * @var string $customer_code
+     */
+    public function setCartIndtPrice($arProductCode,$hsMstProductCodeCheckShow,$commonS,$customer_code)
+    {
+        $arPriceAndTanaka = $commonS->getPriceFromDtPriceOfCusV2($customer_code,$arProductCode);
+
+        $arProductCodeInDtPrice = $arPriceAndTanaka[0];
+        $arTanakaNumber = $arPriceAndTanaka[1];
+
+        if(count($arProductCodeInDtPrice)>0 && count($arTanakaNumber)>0){
+            $hsDtPriceProductCode =    $commonS->getPriceFromDtPriceTankaProductCode($arTanakaNumber,$arProductCodeInDtPrice,$customer_code);
+
+        }
+
+        foreach ($hsMstProductCodeCheckShow as $keyCheck=>$valueCheck){
+            if(isset($hsDtPriceProductCode[$keyCheck])){
+                $hsMstProductCodeCheckShow[$keyCheck]="good_price";
+            }
+        }
+        return $hsMstProductCodeCheckShow;
+
     }
 
 

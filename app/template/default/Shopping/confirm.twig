@@ -59,6 +59,14 @@ console.log(Math.random());
         .delivery_address_main {
             padding-top: 15px;
         }
+        .standar_price{
+            color: #00B050;
+            font-size: 100% !important;
+        }
+        .good_price{
+            color: #FF0000;
+            font-size: 100% !important;
+        }
      </style>
 <div class="ec-role">
     <div class="ec-pageHeader">
@@ -137,6 +145,7 @@ console.log(Math.random());
                         <ul class="ec-borderedList">
                             {% for orderItem in shipping.productOrderItems %}
                                 {% set MstProduct = hsProductId[orderItem.Product.id] %}
+                                {% set classShow=hsMstProductCodeCheckShow[MstProduct.product_code] %}
                             <li>
                                 <div class="ec-imageGrid">
                                     <div class="ec-imageGrid__img"><img src="{{ asset((orderItem.product is null ? null : orderItem.product.MainListImage)|no_image_product, 'save_image') }}" alt="{{ MstProduct.product_name }}"></div>
@@ -151,7 +160,11 @@ console.log(Math.random());
                                         {% if orderItem.productClass is not null and orderItem.productClass.classCategory2 %}
                                             <p>{{ orderItem.productClass.classCategory2.className.name }}：{{ orderItem.productClass.classCategory2 }}</p>
                                         {% endif %}
-                                        <p>{{ roundPriceZero(orderItem.priceIncTax)|raw }} × {{ orderItem.quantity|number_format }}
+                                        <p>
+                                             <span class="{{ classShow }}">
+                                            {{ roundPriceZero(orderItem.priceIncTax)|raw }}
+                                            </span>
+                                            × {{ orderItem.quantity|number_format }}
                                             {% if MstProduct.quantity>1 %}
                                                 箱({{ orderItem.quantity*MstProduct.quantity }}個)
                                             {% else %}

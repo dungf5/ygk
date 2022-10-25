@@ -692,6 +692,14 @@ console.log(Math.random());
     {#    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">#}
     <link rel="stylesheet" href="{{ asset('assets/selectbox/jquery_ui_1_13_2.css') }}">
     <style>
+        .standar_price{
+            color: #00B050;
+            font-size: 100% !important;
+        }
+        .good_price{
+            color: #FF0000;
+            font-size: 100% !important;
+        }
         .custom-combobox {
             position: relative;
             display: inline-block;
@@ -978,7 +986,7 @@ console.log(Math.random());
                             <ul class="ec-borderedList">
                                 {% for orderItem in shipping.productOrderItems %}
                                     {% set MstProduct = hsProductId[orderItem.Product.id] %}
-
+                                    {% set classShow=hsMstProductCodeCheckShow[MstProduct.product_code] -%}
                                     <li>
                                         <div class="ec-imageGrid">
                                             <div class="ec-imageGrid__img"><img
@@ -996,8 +1004,10 @@ console.log(Math.random());
                                                 {% if orderItem.productClass is not null and orderItem.productClass.classCategory2 %}
                                                     {{ orderItem.productClass.classCategory2.className.name }}：{{ orderItem.productClass.classCategory2 }}
                                                 {% endif %}
+                                                <span class="{{ classShow }}">
+                                                {{ roundPriceZero(orderItem.priceIncTax,classShow)|raw }}
+                                                </span>
 
-                                                {{ roundPriceZero(orderItem.priceIncTax)|raw }}
                                                 × {{ orderItem.quantity|number_format }}
                                                 {#                                                trongadd#}
                                                 {% if MstProduct.quantity>1 %}
