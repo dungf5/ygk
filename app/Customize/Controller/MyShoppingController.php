@@ -454,13 +454,16 @@ class MyShoppingController extends AbstractShoppingController
 
         $mstProduct = $comSer->getMstProductsFromCart($cartList);
         $hsProductId = [];
+        $hsMstProductCodeCheckShow = [];
         foreach ($mstProduct as $itemP) {
             $hsProductId[$itemP['ec_product_id']] = $itemP;
+            $hsMstProductCodeCheckShow[$itemP['product_code']] = "standar_price";
         }
 
         return [
             'form' => $form->createView(),
             'Order' => $Order,
+            'hsMstProductCodeCheckShow'=>$hsMstProductCodeCheckShow,
             'hsProductId' => $hsProductId,
         ];
     }
