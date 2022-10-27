@@ -353,7 +353,7 @@ class ProductRepository extends AbstractRepository
             //$qb->andWhere("price.valid_date = '$curentDate'  AND '$curentDate'<= price.expire_date and price.customer_code='$customer_code'");
 
         }
-        $listSelectMstProduct = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name,mstProduct.size,mstProduct.color";
+        $listSelectMstProduct = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name,mstProduct.quantity_box,mstProduct.size,mstProduct.color";
         $listSelectMstProduct.=",mstProduct.quantity as mst_quantity,mstProduct.jan_code,mstProduct.material,mstProduct.model ";
         $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');

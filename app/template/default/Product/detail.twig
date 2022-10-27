@@ -424,6 +424,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                                          販売単位：{{ MstProduct.quantity }}個/箱～
                                      {% else %}
                                          販売単位：{{ MstProduct.quantity }}個～
+                                         <br/>（ボックス単位数：{{ MstProduct.quantity_box }}個）<br/>
                                      {% endif %}
 
                                     {#  set class#}

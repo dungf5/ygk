@@ -74,6 +74,13 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         private $unit_price;
 
         /**
+         * @var int
+         *
+         * @ORM\Column(name="quantity_box", type="integer", nullable=true)
+         */
+        private $quantity_box;
+
+        /**
          * @var string
          *
          * @ORM\Column(name="tag_code1", type="string", length=10, nullable=true)
@@ -335,6 +342,21 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         public function setUnitPrice(int $unit_price): void
         {
             $this->unit_price = $unit_price;
+        }
+        /**
+         * @return int
+         */
+        public function getQuantityBox(): int
+        {
+            return $this->quantity_box;
+        }
+
+        /**
+         * @param int $quantity_box
+         */
+        public function setQuantityBox(int $quantity_box): void
+        {
+            $this->quantity_box = $quantity_box;
         }
 
         /**
