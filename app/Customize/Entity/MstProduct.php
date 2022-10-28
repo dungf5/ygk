@@ -73,12 +73,12 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
          */
         private $unit_price;
 
-        /**
-         * @var int
-         *
-         * @ORM\Column(name="quantity_box", type="integer", nullable=true)
-         */
-        private $quantity_box;
+//        /**
+//         * @var int
+//         *
+//         * @ORM\Column(name="quantity_box", type="integer", nullable=true)
+//         */
+//        private $quantity_box;
 
         /**
          * @var string
@@ -343,21 +343,21 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         {
             $this->unit_price = $unit_price;
         }
-        /**
-         * @return int
-         */
-        public function getQuantityBox(): int
-        {
-            return $this->quantity_box;
-        }
+//        /**
+//         * @return int
+//         */
+//        public function getQuantityBox(): int
+//        {
+//            return $this->quantity_box;
+//        }
 
-        /**
-         * @param int $quantity_box
-         */
-        public function setQuantityBox(int $quantity_box): void
-        {
-            $this->quantity_box = $quantity_box;
-        }
+//        /**
+//         * @param int $quantity_box
+//         */
+//        public function setQuantityBox(int $quantity_box): void
+//        {
+//            $this->quantity_box = $quantity_box;
+//        }
 
         /**
          * @return string
