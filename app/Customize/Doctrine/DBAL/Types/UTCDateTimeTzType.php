@@ -64,7 +64,7 @@ class UTCDateTimeTzType extends DateTimeTzType
                 $stringFormat = "Y-m-d H:i:s.u";
             }
             return $stringFormat;
-           // return $value->format("Y-m-d H:i:s.u");
+            // return $value->format("Y-m-d H:i:s.u");
         }
 
         throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'DateTime']);
@@ -84,7 +84,7 @@ class UTCDateTimeTzType extends DateTimeTzType
             $stringFormat = "Y-m-d H:i:s.u";
         }
         $converted = \DateTime::createFromFormat(
-           // $platform->getDateTimeTzFormatString(),
+        // $platform->getDateTimeTzFormatString(),
             $stringFormat,
             $value,
             self::getUtcTimeZone()
@@ -106,7 +106,8 @@ class UTCDateTimeTzType extends DateTimeTzType
     protected static function getUtcTimeZone()
     {
         if (is_null(self::$utc)) {
-            self::$utc = new \DateTimeZone('Asia/Tokyo');;
+            // self::$utc = new \DateTimeZone('Asia/Tokyo');;
+            self::$utc = new \DateTimeZone('UTC');;
         }
 
         return self::$utc;
@@ -127,7 +128,7 @@ class UTCDateTimeTzType extends DateTimeTzType
     /**
      * @param string $timezone
      */
-    public static function setTimeZone($timezone = 'Asia/Tokyo')
+    public static function setTimeZone($timezone = 'UTC')
     {
         self::$timezone = new \DateTimeZone($timezone);
     }
