@@ -363,7 +363,7 @@ class MyCommonService extends AbstractRepository
         $sql = "select pri.product_code,pri.customer_code  from dt_price pri
                 WHERE pri.customer_code=?
                 and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
-                and pri.customer_code = pri.shipping_no
+
                 GROUP BY pri.product_code,pri.customer_code
                 HAVING COUNT(*)=1
                 ; ";
@@ -409,10 +409,10 @@ class MyCommonService extends AbstractRepository
         }
 
         //pri.customer_code = pri.shipping_no cho giao hang phai giong de co gia tot
-        $sql = "select pri.product_code,MIN(pri.tanka_number) AS min_tanka_number from dt_price pri
+        $sql = "select DISTINCT pri.product_code,MIN(pri.tanka_number) AS min_tanka_number from dt_price pri
                 WHERE pri.customer_code=?
                 and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
-                and pri.customer_code = pri.shipping_no {$subQuereAdd}
+                 {$subQuereAdd}
                 GROUP BY product_code
 
                 ORDER BY pri.tanka_number asc
@@ -471,7 +471,7 @@ class MyCommonService extends AbstractRepository
         $sql = "select pri.product_code,price_s01 from dt_price pri
                 WHERE pri.customer_code=?
                 and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
-                and pri.customer_code = pri.shipping_no
+
                 and pri.tanka_number in ({$subWhereTanka}) and pri.product_code in ({$subWhereProductCode})
 
                 GROUP BY product_code
@@ -1167,7 +1167,7 @@ class MyCommonService extends AbstractRepository
 ( select pri.product_code,MIN(pri.tanka_number) AS min_tanka_number from dt_price pri
                 WHERE pri.customer_code=?
                 and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
-                and pri.customer_code = pri.shipping_no
+
 AND          pri.product_code=?
                 GROUP BY product_code ) AS b ON b.min_tanka_number = a.tanka_number AND a.product_code=b.product_code
                 ; ";
@@ -1203,7 +1203,7 @@ AND          pri.product_code=?
                  WHERE pri.customer_code=?
                     and DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date    AND DATE_FORMAT(NOW(),'%Y-%m-%d') <= pri.expire_date
                     and pri.product_code=?
-                    and pri.customer_code = pri.shipping_no
+
                     GROUP BY pri.product_code,pri.customer_code,pri.valid_date
                     HAVING COUNT(*)=1
                 ; ";
