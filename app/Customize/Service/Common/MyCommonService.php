@@ -1289,26 +1289,54 @@ AND          pri.product_code=?
 
     public function getSearchProductName($productName)
     {
-        $sql = "SELECT jan_code FROM  mst_product a WHERE  match(a.product_name )
-                 AGAINST( ? IN natural LANGUAGE MODE) >1 ";
-        $myPara = [ $productName];
+        $arrSpaceName  =  explode(" ",$productName);
+
+        $myPara = [ ];
+        $whereLike = "";
+        if(count($arrSpaceName)>0){
+            $arK = array_keys($arrSpaceName) ;
+            $last_key = end($arK);
+            foreach ($arrSpaceName as $key=>$itemR){
+                $myPara []= "%".$itemR."%";
+                if ($key == $last_key) {
+                    $whereLike .= " a.product_name like ?  ";
+                }else{
+                    $whereLike .= " a.product_name like ? and ";
+                }
+
+            }
+        }else{
+            $whereLike = " a.product_name like ?  ";
+            $myPara = [ "%".$productName."%"];
+        }
+        $sql = "SELECT jan_code FROM  mst_product a WHERE  ".$whereLike;
 
         $statement = $this->entityManager->getConnection()->prepare($sql);
         $result = $statement->executeQuery($myPara);
         $rows = $result->fetchAllAssociative();
-        if(count($rows)==0){
-            $sql = "SELECT jan_code FROM  mst_product a WHERE  a.product_name like ?";
-            $myPara = [ "%".$productName."%"];
-            $statement = $this->entityManager->getConnection()->prepare($sql);
-            $result = $statement->executeQuery($myPara);
-            $rows = $result->fetchAllAssociative();
-        }
         $arrProductCode = [];
         foreach ($rows as $itemR){
             $arrProductCode[] =$itemR["jan_code"];
         }
 
         return $arrProductCode;
+
+//        $myPara = [ $productName];
+//        $sql = "SELECT jan_code FROM  mst_product a WHERE  match(a.product_name )
+//                 AGAINST( ? IN natural LANGUAGE MODE) >1 ";
+//
+
+//        $statement = $this->entityManager->getConnection()->prepare($sql);
+//        $result = $statement->executeQuery($myPara);
+//        $rows = $result->fetchAllAssociative();
+//        if(count($rows)==0){
+//            $sql = "SELECT jan_code FROM  mst_product a WHERE  a.product_name like ?";
+//            $myPara = [ "%".$productName."%"];
+//            $statement = $this->entityManager->getConnection()->prepare($sql);
+//            $result = $statement->executeQuery($myPara);
+//            $rows = $result->fetchAllAssociative();
+//        }
+
     }
     public function getSearchCatalogCode($catalog_code)
     {
