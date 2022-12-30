@@ -720,7 +720,7 @@ class MyShoppingController extends AbstractShoppingController
             $newOrder['addr02'] = $customer['addr02'];
             $newOrder['addr03'] = $customer['addr03'];
             $newOrder['phone_number'] = $customer['phone_number'];
-            $newOrder['email'] = $customer['email'];
+            $newOrder['email'] = $customer['customer_email'];
             // Get Product
             $goods = $commonService->getMstProductsOrderCustomer($Order->getId());
             $newOrder['ProductOrderItems'] = $goods;
