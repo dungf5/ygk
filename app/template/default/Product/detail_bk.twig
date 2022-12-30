@@ -157,6 +157,23 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
         });
     </script>
     <script>
+            {#$( "#quantity" ).focus(function() {#}
+
+            {#   if ($('#quantity').val() < 1) {#}
+
+            {#        let input1 =document.getElementById('quantity');#}
+            {#      //  $('#quantity')[0].setCustomValidity('{{ 'front.product.invalid_quantity'|trans }}');#}
+            {#        input1.setCustomValidity('{{ 'front.product.invalid_quantity'|trans }}');#}
+            {#         input1.reportValidity();#}
+            {#        return true;#}
+            {#    }#}
+            {#  if($('#quantity').val() % {{ MstProduct.quantity }}  !== 0) {#}
+            {#            $('#quantity')[0].setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity_multiples'|trans }}');#}
+            {#             $('#quantity')[0].reportValidity();#}
+            {#            return true;#}
+            {#   }#}
+
+            {#});#}
         $(function() {
             $('.add-cart').on('click', function(event) {
 
@@ -190,9 +207,27 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                 if(checkInput('quantity')==false){
                     return false;
                 }
+                if ($('#quantity').val() == "") {
+                    {#let input1 =document.getElementById('quantity');#}
+                    {#input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');#}
+                    {#input1.reportValidity();#}
+                    {#return true;#}
+                } else {
+                    {#let checkCase1 = $('#quantity').val() < {{ MstProduct.quantity }} ;#}
+                    {#let checkCase2 = $('#quantity').val() <1 ;#}
+                    {#let checkCase3 = $('#quantity').val() % {{ MstProduct.quantity }}  !== 0;#}
+
+                    {#if(checkCase1||checkCase2||checkCase3) {#}
+                    {#    $('#quantity')[0].setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');#}
+                    {#    $('#quantity')[0].reportValidity();#}
+                    {#    return true;#}
+                    {#}#}
+                    {#$('#quantity')[0].setCustomValidity('');#}
+                }
 
                 event.preventDefault();
                 $form = $('#form1');
+
 
                 $.ajax({
                     url: $form.attr('action'),
@@ -236,6 +271,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                     // Buttonを有効にする
                     $('.add-cart').prop('disabled', false);
                 });
+
             });
         });
 
@@ -255,8 +291,8 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
 
                 var valInput = $('#'+idQuantity).val().trim();
                   let input1 =document.getElementById(idQuantity);
+                  let myid = $('#'+idQuantity).attr('myid');
                   input1.setCustomValidity('');
-                   let myid = $('#'+idQuantity).attr('myid');
              if (valInput == "") {
 
 
@@ -303,6 +339,13 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
             });
 
         });
+
+ $('.btnBack').click(function() {
+      // if( checkInput('quantity')==true){
+          window.location.href= $.cookie( 'listUrl');
+     //  }
+
+ });
     </script>
     <script type="application/ld+json">
     {
@@ -334,55 +377,54 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
 
 {% block main %}
     <form action="{{ url('product_add_cart', {id:Product.id}) }}" method="post" id="form1" name="form1">
-        <div class="ec-productRole">
-            <div class="ec-grid2">
-                <div class="ec-grid2__cell">
-                    <div class="ec-sliderItemRole">
+    <div class="ec-productRole">
+        <div class="ec-grid2">
+            <div class="ec-grid2__cell">
+                <div class="ec-sliderItemRole">
 
-                        <div class="item_visual">
-                            {% for ProductImage in Product.ProductImage %}
-                                <div class="slide-item"><img src="{{ asset(ProductImage, 'save_image') }}" alt="{{ loop.first ? MstProduct.product_name : '' }}"></div>
-                            {% else %}
-                                <div class="slide-item"><img src="{{ asset(''|no_image_product, 'save_image') }}" alt="{{ loop.first ? MstProduct.product_name : '' }}" /></div>
-                            {% endfor %}
-                        </div>
-                        <div class="item_nav">
-                            {% for ProductImage in Product.ProductImage %}
-                                <div class="slideThumb" data-index="{{ loop.index0 }}"><img src="{{ asset(ProductImage, 'save_image') }}" alt=""></div>
-                            {% endfor %}
-                        </div>
+                    <div class="item_visual">
+                        {% for ProductImage in Product.ProductImage %}
+                            <div class="slide-item"><img src="{{ asset(ProductImage, 'save_image') }}" alt="{{ loop.first ? MstProduct.product_name : '' }}"></div>
+                        {% else %}
+                            <div class="slide-item"><img src="{{ asset(''|no_image_product, 'save_image') }}" alt="{{ loop.first ? MstProduct.product_name : '' }}" /></div>
+                        {% endfor %}
+                    </div>
+                    <div class="item_nav">
+                        {% for ProductImage in Product.ProductImage %}
+                            <div class="slideThumb" data-index="{{ loop.index0 }}"><img src="{{ asset(ProductImage, 'save_image') }}" alt=""></div>
+                        {% endfor %}
                     </div>
                 </div>
-                <div class="ec-grid2__cell">
-                    <div class="ec-productRole__profile">
-                        {# 商品名 #}
-                        <div class="ec-productRole__title">
-                            <h2 class="ec-headingTitle">{{ MstProduct.product_name }}</h2>
-                        </div>
-                        {# タグ #}
-                        <ul class="ec-productRole__tags">
-                            {% for Tag in Product.Tags %}
-                                <li class="ec-productRole__tag tag_{{ Tag.id }}">{{ Tag }}</li>
-                            {% endfor %}
-                        </ul>
+            </div>
+            <div class="ec-grid2__cell">
+                <div class="ec-productRole__profile">
+                    {# 商品名 #}
+                    <div class="ec-productRole__title">
+                        <h2 class="ec-headingTitle">{{ MstProduct.product_name }}</h2>
+                    </div>
+                    {# タグ #}
+                    <ul class="ec-productRole__tags">
+                        {% for Tag in Product.Tags %}
+                            <li class="ec-productRole__tag tag_{{ Tag.id }}">{{ Tag }}</li>
+                        {% endfor %}
+                    </ul>
 
-                        {% if app.user==null %}
-                            <div style="text-align: left;color:#00B050">未ログインのため、標準単価を表示しています</div>
-                        {% endif %}
+                    {% if app.user==null %}
+                        <div style="text-align: left;color:#00B050">未ログインのため、標準単価を表示しています</div>
+                    {% endif %}
 
-                        <div class="ec-productRole__price">
+                    <div class="ec-productRole__price">
 
-                            {# {% if app.user -%}#}
+                       {# {% if app.user -%}#}
                             {# 標準単価 #}
                             <div class="ec-price">
                                 <span class="ec-price__price price02-default">
-                                     {% if MstProduct.quantity > 1 %}
+
+                                     {% if MstProduct.quantity>1 %}
                                          販売単位：{{ MstProduct.quantity }}個/箱～
                                      {% else %}
-                                         販売単位：{{ MstProduct.quantity }}個～<br/>
-                                        {% if MstProduct.quantity == 1 and MstProduct.quantity_box > 0 %}
-                                            （ボックス単位数：{{ MstProduct.quantity_box }}個）<br/>
-                                        {% endif %}
+                                         販売単位：{{ MstProduct.quantity }}個～
+{#                                         <br/>（ボックス単位数：{{ MstProduct.quantity_box }}個）<br/>#}
                                      {% endif %}
 
                                     {#  set class#}
@@ -393,140 +435,99 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                                         {% endif %}
                                     {% endif %}
                                     {#  set end#}
-
-                                    {# Check mst_customer.price_view_flg #}
                                     {% if  classShow=="good_price" %}
-                                        <span class="{{ classShow }}"> 販売単価:</span>
-                                    {% else %}
-                                        <span class="{{ classShow }}"> 標準単価:</span>
+                                        <span class="{{ classShow }}"> 販売単価：</span>
+                                                    {% else %}
+                                        <span class="{{ classShow }}"> 標準単価：</span>
                                     {% endif %}
 
                                     {% if Price is defined and Price is not null %}
                                         <span class="{{ classShow }}" >  {{ roundPrice(Price.price_s01)}}</span>
                                     {% else %}
                                         {% if MstProduct is defined and MstProduct is not null %}
-                                            <span class="{{ classShow }}" >     {{ roundPriceZero(MstProduct.unit_price)|raw }}</span>
+                                        <span class="{{ classShow }}" >     {{ roundPriceZero(MstProduct.unit_price)|raw }}</span>
+
                                         {% endif %}
                                     {% endif %}
+
                                 </span>
-                            </div>
 
-                            <div style="padding-left: 0.3em">
-                                <div class="ec-numberInput"><span style="color: #000000">{{ 'common.quantity'|trans }}:</span>
+                            </div>
+                        {#{% else %}#}
+                           {# 価格 #}
+                        {#<div class="ec-price">
+                             <span class="ec-price__price">{{ roundPrice(MstProduct.unit_price) }}
+                             </span>
+                         </div>
+                     {% endif %}#}
+
+                        <div style="padding-left: 0.3em">
+                            <div class="ec-numberInput"><span style="color: #000000">{{ 'common.quantity'|trans }}:</span>
                                 {{ form_widget(form.quantity,{'attr': {'myId':Product.id,'title':'','class': 'quantity','value': MstProduct.quantity|number_format
-                                        ,'min':MstProduct.quantity
-                                        ,'step':MstProduct.quantity}}) }}
-                                    {{ form_errors(form.quantity) }}
-                                </div>
+                                    ,'min':MstProduct.quantity
+                                    ,'step':MstProduct.quantity}}) }}
+                                {{ form_errors(form.quantity) }}
                             </div>
+                        </div>
 
-                        </div>
-                        {# 商品コード #}
-                        <div class="ec-productRole__code">
-                            {% if MstProduct is defined and MstProduct is not null %}
-                                <div class="product-code-default">
-                                    <dl class="content-detail">
-                                        <dt>{{ 'front.product.code'|trans }}</dt>
-                                        <dd> : {{ MstProduct.product_code }}</dd>
-                                    </dl>
-                                </div>
-                                <div class="product-name-default">
-                                    <dl class="content-detail">
-                                        <dt>{{ 'front.product.name'|trans }}</dt>
-                                        <dd> : {{ MstProduct.product_name }}</dd>
-                                    </dl>
-                                </div>
-                                <div class="product-jan-code-default">
-                                    <dl class="content-detail">
-                                        <dt>{{ 'front.product.jan_code'|trans }}</dt>
-                                        <dd> : {{ MstProduct.jan_code }}</dd>
-                                    </dl>
-                                </div>
-                                <div class="product-product-name-abb-default">
-                                    <dl class="content-detail">
-                                        <dt>{{ 'front.product.product_name_abb'|trans }}</dt>
-                                        <dd> : {{ MstProduct.product_name_abb }}</dd>
-                                    </dl>
-                                </div>
-                                <div class="product-unit-price-default hidden">
-                                    <dl class="content-detail">
-                                        <dt>{{ 'front.product.unit_price'|trans }}</dt>
-                                        <dd> : {{ MstProduct.unit_price }}</dd>
-                                    </dl>
-                                </div>
-                                <div class="product-series-name-default">
-                                    <dl class="content-detail">
-                                        <dt>{{ 'front.product.series_name'|trans }}</dt>
-                                        <dd> : {{ MstProduct.series_name }}</dd>
-                                    </dl>
-                                </div>
-                                <div class="product-line-no-default">
-                                    <dl class="content-detail">
-                                        <dt>{{ 'front.product.line_no'|trans }}</dt>
-                                        <dd> : {{ MstProduct.line_no }}</dd>
-                                    </dl>
-                                </div>
-                                <div class="product-quantity-default hidden">
-                                    <dl class="content-detail">
-                                        <dt>{{ 'front.product.quantity'|trans }}</dt>
-                                        <dd> : {{ MstProduct.quantity }}</dd>
-                                    </dl>
-                                </div>
-                                <div class="product-model-default">
-                                    <dl class="content-detail">
-                                        <dt>{{ 'front.product.model'|trans }}</dt>
-                                        <dd> : {{ MstProduct.size }}</dd>
-                                    </dl>
-                                </div>
-                                <div class="product-color-default">
-                                    <dl class="content-detail">
-                                        <dt>{{ 'front.product.color'|trans }}</dt>
-                                        <dd> : {{ MstProduct.color }}</dd>
-                                    </dl>
-                                </div>
-                            {% endif %}
-                        </div>
-                        {# 在庫 #}
-                        <div class="ec-productRole__code">
-                            <div class="product-stock_default">
-                                {{ 'front.product.stock'|trans }}：
-                                {% if app.user -%}
-                                    {% if Stock is defined and Stock is not null %}
-                                        {% if Stock.stock_num >= 31 %}
-                                            〇
+                    </div>
+                    {# 商品コード #}
+                    <div class="ec-productRole__code">
+                        {% if MstProduct is defined and MstProduct is not null %}
+                            <div class="product-code-default">{{ 'front.product.code'|trans }}： {{ MstProduct.product_code }}</div>
+                            <div class="product-name-default">{{ 'front.product.name'|trans }}： {{ MstProduct.product_name }}</div>
+                            <div class="product-jan-code-default">{{ 'front.product.jan_code'|trans }}： {{ MstProduct.jan_code }}</div>
+                            <div class="product-product-name-abb-default">{{ 'front.product.product_name_abb'|trans }}： {{ MstProduct.product_name_abb }}</div>
+                            <div class="product-unit-price-default hidden">{{ 'front.product.unit_price'|trans }}： {{ MstProduct.unit_price }}</div>
+                            <div class="product-series-name-default">{{ 'front.product.series_name'|trans }}： {{ MstProduct.series_name }}</div>
+                            <div class="product-line-no-default">{{ 'front.product.line_no'|trans }}： {{ MstProduct.line_no }}</div>
+                            <div class="product-quantity-default hidden">{{ 'front.product.quantity'|trans }}： {{ MstProduct.quantity }}</div>
+                            <div class="product-size-default">{{ 'front.product.size'|trans }}： {{ MstProduct.size }}</div>
+                            <div class="product-color-default">{{ 'front.product.color'|trans }}： {{ MstProduct.color }}</div>
+                            <div class="product-material-default">{{ 'front.product.material'|trans }}： {{ MstProduct.material }}</div>
+                            <div class="product-model-default">{{ 'front.product.model'|trans }}： {{ MstProduct.model }}</div>
+                        {% endif %}
+                    </div>
+                    {# 在庫 #}
+                    <div class="ec-productRole__code">
+                        <div class="product-stock_default">
+                            {{ 'front.product.stock'|trans }}：
+                            {% if app.user -%}
+                                {% if Stock is defined and Stock is not null %}
+                                    {% if Stock.stock_num >= 31 %}
+                                        〇
+                                    {% else  %}
+                                        {% if Stock.stock_num == 0 %}
+                                            ×
                                         {% else  %}
-                                            {% if Stock.stock_num == 0 %}
-                                                ×
-                                            {% else  %}
-                                                △
-                                            {% endif %}
+                                            △
                                         {% endif %}
-                                    {% else %}
-                                        ×
                                     {% endif %}
                                 {% else %}
                                     ×
                                 {% endif %}
-                                <p style="margin-left: 40px;">在庫数31以上＝〇、在庫数30以下＝△、在庫切れ＝×</p>
-                            </div>
+                            {% else %}
+                                ×
+                            {% endif %}
                         </div>
-                        {# 関連カテゴリ #}
-                        {% if Product.ProductCategories is not empty %}
-                            <div class="ec-productRole__category">
-                                <div>{{ 'front.product.related_category'|trans }}</div>
-                                {% for ProductCategory in Product.ProductCategories %}
-                                    <ul>
-                                        <li>
-                                            {% for Category in ProductCategory.Category.path %}
-                                                <a href="{{ url('product_list') }}?category_id={{ Category.id }}">{{ Category.name }}</a> {%- if loop.last == false %}
-                                                <span>＞</span>{% endif -%}
-                                            {% endfor %}
-                                        </li>
-                                    </ul>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        {#                    startform#}
+                    </div>
+                    {# 関連カテゴリ #}
+                    {% if Product.ProductCategories is not empty %}
+                        <div class="ec-productRole__category">
+                            <div>{{ 'front.product.related_category'|trans }}</div>
+                            {% for ProductCategory in Product.ProductCategories %}
+                                <ul>
+                                    <li>
+                                        {% for Category in ProductCategory.Category.path %}
+                                            <a href="{{ url('product_list') }}?category_id={{ Category.id }}">{{ Category.name }}</a> {%- if loop.last == false %}
+                                            <span>＞</span>{% endif -%}
+                                        {% endfor %}
+                                    </li>
+                                </ul>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+{#                    startform#}
                         {% if Product.stock_find %}
                             <div class="ec-productRole__actions ">
                                 {% if form.classcategory_id1 is defined %}
@@ -541,14 +542,20 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                                         </div>
                                     {% endif %}
                                 {% endif %}
+{#                                <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}</span>#}
+{#                                    {{ form_widget(form.quantity,{'attr': {'value': MstProduct.quantity|number_format#}
+{#                                        ,'min':MstProduct.quantity#}
+{#                                        ,'step':MstProduct.quantity}}) }}#}
+{#                                    {{ form_errors(form.quantity) }}#}
+{#                                </div>#}
                             </div>
-                            <div class="ec-productRole__btn" style="display: inline-flex">
+                            <div class="ec-productRole__btn" style="display: -webkit-inline-box">
                                 <button type="button" class="ec-blockBtn--action add-cart">
                                     {{ 'front.product.add_cart'|trans }}
                                 </button>
-                                <a type="button" class="ec-blockBtn--action btnBack" href="{{ url_referer }}">
+                                <button type="button" class="ec-blockBtn--action btnBack">
                                     << 戻る
-                                </a>
+                                </button>
                             </div>
                         {% else %}
                             <div class="ec-productRole__btn">
@@ -557,48 +564,48 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                                 </button>
                             </div>
                         {% endif %}
-                        {#endform#}
-                        {{ form_rest(form) }}
+{#endform#}
+                    {{ form_rest(form) }}
     </form>
-    <div class="ec-modal">
-        <div class="ec-modal-overlay">
-            <div class="ec-modal-wrap">
-                <span class="ec-modal-close"><span class="ec-icon"><img src="{{ asset('assets/icon/cross-dark.svg') }}" alt=""/></span></span>
-                <div id="ec-modal-header" class="text-center">{{ 'front.product.add_cart_complete'|trans }}</div>
-                <div class="ec-modal-box">
-                    <div class="ec-role">
-                        <span class="ec-inlineBtn--cancel">{{ 'front.product.continue'|trans }}</span>
-                        <a href="{{ url('cart') }}" class="ec-inlineBtn--action">{{ 'common.go_to_cart'|trans }}</a>
+                    <div class="ec-modal">
+                        <div class="ec-modal-overlay">
+                            <div class="ec-modal-wrap">
+                                <span class="ec-modal-close"><span class="ec-icon"><img src="{{ asset('assets/icon/cross-dark.svg') }}" alt=""/></span></span>
+                                <div id="ec-modal-header" class="text-center">{{ 'front.product.add_cart_complete'|trans }}</div>
+                                <div class="ec-modal-box">
+                                    <div class="ec-role">
+                                        <span class="ec-inlineBtn--cancel">{{ 'front.product.continue'|trans }}</span>
+                                        <a href="{{ url('cart') }}" class="ec-inlineBtn--action">{{ 'common.go_to_cart'|trans }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if BaseInfo.option_favorite_product %}
+                        <form action="{{ url('product_add_favorite', {id:Product.id}) }}" method="post">
+                            <div class="ec-productRole__btn">
+                                {% if is_favorite == false %}
+                                    <button type="submit" id="favorite" class="ec-blockBtn--cancel">
+                                        {{ 'front.product.add_favorite'|trans }}
+                                    </button>
+                                {% else %}
+                                    <button type="submit" id="favorite" class="ec-blockBtn--cancel"
+                                            disabled="disabled">{{ 'front.product.add_favorite_alrady'|trans }}
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </form>
+                    {% endif %}
+                    <div class="ec-productRole__description">{{ Product.description_detail|raw|nl2br }}
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    {% if BaseInfo.option_favorite_product %}
-        <form action="{{ url('product_add_favorite', {id:Product.id}) }}" method="post">
-            <div class="ec-productRole__btn">
-                {% if is_favorite == false %}
-                    <button type="submit" id="favorite" class="ec-blockBtn--cancel">
-                        {{ 'front.product.add_favorite'|trans }}
-                    </button>
-                {% else %}
-                    <button type="submit" id="favorite" class="ec-blockBtn--cancel"
-                            disabled="disabled">{{ 'front.product.add_favorite_alrady'|trans }}
-                    </button>
-                {% endif %}
+        {% if Product.freearea %}
+            <div class="ec-productRole__description">
+                {{ include(template_from_string(Product.freearea)) }}
             </div>
-        </form>
-    {% endif %}
-    <div class="ec-productRole__description">{{ Product.description_detail|raw|nl2br }}
-    </div>
-    </div>
-    </div>
-    </div>
-    {% if Product.freearea %}
-        <div class="ec-productRole__description">
-            {{ include(template_from_string(Product.freearea)) }}
-        </div>
-    {% endif %}
+        {% endif %}
     </div>
 
 

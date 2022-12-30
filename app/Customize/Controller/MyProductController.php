@@ -174,6 +174,8 @@ class MyProductController extends AbstractController
      */
     public function detail(Request $request, Product $Product)
     {
+        $referer    = $request->headers->get('referer', '/products/list');
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         if (!$this->checkVisibility($Product)) {
             throw new NotFoundHttpException();
@@ -231,17 +233,18 @@ class MyProductController extends AbstractController
         }
 
         return [
-            'title' => $this->title,
-            'subtitle' => $Product->getName(),
-            'form' => $builder->getForm()->createView(),
-            'product_in_cart' => $product_in_cart,
-            'Product' => $Product,
-            'is_favorite' => $is_favorite,
-            'productClassId' => $productClassId,
-            'oneCartId' => $oneCartId,
-            'Price' => $price,
-            'Stock' => $stock,
-            'MstProduct' => $mstProduct,
+            'title'             => $this->title,
+            'subtitle'          => $Product->getName(),
+            'form'              => $builder->getForm()->createView(),
+            'product_in_cart'   => $product_in_cart,
+            'Product'           => $Product,
+            'is_favorite'       => $is_favorite,
+            'productClassId'    => $productClassId,
+            'oneCartId'         => $oneCartId,
+            'Price'             => $price,
+            'Stock'             => $stock,
+            'MstProduct'        => $mstProduct,
+            'url_referer'       => $referer,
         ];
     }
 
@@ -585,16 +588,17 @@ class MyProductController extends AbstractController
         }
 
         // 表示件数
-        $builder = $this->formFactory->createNamedBuilder(
+        $builder    = $this->formFactory->createNamedBuilder(
             'disp_number',
             ProductListMaxType::class,
             null,
             [
-                'required' => false,
-                'allow_extra_fields' => true,
-                'choice_value' => 'sort_no',
+                'required'              => false,
+                'allow_extra_fields'    => true,
+                'choice_value'          => 'sort_no',
             ]
         );
+
         if ($request->getMethod() === 'GET') {
             $builder->setMethod('GET');
         }

@@ -29,11 +29,9 @@ class StockListRepository extends AbstractRepository
      */
     public function getData($product_code = '', $customer_code ='')
     {
-        $qb = $this->createQueryBuilder('s');
-        $qb->where('s.product_code = :product_code AND s.customer_code = :customer_code')
-            ->setParameter('product_code', $product_code)
-            ->setParameter('customer_code', $customer_code);
-        return $qb
-            ->getQuery()->getOneOrNullResult();
+        $qb     = $this->createQueryBuilder('s');
+        $qb->where('s.product_code = :product_code')->setParameter('product_code', $product_code);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 }

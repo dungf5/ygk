@@ -9,8 +9,10 @@ front.product.quantity: １箱入数
 front.product.size: サイズ
 front.product.color: カラー
 front.product.material: 素材
-front.product.model: 規格（m）
+front.product.model: 規格
 front.product.stock: 在庫
+front.product.cart: カート
+front.product.content: 商品内容
 
 front.product.invalid_quantity_multiples:  の倍数で入力してください。
 front.product.invalid_quantity: 以上で入力してください。

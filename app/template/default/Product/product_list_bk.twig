@@ -1,0 +1,487 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends 'default_frame.twig' %}
+
+{% set body_class = 'product_page' %}
+
+{% block javascript %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        {#eccube.productsClassCategories = {#}
+        {#    {% for Product in paginationExt %}#}
+        {#    "{{ Product[0].id|escape('js') }}": {{ class_categories_as_json(Product[0])|raw }}{% if loop.last == false %}, {% endif %}#}
+        {#    {% endfor %}#}
+        {#};#}
+
+        $(function() {
+                    $(document).on("keydown", "form", function(event) {
+                       return event.key != "Enter";
+                     });
+            // 表示件数を変更
+            $('.disp-number').change(function() {
+                var dispNumber = $(this).val();
+                $('#disp_number').val(dispNumber);
+                $('#pageno').val(1);
+                $("#form1").submit();
+            });
+
+            // 並び順を変更
+            $('.order-by').change(function() {
+                var orderBy = $(this).val();
+                $('#orderby').val(orderBy);
+                $('#pageno').val(1);
+                $("#form1").submit();
+            });
+
+            $('.add-cart').on('click', function(e) {
+                let userCode='{{getUserCode()}}';
+                if(userCode=="6000"){
+                    alert("{{ 'messge.cannotcart.all'|trans }}");
+
+                    return ;
+                }
+
+                var $form = $(this).parents('tr').find('form');
+
+                {#// 個数フォームのチェック#}
+                var $quantity = $form.parent().find('.quantity');
+                let idProduct = $quantity.attr('myid');
+                var $checkQuantity = $form.parent().find('.checkQuantity');
+                let rsCheck = checkInput('quantity'+idProduct);
+                if(rsCheck==false){
+                    return;
+                }
+
+               {#  if ($quantity.val()=="") {#}
+
+               {#     $quantity[0].setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');#}
+               {#     $quantity[0].reportValidity();#}
+
+               {#     setTimeout(function() {#}
+               {#         loadingOverlay('hide');#}
+               {#     }, 100);#}
+               {#     return true;#}
+               {# }#}
+
+               {#if ( ($quantity.val()< 1)||($quantity.val()< $checkQuantity.val()) ) {#}
+
+               {#     $quantity[0].setCustomValidity($checkQuantity.val()+'{{ 'front.product.invalid_quantity'|trans }}');#}
+               {#     $quantity[0].reportValidity();#}
+
+               {#     setTimeout(function() {#}
+               {#         loadingOverlay('hide');#}
+               {#     }, 100);#}
+               {#     return true;#}
+               {# }#}
+               {# if (parseInt($quantity.val()) % parseInt($checkQuantity.val()) !== 0) {#}
+
+               {#     $quantity[0].setCustomValidity($checkQuantity.val()+'{{ 'front.product.invalid_quantity'|trans }}');#}
+               {#     $quantity[0].reportValidity();#}
+
+               {#     setTimeout(function() {#}
+               {#         loadingOverlay('hide');#}
+               {#     }, 100);#}
+               {#     return true;#}
+               {# } else {#}
+               {#     $quantity[0].setCustomValidity('');#}
+               {# }#}
+                e.preventDefault();
+                $.ajax({
+                    url: $form.attr('action'),
+                    type: $form.attr('method'),
+                    data: $form.serialize(),
+                    dataType: 'json',
+                    beforeSend: function(xhr, settings) {
+                        // Buttonを無効にする
+                        $('.add-cart').prop('disabled', true);
+                    }
+                }).done(function(data) {
+                    // レスポンス内のメッセージをalertで表示
+                    $.each(data.messages, function() {
+                        $('#ec-modal-header').html(this);
+                    });
+
+                    $('.ec-modal').show();
+
+                   $('a>.fnDIN').html(data.totalNew);
+
+                   let cartHtml ="<span class='fnDIN'>"+data.totalNew+"</span>";
+                    $('#emptyCart').html(cartHtml);
+                     //nvtrongxxx
+
+                    let myValue =   $.cookie(idProduct);
+                    if( myValue!=undefined){
+                      $('#quantity'+idProduct).val(myValue);
+                     }
+                    // カートブロックを更新する
+                    $.ajax({
+                        url: '{{ url('block_cart') }}',
+                        type: 'GET',
+                        dataType: 'html'
+                    }).done(function(html) {
+                        $('.ec-headerRole__cart').html(html);
+                    });
+                }).fail(function(data) {
+                    alert('{{ 'front.product.add_cart_error'|trans }}');
+                }).always(function(data) {
+                    // Buttonを有効にする
+                    $('.add-cart').prop('disabled', false);
+                });
+            });
+        });
+
+        $('.ec-modal-wrap').on('click', function(e) {
+            // モーダル内の処理は外側にバブリングさせない
+            e.stopPropagation();
+        });
+        $('.ec-modal-overlay, .ec-modal, .ec-modal-close, .ec-inlineBtn--cancel').on('click', function() {
+            $('.ec-modal').hide()
+        });
+
+//nvtrong add
+
+function initInputVal(){
+
+
+    var myStringArray = ALL_PRODUCT;
+    var arrayLength = myStringArray.length;
+    for (var i = 0; i < arrayLength; i++) {
+        let myValue =   $.cookie(myStringArray[i] );
+        if( myValue!=undefined){
+          $('#quantity'+myStringArray[i]).val(myValue);
+         }
+    }
+}
+ function checkInput(idQuantity){
+
+
+                var valInput = $('#'+idQuantity).val().trim();
+                let mymst_quantity = $('#'+idQuantity).attr('mymst_quantity');
+                  let input1 =document.getElementById(idQuantity);
+                  input1.setCustomValidity('');
+             if (valInput == "") {
+
+
+                    input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+                    input1.reportValidity();
+                    return false;
+              }
+
+             if ( (valInput == 0) && (1 == mymst_quantity) ){
+
+                    input1.setCustomValidity(mymst_quantity+'{{ 'front.product.invalid_quantity'|trans }}');
+                    input1.reportValidity();
+                    return false;
+              }
+
+            if ( (valInput == 0) && (1 != mymst_quantity) ){
+                   //%number%
+                   let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                   msgShow = msgShow.replace('%number%',mymst_quantity);
+                    input1.setCustomValidity(msgShow);
+                    input1.reportValidity();
+                    return false;
+              }
+             if(valInput % mymst_quantity  !== 0) {
+                   let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                   msgShow = msgShow.replace('%number%',mymst_quantity);
+                    $('#'+idQuantity)[0].setCustomValidity(msgShow);
+                    $('#'+idQuantity)[0].reportValidity();
+                     return false;
+             }
+                $.cookie( idQuantity,valInput, { path: '/' });
+                 console.log('keyde#'+idQuantity);
+             return true;
+        }
+ $(function() {
+            initInputVal();
+            $.cookie( 'listUrl',window.location.href);
+            // 表示件数を変更
+            $('.quantity').on("input", function(ev) {
+
+                var objT = this;
+                var isFail = false;
+                //href set
+                 var dtId = "link_detail"+$(objT).attr('myid');
+                 //quantity1421
+                let quantityId = "quantity"+$(objT).attr('myid');
+                     let myUrl = $("#"+dtId).attr('href');
+                     //let okmyUrl = 'myUrl.replace(/#|_/g,'')'; // result: "this is a test"
+                     let okmyUrl = '/products/detail/'+$(objT).attr('myid'); // result: "this is a test"
+
+                     //let newUrl = "#"+myUrl;
+                     let newUrl = "javascript:;";
+                      let input1 =document.getElementById(objT.id);
+                 //
+                 input1.setCustomValidity('');
+                  let mymst_quantity= $(objT).attr('mymst_quantity');
+                 let resultCheck = checkInput(quantityId);
+                {# if (objT.value == "") {#}
+
+
+                {#     input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');#}
+                {#     input1.reportValidity();#}
+                {#     $("#"+dtId).attr('href',newUrl);#}
+                {#     isFail=true;#}
+                {#    return true;#}
+                {#}#}
+                {#if ( (objT.value < 1) || (objT.value < mymst_quantity)) {#}
+
+
+                {#     input1.setCustomValidity(mymst_quantity+"{{ 'front.product.invalid_quantity'|trans }}");#}
+                {#     input1.reportValidity();#}
+                {#     $("#"+dtId).attr('href',newUrl);#}
+                {#     isFail=true;#}
+                {#    return true;#}
+                {#}#}
+
+                {#  if(objT.value % mymst_quantity  !== 0) {#}
+                {#            input1.setCustomValidity(mymst_quantity+"{{ 'front.product.invalid_quantity'|trans }}");#}
+                {#            input1.reportValidity();#}
+                {#              isFail=true;#}
+                {#          $("#"+dtId).attr('href',newUrl);#}
+                {#            return true;#}
+                {#   }#}
+                {#   console.log('keylist#'+ $(objT).attr('myid'));#}
+                if(resultCheck==true){
+                    $.cookie( $(objT).attr('myid'),objT.value, { path: '/' });
+                         $("#"+dtId).attr('href',okmyUrl);
+                }
+            });
+
+
+
+        });
+    </script>
+{% endblock %}
+
+{% block main %}
+    <script>var ALL_PRODUCT = [];
+    </script>
+    <style>
+        .standar_price{
+            color: #00B050;
+        }
+        .good_price{
+            color: #FF0000;
+        }
+
+    </style>
+    {% if search_form.category_id.vars.errors|length > 0 %}
+        <div class="ec-searchnavRole">
+            <p class="errormsg text-danger">{{ 'front.product.search__category_not_found'|trans }}</p>
+        </div>
+    {% else %}
+        <div class="ec-searchnavRole">
+            <form name="form1" id="form1" method="get" action="?">
+                {% for item in search_form %}
+                    <input type="hidden" id="{{ item.vars.id }}"
+                           name="{{ item.vars.full_name }}"
+                           {% if item.vars.value is not empty %}value="{{ item.vars.value }}" {% endif %}/>
+                {% endfor %}
+            </form>
+            <div class="ec-searchnavRole__topicpath">
+                <ol class="ec-topicpath">
+                    <li class="ec-topicpath__item"><a href="{{ url('product_list') }}">{{ 'front.product.all_category'|trans }}</a>
+                    </li>
+                    {% if Category is not null %}
+                        {% for Path in Category.path %}
+                            <li class="ec-topicpath__divider">|</li>
+                            <li class="ec-topicpath__item{% if loop.last %}--active{% endif %}"><a
+                                        href="{{ url('product_list') }}?category_id={{ Path.id }}">{{ Path.name }}</a>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                    {% if search_form.vars.value and search_form.vars.value.name %}
+                        <li class="ec-topicpath__divider">|</li>
+                        <li class="ec-topicpath__item">{{ 'front.product.search_result__keyword'|trans({ '%name%': search_form.vars.value.name }) }}</li>
+                    {% endif %}
+                </ol>
+            </div>
+            <div class="ec-searchnavRole__infos">
+                <div class="ec-searchnavRole__counter">
+                    {% if pagination.totalItemCount > 0 %}
+                        {{ 'front.product.search_result__detail'|trans({ '%count%': pagination.totalItemCount })|raw }}
+                    {% else %}
+                        <span>{{ 'front.product.search__product_not_found'|trans }}</span>
+                    {% endif %}
+                </div>
+                {% if pagination.totalItemCount > 0 %}
+                    <div class="ec-searchnavRole__actions">
+                        <div class="ec-select">
+                            {{ form_widget(disp_number_form, {'id': '', 'attr': {'class': 'disp-number'}}) }}
+                            {{ form_widget(order_by_form, {'id': 'order_by_form', 'attr': {'class': 'order-by'}}) }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="ec-shelfRole">
+        {% if pagination.totalItemCount > 0 %}
+                    <div class="w-100" >
+                         {% if app.user==null %}
+                             <div style="text-align: center;color:#00B050">未ログインのため、標準単価を表示しています</div>
+                          {% endif %}
+                        <table class="ec-productList">
+                            <thead>
+                            <tr>
+                                <th class="item">商品内容</th>
+                                <th class="cart">カート</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for Product in pagination %}
+
+                                {% set form = forms[Product.id] %}
+                                <script>
+                                    ALL_PRODUCT.push('{{ Product.id }}');
+                                </script>
+
+                                <tr>
+                                    <td class="item spec">
+                                        <a id="link_detail{{ Product.id }}" href="/products/detail/{{ Product.id }}">
+                                            <div class="itemImage">
+                                                {% if hsKeyImg[Product.id] is defined %}
+                                                    <img  style="width: 150px;height: 150px" src="{{ asset(hsKeyImg[Product.id]|no_image_product, 'save_image') }}" alt="{{ Product.product_name }}" loading="lazy">
+                                                {% else %}
+
+                                                {% endif %}
+
+
+                                            </div>
+                                            <ul class="itemName">
+                                                <li class="sku">  {{ Product.jan_code }}</li>
+                                                <li class="name"> {{ Product.product_name }}</li>
+                                                <li class="numPrice">
+                                                    {% if Product.mst_quantity>1 %}
+                                                     販売単位：{{ Product.mst_quantity }}個/箱～
+                                                    {% else %}
+                                                    販売単位：{{ Product.mst_quantity }}個～
+{#                                                    <br/>（ボックス単位数：{{ Product.quantity_box }}個）#}
+                                                    {% endif %}
+                                                    <br>
+                                                    {#  set class#}
+                                                    {% set classShow="standar_price" -%}
+                                                    {% if app.user -%}
+                                                        {% if Product.price_s01 is not empty %}
+                                                            {% set classShow="good_price" -%}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    {#  set end#}
+                                                    {% if  classShow=="good_price" %}
+                                                        <span class="{{ classShow }}"> 販売単価：</span>
+                                                    {% else %}
+                                                        <span class="{{ classShow }}"> 標準単価：</span>
+                                                    {% endif %}
+
+
+                                                    {% if app.user -%}
+
+                                                        {% if Product.price_s01 is not empty %}
+                                                    <span class="{{ classShow }}" > {{ roundPrice(Product.price_s01) }}</span>
+                                                        {% else %}
+                                                    <span class="{{ classShow }}">    {{ roundPriceZero(Product.mst_unit_price )|raw}}</span>
+                                                        {% endif %}
+                                                    {% else %}
+                                                    <span class="{{ classShow }}">
+                                                        {{ roundPriceZero(Product.mst_unit_price)|raw }}</span>
+                                                    {% endif %}
+
+                                                    {% if  classShow=="standar_price" and roundPriceZero(Product.mst_unit_price) == "<span style='color:#f00'>オープン価格</span>" %}
+                                                    {% else %}
+                                                    <span class="{{ classShow }}">（税抜）</span></li>
+                                                    {% endif %}
+
+                                            </ul>
+                                        </a>
+                                        <div class="itemSpec">
+                                            <dl>
+                                                <dt>サイズ</dt>
+                                                <dd> {{ Product.size }}</dd>
+                                            </dl>
+                                            <dl>
+                                                <dt>カラー</dt>
+                                                <dd>{{ Product.color }}</dd>
+                                            </dl>
+                                            <dl>
+                                                <dt>素材</dt>
+                                                <dd>{{ Product.material }}</dd>
+                                            </dl>
+                                            <dl>
+                                                <dt>規格<span>（m）</span></dt>
+                                                <dd>{{ Product.model }} </dd>
+                                            </dl>
+                                        </div>
+                                    </td>
+                                    <td class="cart">
+                                        <form name="form{{ Product.id }}" id="productForm{{ Product.id }}" action="{{ url('product_add_cart', {id:Product.id}) }}" method="post">
+                                            <div class="ec-productRole__actions">
+                                                {% if form.classcategory_id1 is defined %}
+                                                    <div class="ec-select ">
+                                                        {{ form_widget(form.classcategory_id1) }}
+                                                        {{ form_errors(form.classcategory_id1) }}
+                                                    </div>
+                                                    {% if form.classcategory_id2 is defined %}
+                                                        <div class="ec-select ">
+                                                            {{ form_widget(form.classcategory_id2) }}
+                                                            {{ form_errors(form.classcategory_id2) }}
+                                                        </div>
+                                                    {% endif %}
+                                                {% endif %}
+                                                <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}:</span>
+                                                    {{ form_widget(form.quantity, {'attr': {'myId':Product.id,'title':'','mymst_quantity':Product.mst_quantity,'class': 'quantity','value': Product.mst_quantity|number_format
+                                                        ,'min':Product.mst_quantity
+                                                        ,'step':Product.mst_quantity}}) }}
+                                                    {{ form_errors(form.quantity) }}
+                                                </div>
+                                                <input type="hidden" id="checkQuantity{{ Product.id }}" class="checkQuantity"  value="{{ Product.mst_quantity }}">
+                                            </div>
+
+                                            {{ form_rest(form) }}
+                                        </form>
+
+
+                                        <div class="ec-productRole__btn">
+
+                                            <button type="button" class="ec-blockBtn--action add-cart" data-cartid="{{ Product.id }}" form="productForm{{ Product.id }}">
+                                                {{ 'front.product.add_cart'|trans }}
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+
+            <div class="ec-modal">
+                <div class="ec-modal-overlay">
+                    <div class="ec-modal-wrap">
+                        <span class="ec-modal-close"><span class="ec-icon"><img src="{{ asset('assets/icon/cross-dark.svg') }}" alt=""/></span></span>
+                        <div id="ec-modal-header" class="text-center">{{ 'front.product.add_cart_complete'|trans }}</div>
+                        <div class="ec-modal-box">
+                            <div class="ec-role">
+                                <span class="ec-inlineBtn--cancel">{{ 'front.product.continue'|trans }}</span>
+                                <a href="{{ url('cart') }}" class="ec-inlineBtn--action">{{ 'common.go_to_cart'|trans }}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ec-pagerRole">
+                {% include "pager.twig" with {'pages': pagination.paginationData} %}
+            </div>
+        {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}

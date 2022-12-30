@@ -354,9 +354,16 @@ class ProductRepository extends AbstractRepository
 
         }
         $listSelectMstProduct = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name,mstProduct.size,mstProduct.color";
-        $listSelectMstProduct.=",mstProduct.quantity as mst_quantity,mstProduct.jan_code,mstProduct.material,mstProduct.model ";
+        $listSelectMstProduct.=",mstProduct.quantity as mst_quantity,mstProduct.jan_code,mstProduct.material,mstProduct.model, mstProduct.quantity_box ";
         $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');
+
+        $qb->leftJoin('Customize\Entity\StockList',
+            'stock_list',
+            Join::WITH,
+            "stock_list.product_code = mstProduct.product_code");
+        $qb->addSelect('stock_list.stock_num');
+
         $qb->distinct();
         //var_dump($qb->getQuery()->getSQL(),"-------");var_dump($qb->getParameters() );die();
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
