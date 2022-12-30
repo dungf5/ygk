@@ -61,6 +61,24 @@ common.mail_address: ユーザーコード
 #alert
 messge.cannotcart.all: 当ログインIDではカートを入れることはできません。
 
+front.forgot.title: パスワード新規登録・変更のご案内
+front.forgot.message1: ご登録時のメールアドレスを入力して「次へ」ボタンをクリックしてください。
+front.forgot.message2: ※パスワード再発行メールを送信します。メールの内容をご確認の上、新しいパスワードを登録してください。
+front.forgot.complete_title: パスワードの再発行(メール送信)
+front.forgot.complete_message__title: パスワード新規登録・変更メールの送信が完了しました。
+front.forgot.complete_message__body: |
+  ご登録メールアドレスにパスワード新規登録・変更するためのメールを送信いたしました。
+  メールの内容をご確認いただきますよう、お願いいたします。
+  ※メールが届かない場合はメールアドレスをご確認の上、再度お試しください。
+front.forgot.reset_title: パスワード再発行(再設定)
+front.forgot.reset_complete: パスワードを更新しました。
+front.forgot.reset_error: 有効期限が切れているか、無効なURLです。
+front.forgot.reset_not_found: |
+  メールアドレスが登録されていません。
+  弊社営業担当者にお問い合わせください。
+front.forgot.error_message__title: メールアドレスが登録されていません。
+front.forgot.error_message__body: 弊社営業担当者にお問い合わせください。
+
 
 
 

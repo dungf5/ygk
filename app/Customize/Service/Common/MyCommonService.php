@@ -90,7 +90,8 @@ class MyCommonService extends AbstractRepository
                     dtcus.email,
                     a.phone_number,
                     a.create_date,
-                    a.update_date
+                    a.update_date,
+                    a.email as customer_email
          ";
 
         $sql        = " SELECT $column   FROM mst_customer a join `dtb_customer` `dtcus` on((`dtcus`.`id` = `a`.`ec_customer_id`))  WHERE ec_customer_id=?";

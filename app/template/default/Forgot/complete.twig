@@ -1,0 +1,49 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends 'default_frame.twig' %}
+
+{% block main %}
+    {% if error is defined %}
+        <div class="ec-role">
+            <div class="ec-pageHeader">
+                <h1>{{ 'front.forgot.title'|trans }}</h1>
+            </div>
+        </div>
+        <div class="ec-forgetCompleteRole">
+            <div class="ec-off3Grid ec-text-ac">
+                <div class="ec-off3Grid__cell">
+                    <div class="ec-reportHeading">
+                        <h2>{{ 'front.forgot.error_message__title'|trans }}</h2>
+                    </div>
+                    <p class="ec-reportDescription">{{ 'front.forgot.error_message__body'|trans }}</p>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="ec-role">
+            <div class="ec-pageHeader">
+                <h1>{{ 'front.forgot.title'|trans }}</h1>
+            </div>
+        </div>
+        <div class="ec-forgetCompleteRole">
+            <div class="ec-off3Grid ec-text-ac">
+                <div class="ec-off3Grid__cell">
+                    <div class="ec-reportHeading">
+                        <h2>{{ 'front.forgot.complete_message__title'|trans }}</h2>
+                    </div>
+                    <p class="ec-reportDescription">{{ 'front.forgot.complete_message__body'|trans }}</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+
