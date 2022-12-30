@@ -1,75 +1,93 @@
-<div class="loginCartMenu">
-        <form method="get" class="searchformLeft" action="{{ path('product_list') }}">
-
-        <div class="ec-borderedDefs">
-
+{% if global_service.customerId and global_service.customerId != '' %}
+    <div class="ec-borderedDefs menu shipping">
+        <div class="ec-shipping">
             <div>
-                <div>
-                    <label class="ec-label" for="s_product_name">商品名</label>
-                </div>
-                <div>
-                    <div class="ec-halfInput">
-                        <input type="text"   class="searchE" id="s_product_name" name="s_product_name" placeholder=""
-                               value="{{ getFromUrl('s_product_name') }}" >
+                <label class="ec-label"><i class="fas fa-user-alt"></i>お客様</label>
+                <div class="ec-sub-label">{{ global_service.companyName }}</div>
+            </div>
+        </div>
+        <div class="ec-shipping">
+            <div>
+                <label class="ec-label" for="s_shipping_code"><i class="fas fa-truck"></i>出荷先</label>
+                <div class="ec-halfInput select">
+                    <select class="searchE" id="s_shipping_code" name="s_shipping_code" customerId="{{ global_service.customerId }}" onchange="handleChange(this)" value="{{ global_service.getShippingCode }}">
 
-                    </div>
+                        {% set shoppingOpt = global_service.shippingOption(global_service.customerId) %}
+                        {% if shoppingOpt %}
+                            {% if shoppingOpt|length > 1 %}
+                                <option value="" selected>---</option>
+                            {% endif %}
+
+                            {% for item in shoppingOpt %}
+                                <option value="{{ item["shipping_no"] }}" {% if global_service.getShippingCode == item["shipping_no"] %} selected {% endif %}>
+                                    {{ item["name01"] }} 〒 {{ item["postal_code"] }} {{ item["addr01"] }} {{ item["addr02"] }} {{ item["addr03"] }}
+                                </option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
                 </div>
             </div>
+        </div>
+        <div class="ec-shipping">
             <div>
-                <div>
-                    <label class="ec-label" for="s_jan"> JANコード</label>
-                </div>
-                <div>
-                    <div class="ec-halfInput">
-                        <input class="searchE" type="text" id="s_jan" name="s_jan" placeholder=""
-                               value="{{ getFromUrl('s_jan') }}" >
-
-                    </div>
+                <label class="ec-label" for="s_otodoke_code"><i class="fas fa-store"></i>届け先</label><br/>
+                <div class="ec-halfInput select">
+                    <select class="searchE" id="s_otodoke_code" name="s_otodoke_code" onchange="handleChange(this)" value="{{ global_service.getOtodokeCode }}">
+                    </select>
                 </div>
             </div>
-            <div>
-                <div>
-                    <label class="ec-label" for="s_catalog_code">  カタログコード</label>
-                </div>
-                <div>
-                    <div class="ec-halfInput">
-                        <input type="text"  class="searchE" id="s_catalog_code" name="s_catalog_code" placeholder=""
-                               value="{{ getFromUrl('s_catalog_code') }}" >
+        </div>
+    </div>
+{% endif %}
 
-                    </div>
+<form method="get" class="searchformLeft" action="{{ path('product_list') }}">
+    <div class="ec-borderedDefs menu search">
+        <div class="ec-shipping">
+            <div>
+                <label class="ec-label" for="s_product_name">商品名</label>
+                <div class="ec-halfInput">
+                    <input type="text"   class="searchE" id="s_product_name" name="s_product_name" placeholder="" value="{{ getFromUrl('s_product_name') }}" >
                 </div>
             </div>
-
+        </div>
+        <div class="ec-shipping">
+            <div>
+                <label class="ec-label" for="s_jan">JANコード</label>
+                <div class="ec-halfInput">
+                    <input class="searchE" type="text" id="s_jan" name="s_jan" placeholder="" value="{{ getFromUrl('s_jan') }}" >
+                </div>
+            </div>
+        </div>
+        <div class="ec-shipping">
+            <div>
+                <label class="ec-label" for="s_catalog_code">カタログコード</label>
+                <div class="ec-halfInput">
+                    <input type="text" class="searchE" id="s_catalog_code" name="s_catalog_code" placeholder="" value="{{ getFromUrl('s_catalog_code') }}" >
+                </div>
+            </div>
         </div>
         <div class="ec-RegisterRole__actions">
-            <div class="">
-                <div class="ec-off4Grid__cell">
-                    <button type="submit" class="ec-blockBtn--action" name="mode" value="searchLeft" >
-                        絞り込み
-                    </button>
-                </div>
+            <div class="btnArea">
+                <button type="submit" class="btn01" name="mode" value="searchLeft" >
+                    <i class="fas fa-angle-double-right"></i>
+                    絞り込み
+                </button>
             </div>
         </div>
-    </form>
-</div>
-<style>
-    .searchE{
-        width: 250px !important;
-    }
-</style>
-
+    </div>
+</form>
 
 {% set Categories = repository('Eccube\\Entity\\Category').getList() %}
 
 {% macro tree(Category) %}
-{% from _self import tree %}<a href="{{ url('product_list') }}?category_id={{ Category.id }}" class="categoryID{{ Category.id }}"><span>{{ Category.name }}</span></a>{% if Category.children|length > 0 %}
+    {% from _self import tree %}<a href="{{ url('product_list') }}?category_id={{ Category.id }}" class="categoryID{{ Category.id }}"><span>{{ Category.name }}</span></a>{% if Category.children|length > 0 %}
 
-                <ul>
-{% for ChildCategory in Category.children %}
-                    <li>{{ tree(ChildCategory) }}</li>
-{% endfor %}
-                </ul>
-            {% endif %}
+    <ul>
+        {% for ChildCategory in Category.children %}
+            <li>{{ tree(ChildCategory) }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
 {% endmacro %}
 {# @see https://github.com/bolt/bolt/pull/2388 #}
 {% from _self import tree %}
@@ -77,11 +95,175 @@
 <div class="ec-categoryNaviRole">
     <div class="ec-itemNav">
         <ul class="ec-itemNav__nav fnDIN">
-{% for Category in Categories %}
-{% if Category.id is not same as(20) %}
-            <li>{{ tree(Category) }}</li>
-{% endif %}
-{% endfor %}
+            {% for Category in Categories %}
+                {% if Category.id is not same as(20) %}
+                    <li>{{ tree(Category) }}</li>
+                {% endif %}
+            {% endfor %}
         </ul>
     </div>
 </div>
+
+{% block javascript %}
+<script>
+    $( document ).ready(function () {
+        let customer_id         =  "{{ global_service.customerId }}" ;
+        let s_shipping_code     =  "{{ global_service.getShippingCode }}";
+        let s_otodoke_code      =  "{{ global_service.getOtodokeCode }}";
+        let objSelect           = document.getElementById("s_shipping_code");
+
+        if (customer_id != '' && s_shipping_code != '' && s_shipping_code != objSelect.value) {
+            //Khi session s_shipping_code có tồn tại thì cho auto select s_shipping_code
+            objSelect.value     = s_shipping_code;
+            objSelect.dispatchEvent(new Event("change"));
+
+        } else if (customer_id != '' && s_shipping_code != '') {
+            handleGetOtodokeOption(customer_id, s_shipping_code);
+        }
+
+        if (s_otodoke_code != '') {
+            $('#s_otodoke_code').attr('value', s_otodoke_code);
+        }
+    })
+
+    function handleChange (event) {
+        let name          = event.name;
+        let value         = event.value;
+        let customer_id   = event.getAttribute("customerId");
+        event.setAttribute('value', value);
+
+        if (name == 's_shipping_code') {
+            handleChangeShippingCode(value);
+
+            if (value == '') {
+                handleChangeOtodokeCode(value);
+            }
+        }
+
+        if (name == 's_otodoke_code') {
+            handleChangeOtodokeCode(value);
+        }
+    }
+
+    function handleGetOtodokeOption (customer_id, shipping_code) {
+        /* Làm mới option*/
+        $('#s_otodoke_code').attr('value', "");
+        /* End - Làm mới option*/
+
+            $.ajax({
+                url: '{{ url('otodoke_option') }}',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'customer_id': customer_id,
+                        'shipping_code': shipping_code,
+                        '_csrf_token': '{{ csrf_token('authenticate') }}'
+                    },
+                    beforeSend: function( xhr ) {
+                        loadingOverlay();
+                    }
+                }).done(function(data) {
+                    if (data.status == 1) {
+                        if (data.data.length > 1) {
+                            $('#s_otodoke_code')
+                                .val("")
+                                .find('option')
+                                .remove()
+                                .end()
+                                .append('<option value="">---</option>');
+                        }
+
+                        $.each(data.data, function(index, value) {
+                            let selected = value.otodoke_code == "{{ global_service.getOtodokeCode }}" ? 'selected' : '';
+
+                            $('#s_otodoke_code')
+                            .find('option')
+                            .end()
+                            .append('<option value="' + (value.otodoke_code ? value.otodoke_code : '') +'" ' + selected + '>'+ (value.name01 ? value.name01 : '') + " 〒 " + (value.postal_code ? value.postal_code : '') + " " + (value.addr01 ? value.addr01 : '') + " " + (value.addr02 ? value.addr02 : '') + " " + (value.addr03 ? value.addr03 : '') +'</option>');
+                        })
+
+                        if (data.data.length == 1) {
+                            //Khi select chỉ có 1 option, thì kích hoạt hàm change otodoke_code, cho chọn luôn
+                            let otodoke_code    = data.data[0].otodoke_code;
+                            let reload          = false;
+                            handleChangeOtodokeCode(otodoke_code, reload);
+                        }
+                    }
+
+                }).fail(function(data) {
+
+                }).always(function() {
+                    loadingOverlay("hide");
+                });
+    }
+
+    function handleChangeShippingCode (shipping_code) {
+        $.ajax({
+            url: '{{ url('shipping_code_change') }}',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'shipping_code': shipping_code,
+                    '_csrf_token': '{{ csrf_token('authenticate') }}'
+                },
+                beforeSend: function( xhr ) {
+                    loadingOverlay();
+                }
+            })
+            .done(function(data) {
+                //handleGetOtodokeOption(customer_id, shipping_code);
+
+            })
+            .fail(function(data) {
+
+            }).always(function() {
+                loadingOverlay("hide");
+
+                let pathname                = location.pathname;
+                if (pathname.search("shopping") != -1) {
+                    window.location.reload();
+
+                } else {
+                    let search              = location.search;
+                    search                  = search.replace(/pageno=[0-9]+/g, "pageno=1");
+                    location.search         = search;
+                }
+            });
+    }
+
+    function handleChangeOtodokeCode (otodoke_code, reload = true) {
+        loadingOverlay();
+
+        $.ajax({
+            url: '{{ url('otodoke_code_change') }}',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'otodoke_code': otodoke_code,
+                    '_csrf_token': '{{ csrf_token('authenticate') }}'
+                }
+            }).done(function(data) {
+                loadingOverlay("hide");
+
+            }).fail(function(data) {
+                loadingOverlay("hide");
+
+            }).always(function() {
+                loadingOverlay("hide");
+
+                if (reload) {
+                    let pathname                = location.pathname;
+                    if (pathname.search("shopping") != -1) {
+                        window.location.reload();
+
+                    } else {
+                        let search              = location.search;
+                        search                  = search.replace(/pageno=[0-9]+/g, "pageno=1");
+                        location.search         = search;
+                    }
+                }
+            });
+    }
+</script>
+{% endblock javascript %}
+

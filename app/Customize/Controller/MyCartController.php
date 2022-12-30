@@ -106,40 +106,42 @@ class MyCartController extends AbstractController
     {
 
         if ('POST' === $request->getMethod()) {
-            $commonService = new MyCommonService($this->entityManager);
-            $shipping_code = $request->get('shipping_code');
-            $pre_order_id = $request->get('pre_order_id');
-            $customer_id = $request->get('customer_id');
-            $date_want_delivery = $request->get('date_want_delivery');
-            $is_check_exist  = $request->get('is_check_exist');
+            $commonService          = new MyCommonService($this->entityManager);
+            $shipping_code          = $request->get('shipping_code');
+            $pre_order_id           = $request->get('pre_order_id');
+            $customer_id            = $request->get('customer_id');
+            $date_want_delivery     = $request->get('date_want_delivery');
+            $is_check_exist         = $request->get('is_check_exist');
             if($is_check_exist==1){
 
-               echo $commonService->checkExistPreOrder($pre_order_id);
+                echo $commonService->checkExistPreOrder($pre_order_id);
                 die();
             }
 
             $commonService->saveTempCart($shipping_code, $pre_order_id);
-            $arrOtoProductOrder = $commonService->getCustomerOtodoke($customer_id, $shipping_code);
+            $arrOtoProductOrder     = $commonService->getCustomerOtodoke($customer_id, $shipping_code, null);
+            $moreOrder              = $commonService->getMoreOrder($pre_order_id);
+            $data                   = (object) [];
+            $otodoke_code_checked   = '';
 
-            $moreOrder = $commonService->getMoreOrder($pre_order_id);
-            $data = (object) [];
-            $otodoke_code_checked = '';
             if (!MyCommon::isEmptyOrNull($moreOrder)) {
-                $data->moreOrder = $moreOrder;
+                $data->moreOrder    = $moreOrder;
                 $data->hasMoreOrder = 1;
+
                 foreach ($arrOtoProductOrder as $mS) {
                     if ($mS['otodoke_code'] == $moreOrder['otodoke_code']) {
                         $otodoke_code_checked = $mS['otodoke_code'];
                     }
                 }
+
             } else {
                 $data->hasMoreOrder = 0;
             }
 
-            $data->otodoke_code_checked = $otodoke_code_checked;
-            $data->shipping = $arrOtoProductOrder;
+            $data->otodoke_code_checked     = $otodoke_code_checked;
+            $data->shipping                 = $arrOtoProductOrder;
 
-            $result = ['is_ok' => '1', 'msg' => 'OK', 'data' => $data];
+            $result     = ['is_ok' => '1', 'msg' => 'OK', 'data' => $data];
 
             return $result;
         }
@@ -157,41 +159,110 @@ class MyCartController extends AbstractController
      */
     public function cartSaveTempOrder(Request $request)
     {
-        $result = ['is_ok' => '0', 'msg' => 'NG', 'delivery_code' => ''];
+        $result                 = [
+            'is_ok'             => '0',
+            'msg'               => 'NG',
+            'delivery_code'     => ''
+        ];
+
         if ('POST' === $request->getMethod()) {
-            $commonService = new MyCommonService($this->entityManager);
-            $delivery_code = $request->get('delivery_code');
-            $date_want_delivery = $request->get('date_want_delivery');
-            $pre_order_id = $request->get('pre_order_id');
-            $bill_code = $request->get('bill_code');
-            $date_want_delivery = $request->get('date_want_delivery');
-            $result = ['is_ok' => '1', 'msg' => 'NGNG', 'delivery_code' => $delivery_code];
+            $commonService          = new MyCommonService($this->entityManager);
+            $delivery_code          = $request->get('delivery_code');
+            $date_want_delivery     = $request->get('date_want_delivery');
+            $pre_order_id           = $request->get('pre_order_id');
+            $bill_code              = $request->get('bill_code');
+            $date_want_delivery     = $request->get('date_want_delivery');
+            $remarks1               = $request->get('remarks1');
+            $remarks2               = $request->get('remarks2');
+
+            $result                 = [
+                'is_ok'             => '1',
+                'msg'               => 'OK',
+                'delivery_code'     => $delivery_code
+            ];
 
             if (!empty($bill_code)) {
                 $commonService->saveTempCartBillSeiky($bill_code, $pre_order_id);
-                $result = ['is_ok' => '1', 'msg' => 'OK', 'bill_code' => $bill_code, 'pre_order_id' => $pre_order_id];
+
+                $result             = [
+                    'is_ok'         => '1',
+                    'msg'           => 'OK',
+                    'bill_code'     => $bill_code,
+                    'pre_order_id'  => $pre_order_id
+                ];
             }
+
             if (!empty($delivery_code)) {
                 $commonService->saveTempCartDeliCodeOto($delivery_code, $pre_order_id);
-                $result = ['is_ok' => '1', 'msg' => 'OK', 'delivery_code' => $delivery_code, 'pre_order_id' => $pre_order_id];
+
+                $result             = [
+                    'is_ok'         => '1',
+                    'msg'           => 'OK',
+                    'delivery_code' => $delivery_code,
+                    'pre_order_id'  => $pre_order_id
+                ];
+
+                //Nạp lại session otodoke_code
+                $_SESSION['s_otodoke_code']     = $delivery_code;
             }
+
             if (!MyCommon::isEmptyOrNull($date_want_delivery)) {
-                $result = ['is_ok' => '0', 'msg' => 'OK', 'date_want_delivery' => $date_want_delivery, 'pre_order_id' => $pre_order_id];
-                $dayTest= $date_want_delivery;
-                $comS = new MyCommonService($this->entityManager);
-                $arrDayOff = $comS->getDayOff();
-                $dayAfter = MyCommon::getValidDate($dayTest, MyCommon::getDayWeekend(),$arrDayOff);
-                $dayAfterDay =  new \DateTime($dayAfter);
-                $curDay = new \DateTime();
+                $result                         = [
+                    'is_ok'                     => '0',
+                    'msg'                       => 'OK',
+                    'date_want_delivery'        => $date_want_delivery,
+                    'pre_order_id'              => $pre_order_id
+                ];
+
+                $dayTest                        = $date_want_delivery;
+                $comS                           = new MyCommonService($this->entityManager);
+                $arrDayOff                      = $comS->getDayOff();
+                $dayAfter                       = MyCommon::getValidDate($dayTest, MyCommon::getDayWeekend(),$arrDayOff);
+                $dayAfterDay                    =  new \DateTime($dayAfter);
+                $curDay                         = new \DateTime();
                 $curDay->modify('+1 month');
-                if ($dayAfterDay > $curDay){
-                    $result = ['is_ok' => '0', 'msg' => 'Over one months', 'date_want_delivery' => $dayAfter, 'pre_order_id' => $pre_order_id];
-                }else{
 
-                    $commonService->saveTempCartDateWantDeli($dayAfter, $pre_order_id);
-                    $result = ['is_ok' => '1', 'msg' => 'OK saved', 'date_want_delivery' => $dayAfter, 'pre_order_id' => $pre_order_id];
+                if ($dayAfterDay > $curDay) {
+                    $result                     = [
+                        'is_ok'                 => '0',
+                        'msg'                   => 'Over one months',
+                        'date_want_delivery'    => $dayAfter,
+                        'pre_order_id'          => $pre_order_id
+                    ];
                 }
+                else {
+                    $commonService->saveTempCartDateWantDeli($dayAfter, $pre_order_id);
+                    $result                     = [
+                        'is_ok'                 => '1',
+                        'msg'                   => 'OK saved',
+                        'date_want_delivery'    => $dayAfter,
+                        'pre_order_id'          => $pre_order_id
+                    ];
+                }
+            }
 
+            if (isset($remarks1)) {
+                $name               = "remarks1";
+                $commonService->saveTempCartRemarks($pre_order_id, $name, trim($remarks1));
+
+                $result             = [
+                    'is_ok'         => '1',
+                    'msg'           => 'OK',
+                    'remarks1'      => $remarks1,
+                    'pre_order_id'  => $pre_order_id
+                ];
+            }
+
+            if (isset($remarks2)) {
+                $name               = "remarks2";
+                $commonService->saveTempCartRemarks($pre_order_id, $name, trim($remarks2));
+
+                $result             = [
+                    'is_ok'         => '1',
+                    'msg'           => 'OK',
+                    'remarks2'      => $remarks2,
+                    'pre_order_id'  => $pre_order_id
+                ];
             }
 
             return $this->json($result, 200);

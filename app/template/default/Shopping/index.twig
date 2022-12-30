@@ -9,196 +9,185 @@ For the full copyright and license information, please view the LICENSE
 file that was distributed with this source code.
 #}
 {% extends 'default_frame.twig' %}
-
 {% form_theme form 'Form/form_div_layout.twig' %}
 
 {% block javascript %}
 <script src="{{ asset('assets/selectbox/jquery-ui_1_13_2.js') }}"></script>
-    <script>
-    $( function() {
-        $.widget( "custom.combobox", {
-            _create: function() {
-                this.wrapper = $( "<span>" )
-                    .addClass( "custom-combobox" )
-                    .insertAfter( this.element );
+<script>
+$( function() {
+    $.widget( "custom.combobox", {
+        _create: function() {
+            this.wrapper    = $( "<span>" )
+            .addClass( "custom-combobox" )
+            .insertAfter( this.element );
 
-                this.element.hide();
-                this._createAutocomplete();
-                this._createShowAllButton();
-            },
+            this.element.hide();
+            this._createAutocomplete();
+            this._createShowAllButton();
+        },
 
-            _createAutocomplete: function() {
-                var selected = this.element.children( ":selected" ),
-                    value = selected.val() ? selected.text() : "";
+        _createAutocomplete: function() {
+            var selected    = this.element.children( ":selected" ),
+            value           = selected.val() ? selected.text() : "";
 
-                this.input = $( "<input>" )
-                    .appendTo( this.wrapper )
-                    .val( value )
-                    .attr( "title", "" )
-                    .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
-                    .autocomplete({
-                        delay: 0,
-                        minLength: 0,
-                        source: this._source.bind( this )
-                    })
-                    .tooltip({
-                        classes: {
-                            "ui-tooltip": "ui-state-highlight"
-                        }
-                    });
-
-                this._on( this.input, {
-                    autocompleteselect: function( event, ui ) {
-                        ui.item.option.selected = true;
-
-
-//shipping_destination_right shipping_radio_is_shipping_code
-                     let shipping_radio_is_shipping_code =  $(this.input).parent().parent().attr("class");
-                     if(shipping_radio_is_shipping_code=="shipping_destination_right shipping_radio_is_shipping_code"){
-                          updateShipingAddress(ui.item.option.value);
-                     }else{
-
-                         updateDeliverydAdress(ui.item.option.value);
-                     }
-
-                        this._trigger( "select", event, {
-                            item: ui.item.option
-                        });
-                    },
-
-                    autocompletechange: "_removeIfInvalid"
-                });
-            },
-
-            _createShowAllButton: function() {
-                var input = this.input,
-                    wasOpen = false;
-                 input.on( "focusout", function(objI) {
-                     if(this.value==""){
-
-                       //$('.delivery_address_main').html('');
-                       let clasCheck = $(this).parent().parent().attr("class");
-                       if(clasCheck=='shipping_destination_right combo_add_list'){
-                           //  $('.combo_add_list').html('');
-                            $("select[name='delivery_address']").val('');
-                       }else{
-
-                           $('.error_delivery_address').hide();
-                           let Temp ='<span class="custom-combobox"><input title="" class="custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left ui-autocomplete-input" autocomplete="off" data-dashlane-rid="c17f3366f0c61f3d" data-form-type="other"><a tabindex="-1" title="すべて表示" class="ui-button ui-widget ui-button-icon-only custom-combobox-toggle ui-corner-right" role="button" data-dashlane-label="true" data-dashlane-rid="a9ea447d28e61422" data-form-type="other"><span class="ui-button-icon ui-icon ui-icon-triangle-1-s"></span><span class="ui-button-icon-space"> </span></a></span>';
-                            $('.combo_add_list').html(Temp);
-                            $("select[name='shipping_radio']").val('');
-                       }
-
-
-
-                     }
-
-                 });
-                $( "<a>" )
-                    .attr( "tabIndex", -1 )
-                    .attr( "title", "すべて表示" )
-                    .tooltip()
-                    .appendTo( this.wrapper )
-                    .button({
-                        icons: {
-                            primary: "ui-icon-triangle-1-s"
-                        },
-                        text: false
-                    })
-                    .removeClass( "ui-corner-all" )
-                    .addClass( "custom-combobox-toggle ui-corner-right" )
-                    .on( "mousedown", function() {
-                        wasOpen = input.autocomplete( "widget" ).is( ":visible" );
-                    })
-                    .on( "click", function() {
-                        input.trigger( "focus" );
-
-                        // Close if already visible
-                        if ( wasOpen ) {
-                            return;
-                        }
-
-                        // Pass empty string as value to search for, displaying all results
-                        input.autocomplete( "search", "" );
-                    });
-            },
-
-            _source: function( request, response ) {
-                var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
-                response( this.element.children( "option" ).map(function() {
-                 var value2 = $( this ).val()
-                    var text = $( this ).text();
-                    if ( this.value && ( !request.term || matcher.test(text) || matcher.test(value2) ) )
-                        return {
-                            label: text,
-                            value: text,
-                            option: this
-                        };
-
-
-                }) );
-            },
-
-            _removeIfInvalid: function( event, ui ) {
-
-                // Selected an item, nothing to do
-                if ( ui.item ) {
-                    return;
+            this.input      = $( "<input>" )
+            .appendTo( this.wrapper )
+            .val( value )
+            .attr( "title", "" )
+            .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left select" )
+            .autocomplete({
+                delay: 0,
+                minLength: 0,
+                source: this._source.bind( this )
+            })
+            .tooltip({
+                classes: {
+                    "ui-tooltip": "ui-state-highlight"
                 }
+            });
 
-                // Search for a match (case-insensitive)
-                var value = this.input.val(),
-                    valueLowerCase = value.toLowerCase(),
-                    valid = false;
-                this.element.children( "option" ).each(function() {
-                    if ( $( this ).text().toLowerCase() === valueLowerCase ) {
-                        this.selected = valid = true;
-                        return false;
+            this._on( this.input, {
+                autocompleteselect: function( event, ui ) {
+                    ui.item.option.selected                 = true;
+
+                    //shipping_destination_right shipping_radio_is_shipping_code
+                    let shipping_radio_is_shipping_code     =  $(this.input).parent().parent().attr("class");
+
+                    if (shipping_radio_is_shipping_code == "shipping_destination_right") {
+                        updateShipingAddress(ui.item.option.value);
+
+                        // Khi shipping_code change thì update otodoke_code laị về rỗng. Vì otodoke_code phụ thuộc vào shipping_code
+                        updateDeliverydAdress('');
+
+                        //Update Cart
+                        handleChangeShippingCode(ui.item.option.value);
                     }
-                });
+                    else {
+                        updateDeliverydAdress(ui.item.option.value);
+                    }
 
-                // Found a match, nothing to do
-                if ( valid ) {
+                    this._trigger( "select", event, {
+                        item: ui.item.option
+                    });
+                },
+
+                autocompletechange: "_removeIfInvalid"
+            });
+        },
+
+        _createShowAllButton: function() {
+            var input       = this.input,
+            wasOpen         = false;
+
+            input.on( "focusout", function(objI) {
+                if (this.value == "") {
+                    //$('.delivery_address_main').html('');
+                    let clasCheck   = $(this).parent().parent().attr("class");
+
+                    if (clasCheck == 'shipping_destination_right combo_add_list') {
+                        //  $('.combo_add_list').html('');
+                        $("select[name='delivery_address']").val('');
+                    }
+                    else {
+                        $('.error_delivery_address').hide();
+                        let Temp    = '<span class="custom-combobox"><input title="" class="custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left ui-autocomplete-input select" autocomplete="off" data-dashlane-rid="c17f3366f0c61f3d" data-form-type="other"><a tabindex="-1" title="すべて表示" class="ui-button ui-widget ui-button-icon-only custom-combobox-toggle ui-corner-right" role="button" data-dashlane-label="true" data-dashlane-rid="a9ea447d28e61422" data-form-type="other"><span class="ui-button-icon ui-icon ui-icon-triangle-1-s"></span><span class="ui-button-icon-space"> </span></a></span>';
+
+                        $('.combo_add_list').html(Temp);
+                        $("select[name='shipping_radio']").val('');
+                    }
+                }
+            });
+
+            $( "<a>" )
+            .attr( "tabIndex", -1 )
+            .attr( "title", "すべて表示" )
+            .tooltip()
+            .appendTo( this.wrapper )
+            .button({
+                icons: {
+                    primary: "ui-icon-triangle-1-s"
+                },
+                text: false
+            })
+            .removeClass( "ui-corner-all" )
+            .addClass( "custom-combobox-toggle ui-corner-right" )
+            .on( "mousedown", function() {
+                wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+            })
+            .on( "click", function() {
+                input.trigger( "focus" );
+
+                // Close if already visible
+                if ( wasOpen ) {
                     return;
                 }
 
-                // Remove invalid value
-                this.input
-                    .val( "" )
-                    .attr( "title", value + " お届け先が不在でございます。" )
-                    .tooltip( "open" );
-                this.element.val( "" );
-                this._delay(function() {
-                    this.input.tooltip( "close" ).attr( "title", "" );
-                }, 500 );
-                this.input.autocomplete( "instance" ).term = "";
+                // Pass empty string as value to search for, displaying all results
+                input.autocomplete( "search", "" );
+            });
+        },
 
-               //  $('.delivery_address_main').html('');
+        _source: function( request, response ) {
+            var matcher         = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
 
-            },
+            response( this.element.children( "option" ).map(function() {
+                var value2      = $( this ).val()
+                var text        = $( this ).text();
 
-            _destroy: function() {
-                this.wrapper.remove();
-                this.element.show();
+                if (this.value && ( !request.term || matcher.test(text) || matcher.test(value2)))
+                return {
+                    label: text,
+                    value: text,
+                    option: this
+                };
+            }));
+        },
+
+        _removeIfInvalid: function( event, ui ) {
+            // Selected an item, nothing to do
+            if ( ui.item ) {
+                return;
             }
-        });
 
+            // Search for a match (case-insensitive)
+            var value           = this.input.val(),
+            valueLowerCase      = value.toLowerCase(),
+            valid               = false;
 
+            this.element.children( "option" ).each(function() {
+                if ($( this ).text().toLowerCase() === valueLowerCase) {
+                    this.selected = valid = true;
+                    return false;
+                }
+            });
 
-        $( "#shipping_radio" ).combobox({
+            // Found a match, nothing to do
+            if (valid) {
+                return;
+            }
 
-        });
+            // Remove invalid value
+            this.input
+            .val( "" )
+            .attr( "title", value + " お届け先が不在でございます。" )
+            .tooltip( "open" );
 
+            this.element.val( "" );
+            this._delay(function() {
+                this.input.tooltip( "close" ).attr( "title", "" );
+            }, 500 );
 
-        // $( "#toggle" ).on( "click", function() {
-        //     $( "#shipping_radio" ).toggle();
-        // });
+            this.input.autocomplete( "instance" ).term = "";
+        },
 
+        _destroy: function() {
+            this.wrapper.remove();
+            this.element.show();
+        }
+    });
 
-    } );
-
-
-
+    $( "#shipping_radio" ).combobox({});
+});
 </script>
 
 <script>
@@ -207,268 +196,255 @@ $(function () {
         loadingOverlay();
         $('#shopping_order_redirect_to').val($(this).attr('data-path'));
         $('#shopping-form').attr('action', '{{ url("shopping_redirect_to") }}').submit();
-                setTimeout(function () {
-                    loadingOverlay("hide");
-                }, 2000);
-            };
-            $('[data-trigger]').each(function() {
-                $(this).on($(this).attr('data-trigger'), $redirectCallback);
+
+        setTimeout(function () {
+            loadingOverlay("hide");
+        }, 2000);
+    };
+
+    $('[data-trigger]').each(function() {
+        $(this).on($(this).attr('data-trigger'), $redirectCallback);
+    });
+
+    {% if is_granted('ROLE_USER') == false %}
+        var edit            = $('.customer-edit');
+        var hidden          = $('.customer-in');
+        var form            = $('.customer-form');
+
+        $('#customer').click(function() {
+            $(edit).each(function(index) {
+                var name    = $(this).text();
+                var input   = $('<input id="edit' + index + '" type="text" />').val(name);
+                $(form[index]).empty().append(input);
             });
 
-            {% if is_granted('ROLE_USER') == false %}
-            var edit = $('.customer-edit');
-            var hidden = $('.customer-in');
-            var form = $('.customer-form');
+            $('.non-customer-display').hide();
+            $('.non-customer-edit').show();
+            $('.mod-button').show();
+        });
 
-            $('#customer').click(function() {
-                $(edit).each(function(index) {
-                    var name = $(this).text();
-                    var input = $('<input id="edit' + index + '" type="text" />').val(name);
-                    $(form[index]).empty().append(input);
-                });
-
-                $('.non-customer-display').hide();
-                $('.non-customer-edit').show();
-                $('.mod-button').show();
+        $('#customer-ok').click(function() {
+            $(form).each(function(index) {
+                $(hidden[index]).val($(form[index]).children('input').val());
             });
 
-            $('#customer-ok').click(function() {
-                $(form).each(function(index) {
-                    $(hidden[index]).val($(form[index]).children('input').val());
-                });
+            var postData        = {};
+            $(hidden).each(function() {
+                postData[$(this).attr('name')] = $(this).val();
+            });
 
-                var postData = {};
-                $(hidden).each(function() {
-                    postData[$(this).attr('name')] = $(this).val();
-                });
+            loadingOverlay();
 
-                loadingOverlay();
-
-                $.ajax({
-                    url: "{{ url('shopping_customer') }}",
-                    type: 'POST',
-                    data: postData,
-                    dataType: 'json'
-                }).done(function(data) {
-                    if (data.status == 'OK') {
+            $.ajax({
+                url: "{{ url('shopping_customer') }}",
+                type: 'POST',
+                data: postData,
+                dataType: 'json'
+            })
+            .done(function(data) {
+                if (data.status == 'OK') {
                         $(form).each(function(index) {
-                            $(edit[index]).empty().text($(form[index]).children('input').val());
-                            $(form[index]).empty();
-                        });
-
-                        // kana field
-                        $(edit[2]).empty().text(data.kana01);
-                        $(edit[3]).empty().text(data.kana02);
-                        $('#customer-kana01').val(data.kana01);
-                        $('#customer-kana02').val(data.kana02);
-                    }
-                }).fail(function() {
-                    alert('更新に失敗しました。入力内容を確認してください。');
-                }).always(function(data) {
-                    // overlayを無効
-                    loadingOverlay('hide');
-                });
-
-                $('.non-customer-display').show();
-                $('.non-customer-edit').hide();
-                $('.mod-button').hide();
-            });
-
-            $('#customer-cancel').click(function() {
-                $('.non-customer-display').show();
-                $('.non-customer-edit').hide();
-                $('.mod-button').hide();
-            });
-            {% endif %}
-
-//nvtrong ajax
-            $('.mySubmitConfirm').click(function() {
-
-                let isSubmit =1;
-
-               let valbill_address = $("select[name='bill_address']").val();
-               let valbill_addressInput = $("input[name='bill_address']").val();//leng =1
-               let ishow2_addressInputOk =0;
-               if (valbill_addressInput!=null || valbill_addressInput!='' ) {
-                        ishow2_addressInputOk=1;
-               }
-               if(ishow2_addressInputOk==0){
-
-                        if ( (valbill_address==null || valbill_address=='' )) {
-                        $('.error_bill_address').show();
-                        isSubmit =0;
-                       }else{
-
-                            $('.error_bill_address').hide();
-                       }
-               }
-
-
-
-
-             let shipRadioVal = $("input[name='shipping_radio']").val();//leng =1
-             let isShipNoOk = 0;
-             if(shipRadioVal!=null){
-                 isShipNoOk=1;
-
-             }
-             if(isShipNoOk==0){
-                         let valShip = $("select[name='shipping_radio']").val();
-               if ( valShip == null || valShip== "") {
-                    isSubmit =0;
-                    $('.errorshipping_radio').show();
-                }else{
-                $('.errorshipping_radio').hide();
-
-                }
-             }else{
-                 $('.errorshipping_radio').hide();
-             }
-
-
-              let deliveryRadioVal = $("input[name='delivery_address']").val();//leng =1
-             let isDeliveryOk = 0;
-             if(deliveryRadioVal!=null){
-                 isDeliveryOk=1;
-
-             }
-             if(isDeliveryOk==0){
-                   let valdelivery_address = $("select[name='delivery_address']").val();
-               if (valdelivery_address==null || valdelivery_address=='' ) {
-                        $('.error_delivery_address').show();
-                        isSubmit =0;
-               }else{
-                    $('.error_delivery_address').hide();
-               }
-
-
-                if(checkDate() && isSubmit ===1){
-                  $('#shopping-form').submit();
-                }
-
-             }else{
-                   $('.error_delivery_address').hide();
-             }
-               if(checkDate() && isSubmit ===1){
-                  $('#shopping-form').submit();
-                }
-
-
-            });//end validate sumit
-
-                 //delivery_address is otoke_code delivery_address_main
-            $('.combo_add_list').delegate("select[name='delivery_address']", 'change', function() {
-              let delivery_code =  $(this).val();
-               //delivery_address is otoke_code
-               updateDeliverydAdress(delivery_code);
-             });
-
-            $('.bill_address').delegate("select[name='bill_address']", 'change', function() {
-                let bill_code =  $(this).val();
-
-                updateBillAddress(bill_code);
-                 $('.error_bill_address').hide();
-             });
-
-
-            // $("input[name='shipping_radio']").change(function(){
-            //     let shipping_code =  $(this).val();
-            //     updateShipingAddress(shipping_code);
-            //
-            //     });
-              $("select[name='shipping_radio']").change(function(){
-                let shipping_code =  $(this).val();
-                updateShipingAddress(shipping_code);
-
-                });
-
-
-              {% if Order.dtBillSeikyuCode|length == 1 %}
-                updateBillAddress('{{ Order.dtBillSeikyuCode[0]["seikyu_code"] }}');
-              {% endif %}
-
-            {% if Order.mstShips|length == 1 %}
-             updateShipingAddress('{{ Order.mstShips[0]["shipping_code"] }}');
-            {% endif %}
-
-
-
-
-            });
-
-        function updateShipingAddress(shipping_code) {
-                $('.error_delivery_address').hide();
-                $('.errorshipping_radio').hide();
-                $.ajax({
-                        url: '{{ url('cart_save_temp') }}',
-                        type: 'POST',
-                        data: {
-                            shipping_code:shipping_code ,
-                            '_token':'{{ csrf_token('_token') }}',
-                            'pre_order_id':'{{ Order.pre_order_id }}',
-                             'customer_id':'{{ Order.Customer.id }}'
-
-                        }
-                    }).done(function(htmlRe, statusText, jqXHR) {
-
-                        // delivery_address_main
-                        $('.combo_add_list').html(htmlRe);
-
-                    }).fail(function(jqXHR, statusText, errorThrown) {
-             });
-
-        }
-        function updateBillAddress(bill_code){
-             $.ajax({
-                        url: '{{ url('cart_save_temp_order') }}',
-                        type: 'POST',
-                        data: {
-                            'bill_code': bill_code,
-                            '_token':'{{ csrf_token('_token') }}',
-                            'pre_order_id':'{{ Order.pre_order_id }}',
-                             'customer_id':'{{ Order.Customer.id }}'
-
-                        }
-                    }).done(function(htmlRe, statusText, jqXHR) {
-                      console.log(htmlRe);
-
-                    }).fail(function(jqXHR, statusText, errorThrown) {
+                        $(edit[index]).empty().text($(form[index]).children('input').val());
+                        $(form[index]).empty();
                     });
+
+                    // kana field
+                    $(edit[2]).empty().text(data.kana01);
+                    $(edit[3]).empty().text(data.kana02);
+                    $('#customer-kana01').val(data.kana01);
+                    $('#customer-kana02').val(data.kana02);
+                }
+            })
+            .fail(function() {
+                alert('更新に失敗しました。入力内容を確認してください。');
+            })
+            .always(function(data) {
+                // overlayを無効
+                loadingOverlay('hide');
+            });
+
+            $('.non-customer-display').show();
+            $('.non-customer-edit').hide();
+            $('.mod-button').hide();
+        });
+
+        $('#customer-cancel').click(function() {
+            $('.non-customer-display').show();
+            $('.non-customer-edit').hide();
+            $('.mod-button').hide();
+        });
+    {% endif %}
+
+    //nvtrong ajax
+    $('.mySubmitConfirm').click(function() {
+        let isSubmit                = 1;
+        let valbill_address         = $("select[name='bill_address']").val();
+        let valbill_addressInput    = $("input[name='bill_address']").val();//leng =1
+        let ishow2_addressInputOk   = 0;
+
+        if (valbill_addressInput!=null || valbill_addressInput!='' ) {
+            ishow2_addressInputOk=1;
+        }
+
+        if (ishow2_addressInputOk == 0) {
+            if ( (valbill_address==null || valbill_address=='' )) {
+                $('.error_bill_address').show();
+                isSubmit            = 0;
             }
-        function updateDeliverydAdress(delivery_code){
+            else {
+                $('.error_bill_address').hide();
+            }
+        }
 
-                 $.ajax({
-                        url: '{{ url('cart_save_temp_order') }}',
-                        type: 'POST',
-                        data: {
-                            'delivery_code': delivery_code,
-                            '_token':'{{ csrf_token('_token') }}',
-                            'pre_order_id':'{{ Order.pre_order_id }}',
-                             'customer_id':'{{ Order.Customer.id }}'
+        let shipRadioVal            = $("input[name='shipping_radio']").val();//leng =1
+        let isShipNoOk              = 0;
 
-                        }
-                    }).done(function(htmlRe, statusText, jqXHR) {
+        if (shipRadioVal != null) {
+            isShipNoOk=1;
+        }
 
-                       console.log(htmlRe);
+        if (isShipNoOk == 0) {
+            let valShip             = $("select[name='shipping_radio']").val();
 
-                    }).fail(function(jqXHR, statusText, errorThrown) {
+            if ( valShip == null || valShip== "") {
+                isSubmit            = 0;
+                $('.errorshipping_radio').show();
+            }
+            else {
+                $('.errorshipping_radio').hide();
+            }
+        }
+        else {
+            $('.errorshipping_radio').hide();
+        }
 
-                });
 
+        let deliveryRadioVal        = $("input[name='delivery_address']").val();//leng =1
+        let isDeliveryOk            = 0;
+
+        if (deliveryRadioVal != null) {
+            isDeliveryOk=1;
+        }
+
+        if (isDeliveryOk == 0) {
+            let valdelivery_address = $("select[name='delivery_address']").val();
+
+            if (valdelivery_address == null || valdelivery_address == '') {
+                $('.error_delivery_address').show();
+                isSubmit            = 0;
+            }
+            else {
+                $('.error_delivery_address').hide();
             }
 
-            {% if Order.shipping_no_checked !=""  %}
-              updateShipingAddress("{{Order.shipping_no_checked}}");
-             {% endif %}
-             //update one item xxxxx
-              {% if Order.mstShips|length == 1 %}
-                updateShipingAddress("{{ Order.mstShips[0]["shipping_no"] }}");
-             {% endif %}
+            if (checkDate() && isSubmit === 1) {
+                $('#shopping-form').submit();
+            }
+        }
+        else {
+            $('.error_delivery_address').hide();
+        }
 
+        if (checkDate() && isSubmit === 1) {
+            $('#shopping-form').submit();
+        }
+    });
+    //end validate sumit
 
+    //delivery_address is otoke_code delivery_address_main
+    $('.combo_add_list').delegate("select[name='delivery_address']", 'change', function() {
+        let delivery_code       = $(this).val();
 
+        //delivery_address is otoke_code
+        updateDeliverydAdress(delivery_code);
+    });
 
-    </script>
+    $('.bill_address').delegate("select[name='bill_address']", 'change', function() {
+        let bill_code           =  $(this).val();
+
+        updateBillAddress(bill_code);
+        $('.error_bill_address').hide();
+    });
+
+    $("select[name='shipping_radio']").change(function() {
+        let shipping_code       =  $(this).val();
+        updateShipingAddress(shipping_code);
+    });
+
+    {% if Order.dtBillSeikyuCode|length == 1 %}
+        updateBillAddress('{{ Order.dtBillSeikyuCode[0]["seikyu_code"] }}');
+    {% endif %}
+
+    {% if Order.mstShips|length == 1 %}
+        updateShipingAddress('{{ Order.mstShips[0]["shipping_code"] }}');
+    {% endif %}
+});
+
+function updateShipingAddress(shipping_code) {
+    $('.error_delivery_address').hide();
+    $('.errorshipping_radio').hide();
+
+    $.ajax({
+        url: '{{ url('cart_save_temp') }}',
+        type: 'POST',
+        data: {
+            shipping_code:shipping_code ,
+            '_token':'{{ csrf_token('_token') }}',
+            'pre_order_id':'{{ Order.pre_order_id }}',
+            'customer_id':'{{ Order.Customer.id }}'
+        }
+    })
+    .done(function(htmlRe, statusText, jqXHR) {
+        // delivery_address_main
+        $('.combo_add_list').html(htmlRe);
+    })
+    .fail(function(jqXHR, statusText, errorThrown) {
+    });
+}
+
+function updateBillAddress(bill_code) {
+    $.ajax({
+        url: '{{ url('cart_save_temp_order') }}',
+        type: 'POST',
+        data: {
+            'bill_code': bill_code,
+            '_token':'{{ csrf_token('_token') }}',
+            'pre_order_id':'{{ Order.pre_order_id }}',
+            'customer_id':'{{ Order.Customer.id }}'
+        }
+    })
+    .done(function(htmlRe, statusText, jqXHR) {
+    })
+    .fail(function(jqXHR, statusText, errorThrown) {
+    });
+}
+
+function updateDeliverydAdress(delivery_code) {
+    $.ajax({
+        url: '{{ url('cart_save_temp_order') }}',
+        type: 'POST',
+        data: {
+            'delivery_code': delivery_code,
+            '_token':'{{ csrf_token('_token') }}',
+            'pre_order_id':'{{ Order.pre_order_id }}',
+            'customer_id':'{{ Order.Customer.id }}'
+        }
+    }).done(function(htmlRe, statusText, jqXHR) {
+
+    }).fail(function(jqXHR, statusText, errorThrown) {
+
+    });
+}
+
+{% if Order.shipping_no_checked !=""  %}
+    updateShipingAddress("{{Order.shipping_no_checked}}");
+{% endif %}
+
+//update one item xxxxx
+{% if Order.mstShips|length == 1 %}
+    updateShipingAddress("{{ Order.mstShips[0]["shipping_no"] }}");
+{% endif %}
+</script>
 
 <script src="{{ asset('assets/js/vendor/moment.min.js', 'admin') }}"></script>
 <script src="{{ asset('assets/js/vendor/moment-with-locales.min.js', 'admin') }}"></script>
@@ -476,69 +452,81 @@ $(function () {
 
 <script>
     Date.isLeapYear = function (year) {
-            return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0));
-        };
+        return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0));
+    };
 
-        Date.getDaysInMonth = function (year, month) {
-            return [31, (Date.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
-        };
+    Date.getDaysInMonth = function (year, month) {
+        return [31, (Date.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+    };
 
-        Date.prototype.isLeapYear = function () {
-            return Date.isLeapYear(this.getFullYear());
-        };
+    Date.prototype.isLeapYear = function () {
+        return Date.isLeapYear(this.getFullYear());
+    };
 
-        Date.prototype.getDaysInMonth = function () {
-            return Date.getDaysInMonth(this.getFullYear(), this.getMonth());
-        };
+    Date.prototype.getDaysInMonth = function () {
+        return Date.getDaysInMonth(this.getFullYear(), this.getMonth());
+    };
 
-        Date.prototype.addMonths = function (value) {
-            var n = this.getDate();
-            this.setDate(1);
-            this.setMonth(this.getMonth() + value);
-            this.setDate(Math.min(n, this.getDaysInMonth()));
-            return this;
-        };
-        function checkDate(){
-             $('.error_date').html('');
-              let msErSame = "{{ 'front.shopping.shipping_date_err_same'|trans }}";//same error_date
-              let msErSmal =  "{{ 'front.shopping.shipping_date_err_small'|trans }}";//smaller
-              let msErMonth =  "{{ 'front.shopping.shipping_date_err_month'|trans }}";//>1month
-              let date1Str = $('#date_picker_delivery').val();
-              if(date1Str.trim()==''){
-                  return  true;
-              }
+    Date.prototype.addMonths = function (value) {
+        var n   = this.getDate();
+        this.setDate(1);
+        this.setMonth(this.getMonth() + value);
+        this.setDate(Math.min(n, this.getDaysInMonth()));
+        return this;
+    };
 
-            let inputDateStr = date1Str;
-            let curDate = new Date();
-            curDate.setHours(0, 0, 0, 0);
-            let inputDate = new Date(inputDateStr);
-            inputDate.setHours(0, 0, 0, 0);
-            if(curDate.toString()==inputDate.toString()){
-                $('#date_picker_delivery').focus();
-                 $('.error_date').html(msErSame);
-                 return false;
-            }
-            if(inputDate<curDate){
-                 $('.error_date').html(msErSmal);
-                 return false;
-            }
-            curDate.addMonths(1);
-            if(inputDate>curDate){
-                 $('.error_date').html(msErMonth);
-                 return false;
-            }
-            return true;
+    function checkDate() {
+        $('.error_date').html('');
+
+        let msErSame        = "{{ 'front.shopping.shipping_date_err_same'|trans }}";//same error_date
+        let msErSmal        =  "{{ 'front.shopping.shipping_date_err_small'|trans }}";//smaller
+        let msErMonth       =  "{{ 'front.shopping.shipping_date_err_month'|trans }}";//>1month
+        let date1Str        = $('#date_picker_delivery').val();
+
+        if (date1Str.trim() == '') {
+            return  true;
         }
 
-        var CUR_INPUT_DATE=null;
-        $( document ).ready(function() {
-             var maxDate = "{{ getNext3Month() }}";
-       var minDate = "{{ getMinDate() }}";
-       let defaultDate='';
-           {% if Order.hasMoreOrder == 1 %}
-          defaultDate = '{{ Order.moreOrder.date_want_delivery }}';
+        let inputDateStr    = date1Str;
+        let curDate         = new Date();
+        curDate.setHours(0, 0, 0, 0);
+        let inputDate       = new Date(inputDateStr);
+        inputDate.setHours(0, 0, 0, 0);
 
-           {% endif %}
+        if (curDate.toString() == inputDate.toString()) {
+            $('#date_picker_delivery').focus();
+            $('.error_date').html(msErSame);
+
+            return false;
+        }
+
+        if (inputDate < curDate) {
+            $('.error_date').html(msErSmal);
+
+            return false;
+        }
+
+        curDate.addMonths(1);
+
+        if (inputDate > curDate) {
+            $('.error_date').html(msErMonth);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    var CUR_INPUT_DATE      = null;
+    $( document ).ready(function() {
+        var maxDate         = "{{ getNext3Month() }}";
+        var minDate         = "{{ getMinDate() }}";
+        let defaultDate     = '';
+
+        {% if Order.hasMoreOrder == 1 %}
+            defaultDate     = '{{ Order.moreOrder.date_want_delivery }}';
+        {% endif %}
+
         $('#date_picker_delivery').datetimepicker({
             locale: 'ja',
             format: 'YYYY-MM-DD',
@@ -554,156 +542,108 @@ $(function () {
             }
         });
 
-              // $("#date_picker_delivery").on("keyup.datetimepicker", function (e) {
-              //    checkDate()
-              // });
-              //    $("#date_picker_delivery").on("hide.datetimepicker", function (e) {
-              //
-              //    checkDate()
-              // });
-                   $("#date_picker_delivery").keydown(false);
-            function dateIsValid(dateStr) {
-              const regex = /^\d{4}-\d{2}-\d{2}$/;
+        $("#date_picker_delivery").keydown(false);
 
-              if (dateStr.match(regex) === null) {
+        function dateIsValid(dateStr) {
+            const regex         = /^\d{4}-\d{2}-\d{2}$/;
+
+            if (dateStr.match(regex) === null) {
                 return false;
-              }
-
-              const date = new Date(dateStr);
-
-              const timestamp = date.getTime();
-
-              if (typeof timestamp !== 'number' || Number.isNaN(timestamp)) {
-                return false;
-              }
-
-              return date.toISOString().startsWith(dateStr);
             }
 
+            const date          = new Date(dateStr);
+            const timestamp     = date.getTime();
 
+            if (typeof timestamp !== 'number' || Number.isNaN(timestamp)) {
+                return false;
+            }
 
-         $("#date_picker_delivery").on("change.datetimepicker", function (e) {
+            return date.toISOString().startsWith(dateStr);
+        }
 
-
-             if(e.date!=undefined){
-
+        $("#date_picker_delivery").on("change.datetimepicker", function (e) {
+            if (e.date != undefined) {
                 let dateChoose = e.date.format('YYYY-MM-DD');
-                if(checkDate()){
-                updateDateDeli(dateChoose);
+
+                if (checkDate()) {
+                    updateDateDeli(dateChoose);
                 }
+            }
+        });
+    });
 
-             }else{
-                let inputDateStr =$(this).val();
-               //  let curDate = new Date();
-               //    curDate.setHours(0, 0, 0, 0);
-               //   let inputDate = new Date(inputDateStr);
-               // let msS = "当日日時は指定できません。1";
-               // inputDate.setHours(0, 0, 0, 0);
-               // if(curDate.toString()==inputDate.toString()){
-               //     alert(msS);
-               // }
-               //
-               //  e.date=inputDate;
-               // defaultDate =inputDateStr;
-               // $( "#date_picker_delivery" ).datepicker({ defaultDate: inputDateStr });
-               // $('#date_picker_delivery').datepicker("setDate", inputDate );
-               // setTimeout(function() {
-               //     if(dateIsValid(inputDateStr)){
-               //     $( "#date_picker_delivery" ).val(inputDateStr);
-               //     }
-               //
-               // },30)
-             }
+    function updateDateDeli(dateChoose) {
+        let htmlRe1 = '';
+        $('.error_date').html('');
 
+        $.ajax({
+            url: '{{ url('cart_save_temp_order') }}',
+            type: 'POST',
+            async:false,
+            data: {
+                'date_want_delivery': dateChoose,
+                'pre_order_id':'{{ Order.pre_order_id }}',
+                'customer_id':'{{ Order.Customer.id }}'
+            }
+        })
+        .done(function(htmlRe, statusText, jqXHR) {
+            htmlRe1 = htmlRe;
+        })
+        .fail(function(jqXHR, statusText, errorThrown) {
 
         });
-});
 
-      function updateDateDeli(dateChoose){
-                let htmlRe1='';
-                $('.error_date').html('');
-                 $.ajax({
-                        url: '{{ url('cart_save_temp_order') }}',
-                        type: 'POST',
-                         async:false,
-                        data: {
-                            'date_want_delivery': dateChoose,
-                            'pre_order_id':'{{ Order.pre_order_id }}',
-                             'customer_id':'{{ Order.Customer.id }}'
-                        }
-                    }).done(function(htmlRe, statusText, jqXHR) {
-                       htmlRe1=htmlRe;
+        $("#date_picker_delivery").val(htmlRe1.date_want_delivery);
 
-                       console.log(htmlRe);
-
-                    }).fail(function(jqXHR, statusText, errorThrown) {
-
-                });
-
-                  $("#date_picker_delivery").val(htmlRe1.date_want_delivery);
-                 if(htmlRe1.is_ok==0){
-                       let msErMonth =  "{{ 'front.shopping.shipping_date_err_month'|trans }}";//>1month
-                     $('.error_date').html(msErMonth);
-                 }
-
-
-            }
-
+        if (htmlRe1.is_ok == 0) {
+            $('.error_date').html(htmlRe1.msg);
+        }
+    }
 </script>
 
 <script>
+    $(function () {
+        let preOrderId = "{{Order.pre_order_id }}";
 
-$(function () {
+        $.ajax({
+            url: '{{ url('cart_save_temp') }}',
+            type: 'POST',
+            data: {
+                pre_order_id: preOrderId,
+                is_check_exist: 1,
+                '_token':'{{ csrf_token('_token') }}'
+            }
+        })
+        .done(function(htmlRe, statusText, jqXHR) {
+           if (htmlRe == "0") {
+               window.location.href='/';
+           }
+        })
+        .fail(function(jqXHR, statusText, errorThrown) {
 
-console.log(Math.random());
-    console.log("{{Order.pre_order_id }}");
-    //9c4eca4b799deba87f49a2fe6d8898aac090ee4b
-
-    let preOrderId = "{{Order.pre_order_id }}";
-    $.ajax({
-                        url: '{{ url('cart_save_temp') }}',
-                        type: 'POST',
-                        data: {
-                            pre_order_id: preOrderId,
-                            is_check_exist: 1,
-                            '_token':'{{ csrf_token('_token') }}'
-                        }
-                    }).done(function(htmlRe, statusText, jqXHR) {
-
-                       if(htmlRe=="0"){
-                           window.location.href='/';
-
-                       }
-
-                    }).fail(function(jqXHR, statusText, errorThrown) {
-
-             });
-
-
-});
-
-
-
+         });
+    });
 </script>
-
 {% endblock javascript %}
 
 {% block main %}
-    {#    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">#}
     <link rel="stylesheet" href="{{ asset('assets/selectbox/jquery_ui_1_13_2.css') }}">
     <style>
-        .standar_price{
+        .standar_price {
             color: #00B050;
             font-size: 100% !important;
         }
-        .good_price{
+
+        .good_price {
             color: #FF0000;
             font-size: 100% !important;
         }
+
         .custom-combobox {
             position: relative;
             display: inline-block;
         }
+
         .custom-combobox-toggle {
             position: absolute;
             top: 0;
@@ -711,6 +651,7 @@ console.log(Math.random());
             margin-left: -1px;
             padding: 0;
         }
+
         .custom-combobox-input {
             margin: 0;
             padding: 5px 10px;
@@ -970,18 +911,18 @@ console.log(Math.random());
                         {% set idx = loop.index0 %}
                         {% set isShowReducedTaxMess = false %}
 
-{#                        <div#}
-{#                            class="ec-orderDelivery__title nvtrong hidden">{{ 'front.shopping.delivery_to'|trans }}{% if Order.multiple %}({{ loop.index }}){% endif %}#}
-{#                            <div class="ec-orderDelivery__change">#}
-{#                                {% if is_granted('ROLE_USER') %}#}
-{#                                    <button class="ec-inlineBtn nvtrong hidden" data-id="{{ shipping.id }}" data-trigger="click"#}
-{#                                            data-path="{{ path('shopping_shipping', {'id': shipping.id}) }}">{{ 'common.change'|trans }}</button>#}
-{#                                {% else %}#}
-{#                                    <button class="ec-inlineBtn nvtrong hidden" data-id="{{ shipping.id }}" data-trigger="click"#}
-{#                                            data-path="{{ path('shopping_shipping_edit', {'id': shipping.id}) }}">{{ 'common.change'|trans }}</button>#}
-{#                                {% endif %}#}
-{#                            </div>#}
-{#                        </div>#}
+                        {#                        <div#}
+                        {#                            class="ec-orderDelivery__title nvtrong hidden">{{ 'front.shopping.delivery_to'|trans }}{% if Order.multiple %}({{ loop.index }}){% endif %}#}
+                        {#                            <div class="ec-orderDelivery__change">#}
+                        {#                                {% if is_granted('ROLE_USER') %}#}
+                        {#                                    <button class="ec-inlineBtn nvtrong hidden" data-id="{{ shipping.id }}" data-trigger="click"#}
+                        {#                                            data-path="{{ path('shopping_shipping', {'id': shipping.id}) }}">{{ 'common.change'|trans }}</button>#}
+                        {#                                {% else %}#}
+                        {#                                    <button class="ec-inlineBtn nvtrong hidden" data-id="{{ shipping.id }}" data-trigger="click"#}
+                        {#                                            data-path="{{ path('shopping_shipping_edit', {'id': shipping.id}) }}">{{ 'common.change'|trans }}</button>#}
+                        {#                                {% endif %}#}
+                        {#                            </div>#}
+                        {#                        </div>#}
                         <div class="ec-orderDelivery__item">
                             <ul class="ec-borderedList">
                                 {% for orderItem in shipping.productOrderItems %}
@@ -1069,10 +1010,10 @@ console.log(Math.random());
                     }
 
                     .shipping_destination_left > div {
-                        width: 100px;
+                        width: 110px;
                         background-color: #c9b5b5;
                         text-align: center;
-
+                        margin-right: 20px;
                     }
 
                     .shipping_destination_right {
@@ -1094,6 +1035,31 @@ console.log(Math.random());
                     .date_picker_row {
                         display: flex;
                         margin-top: 10px;
+                    }
+                    .date-picker-delivery-notify {
+                        padding: 5px 0;
+                    }
+                    .ui-autocomplete-input.select {
+                        position: relative;
+                        align-items: center;
+                        max-width: 26vw;
+                        height: 30px;
+                        border-radius: 5px;
+                        border: 1px solid #ccc;
+                        transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .shipping_radio_is_shipping_code {
+                        position: relative;
+                        align-items: center;
+                        max-width: 26vw;
+                        height: 30px;
+                        border-radius: 5px;
+                        border: 1px solid #ccc;
+                        transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+                        margin: 0;
+                        padding: 0;
                     }
                 </style>
 
@@ -1119,76 +1085,76 @@ console.log(Math.random());
                     </div>
                 </div>
 
-                <div class="bill_address shipping_destination">
-                    <div class="shipping_destination_left">
-                        <div>請求先</div>
-                    </div>
-                    <div class="shipping_destination_right">
+                {#                <div class="bill_address shipping_destination">#}
+                {#                    <div class="shipping_destination_left">#}
+                {#                        <div>請求先</div>#}
+                {#                    </div>#}
+                {#                    <div class="shipping_destination_right">#}
 
 
-                        {% if Order.dtBillSeikyuCode|length == 1 %}
-                            {% set arSeikyuCode1 = Order.dtBillSeikyuCode[0] %}
-                            <div class="shipping_row">
+                {#                        {% if Order.dtBillSeikyuCode|length == 1 %}#}
+                {#                            {% set arSeikyuCode1 = Order.dtBillSeikyuCode[0] %}#}
+                {#                            <div class="shipping_row">#}
 
-                                <div class="shipping_col1">
-                                    <span>
-                                        {% if Order.dtBillSeikyuCode|length == 1 %}
-                                            <input class="hidden seikyu_code_" checked name="bill_address"
-                                                   value="{{ arSeikyuCode1["seikyu_code"] }}"
-                                                   id="bill_{{ arSeikyuCode1["seikyu_code"] }}">
+                {#                                <div class="shipping_col1">#}
+                {#                                    <span>#}
+                {#                                        {% if Order.dtBillSeikyuCode|length == 1 %}#}
+                {#                                            <input class="hidden seikyu_code_" checked name="bill_address"#}
+                {#                                                   value="{{ arSeikyuCode1["seikyu_code"] }}"#}
+                {#                                                   id="bill_{{ arSeikyuCode1["seikyu_code"] }}">#}
 
-                                        {% else %}
+                {#                                        {% else %}#}
 
-                                        {% endif %}
+                {#                                        {% endif %}#}
 
-                                    </span>
-                                    <label
-                                        for="bill_{{ arSeikyuCode1["seikyu_code"] }}">{{ arSeikyuCode1["name01"] }} </label>
-                                </div>
-                                <div class="shipping_col2">
+                {#                                    </span>#}
+                {#                                    <label#}
+                {#                                        for="bill_{{ arSeikyuCode1["seikyu_code"] }}">{{ arSeikyuCode1["name01"] }} </label>#}
+                {#                                </div>#}
+                {#                                <div class="shipping_col2">#}
 
-                                    〒 {{ arSeikyuCode1["postal_code"] }} {{ arSeikyuCode1["addr01"] }} {{ arSeikyuCode1["addr02"] }} {{ arSeikyuCode1["addr03"] }}
-                                </div>
+                {#                                    〒 {{ arSeikyuCode1["postal_code"] }} {{ arSeikyuCode1["addr01"] }} {{ arSeikyuCode1["addr02"] }} {{ arSeikyuCode1["addr03"] }}#}
+                {#                                </div>#}
 
-                            </div>
+                {#                            </div>#}
 
-                        {% endif %}
-
-
-                        {% if Order.dtBillSeikyuCode|length > 1 %}
-                            <select id="bill_address" style="width: 555px" name="bill_address"
-                            >
-                                <option disabled selected
-                                        value=""> {{ 'front.shopping.select_one_bill_address'|trans }}</option>
-                                {% for arShipping in Order.dtBillSeikyuCode %}
-
-                                    {% if Order.seikyu_code_checked ==  arShipping["seikyu_code"] %}
+                {#                        {% endif %}#}
 
 
-                                        <option selected
-                                                value="{{ arShipping["seikyu_code"] }}">{{ arShipping["name01"] }}
-                                            〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}</option>
+                {#                        {% if Order.dtBillSeikyuCode|length > 1 %}#}
+                {#                            <select id="bill_address" style="width: 555px" name="bill_address"#}
+                {#                            >#}
+                {#                                <option disabled selected#}
+                {#                                        value=""> {{ 'front.shopping.select_one_bill_address'|trans }}</option>#}
+                {#                                {% for arShipping in Order.dtBillSeikyuCode %}#}
 
-                                    {% else %}
-
-                                        <option value="{{ arShipping["seikyu_code"] }}">{{ arShipping["name01"] }}
-                                            〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}</option>
-
-                                    {% endif %}
+                {#                                    {% if Order.seikyu_code_checked ==  arShipping["seikyu_code"] %}#}
 
 
+                {#                                        <option selected#}
+                {#                                                value="{{ arShipping["seikyu_code"] }}">{{ arShipping["name01"] }}#}
+                {#                                            〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}</option>#}
 
-                                {% endfor %}
-                            </select>
+                {#                                    {% else %}#}
+
+                {#                                        <option value="{{ arShipping["seikyu_code"] }}">{{ arShipping["name01"] }}#}
+                {#                                            〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}</option>#}
+
+                {#                                    {% endif %}#}
 
 
-                        {% endif %}
+
+                {#                                {% endfor %}#}
+                {#                            </select>#}
 
 
-                    </div>
+                {#                        {% endif %}#}
 
 
-                </div>
+                {#                    </div>#}
+
+
+                {#                </div>#}
                 <p class="error_bill_address" style="color: red;font-size: larger;font-weight: bold;display: none">
                     {{ 'front.shopping.error_bill_address'|trans }}
                 </p>
@@ -1199,7 +1165,7 @@ console.log(Math.random());
                     <div class="shipping_destination_left">
                         <div>出荷先</div>
                     </div>
-                    <div class="shipping_destination_right shipping_radio_is_shipping_code">
+                    <div class="shipping_destination_right">
 
                         {% if Order.mstShips|length == 1 %}
                             <div class="shipping_row">
@@ -1207,7 +1173,7 @@ console.log(Math.random());
                                 <div class="shipping_col1">
                                     <span>
                                         {% if Order.mstShips|length == 1 %}
-                                            <input type="radio" class="hidden shipping_radio_is_shipping_code" checked name="shipping_radio"
+                                            <input type="radio" class="hidden" checked name="shipping_radio"
                                                    value="{{ Order.mstShips[0]["shipping_no"] }}"
                                                    id="{{ Order.mstShips[0]["shipping_no"] }}">
 
@@ -1224,7 +1190,7 @@ console.log(Math.random());
 
 
                         {% else %}
-                            <select class=" shipping_radio_is_shipping_code" id="shipping_radio" style="width: 555px" name="shipping_radio"
+                            <select id="shipping_radio" style="width: 555px" name="shipping_radio"
                             >
                                 <option disabled selected
                                         value=""> {{ 'front.shopping.select_one_shipping_radio'|trans }}</option>
@@ -1258,7 +1224,7 @@ console.log(Math.random());
                             <div>届け先 </div>
                         </div>
                         <div class="shipping_destination_right combo_add_list">
-                            <span class="custom-combobox"><input title="" class="custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left ui-autocomplete-input" autocomplete="off" data-dashlane-rid="c17f3366f0c61f3d" data-form-type="other"><a tabindex="-1" title="すべて表示" class="ui-button ui-widget ui-button-icon-only custom-combobox-toggle ui-corner-right" role="button" data-dashlane-label="true" data-dashlane-rid="a9ea447d28e61422" data-form-type="other"><span class="ui-button-icon ui-icon ui-icon-triangle-1-s"></span><span class="ui-button-icon-space"> </span></a></span>
+                            <span class="custom-combobox"><input title="" class="custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left ui-autocomplete-input select" autocomplete="off" data-dashlane-rid="c17f3366f0c61f3d" data-form-type="other"><a tabindex="-1" title="すべて表示" class="ui-button ui-widget ui-button-icon-only custom-combobox-toggle ui-corner-right" role="button" data-dashlane-label="true" data-dashlane-rid="a9ea447d28e61422" data-form-type="other"><span class="ui-button-icon ui-icon ui-icon-triangle-1-s"></span><span class="ui-button-icon-space"> </span></a></span>
                         </div>
                     </div>
 
@@ -1298,7 +1264,6 @@ console.log(Math.random());
                     </p>
 
                 </div>
-
 
                 <div class="ec-orderPayment  hidden nvtrong">
                     <div class="ec-rectHeading">
@@ -1340,6 +1305,7 @@ console.log(Math.random());
                     </div>
                 </div>
             </div>
+
             <div class="ec-orderRole__summary">
                 <div class="ec-totalBox">
                     <dl class="ec-totalBox__spec">
@@ -1354,43 +1320,24 @@ console.log(Math.random());
                         <dt>{{ 'common.delivery_fee'|trans }}</dt>
                         <dd>{{ roundPrice(Order.deliveryFeeTotal) }}</dd>
                     </dl>
-                    {#                    {% if Order.taxable_discount < 0 %}#}
-                    {#                        <dl class="ec-totalBox__spec">#}
-                    {#                            <dt>{{ 'common.discount'|trans }}</dt>#}
-                    {#                            <dd>{{ Order.taxable_discount|price }}</dd>#}
-                    {#                        </dl>#}
-                    {#                    {% endif %}#}
-                    {#                    <div class="ec-totalBox__total">{{ 'common.total'|trans }}<span#}
-                    {#                            class="ec-totalBox__price">{{ Order.taxable_total|price }}</span><span#}
-                    {#                            class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>#}
-                    <div class="ec-totalBox__total">{{ 'common.total'|trans }}<span
-                            class="ec-totalBox__price">{{ roundPriceZeroTotalAll(Order.payment_total) }}</span><span
-                            class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>
-                    {#                    {% for rate, total in Order.taxable_total_by_tax_rate %}#}
-                    {#                        <dl class="ec-totalBox__taxRate">#}
-                    {#                            <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': rate }) }}</dt>#}
-                    {#                            <dd>{{ total|price }}</dd>#}
-                    {#                        </dl>#}
+                    <div class="ec-totalBox__total">{{ 'common.total'|trans }}
+                        <span class="ec-totalBox__price">{{ roundPriceZeroTotalAll(Order.payment_total) }}</span>
+                        <span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span>
+                    </div>
                     <dl class="ec-totalBox__taxRate hidden">
                         <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': Order.rate }) }}</dt>
                         <dd>{{ roundPriceZeroTotalAll(Order.total) }}</dd>
                     </dl>
-                    {#                    {% endfor %}#}
-                    {#                    {% for item in Order.tax_free_discount_items %}#}
-                    {#                        {% if loop.first %}#}
-                    {#                            <div class="ec-totalBox__total"></div>{% endif %}#}
-                    {#                        <dl class="ec-totalBox__spec">#}
-                    {#                            <dt>{{ item.product_name }}</dt>#}
-                    {#                            <dd>{{ item.total_price|price }}</dd>#}
-                    {#                        </dl>#}
-                    {#                    {% endfor %}#}
-                    <div class="ec-totalBox__paymentTotal hidden">{{ 'common.payment_total'|trans }}<span
-                            class="ec-totalBox__price">{{ roundPriceZeroTotalAll(Order.payment_total) }}</span>
+                    <div class="ec-totalBox__paymentTotal hidden">
+                        {{ 'common.payment_total'|trans }}
+                        <span class="ec-totalBox__price">
+                            {{ roundPriceZeroTotalAll(Order.payment_total) }}
+                        </span>
                         {% if roundPriceZeroTotal(Order.payment_total) != "" %}
-                            <span
-                                class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span>
+                            <span class="ec-totalBox__taxLabel">
+                            {{ 'common.tax_include'|trans }}
+                        </span>
                         {% endif %}
-
                     </div>
                     {% if BaseInfo.isOptionPoint and Order.Customer is not null %}
                         <div class="ec-totalBox__pointBlock">
@@ -1414,5 +1361,4 @@ console.log(Math.random());
             </div>
         </div>
     </form>
-
 {% endblock %}

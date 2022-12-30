@@ -58,31 +58,36 @@
             {{ render(path('block_search_product')) }}
         </div>
         <ul class="menu">
-{#            <li><a href="{{ url('help_about') }}"><i class="fas fa-chalkboard-teacher"></i><div>当店について</div></a></li>   #}
-{#            <li><a href="{{ url('help_tradelaw') }}"><i class="fas fa-city"></i><div>会社概要</div></a></li>    #}
-{% if is_granted('ROLE_USER') %}
-            <li class="mypage"><a href="{{ url('mypage') }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>
-    <li class="mypage"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i><div>  ログアウト</div></a></li>
-{% else %}
-            <li class="mypage"><a href="{{ url('mypage_login') }}"><i class="fas fa-lock"></i><div>ログイン</div></a></li>
-{% endif %}
-            <li class="contact"><a href="{{ url('contact') }}"><i class="fas fa-envelope"></i><div>メール</div></a></li>
-{% if totalQuantity > 0 %}
-            <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div><span class="fnDIN">{{ totalQuantity|number_format }}</span></a></li>
-{% else %}
-            <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div><div id="emptyCart"></div></a></li>
-{% endif %}
+            <li class="siteTop"><a href="{{ url('homepage') }}"><i class="fas fa-home"></i><div>トップページ</div></a></li>
+
+            {% if is_granted('ROLE_USER') %}
+                <li class="mypage"><a href="{{ url('mypage') }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>
+                <li class="mypage"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i><div>  ログアウト</div></a></li>
+
+            {% else %}
+                <li class="mypage"><a href="{{ url('mypage_login') }}"><i class="fas fa-lock"></i><div>ログイン</div></a></li>
+            {% endif %}
+
+            {% if totalQuantity > 0 %}
+                <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div><span class="fnDIN">{{ totalQuantity|number_format }}</span></a></li>
+
+            {% else %}
+                <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div></a></li>
+            {% endif %}
         </ul>
     </div>
-
 </div>
 <style>
     {% if is_granted('ROLE_USER') %}
     .headerMenu .menu{
-        width: 330px !important;
+        width: 430px !important;
+    }
+    @media screen and (max-width:979px) {
+        .headerMenu .menu{
+            width: 340px !important;
+        }
     }
     {% endif %}
-
 </style>
 
 <script src="https://cdn.jsdelivr.net/gh/yeikos/jquery.history/jquery.history.js"></script>
