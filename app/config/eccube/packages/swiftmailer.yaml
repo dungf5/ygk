@@ -1,5 +1,14 @@
 parameters:
     env(MAILER_URL): ''
 swiftmailer:
-    url: '%env(MAILER_URL)%'
+    # url: '%env(MAILER_URL)%'
+    # ↓ここから追加
+    transport: '%env(MAILER_TRANSPORT)%'
+    host: '%env(MAILER_HOST)%'
+    port: '%env(MAILER_PORT)%'
+    username: '%env(MAILER_USERNAME)%'
+    password: '%env(MAILER_PASSWORD)%'
+    encryption: '%env(MAILER_ENCRYPTION)%'
+    sender_address: '%env(MAILER_SENDER_ADDRESS)%'
+    # ↑ここまで
     spool: { type: 'memory' }
