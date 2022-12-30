@@ -15,6 +15,7 @@ namespace Customize\Controller;
 
 use Customize\Common\MyCommon;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\MoreOrder;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\GlobalService;
 use Customize\Service\MailService;
@@ -272,6 +273,29 @@ class MyShoppingController extends AbstractShoppingController
 
         } else {
             $Order->hasMoreOrder                    = 0;
+
+            //Nếu pre_order_id có tồn tại.
+            if (!empty($Order->getPreOrderId())) {
+                //Nạp Sesssion
+                $_SESSION['s_pre_order_id']         = $Order->getPreOrderId() ?? '';
+
+                $orderItem                          = new MoreOrder();
+                $orderItem['shipping_code']         = $this->globalService->getShippingCode();
+                $orderItem['otodoke_code']          = $this->globalService->getOtodokeCode();
+                $orderItem->setPreOrderId($Order->getPreOrderId());
+                $orderItem->setShippingCode($this->globalService->getShippingCode());
+                $orderItem->setOtodokeCode($this->globalService->getOtodokeCode());
+                $this->entityManager->persist($orderItem);
+                $this->entityManager->flush();
+
+                $Order->moreOrder                   = $orderItem;
+
+                foreach ($mstShip as $mS) {
+                    if ($mS['shipping_no']      == $orderItem['shipping_code']) {
+                        $shipping_no_checked        = $mS['shipping_no'];
+                    }
+                }
+            }
         }
 
         $Order->shipping_no_checked                 = $shipping_no_checked;
