@@ -143,7 +143,7 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
-    public function getShipList($customer_code,$shipping_no,$order_no)
+    public function getShipList($type, $customer_code, $shipping_no, $order_no, $jan_code)
     {
         $sql = " select
                     c.otodoke_code,
@@ -187,7 +187,11 @@ class MyCommonService extends AbstractRepository
         $param[]    = $customer_code;
         $param[]    = $shipping_no;
         $param[]    = $order_no;
-//var_dump($sql,$param);
+
+        if ($type == 'one') {
+            $sql        .= " and b.jan_code = ? ";
+            $param[]    = $jan_code;
+        }
 
         $statement = $this->entityManager->getConnection()->prepare($sql);
         try {

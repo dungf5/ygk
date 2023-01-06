@@ -118,10 +118,11 @@ class MypageController extends AbstractController
         $arRe               = [];
         $comS               = new MyCommonService($this->entityManager);
         $customer_code      = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
+        $type               = $request->get("type");
         $shipping_no        = $request->get("shipping_no");
         $order_no           = $request->get("order_no");
         $jan_code           = $request->get("jan_code");
-        $arRe               = $comS->getShipList($customer_code, $shipping_no, $order_no);
+        $arRe               = $comS->getShipList($type, $customer_code, $shipping_no, $order_no, $jan_code);
 
         if (count($arRe) > 0) {
             $otodoke_code   = $arRe[0]["otodoke_code"];

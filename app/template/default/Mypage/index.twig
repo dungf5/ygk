@@ -90,11 +90,17 @@ file that was distributed with this source code.
                         <td class="hide" >{{Order.shipping_date}}</td>
                         <td>
                             {% if Order.shipping_no %}
-                                <a class=" btn btn-primary actBg " onclick="loadDataFor('{{Order.ec_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest" >
-                                    出荷状況
+                                <a class=" btn btn-primary actBg " onclick="loadDataFor('all', {{Order.ec_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest">
+                                    注文出荷状況
+                                </a>
+                                <br/><br/>
+                                <a class=" btn btn-primary actBg " onclick="loadDataFor('one', {{Order.ec_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest">
+                                    注文出荷状況
                                 </a>
                             {% else %}
-                                <div class=" btn btn-primary disabled disBg ">    出荷状況</div>
+                                <div class=" btn btn-primary disabled disBg">注文出荷状況</div>
+                                <br/><br/>
+                                <div class=" btn btn-primary disabled disBg">個別出荷状況</div>
                             {% endif %}
                         </td>
                     </tr>
@@ -114,10 +120,11 @@ file that was distributed with this source code.
 {% endblock %}
 {% block javascript %}
 <script>
-function updateShipingAddress(shipping_no, ec_order_no, jan_code) {
+function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
     $('.showbody').html("loading...");
 
     let dataSend    = {
+        type : type,
         shipping_no:shipping_no,
         order_no:ec_order_no,
         jan_code:jan_code,
@@ -136,8 +143,8 @@ function updateShipingAddress(shipping_no, ec_order_no, jan_code) {
     });
 }
 
-function loadDataFor(ec_order_no, shipping_no, jan_code) {
-    updateShipingAddress(shipping_no,ec_order_no, jan_code);
+function loadDataFor(type, ec_order_no, shipping_no, jan_code) {
+    updateShipingAddress(type, shipping_no,ec_order_no, jan_code);
 }
 </script>
 {% endblock %}
