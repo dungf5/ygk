@@ -115,27 +115,31 @@ class MypageController extends AbstractController
      */
     public function shippingList(Request $request)
     {
+        $arRe               = [];
+        $comS               = new MyCommonService($this->entityManager);
+        $customer_code      = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
+        $shipping_no        = $request->get("shipping_no");
+        $order_no           = $request->get("order_no");
+        $jan_code           = $request->get("jan_code");
+        $arRe               = $comS->getShipList($customer_code, $shipping_no, $order_no);
 
-        $arRe=[];
-        $comS = new MyCommonService($this->entityManager);
-        $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
-        $shipping_no = $request->get("shipping_no");
-        $order_no = $request->get("order_no");
+        if (count($arRe)>0) {
+            $otodoke_code   = $arRe[0]["otodoke_code"];
+            $shipping_code  = $arRe[0]["shipping_code"];
 
-        $arRe = $comS->getShipList($customer_code,$shipping_no,$order_no);
-        if(count($arRe)>0){
-            $otodoke_code = $arRe[0]["otodoke_code"];
-            $shipping_code = $arRe[0]["shipping_code"];
-
+            foreach ($arRe AS $key => &$item) {
+                if (empty($item['ec_order_no']) && $item['jan_code'] == $jan_code) {
+                    $item['highlight'] = true;
+                } else {
+                    $item['highlight'] = false;
+                }
+            }
         }
-        $arMore = $comS->getShipListExtend($otodoke_code,$shipping_code);
 
-
-        $arReturn = ["myData"=>$arRe,"arMore"=>$arMore];
+        $arMore             = $comS->getShipListExtend($otodoke_code, $shipping_code);
+        $arReturn           = ["myData" => $arRe, "arMore" => $arMore];
 
         return $arReturn;
-
-
     }
 
     /**
@@ -222,7 +226,6 @@ class MypageController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
-
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $Customer = $this->getUser();

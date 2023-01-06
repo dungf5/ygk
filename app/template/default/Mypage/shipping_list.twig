@@ -40,14 +40,14 @@
     <tbody>
     {% for item in myData %}
         <tr>
-            <td>{{item.shipping_no }}</td>
-            <td>{{item.jan_code }}</td>
-            <td>{{item.product_name }}</td>
-            <td>{{item.shipping_status }}</td>
-            <td style="text-align: right" >{{item.shipping_num }}</td>
-            <td>{{item.shipping_plan_date }}</td>
-            <td>{{item.shipping_date }}</td>
-            <td>{{item.shipping_company_code }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.shipping_no }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.jan_code }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.product_name }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.shipping_status }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %} style="text-align: right" >{{item.shipping_num }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.shipping_plan_date }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.shipping_date }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.shipping_company_code }}</td>
         </tr>
     {% endfor %}
     </tbody>
