@@ -5,9 +5,6 @@
         お客様：<b>{{myData[0].user_created_company_name }}</b>
     </div>
     <div>
-        出荷指示№：<b>{{myData[0].shipping_no }}</b>
-    </div>
-    <div>
         出荷先：<b>{{arMore[0].shipping_company_name }}</b>
     </div>
     <div>
@@ -29,46 +26,29 @@
 </div>
 <table class="table myTable">
     <thead>
-    <tr>
-{#        <th title="shipping_no">出荷指示№</th>#}
-{#        <th title="customer_name">顧客</th>#}
-{#        <th title="shipping_customer_name">出荷先</th>#}
-
-        <th title="product_code ">{{ 'front.order.jan_code'|trans| raw }}</th>
-        <th title="product_name"> 商品名</th>
-        <th title="shipping_status">出荷ステータス</th>
-        <th style="text-align: right" title="shipping_num">出荷数</th>
-        <th title="shipping_plan_date">出荷指示日</th>
-        <th title="shipping_date">出荷日</th>
-
-        <th title="shipping_company_code">運送会社</th>
-{#        <th title="inquiry_no" >荷送伝票番号</th>#}
-
-    </tr>
+        <tr>
+            <th title="shipping_no ">{{ 'front.mypage.shipping_no'|trans| raw }}</th>
+            <th title="product_code ">{{ 'front.order.jan_code'|trans| raw }}</th>
+            <th title="product_name"> 商品名</th>
+            <th title="shipping_status">出荷ステータス</th>
+            <th style="text-align: right" title="shipping_num">出荷数</th>
+            <th title="shipping_plan_date">出荷指示日</th>
+            <th title="shipping_date">出荷日</th>
+            <th title="shipping_company_code">運送会社</th>
+        </tr>
     </thead>
     <tbody>
     {% for item in myData %}
-    <tr>
-{#        <td>{{item.shipping_no }}</td>#}
-{#        <td>{{item.customer_name }}</td>#}
-{#        <td>{{item.shipping_customer_name }}</td>#}
-        <td>{{item.jan_code }}</td>
-        <td>{{item.product_name }}</td>
-        <td>{{item.shipping_status }}</td>
-        <td style="text-align: right" >{{item.shipping_num }}</td>
-        <td>{{item.shipping_plan_date }}</td>
-        <td>{{item.shipping_date }}</td>
-        <td>{{item.shipping_company_code }}</td>
-
-            {#            <a target="_blank" href="/mypage/exportOrderPdf?inquiry_no={{item.inquiry_no}}">{{item.inquiry_no}}</a>#}
-
-
-
-
-
-
-    </tr>
+        <tr>
+            <td>{{item.shipping_no }}</td>
+            <td>{{item.jan_code }}</td>
+            <td>{{item.product_name }}</td>
+            <td>{{item.shipping_status }}</td>
+            <td style="text-align: right" >{{item.shipping_num }}</td>
+            <td>{{item.shipping_plan_date }}</td>
+            <td>{{item.shipping_date }}</td>
+            <td>{{item.shipping_company_code }}</td>
+        </tr>
     {% endfor %}
-
     </tbody>
 </table>
