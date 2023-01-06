@@ -39,7 +39,7 @@
     </thead>
     <tbody>
     {% for item in myData %}
-        <tr>
+        <tr {% if item.highlight %} style="border: solid red;"  {% endif %}>
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.shipping_no }}</td>
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.jan_code }}</td>
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.product_name }}</td>
