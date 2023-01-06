@@ -123,12 +123,12 @@ class MypageController extends AbstractController
         $jan_code           = $request->get("jan_code");
         $arRe               = $comS->getShipList($customer_code, $shipping_no, $order_no);
 
-        if (count($arRe)>0) {
+        if (count($arRe) > 0) {
             $otodoke_code   = $arRe[0]["otodoke_code"];
             $shipping_code  = $arRe[0]["shipping_code"];
 
             foreach ($arRe AS $key => &$item) {
-                if (empty($item['ec_order_no']) && $item['jan_code'] == $jan_code) {
+                if ($item['jan_code'] == $jan_code) {
                     $item['highlight'] = true;
                 } else {
                     $item['highlight'] = false;

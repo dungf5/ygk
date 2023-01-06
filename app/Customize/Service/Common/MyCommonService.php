@@ -145,26 +145,48 @@ class MyCommonService extends AbstractRepository
     }
     public function getShipList($customer_code,$shipping_no,$order_no)
     {
+        $sql = " select
+                    c.otodoke_code,
+                    d.company_name as user_created_company_name,
+                    b.jan_code,
+                    f.order_no as deli_order_no,
+                    c.ec_order_no,
+                    c.ec_order_lineno,
+                    b.product_name,
+                    f.delivery_no,
+                    c.inquiry_no,
+                    c.shipping_no,
+                    cus2.customer_name as shipping_customer_name,
+                    c.shipping_code,
+                    d.customer_name,
+                    c.product_code,
+                    case
+                        when c.shipping_status = 1 then '出荷指示済'
+                        WHEN shipping_status = 2 then '出荷済'
+                        else '未出荷'
+                    end as shipping_status,
+                    c.shipping_num,
+                    c.shipping_plan_date,
+                    c.inquiry_no,
+                    c.shipping_company_code,
+                    c.shipping_date
+                from dt_order_status as a
+                join mst_product as b
+                on a.product_code = b.product_code
+                join mst_shipping as c
+                on a.order_no = c.order_no
+                and a.order_line_no = c.order_lineno
+                join mst_customer as d
+                on c.customer_code = d.customer_code
+                left join mst_customer AS cus2 ON  cus2.customer_code = c.shipping_code
+                left join mst_delivery  as f on concat(c.ec_order_no, '-', c.ec_order_lineno) = f.order_no
+                where a.customer_code = ? and c.shipping_no = ? and a.ec_order_no = ?
+            ";
 
-        $sql = " select c.otodoke_code,d.company_name as user_created_company_name, b.jan_code,f.order_no as deli_order_no,c.ec_order_no, c.ec_order_lineno,b.product_name,f.delivery_no ,c.inquiry_no ,c.shipping_no,cus2.customer_name as shipping_customer_name,c.shipping_code,d.customer_name ,c.product_code,
-                    case when c.shipping_status = 1 then '出荷指示済' WHEN shipping_status = 2 then '出荷済' else '未出荷' end as shipping_status,c.shipping_num
-                    ,c.shipping_plan_date ,c.inquiry_no,c.shipping_company_code,c.shipping_date
-                    from dt_order_status as a
-                    join mst_product as b
-                    on a.product_code = b.product_code
-                    join mst_shipping as c
-                    on a.order_no = c.order_no
-                    and a.order_line_no = c.order_lineno
-                    join mst_customer as d
-                    on c.customer_code = d.customer_code
-                     left join mst_customer AS cus2 ON  cus2.customer_code=c.shipping_code
-                     left join mst_delivery  as f   on concat(c.ec_order_no,'-', c.ec_order_lineno) = f.order_no
-
-                    where a.customer_code = ? and c.shipping_no=? and a.ec_order_no=?";
-        $param = [];
-        $param[] = $customer_code;
-        $param[] = $shipping_no;
-        $param[] = $order_no;
+        $param      = [];
+        $param[]    = $customer_code;
+        $param[]    = $shipping_no;
+        $param[]    = $order_no;
 //var_dump($sql,$param);
 
         $statement = $this->entityManager->getConnection()->prepare($sql);
