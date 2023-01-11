@@ -868,9 +868,6 @@ class MyShoppingController extends AbstractShoppingController
                 $_SESSION['s_shipping_code']    = $shipping_code;
                 $_SESSION['s_otodoke_code']     = '';
 
-                $this->deleteOrder();
-                $this->updateCart();
-
                 return $this->json(['status' => 1], 200);
             }
 
@@ -903,87 +900,6 @@ class MyShoppingController extends AbstractShoppingController
 
         } catch (\Exception $e) {
             return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
-        }
-    }
-
-    private function updateCart()
-    {
-        try {
-            //************** update cart after change shipping code
-            $Cart                   = $this->cartService->getCart();
-            $commonService          = new MyCommonService($this->entityManager);
-            $Customer               = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
-            $arCusLogin             = $commonService->getMstCustomer($Customer->getId());
-            $arCarItemId            = [];
-
-            $cartId                 = $Cart->getId();
-            $represent_type         = $this->globalService->getRepresentType();
-            $shipping_code          = $this->globalService->getShippingCode();
-
-            if ($represent_type == 1) {
-                $productCart        = $commonService->getdtPriceFromCartV2([$cartId], $shipping_code);
-
-            } else {
-                $productCart        = $commonService->getdtPriceFromCartV2([$cartId], $arCusLogin['customer_code']);
-            }
-
-            $hsPriceUp = [];
-            foreach ($productCart as $itemCart) {
-                if ($itemCart['price_s02'] != null && ($itemCart['price_s02'] != '')) {
-                    $price  = $itemCart['price_s02'];
-                } else {
-                    $price  = $itemCart['unit_price'];
-                }
-
-                $hsPriceUp[$itemCart['id']] = $price;
-                $arCarItemId[]              = $itemCart['id'];
-            }
-
-            $commonService->updateCartItem($hsPriceUp, $arCarItemId, $Cart);
-            $this->session->set('is_update_cart', 0);
-            //*****************
-        } catch (\Exception $e) {
-
-        }
-    }
-
-    private function deleteOrder() {
-        try {
-            $Cart                   = $this->cartService->getCart();
-            $preOrderId             = $Cart->getPreOrderId();
-
-            $orderData              = $this->entityManager->getRepository(Order::class)->findOneBy(['pre_order_id' => $preOrderId]);
-            $orderData->setPreOrderId(null);
-            $this->entityManager->persist($orderData);
-            $this->entityManager->flush();
-
-            //Remove orders with pre_order_id is null
-            $orderDataNull          = $this->entityManager->getRepository(Order::class)->findBy(['pre_order_id' => null]);
-
-            foreach ($orderDataNull as $key => $value) {
-                $OrderItems         = $value->getOrderItems();
-                foreach ($OrderItems AS $orderItem) {
-                    $value->removeOrderItem($orderItem);
-                    $this->entityManager->remove($orderItem);
-                    $this->entityManager->flush();
-                }
-
-                $shippings          = $value->getShippings();
-                foreach ($shippings AS $shippingItem) {
-                    $value->removeShipping($shippingItem);
-                    $this->entityManager->remove($shippingItem);
-                    $this->entityManager->flush();
-                }
-
-                $this->entityManager->remove($value);
-                $this->entityManager->flush();
-            }
-
-            //Push Session previous_pre_order_id
-            $_SESSION['previous_pre_order_id'] = $preOrderId;
-
-        } catch (\Exception $e) {
-            return;
         }
     }
 }

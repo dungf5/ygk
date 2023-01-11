@@ -219,15 +219,15 @@
             }).always(function() {
                 loadingOverlay("hide");
 
-                let pathname                = location.pathname;
-                if (pathname.search("shopping") != -1) {
-                    window.location.reload();
-
-                } else {
-                    let search              = location.search;
-                    search                  = search.replace(/pageno=[0-9]+/g, "pageno=1");
-                    location.search         = search;
-                }
+                // let pathname                = location.pathname;
+                // if (pathname.search("shopping") != -1) {
+                //     window.location.reload();
+                //
+                // } else {
+                //     let search              = location.search;
+                //     search                  = search.replace(/pageno=[0-9]+/g, "pageno=1");
+                //     location.search         = search;
+                // }
             });
     }
 
@@ -251,17 +251,17 @@
             }).always(function() {
                 loadingOverlay("hide");
 
-                if (reload) {
-                    let pathname                = location.pathname;
-                    if (pathname.search("shopping") != -1) {
-                        window.location.reload();
-
-                    } else {
-                        let search              = location.search;
-                        search                  = search.replace(/pageno=[0-9]+/g, "pageno=1");
-                        location.search         = search;
-                    }
-                }
+                // if (reload) {
+                //     let pathname                = location.pathname;
+                //     if (pathname.search("shopping") != -1) {
+                //         window.location.reload();
+                //
+                //     } else {
+                //         let search              = location.search;
+                //         search                  = search.replace(/pageno=[0-9]+/g, "pageno=1");
+                //         location.search         = search;
+                //     }
+                // }
             });
     }
 </script>
