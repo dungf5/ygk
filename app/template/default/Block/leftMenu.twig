@@ -107,7 +107,7 @@
 {% block javascript %}
 <script>
     $( document ).ready(function () {
-        let customer_id         =  "{{ global_service.customerId }}" ;
+        let customer_id         =  "{{ global_service.customerId }}";
         let s_shipping_code     =  "{{ global_service.getShippingCode }}";
         let s_otodoke_code      =  "{{ global_service.getOtodokeCode }}";
         let objSelect           = document.getElementById("s_shipping_code");
@@ -164,7 +164,7 @@
                     }
                 }).done(function(data) {
                     if (data.status == 1) {
-                        if (data.data.length > 1) {
+                        if (data.data.length > 0) {
                             $('#s_otodoke_code')
                                 .val("")
                                 .find('option')
@@ -198,6 +198,7 @@
     }
 
     function handleChangeShippingCode (shipping_code) {
+        let customer_id     =  "{{ global_service.customerId }}";
         $.ajax({
             url: '{{ url('shipping_code_change') }}',
                 type: 'POST',
@@ -211,7 +212,7 @@
                 }
             })
             .done(function(data) {
-                //handleGetOtodokeOption(customer_id, shipping_code);
+                handleGetOtodokeOption(customer_id, shipping_code);
 
             })
             .fail(function(data) {
