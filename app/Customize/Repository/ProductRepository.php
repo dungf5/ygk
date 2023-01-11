@@ -274,54 +274,66 @@ class ProductRepository extends AbstractRepository
         }
 
         // Order By
-        // 価格低い順
         $config = $this->eccubeConfig;
 
-        if (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['eccube_product_order_price_lower']) {
+        // JANコード順
+        if (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['eccube_product_jancd_lower']) {
+            $qb->addOrderBy('mstProduct.jan_code', 'asc');
+        }
 
-            // 新着順 orderby=0
-            if(!$user) {
+        //価格が低い順
+        elseif (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['eccube_product_order_price_lower']) {
+            if (!$user) {
                 $qb->addOrderBy('mstProduct.unit_price', 'asc');
-            }else{
+            }
+
+            else {
                 //price.price_s01
                $qb->addOrderBy('orderPrice', 'asc');
-
             }
-            // 価格高い順
-        } elseif (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['eccube_product_order_price_higher']) {
+        }
 
-            if(!$user) {
+        // 価格が高い順
+        elseif (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['eccube_product_order_price_higher']) {
+            if (!$user) {
                 $qb->addOrderBy('mstProduct.unit_price', 'DESC');
-            }else{
+            }
+
+            else {
                 //price.price_s01
                 $qb->addOrderBy('orderPrice', 'desc');
-
             }
-            // 新着順 orderby=1
-        } elseif (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['eccube_product_order_newer']) {
-            // 在庫切れ商品非表示の設定が有効時対応
-            // @see https://github.com/EC-CUBE/ec-cube/issues/1998
+        }
+
+        // 新着順
+        elseif (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['eccube_product_order_newer']) {
             if ($this->getEntityManager()->getFilters()->isEnabled('option_nostock_hidden') == true) {
                 $qb->innerJoin('p.ProductClasses', 'pc');
                 $qb->andWhere('pc.visible = true');
             }
+
             $qb->orderBy('p.create_date', 'DESC');
             $qb->addOrderBy('p.id', 'DESC');
-        } else {
+        }
+
+        else {
             if ($categoryJoin === false) {
                 $qb
                     ->leftJoin('p.ProductCategories', 'pct')
                     ->leftJoin('pct.Category', 'c');
             }
+
             // 新着順 orderby=0
-            if(!$user) {
+            if (!$user) {
                 $qb->addOrderBy('mstProduct.unit_price', 'asc');
-            }else{
+            }
+
+            else {
                 //price.price_s01
                 $qb->addOrderBy('orderPrice', 'desc');
-
             }
         }
+        
        // $qb->andWhere("mstProduct.product_code = '100000-12-5-35-RD'");
         if(!$user) {
             $customer_code = '';
