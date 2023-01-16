@@ -548,6 +548,7 @@ class MyShoppingController extends AbstractShoppingController
     public function checkout(Request $request)
     {
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
         // ログイン状態のチェック.
         if ($this->orderHelper->isLoginRequired()) {
             log_info('[注文処理] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
@@ -557,8 +558,9 @@ class MyShoppingController extends AbstractShoppingController
         }
 
         // 受注の存在チェック
-        $preOrderId = $this->cartService->getPreOrderId();
-        $Order = $this->orderHelper->getPurchaseProcessingOrder($preOrderId);
+        $preOrderId     = $this->cartService->getPreOrderId();
+        $Order          = $this->orderHelper->getPurchaseProcessingOrder($preOrderId);
+
         if (!$Order) {
             log_info('[注文処理] 購入処理中の受注が存在しません.', [$preOrderId]);
 
@@ -566,10 +568,11 @@ class MyShoppingController extends AbstractShoppingController
         }
 
         // フォームの生成.
-        $form = $this->createForm(OrderType::class, $Order, [
+        $form               = $this->createForm(OrderType::class, $Order, [
             // 確認画面から注文処理へ遷移する場合は, Orderエンティティで値を引き回すためフォーム項目の定義をスキップする.
             'skip_add_form' => true,
         ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -580,7 +583,7 @@ class MyShoppingController extends AbstractShoppingController
                  * 集計処理
                  */
                 log_info('[注文処理] 集計処理を開始します.', [$Order->getId()]);
-                $response = $this->executePurchaseFlow($Order);
+                $response       = $this->executePurchaseFlow($Order);
                 $this->entityManager->flush();
 
                 if ($response) {
@@ -588,13 +591,13 @@ class MyShoppingController extends AbstractShoppingController
                 }
 
                 log_info('[注文処理] PaymentMethodを取得します.', [$Order->getPayment()->getMethodClass()]);
-                $paymentMethod = $this->createPaymentMethod($Order, $form);
+                $paymentMethod  = $this->createPaymentMethod($Order, $form);
 
                 /*
                  * 決済実行(前処理)
                  */
                 log_info('[注文処理] PaymentMethod::applyを実行します.');
-                if ($response = $this->executeApply($paymentMethod)) {
+                if ($response   = $this->executeApply($paymentMethod)) {
                     return $response;
                 }
 
@@ -604,7 +607,7 @@ class MyShoppingController extends AbstractShoppingController
                  * PaymentMethod::checkoutでは決済処理が行われ, 正常に処理出来た場合はPurchaseFlow::commitがコールされます.
                  */
                 log_info('[注文処理] PaymentMethod::checkoutを実行します.');
-                if ($response = $this->executeCheckout($paymentMethod)) {
+                if ($response   = $this->executeCheckout($paymentMethod)) {
                     return $response;
                 }
 
@@ -616,24 +619,23 @@ class MyShoppingController extends AbstractShoppingController
                 $itemList                   = $Order->getItems()->toArray();
                 $arEcLData                  = [];
                 $hsArrEcProductCusProduct   = [];
-                $arEcProduct                = [];
-                ///
                 $arMstProduct               = $comS->getMstProductsOrderNo($orderNo);
                 $hsArrRemmain               = [];
                 $hsArrJanCode               = [];
                 $hsArrProductQuantity       = [];
 
                 foreach ($arMstProduct as $itemPro) {
-                    $hsArrEcProductCusProduct[$itemPro['ec_order_lineno']] = $itemPro['product_code'];
-                    $hsArrRemmain[$itemPro['ec_order_lineno']] = $itemPro['quantity']; //$itemPro['product_quantity']
-                    $hsArrJanCode[$itemPro['ec_order_lineno']] = $itemPro['jan_code'];
-                    $hsArrProductQuantity[$itemPro['ec_order_lineno']] = $itemPro['product_quantity'];
+                    $hsArrEcProductCusProduct[$itemPro['ec_order_lineno']]      = $itemPro['product_code'];
+                    $hsArrRemmain[$itemPro['ec_order_lineno']]                  = $itemPro['quantity']; //$itemPro['product_quantity']
+                    $hsArrJanCode[$itemPro['ec_order_lineno']]                  = $itemPro['jan_code'];
+                    $hsArrProductQuantity[$itemPro['ec_order_lineno']]          = $itemPro['product_quantity'];
 
                     if (isset($_COOKIE[$itemPro['product_id']])) {
                         unset($_COOKIE[$itemPro['product_id']]);
                         setcookie($itemPro['product_id'], null, -1, '/');
                     }
                 }
+
                 //customer_code
                 $oneCustomer        = $comS->getMstCustomer($Order->getCustomer()->getId());
                 $customerCode       = $oneCustomer['customer_code'];
@@ -642,6 +644,8 @@ class MyShoppingController extends AbstractShoppingController
                 $seikyu_code        = $moreOrder->getSeikyuCode();
                 $shipping_plan_date = $moreOrder->getDateWantDelivery();
                 $otodoke_code       = $moreOrder->getOtodokeCode();
+                $remarks1           = $moreOrder->getRemarks1();
+                $remarks2           = $moreOrder->getRemarks2();
 
                 //dd($itemList);
                 foreach ($itemList as $itemOr) {
@@ -665,8 +669,11 @@ class MyShoppingController extends AbstractShoppingController
                             'item_no'               => $hsArrJanCode[$itemOr->getId()],                     // ・客先品目No←JANコード
                             'demand_unit'           => $hsArrProductQuantity[$itemOr->getId()] > 1 ? 'CS' : 'PC',        // ・需要単位←商品情報の入り数が‘1’の場合、‘PC’、入り数が‘1’以外の場合、‘CS’
                             'dyna_model_seg2'       => $orderNo,                                    // ・ダイナ規格セグメント02←EC注文番号
+                            'dyna_model_seg3'       => 2,
                             'dyna_model_seg4'       => $orderNo,                                    // ・ダイナ規格セグメント04←EC注文番号
                             'dyna_model_seg5'       => count($itemList),                            // ・ダイナ規格セグメント05←EC注文明細番号
+                            'dyna_model_seg6'       => $remarks1,
+                            'dyna_model_seg7'       => $remarks2,
                             // No41 注文情報送信I/F end
                             ];
                     }
@@ -686,6 +693,7 @@ class MyShoppingController extends AbstractShoppingController
                 $this->addError($e->getMessage());
 
                 return $this->redirectToRoute('shopping_error');
+
             } catch (\Exception $e) {
                 log_error('[注文処理] 予期しないエラーが発生しました.', [$e->getMessage()]);
 
@@ -704,8 +712,10 @@ class MyShoppingController extends AbstractShoppingController
             $this->session->set(OrderHelper::SESSION_ORDER_ID, $Order->getId());
             $commonService      = new MyCommonService($this->entityManager);
             $rate               = $commonService->getTaxInfo()['tax_rate'];
+            $tax                = (float) $Order->getTotal() / (float) $rate;
             $paymentTotal       = (float) $Order->getTotal() + ((float) $Order->getTotal() / (float) $rate);
             $commonService->updateOrderNo($Order->getId(), $paymentTotal);
+            $Order->setTax($tax);
             $Order->setPaymentTotal($paymentTotal);
 
             // メール送信
@@ -739,6 +749,7 @@ class MyShoppingController extends AbstractShoppingController
             // Get Product
             $goods                          = $commonService->getMstProductsOrderCustomer($Order->getId());
             $newOrder['ProductOrderItems']  = $goods;
+            $newOrder['tax']                = $newOrder['subtotal'] / $newOrder['rate'];
 
             // Get Shipping
             //$shipping = $commonService->getMstShippingOrder($user->getId(),$Order->getId());

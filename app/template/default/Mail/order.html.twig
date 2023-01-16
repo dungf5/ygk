@@ -39,7 +39,7 @@ file that was distributed with this source code.
                             {% for OrderItem in Order.ProductOrderItems %}
                                 JANコード：{{ OrderItem.jan_code }}<br/>
                                 商品名：{{ OrderItem.product_name }}<br/>
-                                単価：{{ roundPrice(OrderItem.price) }}<br/>
+                                単価：{{ roundPrice(OrderItem.price) | raw }}<br/>
                                 数量：{{ OrderItem.quantity|number_format }}{% if OrderItem.mst_quantity>1 %}
 箱/({{ OrderItem.mst_quantity*OrderItem.quantity}}個)
                             {% else %}
@@ -49,11 +49,11 @@ file that was distributed with this source code.
                                 <br/>
                             {% endfor %}
                             <hr style="border-top: 2px dashed #8c8b8b;">
-                            小　計：{{ roundPrice(Order.subtotal) }}<br/>
-                            手数料：{{ roundPrice(Order.charge) }}<br/>
+                            小　計：{{ roundPriceZeroTotal(Order.subtotal) | raw }}<br/>
+                            消費税：{{ roundPriceZeroTax(Order.tax) | raw }}<br/>
 
                             <hr style="border-top: 1px dotted #8c8b8b;">
-                            お支払い合計：{{ roundPriceZeroTotalAll(Order.payment_total) }}(税込)
+                            お支払い合計：{{ roundPriceZeroTotalAll(Order.payment_total) | raw }}(税込)
                             <br/>
                             <hr style="border-top: 3px double #8c8b8b;">
                             ご注文者情報<br/>
@@ -83,6 +83,8 @@ file that was distributed with this source code.
                             電話番号：{{ Order.Shipping.phone_number }}<br/>
                             <br/>
                             お届け日：{{ Order.Shipping.shipping_plan_date  }}<br/>
+                            倉庫状況によりご希望日に添えない場合がございます。<br/>
+                            詳しくは各担当者までお問い合わせください<br/>
                             <br/>
                             <hr style="border-top: 2px dotted #8c8b8b;">
                             このメッセージはお客様へのお知らせ専用ですので、<br/>
