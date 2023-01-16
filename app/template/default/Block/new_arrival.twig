@@ -1,5 +1,5 @@
 {% set Category = repository("Eccube\\Entity\\Category").find(20) %}
-{% 
+{%
 set products = repository("Eccube\\Entity\\Product")
 .getQueryBuilderBySearchData({'category_id':Category})
 .setMaxResults(10)
@@ -42,7 +42,7 @@ set products = repository("Eccube\\Entity\\Product")
                 {% if products %}
                 {% for p in products %}
                 <div class="ec-newItemRole__listItem1">
-                    <a href="{{ url('product_detail', {'id': p.id}) }}">
+                    <a href="{{ url('product_detail', {'id': p.id}) }}"  {% if not is_granted('ROLE_USER') %} class="disabled" {% endif %}>
                         <img src="{{ asset(p.main_list_image|no_image_product, 'save_image') }}">
                         <p class="ec-newItemRole__listItemTitle">{{ p.name }}</p>
 {#                        <p class="ec-newItamRole__listItemPrice">{{ 'front.block.new_item.item_1_price'|trans }}</p>#}
@@ -52,8 +52,11 @@ set products = repository("Eccube\\Entity\\Product")
                 {% endif %}
             </div>
         </div>
-        <div class="btnArea">
-            <a href="{{ url('product_list') }}?category_id=20" class="btn01"><i class="fas fa-angle-double-right"></i>and more</a>
-        </div>
+
+        {% if is_granted('ROLE_USER') %}
+            <div class="btnArea">
+                <a href="{{ url('product_list') }}?category_id=20" class="btn01"><i class="fas fa-angle-double-right"></i>and more</a>
+            </div>
+        {% endif %}
     </div>
 </div>

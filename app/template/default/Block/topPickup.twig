@@ -6,7 +6,7 @@
         </div>
         <ul>
             <li>
-                <a href="#">
+                <a href="javascript:void(0)" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %}>
                     <h3>あいうえおかきくけこさしすせそたちつてとなにぬね</h3>
                     <div class="desc">
                         <div class="image">
@@ -17,13 +17,15 @@
                             <p>なぜそんな無闇をしたと聞く人があるかも知れぬ。別段深い理由でもない。新築の二階から首を出していたら、同級生の一人が冗談に、いくら威張っても、そこから飛び降りる事は出来まい。弱虫やーい。と囃したからである。</p>
                         </div>
                     </div>
-                    <div class="btnArea">
-                        <span class="btn01"><i class="fas fa-angle-double-right"></i>and more</span>
-                    </div>
+                    {% if is_granted('ROLE_USER') %}
+                        <div class="btnArea">
+                            <span class="btn01"><i class="fas fa-angle-double-right"></i>and more</span>
+                        </div>
+                    {% endif %}
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="javascript:void(0)" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %}>
                     <h3>あああああああああああああああ</h3>
                     <div class="desc">
                         <div class="image">
@@ -34,13 +36,15 @@
                             <p>なぜそんな無闇をしたと聞く人があるかも知れぬ。別段深い理由でもない。新築の二階から首を出していたら、同級生の一人が冗談に、いくら威張っても、そこから飛び降りる事は出来まい。弱虫やーい。と囃したからである。</p>
                         </div>
                     </div>
-                    <div class="btnArea">
-                        <span class="btn01"><i class="fas fa-angle-double-right"></i>and more</span>
-                    </div>
+                    {% if is_granted('ROLE_USER') %}
+                        <div class="btnArea">
+                            <span class="btn01"><i class="fas fa-angle-double-right"></i>and more</span>
+                        </div>
+                    {% endif %}
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="javascript:void(0)" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %}>
                     <h3>一応3つ以上も入れられるようにしてありますがネタがなければ不要かと思います</h3>
                     <div class="desc">
                         <div class="image">
@@ -51,9 +55,11 @@
                             <p>なぜそんな無闇をしたと聞く人があるかも知れぬ。別段深い理由でもない。新築の二階から首を出していたら、同級生の一人が冗談に、いくら威張っても、そこから飛び降りる事は出来まい。弱虫やーい。と囃したからである。</p>
                         </div>
                     </div>
-                    <div class="btnArea">
-                        <span class="btn01"><i class="fas fa-angle-double-right"></i>and more</span>
-                    </div>
+                    {% if is_granted('ROLE_USER') %}
+                        <div class="btnArea">
+                            <span class="btn01"><i class="fas fa-angle-double-right"></i>and more</span>
+                        </div>
+                    {% endif %}
                 </a>
             </li>
         </ul>

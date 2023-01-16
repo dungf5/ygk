@@ -12,14 +12,16 @@
             </div>
             <div class="menu">
                 <div class="inner">
+                    {% if is_granted('ROLE_USER') %}
                     <div class="ttl fnDIN">CATEGORY</div>
-                    <ul>
-{% for Category in Categories %}
-{% if Category.id is not same as(20) %}
-                        <li>{{ tree(Category) }}</li>
-{% endif %}
-{% endfor %}
-                    </ul>
+                        <ul>
+                            {% for Category in Categories %}
+                                {% if Category.id is not same as(20) %}
+                                    <li>{{ tree(Category) }}</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                 </div>
                 <div class="inner">
                     <div class="ttl fnDIN">CONTENTS</div>
