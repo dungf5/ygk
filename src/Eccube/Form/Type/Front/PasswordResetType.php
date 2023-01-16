@@ -18,6 +18,7 @@ use Eccube\Form\Type\RepeatedPasswordType;
 use Eccube\Form\Validator\Email;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -46,15 +47,23 @@ class PasswordResetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('user_code', TextType::class, [
+            'attr' => [
+                'maxlength' => $this->eccubeConfig['eccube_stext_len'],
+                'readonly' => true,
+            ],
+        ]);
         $builder->add('login_email', EmailType::class, [
             'attr' => [
                 'maxlength' => $this->eccubeConfig['eccube_stext_len'],
+                'readonly' => true,
             ],
             'constraints' => [
                 new Assert\NotBlank(),
                 new Email(['strict' => $this->eccubeConfig['eccube_rfc_email_check']]),
             ],
-        ])->add('password', RepeatedPasswordType::class);
+        ]);
+        $builder->add('password', RepeatedPasswordType::class);
 
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             $form = $event->getForm();

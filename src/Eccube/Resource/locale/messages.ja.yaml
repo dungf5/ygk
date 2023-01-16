@@ -82,6 +82,7 @@ common.delete_confirm: 削除してもよろしいですか?
 common.pagetop: ページトップへ
 common.name.prefix: ''
 common.name.suffix: ' 様'
+common.tax: '消費税'
 
 #====================================================================================
 # フロント画面
@@ -390,6 +391,7 @@ front.shopping.different_payment_methods: 支払い方法が異なる商品が�
 front.shopping.payment_method_unselected: お支払い方法を選択してください。
 front.shopping.payment_method_not_fount: 選択できるお支払い方法がありません。配送方法が異なる場合は同じ配送方法を選んでください。
 front.under_maintenance: メンテナンスモードが有効になっています。
+front.shopping.remarks: 備考
 
 #====================================================================================
 # 管理画面
