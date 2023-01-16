@@ -21,18 +21,34 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
          * @ORM\Id
          */
         private $pre_order_id;
+
         /**
          * @var string
          *
          * @ORM\Column(name="order_no",nullable=true, type="string", length=255, options={"comment":""})
          */
         private $order_no;
+
         /**
          * @var string
          *
          * @ORM\Column(name="seikyu_code",nullable=true, type="string", length=10, options={"comment":"address to customer for bill"})
          */
         private $seikyu_code;
+
+        /**
+         * @var string|null
+         *
+         * @ORM\Column(name="remarks1", type="text",options={"comment":"備考１"}, nullable=true)
+         */
+        private $remarks1;
+
+        /**
+         * @var string|null
+         *
+         * @ORM\Column(name="remarks2", type="text",options={"comment":"備考２"}, nullable=true)
+         */
+        private $remarks2;
 
         /**
          * @return string
@@ -152,6 +168,44 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
             $this->date_want_delivery = $date_want_delivery;
         }
 
+        /**
+         * Set remarks1.
+         *
+         * @param string|null $remarks1
+         */
+        public function setRemarks1($remarks1 = null)
+        {
+            $this->remarks1 = $remarks1;
+        }
 
+        /**
+         * Get remarks1.
+         *
+         * @return string|null
+         */
+        public function getRemarks1()
+        {
+            return $this->remarks1;
+        }
+
+        /**
+         * Set remarks2.
+         *
+         * @param string|null $remarks2
+         */
+        public function setRemarks2($remarks2 = null)
+        {
+            $this->remarks2 = $remarks2;
+        }
+
+        /**
+         * Get remarks2.
+         *
+         * @return string|null
+         */
+        public function getRemarks2()
+        {
+            return $this->remarks2;
+        }
     }
 }

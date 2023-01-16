@@ -137,10 +137,9 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function index(PurchaseFlow $cartPurchaseFlow)
     {
-
-
         // ログイン状態のチェック.
-        $commonService = new MyCommonService($this->entityManager);
+        $commonService  = new MyCommonService($this->entityManager);
+
         if ($this->orderHelper->isLoginRequired()) {
             log_info('[注文手続] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
             $this->session->set('is_update_cart', 1);
@@ -149,7 +148,7 @@ class MyShoppingController extends AbstractShoppingController
         }
 
         // カートチェック.
-        $Cart = $this->cartService->getCart();
+        $Cart           = $this->cartService->getCart();
         if (!($Cart && $this->orderHelper->verifyCart($Cart))) {
             log_info('[注文手続] カートが購入フローへ遷移できない状態のため, カート画面に遷移します.');
 
@@ -158,56 +157,57 @@ class MyShoppingController extends AbstractShoppingController
 
         // 受注の初期化.
         log_info('[注文手続] 受注の初期化処理を開始します.');
-        $Customer = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
-        $arCusLogin = $commonService->getMstCustomer($Customer->getId());
-
+        $Customer       = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
+        $arCusLogin     = $commonService->getMstCustomer($Customer->getId());
         $is_update_cart = $this->session->get('is_update_cart', '');
 
         //************** update cart when login
-        $arCarItemId = [];
+        $arCarItemId    = [];
         if ($is_update_cart == 1) {
-            $cartId = $Cart->getId();
-            $productCart = $commonService->getdtPriceFromCart([$cartId], $arCusLogin['customer_code']);
-            $arPCodeTankaNumber = $commonService->getPriceFromDtPriceOfCusV2($arCusLogin['customer_code']);
-            $arPCode = $arPCodeTankaNumber[0];
-            $arTanaka = $arPCodeTankaNumber[1];
-            $hsHsProductCodeIndtPrice = [];
-            $hsTanaka = [];
+            $cartId                     = $Cart->getId();
+            $productCart                = $commonService->getdtPriceFromCart([$cartId], $arCusLogin['customer_code']);
+            $arPCodeTankaNumber         = $commonService->getPriceFromDtPriceOfCusV2($arCusLogin['customer_code']);
+            $arPCode                    = $arPCodeTankaNumber[0];
+            $arTanaka                   = $arPCodeTankaNumber[1];
+            $hsHsProductCodeIndtPrice   = [];
+            $hsTanaka                   = [];
+
             foreach ($arPCode as $hasKey) {
-                $hsHsProductCodeIndtPrice[$hasKey] = 1;
-            }
-            foreach ($arTanaka as $hasKey) {
-                $hsTanaka[$hasKey] = 1;
+                $hsHsProductCodeIndtPrice[$hasKey]  = 1;
             }
 
-            $hsPriceUp = [];
+            foreach ($arTanaka as $hasKey) {
+                $hsTanaka[$hasKey]                  = 1;
+            }
+
+            $hsPriceUp                              = [];
             foreach ($productCart as $itemCart) {
                 if ($itemCart['price_s01'] != null && ($itemCart['price_s01'] != '')) {
-                    $isPro = isset($hsHsProductCodeIndtPrice[$itemCart['product_code']]);
-                    $isTana = isset($hsTanaka[$itemCart['tanka_number']]);
+                    $isPro                          = isset($hsHsProductCodeIndtPrice[$itemCart['product_code']]);
+                    $isTana                         = isset($hsTanaka[$itemCart['tanka_number']]);
+
                     if ($isPro && $isTana) {
                         $hsPriceUp[$itemCart['id']] = $itemCart['price_s01'];
-                        $arCarItemId[] = $itemCart['id'];
+                        $arCarItemId[]              = $itemCart['id'];
                     }
                 }
             }
+
             $commonService->updateCartItem($hsPriceUp, $arCarItemId, $Cart);
             $this->session->set('is_update_cart', 0);
         }
         //*****************
 
-        $Order = $this->orderHelper->initializeOrder($Cart, $Customer);
+        $Order                      = $this->orderHelper->initializeOrder($Cart, $Customer);
+        $mstShip                    = $commonService->getMstShippingCustomer($Customer->getId());
+        $Order->arCusLogin          = $arCusLogin;
+        $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId());
+        $Order->mstShips            = $mstShip;
+        $Order->dtBillSeikyuCode    = $dtBillSeikyuCode;
 
-        $mstShip = $commonService->getMstShippingCustomer($Customer->getId());
-
-        $Order->arCusLogin = $arCusLogin;
-        $dtBillSeikyuCode = $commonService->getCustomerBillSeikyuCode($Customer->getId());
-
-        $Order->mstShips = $mstShip;
-        $Order->dtBillSeikyuCode = $dtBillSeikyuCode;
         // 集計処理.
         log_info('[注文手続] 集計処理を開始します.', [$Order->getId()]);
-        $flowResult = $this->executePurchaseFlow($Order, false);
+        $flowResult                 = $this->executePurchaseFlow($Order, false);
 
         // マイページで会員情報が更新されていれば, Orderの注文者情報も更新する.
         if ($Customer->getId()) {
@@ -226,8 +226,7 @@ class MyShoppingController extends AbstractShoppingController
             $_SESSION['previous_pre_order_id']      = null;
         }
 
-        $moreOrder = $commonService->getMoreOrder($Order->getPreOrderId());
-
+        $moreOrder                                  = $commonService->getMoreOrder($Order->getPreOrderId());
         $shipping_no_checked                        = '';
         $seikyu_code_checked                        = '';
 
@@ -255,6 +254,14 @@ class MyShoppingController extends AbstractShoppingController
                 $moreOrder['otodoke_code']          = '';
             }
 
+            if (MyCommon::isEmptyOrNull($moreOrder['remarks1'])) {
+                $moreOrder['remarks1']              = null;
+            }
+
+            if (MyCommon::isEmptyOrNull($moreOrder['remarks2'])) {
+                $moreOrder['remarks2']              = null;
+            }
+
             $moreOrder->setShippingCode($this->globalService->getShippingCode() ?? '');
             $moreOrder->setOtodokeCode($this->globalService->getOtodokeCode() ?? '');
             $this->entityManager->persist($moreOrder);
@@ -271,7 +278,9 @@ class MyShoppingController extends AbstractShoppingController
                 }
             }
 
-        } else {
+        }
+
+        else {
             $Order->hasMoreOrder                    = 0;
 
             //Nếu pre_order_id có tồn tại.
@@ -291,7 +300,7 @@ class MyShoppingController extends AbstractShoppingController
                 $Order->moreOrder                   = $orderItem;
 
                 foreach ($mstShip as $mS) {
-                    if ($mS['shipping_no']      == $orderItem['shipping_code']) {
+                    if ($mS['shipping_no'] == $orderItem['shipping_code']) {
                         $shipping_no_checked        = $mS['shipping_no'];
                     }
                 }
@@ -301,11 +310,13 @@ class MyShoppingController extends AbstractShoppingController
         $Order->shipping_no_checked                 = $shipping_no_checked;
         $Order->seikyu_code_checked                 = isset($moreOrder['seikyu_code']) ?? '';
         $Order->rate                                = $commonService->getTaxInfo()['tax_rate'];
-
+        $Order->setTax((float) $Order->getTotal() / (float) $Order->rate);
         $Order->setPaymentTotal((float) $Order->getTotal() + ((float) $Order->getTotal() / (float) $Order->rate));
 
-        $form                                       = $this->createForm(OrderType::class, $Order);
+        $this->entityManager->persist($Order);
+        $this->entityManager->flush();
 
+        $form                                       = $this->createForm(OrderType::class, $Order);
         //show quantity
         $myCart                                     = $this->cartService->getCarts(true);
         //Mapping cart product with mst product
@@ -358,8 +369,8 @@ class MyShoppingController extends AbstractShoppingController
         }
 
         // 受注の存在チェック
-        $preOrderId = $this->cartService->getPreOrderId();
-        $Order = $this->orderHelper->getPurchaseProcessingOrder($preOrderId);
+        $preOrderId         = $this->cartService->getPreOrderId();
+        $Order              = $this->orderHelper->getPurchaseProcessingOrder($preOrderId);
 
         if (!$Order) {
             log_info('[注文確認] 購入処理中の受注が存在しません.', [$preOrderId]);
@@ -372,7 +383,7 @@ class MyShoppingController extends AbstractShoppingController
 
         if ($form->isSubmitted() && $form->isValid()) {
             log_info('[注文確認] 集計処理を開始します.', [$Order->getId()]);
-            $response = $this->executePurchaseFlow($Order);
+            $response           = $this->executePurchaseFlow($Order);
             $this->entityManager->flush();
 
             if ($response) {
@@ -380,8 +391,8 @@ class MyShoppingController extends AbstractShoppingController
             }
 
             log_info('[注文確認] PaymentMethod::verifyを実行します.', [$Order->getPayment()->getMethodClass()]);
-            $paymentMethod = $this->createPaymentMethod($Order, $form);
-            $PaymentResult = $paymentMethod->verify();
+            $paymentMethod      = $this->createPaymentMethod($Order, $form);
+            $PaymentResult      = $paymentMethod->verify();
 
             if ($PaymentResult) {
                 if (!$PaymentResult->isSuccess()) {
@@ -395,7 +406,7 @@ class MyShoppingController extends AbstractShoppingController
                     return $this->redirectToRoute('shopping');
                 }
 
-                $response = $PaymentResult->getResponse();
+                $response       = $PaymentResult->getResponse();
                 if ($response instanceof Response && ($response->isRedirection() || $response->isSuccessful())) {
                     $this->entityManager->flush();
 
@@ -409,42 +420,38 @@ class MyShoppingController extends AbstractShoppingController
 
             log_info('[注文確認] 注文確認画面を表示します.');
             //nvtrong start
-            $Customer = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
-            $commonService = new MyCommonService($this->entityManager);
-            $rate = $commonService->getTaxInfo()['tax_rate'];
-            $paymentTotal = (float) $Order->getTotal() + ((float) $Order->getTotal() / (float) $rate);
+            $Customer           = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
+            $commonService      = new MyCommonService($this->entityManager);
+            $rate               = $commonService->getTaxInfo()['tax_rate'];
+            $tax                = (float) $Order->getTotal() / (float) $rate;
+            $paymentTotal       = (float) $Order->getTotal() + ((float) $Order->getTotal() / (float) $rate);
+            $moreOrder          = $commonService->getMoreOrder($Order->getPreOrderId());
 
-            $moreOrder = $commonService->getMoreOrder($Order->getPreOrderId());
             //add default day delivery
-            if($moreOrder->getDateWantDelivery()==null || $moreOrder->getDateWantDelivery()==""){
+            if ($moreOrder->getDateWantDelivery() == null || $moreOrder->getDateWantDelivery() == "") {
+                $comS                   = new MyCommonService($this->entityManager);
+                $arrDayOff              = $comS->getDayOff();
+                $dayOffSatSun           = MyCommon::getDayWeekend();
+                $arrDayOff              = array_merge($arrDayOff,$dayOffSatSun);
+                $newDate                =  MyCommon::get3DayAfterDayOff($arrDayOff);
 
-                $comS = new MyCommonService($this->entityManager);
-                $arrDayOff = $comS->getDayOff();
-
-                $dayOffSatSun = MyCommon::getDayWeekend();
-
-                $arrDayOff = array_merge($arrDayOff,$dayOffSatSun);
-
-                $newDate =  MyCommon::get3DayAfterDayOff($arrDayOff);
                 $moreOrder->setDateWantDelivery($newDate);
                 $this->entityManager->persist($moreOrder);
                 $this->entityManager->flush();
-
             }
 
+            $mstShip                    = $commonService->getMstShippingCustomer($Customer->getId(), $moreOrder);
+            $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $moreOrder);
+            $arCusLogin                 = $commonService->getMstCustomer($Customer->getId());
+            $Order->arCusLogin          = $arCusLogin;
+            $arrOtoProductOrder         = $commonService->getCustomerOtodoke($Customer->getId(), $moreOrder->getShippingCode(), $moreOrder);
+            $Order->MoreOrder           = $moreOrder;
+            $Order->mstShips            = $mstShip;
+            $Order->dtBillSeikyuCode    = $dtBillSeikyuCode;
+            $Order->dtCustomerOtodoke   = $arrOtoProductOrder;
+            $Order->rate                = $rate;
 
-            $mstShip = $commonService->getMstShippingCustomer($Customer->getId(), $moreOrder);
-
-            $dtBillSeikyuCode = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $moreOrder);
-            $arCusLogin = $commonService->getMstCustomer($Customer->getId());
-            $Order->arCusLogin = $arCusLogin;
-            $arrOtoProductOrder = $commonService->getCustomerOtodoke($Customer->getId(), $moreOrder->getShippingCode(), $moreOrder);
-            $Order->MoreOrder = $moreOrder;
-            $Order->mstShips = $mstShip;
-            $Order->dtBillSeikyuCode = $dtBillSeikyuCode;
-            $Order->dtCustomerOtodoke = $arrOtoProductOrder;
-            $Order->rate = $rate;
-
+            $Order->setTax($tax);
             $Order->setPaymentTotal($paymentTotal);
 
             // Update order_no
@@ -453,28 +460,32 @@ class MyShoppingController extends AbstractShoppingController
             log_info('[注文確認] フォームエラーのため, 注文手続画面を表示します.', [$Order->getId()]);
             //nvtrong end
             //show quantity
-            $myCart = $this->cartService->getCarts(true);
+            $myCart                 = $this->cartService->getCarts(true);
             //Mapping cart product with mst product
-            $comSer = new MyCommonService($this->entityManager);
-            $cartList = [];
+            $comSer                 = new MyCommonService($this->entityManager);
+            $cartList               = [];
+
             foreach ($myCart as $cartT) {
-                $cartList[] = $cartT['id'];
+                $cartList[]         = $cartT['id'];
             }
 
-            $mstProduct = $comSer->getMstProductsFromCart($cartList);
-            $hsProductId = [];
-            $hsMstProductCodeCheckShow =[];
-            $arProductCode  = [];
+            $mstProduct                 = $comSer->getMstProductsFromCart($cartList);
+            $hsProductId                = [];
+            $hsMstProductCodeCheckShow  = [];
+            $arProductCode              = [];
+
             foreach ($mstProduct as $itemP) {
                 $hsProductId[$itemP['ec_product_id']] = $itemP;
-                $arProductCode[] = $itemP['product_code'];
-                $hsMstProductCodeCheckShow[$itemP['product_code']] = "standar_price";
+                $arProductCode[]                                    = $itemP['product_code'];
+                $hsMstProductCodeCheckShow[$itemP['product_code']]  = "standar_price";
             }
-            $customer_code = $comSer->getMstCustomer($Customer->getId())["customer_code"];
-            $hsMstProductCodeCheckShow = $comSer->setCartIndtPrice($arProductCode,$hsMstProductCodeCheckShow,$comSer,$customer_code);
+
+            $customer_code                  = $comSer->getMstCustomer($Customer->getId())["customer_code"];
+            $hsMstProductCodeCheckShow      = $comSer->setCartIndtPrice($arProductCode,$hsMstProductCodeCheckShow,$comSer,$customer_code);
+
             return [
-                'form' => $form->createView(),
-                'Order' => $Order,'hsProductId'=>$hsProductId,'hsMstProductCodeCheckShow'=>$hsMstProductCodeCheckShow
+                'form'          => $form->createView(),
+                'Order'         => $Order,'hsProductId'=>$hsProductId,'hsMstProductCodeCheckShow'=>$hsMstProductCodeCheckShow
             ];
         }
 
@@ -483,27 +494,29 @@ class MyShoppingController extends AbstractShoppingController
         // FIXME @Templateの差し替え.
         $request->attributes->set('_template', new Template(['template' => 'Shopping/index.twig']));
         //show quantity
-        $myCart = $this->cartService->getCarts(true);
+        $myCart             = $this->cartService->getCarts(true);
         //Mapping cart product with mst product
-        $comSer = new MyCommonService($this->entityManager);
-        $cartList = [];
+        $comSer             = new MyCommonService($this->entityManager);
+        $cartList           = [];
+
         foreach ($myCart as $cartT) {
-            $cartList[] = $cartT['id'];
+            $cartList[]     = $cartT['id'];
         }
 
-        $mstProduct = $comSer->getMstProductsFromCart($cartList);
-        $hsProductId = [];
-        $hsMstProductCodeCheckShow = [];
+        $mstProduct                     = $comSer->getMstProductsFromCart($cartList);
+        $hsProductId                    = [];
+        $hsMstProductCodeCheckShow      = [];
+
         foreach ($mstProduct as $itemP) {
-            $hsProductId[$itemP['ec_product_id']] = $itemP;
-            $hsMstProductCodeCheckShow[$itemP['product_code']] = "standar_price";
+            $hsProductId[$itemP['ec_product_id']]               = $itemP;
+            $hsMstProductCodeCheckShow[$itemP['product_code']]  = "standar_price";
         }
 
         return [
-            'form' => $form->createView(),
-            'Order' => $Order,
-            'hsMstProductCodeCheckShow'=>$hsMstProductCodeCheckShow,
-            'hsProductId' => $hsProductId,
+            'form'                      => $form->createView(),
+            'Order'                     => $Order,
+            'hsProductId'               => $hsProductId,
+            'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
         ];
     }
 
@@ -598,18 +611,18 @@ class MyShoppingController extends AbstractShoppingController
                 $this->entityManager->flush();
 
                 //save more nvtrong
-                $comS = new MyCommonService($this->entityManager);
-
-                $orderNo = $Order->getOrderNo();
-                $itemList = $Order->getItems()->toArray();
-                $arEcLData = [];
-                $hsArrEcProductCusProduct = [];
-                $arEcProduct = [];
+                $comS                       = new MyCommonService($this->entityManager);
+                $orderNo                    = $Order->getOrderNo();
+                $itemList                   = $Order->getItems()->toArray();
+                $arEcLData                  = [];
+                $hsArrEcProductCusProduct   = [];
+                $arEcProduct                = [];
                 ///
-                $arMstProduct = $comS->getMstProductsOrderNo($orderNo);
-                $hsArrRemmain = [];
-                $hsArrJanCode = [];
-                $hsArrProductQuantity = [];
+                $arMstProduct               = $comS->getMstProductsOrderNo($orderNo);
+                $hsArrRemmain               = [];
+                $hsArrJanCode               = [];
+                $hsArrProductQuantity       = [];
+
                 foreach ($arMstProduct as $itemPro) {
                     $hsArrEcProductCusProduct[$itemPro['ec_order_lineno']] = $itemPro['product_code'];
                     $hsArrRemmain[$itemPro['ec_order_lineno']] = $itemPro['quantity']; //$itemPro['product_quantity']
@@ -619,41 +632,41 @@ class MyShoppingController extends AbstractShoppingController
                     if (isset($_COOKIE[$itemPro['product_id']])) {
                         unset($_COOKIE[$itemPro['product_id']]);
                         setcookie($itemPro['product_id'], null, -1, '/');
-
                     }
                 }
                 //customer_code
-
-                $oneCustomer = $comS->getMstCustomer($Order->getCustomer()->getId());
-                $customerCode = $oneCustomer['customer_code'];
-                $moreOrder = $comS->getMoreOrder($Order->getPreOrderId());
-
-                $ship_code = $moreOrder->getShippingCode();
-                $seikyu_code = $moreOrder->getSeikyuCode();
+                $oneCustomer        = $comS->getMstCustomer($Order->getCustomer()->getId());
+                $customerCode       = $oneCustomer['customer_code'];
+                $moreOrder          = $comS->getMoreOrder($Order->getPreOrderId());
+                $ship_code          = $moreOrder->getShippingCode();
+                $seikyu_code        = $moreOrder->getSeikyuCode();
                 $shipping_plan_date = $moreOrder->getDateWantDelivery();
-                $otodoke_code = $moreOrder->getOtodokeCode();
-
+                $otodoke_code       = $moreOrder->getOtodokeCode();
 
                 //dd($itemList);
                 foreach ($itemList as $itemOr) {
                     if ($itemOr->isProduct()) {
-                        $arEcLData[] = ['ec_order_no' => $orderNo,
-                            'ec_order_lineno' => $itemOr->getId(), 'product_code' => $hsArrEcProductCusProduct[$itemOr->getId()], 'customer_code' => $customerCode, 'shipping_code' => $ship_code,
-                            'order_remain_num' => $hsArrRemmain[$itemOr->getId()],
-                            'shipping_plan_date' => $shipping_plan_date,
-                            'seikyu_code' => $seikyu_code,
+                        $arEcLData[] = [
+                            'ec_order_no'           => $orderNo,
+                            'ec_order_lineno'       => $itemOr->getId(),
+                            'product_code'          => $hsArrEcProductCusProduct[$itemOr->getId()],
+                            'customer_code'         => $customerCode,
+                            'shipping_code'         => $ship_code,
+                            'order_remain_num'      => $hsArrRemmain[$itemOr->getId()],
+                            'shipping_plan_date'    => $shipping_plan_date,
+                            'seikyu_code'           => $seikyu_code,
                             //dtorder
-                            'order_price' => $itemOr->getPrice(),
-                            'demand_quantity' => $itemOr->getQuantity(),
-                            'otodoke_code' => $otodoke_code,
+                            'order_price'           => $itemOr->getPrice(),
+                            'demand_quantity'       => $itemOr->getQuantity(),
+                            'otodoke_code'          => $otodoke_code,
                             // No41 注文情報送信I/F start
                             //'order_date'=>'',   // ・受注日←受注日(購入日)
-                            'deli_plan_date' => $shipping_plan_date,                          // ・希望納期（納入予定日）←配送日指定
-                            'item_no' => $hsArrJanCode[$itemOr->getId()],                     // ・客先品目No←JANコード
-                            'demand_unit' => $hsArrProductQuantity[$itemOr->getId()] > 1 ? 'CS' : 'PC',        // ・需要単位←商品情報の入り数が‘1’の場合、‘PC’、入り数が‘1’以外の場合、‘CS’
-                            'dyna_model_seg2' => $orderNo,                                    // ・ダイナ規格セグメント02←EC注文番号
-                            'dyna_model_seg4' => $orderNo,                                    // ・ダイナ規格セグメント04←EC注文番号
-                            'dyna_model_seg5' => count($itemList),                            // ・ダイナ規格セグメント05←EC注文明細番号
+                            'deli_plan_date'        => $shipping_plan_date,                          // ・希望納期（納入予定日）←配送日指定
+                            'item_no'               => $hsArrJanCode[$itemOr->getId()],                     // ・客先品目No←JANコード
+                            'demand_unit'           => $hsArrProductQuantity[$itemOr->getId()] > 1 ? 'CS' : 'PC',        // ・需要単位←商品情報の入り数が‘1’の場合、‘PC’、入り数が‘1’以外の場合、‘CS’
+                            'dyna_model_seg2'       => $orderNo,                                    // ・ダイナ規格セグメント02←EC注文番号
+                            'dyna_model_seg4'       => $orderNo,                                    // ・ダイナ規格セグメント04←EC注文番号
+                            'dyna_model_seg5'       => count($itemList),                            // ・ダイナ規格セグメント05←EC注文明細番号
                             // No41 注文情報送信I/F end
                             ];
                     }
@@ -689,45 +702,48 @@ class MyShoppingController extends AbstractShoppingController
 
             // 受注IDをセッションにセット
             $this->session->set(OrderHelper::SESSION_ORDER_ID, $Order->getId());
-            $commonService = new MyCommonService($this->entityManager);
-            $rate = $commonService->getTaxInfo()['tax_rate'];
-            $paymentTotal = (float) $Order->getTotal() + ((float) $Order->getTotal() / (float) $rate);
+            $commonService      = new MyCommonService($this->entityManager);
+            $rate               = $commonService->getTaxInfo()['tax_rate'];
+            $paymentTotal       = (float) $Order->getTotal() + ((float) $Order->getTotal() / (float) $rate);
             $commonService->updateOrderNo($Order->getId(), $paymentTotal);
             $Order->setPaymentTotal($paymentTotal);
+
             // メール送信
             log_info('[注文処理] 注文メールの送信を行います.', [$Order->getId()]);
             // Get info order
             $newOrder = null;
             // Get info customer
 
-            $user = $this->getUser();
-            $customer = $commonService->getMstCustomer($user->getId());
-            $newOrder['name'] = $customer['name01'];
+            $user                           = $this->getUser();
+            $customer                       = $commonService->getMstCustomer($user->getId());
+            $newOrder['name']               = $customer['name01'];
             // Get info order
-            $newOrder['subtotal'] = $Order['subtotal'];
-            $newOrder['charge'] = $Order['charge'];
-            $newOrder['discount'] = $Order['discount'];
+            $newOrder['subtotal']           = $Order['subtotal'];
+            $newOrder['charge']             = $Order['charge'];
+            $newOrder['discount']           = $Order['discount'];
             $newOrder['delivery_fee_total'] = $Order['delivery_fee_total'];
-            $newOrder['tax'] = $Order['tax'];
-            $newOrder['total'] = $Order['total'];
-            $newOrder['payment_total'] = $Order['payment_total'];
+            $newOrder['tax']                = $Order['tax'];
+            $newOrder['total']              = $Order['total'];
+            $newOrder['payment_total']      = $Order['payment_total'];
             // Get info tax
-            $newOrder['rate'] = $commonService->getTaxInfo()['tax_rate'];
+            $newOrder['rate']               = $commonService->getTaxInfo()['tax_rate'];
             // Get Customer
-            $newOrder['company_name'] = $customer['company_name'];
-            $newOrder['postal_code'] = $customer['postal_code'];
-            $newOrder['addr01'] = $customer['addr01'];
-            $newOrder['addr02'] = $customer['addr02'];
-            $newOrder['addr03'] = $customer['addr03'];
-            $newOrder['phone_number'] = $customer['phone_number'];
-            $newOrder['email'] = $customer['customer_email'];
+            $newOrder['company_name']       = $customer['company_name'];
+            $newOrder['postal_code']        = $customer['postal_code'];
+            $newOrder['addr01']             = $customer['addr01'];
+            $newOrder['addr02']             = $customer['addr02'];
+            $newOrder['addr03']             = $customer['addr03'];
+            $newOrder['phone_number']       = $customer['phone_number'];
+            $newOrder['email']              = $customer['customer_email'];
+
             // Get Product
-            $goods = $commonService->getMstProductsOrderCustomer($Order->getId());
-            $newOrder['ProductOrderItems'] = $goods;
+            $goods                          = $commonService->getMstProductsOrderCustomer($Order->getId());
+            $newOrder['ProductOrderItems']  = $goods;
+
             // Get Shipping
             //$shipping = $commonService->getMstShippingOrder($user->getId(),$Order->getId());
-            $shipping = $commonService->getMoreOrderCustomer($Order->getPreOrderId());
-            $newOrder['Shipping'] = $shipping;
+            $shipping                       = $commonService->getMoreOrderCustomer($Order->getPreOrderId());
+            $newOrder['Shipping']           = $shipping;
             $Order->setName01($customer['name01']);
             $Order->setCompanyName( $customer['company_name']);
             $this->mailService->sendOrderMail($newOrder, $Order);

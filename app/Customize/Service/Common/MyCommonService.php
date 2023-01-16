@@ -1543,10 +1543,37 @@ AND          pri.product_code=?
                 $hsMstProductCodeCheckShow[$keyCheck]="good_price";
             }
         }
-        return $hsMstProductCodeCheckShow;
 
+        return $hsMstProductCodeCheckShow;
     }
 
+    /***
+     * @param $shipping_code
+     * @param $pre_order_id
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function saveTempCartRemarks($pre_order_id, $name = "", $value = "")
+    {
+        $objRep         = $this->entityManager->getRepository(MoreOrder::class)->findOneBy(['pre_order_id' => $pre_order_id]);
+        $orderItem      = new MoreOrder();
 
+        if ($objRep !== null) {
+            $orderItem  = $objRep;
+        }
+
+        if ($name == "remarks1") {
+            $orderItem->setPreOrderId($pre_order_id);
+            $orderItem->setRemarks1($value);
+        }
+
+        if ($name == "remarks2") {
+            $orderItem->setPreOrderId($pre_order_id);
+            $orderItem->setRemarks2($value);
+        }
+
+        $this->entityManager->persist($orderItem);
+        $this->entityManager->flush();
+    }
 }
 

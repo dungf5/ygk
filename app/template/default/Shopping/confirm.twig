@@ -162,7 +162,7 @@ console.log(Math.random());
                                         {% endif %}
                                         <p>
                                              <span class="{{ classShow }}">
-                                            {{ roundPriceZero(orderItem.priceIncTax)|raw }}
+                                            {{ roundPriceZero(orderItem.priceIncTax) | raw }}
                                             </span>
                                             × {{ orderItem.quantity|number_format }}
                                             {% if MstProduct.quantity>1 %}
@@ -170,7 +170,7 @@ console.log(Math.random());
                                             {% else %}
                                                 個
                                             {% endif %}
-                                            <span>{{ 'common.subtotal__with_separator'|trans }}{{ roundPriceZeroTotal(orderItem.totalPrice) }}</span></p>
+                                            <span>{{ 'common.subtotal__with_separator'|trans }}{{ roundPriceZeroTotal(orderItem.totalPrice) | raw }}</span></p>
                                     </div>
                                 </div>
                             </li>
@@ -191,7 +191,7 @@ console.log(Math.random());
                                 {% for item in shipping.order_items if item.isDeliveryFee %}
                                     {% set delivery_fee = item.total_price %}
                                 {% endfor %}
-                                {{ Order.Shippings[idx].Delivery }}({{ roundPrice(delivery_fee) }})
+                                {{ Order.Shippings[idx].Delivery }}({{ roundPrice(delivery_fee) | raw }})
                             </div>
                             <div class="ec-select ec-select__delivery">
                                 <label>{{ 'front.shopping.delivery_date'|trans }}</label>
@@ -209,6 +209,7 @@ console.log(Math.random());
             <style>
                 .shipping_destination{
                     display: flex;
+                    margin-top: 10px;
                 }
                 .shipping_destination_left{
                     width: 130px
@@ -319,10 +320,9 @@ console.log(Math.random());
             {#                dtCusAddress#}
             <div class="delivery_address_main">
                 {% include "Ajax/oto_list.twig" with {'data':Order.dtCustomerOtodoke } %}
-
             </div>
 
-            <div class="ec-orderAccount date_picker_row ">
+            <div class="date_picker_row ">
                 <div class="shipping_destination_left date_picker_delivery">
                     <div> {{ 'front.shopping.date_picker_delivery'|trans }}</div>
                 </div>
@@ -330,6 +330,12 @@ console.log(Math.random());
                     <div class="shipping_row">
                         {{ Order.MoreOrder.date_want_delivery }}
                     </div>
+                </div>
+            </div>
+            <div class="date_picker_row">
+                <div class="shipping_destination_left"></div>
+                <div class="shipping_destination_right">
+                    <p class="date-picker-delivery-notify">倉庫状況によりご希望日に添えない場合がございます<br/>詳しくは各担当者までお問い合わせください</p>
                 </div>
             </div>
 
@@ -344,7 +350,7 @@ console.log(Math.random());
                     {% for item in Order.order_items if item.isCharge %}
                         {% set charge = item.total_price %}
                     {% endfor %}
-                    {{ Order.Payment }}({{ roundPrice(charge) }})
+                    {{ Order.Payment }}({{ roundPrice(charge) | raw }})
                 </div>
             </div>
             {% if BaseInfo.isOptionPoint and Order.Customer is not null %}
@@ -365,51 +371,63 @@ console.log(Math.random());
                     {{ Order.message|nl2br }}
                 </div>
             </div>
+
+            {# Remarks#}
+            <div class="shipping_destination">
+                <div class="shipping_destination_left">
+                    <div> {{ 'front.shopping.remarks'|trans }}１</div>
+                </div>
+                <div class="shipping_destination_right">
+                    <div>
+                        <div>
+                            {% if Order.MoreOrder is defined %}
+                                {{ Order.MoreOrder.remarks1 }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shipping_destination">
+                <div class="shipping_destination_left">
+                    <div> {{ 'front.shopping.remarks'|trans }}２</div>
+                </div>
+                <div class="shipping_destination_right">
+                    <div>
+                        <div>
+                            {% if Order.MoreOrder is defined %}
+                                {{ Order.MoreOrder.remarks2 }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {# End - Remarks#}
         </div>
         <div class="ec-orderRole__summary">
             <div class="ec-totalBox">
                 <dl class="ec-totalBox__spec">
                     <dt>{{ 'common.subtotal'|trans }}</dt>
-                    <dd class="ec-totalBox__specTotal">{{ roundPriceZero(Order.subtotal)|raw }}</dd>
+                    <dd class="ec-totalBox__specTotal">{{ roundPriceZeroTotal(Order.subtotal) | raw }}</dd>
                 </dl>
                 <dl class="ec-totalBox__spec">
-                    <dt>{{ 'common.charge'|trans }}</dt>
-                    <dd>{{ roundPrice(Order.charge) }}</dd>
+                    <dt>{{ 'common.tax'|trans }}</dt>
+                    <dd>{{ roundPriceZeroTax(Order.tax) | raw }}</dd>
                 </dl>
                 <dl class="ec-totalBox__spec hide">
                     <dt>{{ 'common.delivery_fee'|trans }}</dt>
-                    <dd>{{ roundPrice(Order.deliveryFeeTotal) }}</dd>
+                    <dd>{{ roundPrice(Order.deliveryFeeTotal) | raw }}</dd>
                 </dl>
-{#                {% if Order.taxable_discount < 0 %}#}
-{#                <dl class="ec-totalBox__spec">#}
-{#                    <dt>{{ 'common.discount'|trans }}</dt>#}
-{#                    <dd>{{ Order.taxable_discount|price }}</dd>#}
-{#                </dl>#}
-{#                {% endif %}#}
-{#                <div class="ec-totalBox__total">{{ 'common.total'|trans }}<span class="ec-totalBox__price">{{ Order.taxable_total|price }}</span><span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>#}
-                <div class="ec-totalBox__total hidden">{{ 'common.total'|trans }}<span class="ec-totalBox__price">{{ roundPriceZero(Order.payment_total)|raw }}</span><span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>
-{#                {% for rate, total in Order.taxable_total_by_tax_rate %}#}
-{#                    <dl class="ec-totalBox__taxRate">#}
-{#                        <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': rate }) }}</dt>#}
-{#                        <dd>{{ total|price }}</dd>#}
-{#                    </dl>#}
+
+                <div class="ec-totalBox__total hidden">{{ 'common.total'|trans }}<span class="ec-totalBox__price">{{ roundPriceZero(Order.payment_total) | raw }}</span><span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>
                 <dl class="ec-totalBox__taxRate hidden">
                     <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': Order.rate }) }}</dt>
-                    <dd>{{ roundPriceZeroTotalAll(Order.total) }}</dd>
+                    <dd>{{ roundPriceZeroTotalAll(Order.total) | raw }}</dd>
                 </dl>
-{#                {% endfor %}#}
-{#                {% for item in Order.tax_free_discount_items %}#}
-{#                    {% if loop.first %}<div class="ec-totalBox__total"></div>{% endif %}#}
-{#                    <dl class="ec-totalBox__spec">#}
-{#                        <dt>{{ item.product_name }}</dt>#}
-{#                        <dd>{{ item.total_price|price }}</dd>#}
-{#                    </dl>#}
-{#                {% endfor %}#}
-                <div class="ec-totalBox__paymentTotal">{{ 'common.payment_total'|trans }}<span class="ec-totalBox__price">{{ roundPriceZeroTotalAll(Order.payment_total) }}</span>
+                <div class="ec-totalBox__paymentTotal">{{ 'common.payment_total'|trans }}<span class="ec-totalBox__price">{{ roundPriceZeroTotalAll(Order.payment_total) | raw }}</span>
                     {% if roundPriceZeroTotal(Order.payment_total) != "" %}
                         <span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span>
                     {% endif %}
-
                 </div>
                 {% if BaseInfo.isOptionPoint and Order.Customer is not null %}
                 <div class="ec-totalBox__pointBlock">

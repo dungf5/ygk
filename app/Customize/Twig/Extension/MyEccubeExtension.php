@@ -38,8 +38,7 @@ class MyEccubeExtension extends AbstractExtension
             new TwigFunction('roundPriceZero', [$this, 'roundPriceZero']),
             new TwigFunction('roundPriceZeroTotal', [$this, 'roundPriceZeroTotal']),
             new TwigFunction('roundPriceZeroTotalAll', [$this, 'roundPriceZeroTotalAll']),
-
-
+            new TwigFunction('roundPriceZeroTax', [$this, 'roundPriceZeroTax']),
         ];
     }
 
@@ -83,33 +82,56 @@ class MyEccubeExtension extends AbstractExtension
         }
         return "￥".$numAf;
     }
-    public function roundPriceZeroTotal($price){
 
-        $numAf = number_format($price,2);
-        if(MyCommon::checkExistText($numAf,".00")){
-            $numAf  = str_replace(".00","",$numAf);
+    public function roundPriceZeroTotal($price)
+    {
+        $numAf      = number_format(round($price));
+
+        if (MyCommon::checkExistText($numAf,".00")) {
+            $numAf  = str_replace(".00","", $numAf);
         }
-        if($numAf == 0){
+
+        if ($numAf == 0) {
             return "";
         }
 
-        return "￥".$numAf;
+        return "￥" . $numAf;
     }
-    public function roundPriceZeroTotalAll($price){
 
-        $numAf = number_format($price,2);
-        if(MyCommon::checkExistText($numAf,".00")){
-            $numAf  = str_replace(".00","",$numAf);
+    public function roundPriceZeroTax($price)
+    {
+        $numAf      = number_format((int) $price);
+
+        if (MyCommon::checkExistText($numAf,".00")) {
+            $numAf  = str_replace(".00","", $numAf);
         }
-        if($numAf == 0){
+
+        if ($numAf == 0) {
             return "";
         }
-        $numAf  =str_replace(",","",$numAf);
-        //$roundUp = round($numAf);
-        $roundUp = (int)$numAf;
-        $roundUp = number_format($roundUp);
-        return "￥".$roundUp;
+
+        return "￥" . $numAf;
     }
+
+    public function roundPriceZeroTotalAll($price)
+    {
+        $numAf      = number_format($price,2);
+
+        if (MyCommon::checkExistText($numAf,".00")) {
+            $numAf  = str_replace(".00","", $numAf);
+        }
+
+        if ($numAf == 0) {
+            return "";
+        }
+
+        $numAf      = str_replace(",","", $numAf);
+        $roundUp    = round($numAf);
+        $roundUp    = number_format($roundUp);
+
+        return "￥" . $roundUp;
+    }
+
     public function getMinDate(){
         $newDate = date('Y-m-d', strtotime(date("Y-m-d"). ' + 1 days'));
         return $newDate;

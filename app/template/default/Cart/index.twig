@@ -283,7 +283,7 @@ function updateOne(objThis){
         {% if totalQuantity > 0 %}
             <div class="ec-cartRole__totalText">
                 <p>
-                    {{ 'front.cart.total_price'|trans({ '%price%': roundPriceZeroTotal(totalPrice) })|raw }}
+                    {{ 'front.cart.total_price'|trans({ '%price%': roundPriceZeroTotal(totalPrice) }) | raw }}
                 </p>
             </div>
 
@@ -345,12 +345,6 @@ function updateOne(objThis){
                                         <div class="ec-cartRow__summary">
                                             <div class="ec-cartRow__name">
                                                 <a  href="{{ url('product_detail', {id : Product.id} ) }}">{{ MstProduct.product_name }}</a>
-{#                                                {% if ProductClass.ClassCategory1 and ProductClass.ClassCategory1.id %}#}
-{#                                                    <br>{{ ProductClass.ClassCategory1.ClassName.name }}：{{ ProductClass.ClassCategory1 }}#}
-{#                                                {% endif %}#}
-{#                                                {% if ProductClass.ClassCategory2 and ProductClass.ClassCategory2.id %}#}
-{#                                                    <br>{{ ProductClass.ClassCategory2.ClassName.name }}：{{ ProductClass.ClassCategory2 }}#}
-{#                                                {% endif %}#}
                                                 <br>
                                                 {{ MstProduct.jan_code}}
                                             </div>
@@ -366,36 +360,18 @@ function updateOne(objThis){
                                                 {% else %}
                                                     <span class="{{ classShow }}"> 標準単価：</span>
                                                 {% endif %}
-                                                <span class="{{ classShow }}">     {{ roundPriceZero(CartItem.price)| raw }}</span>
+                                                <span class="{{ classShow }}">     {{ roundPriceZero(CartItem.price) | raw }}</span>
 
                                                </div>
-                                            <div class="ec-cartRow__sutbtotalSP">{{ 'common.subtotal__with_separator'|trans }}{{ roundPriceZeroTotal(CartItem.total_price) }}</div>
+                                            <div class="ec-cartRow__sutbtotalSP">{{ 'common.subtotal__with_separator'|trans }}{{ roundPriceZeroTotal(CartItem.total_price) | raw }}</div>
                                         </div>
                                     </li>
                                     <li class="ec-cartRow__amountColumn">
-{#                                        <div class="ec-cartRow__amount">{{ (CartItem.quantity * MstProduct.quantity)|number_format }}</div>#}
                                         <div class="ec-cartRow__amountSP">{{ 'common.quantity__with_separator'|trans }}{{ CartItem.quantity|number_format }}</div>
-{#                                        <div class="ec-cartRow__amountUpDown">#}
-{#                                            {% if (CartItem.quantity * MstProduct.quantity) > MstProduct.quantity %}#}
-{#                                                <a href="{{ url('cart_handle_item', {'operation': 'down', 'productClassId': ProductClass.id}) }}" {{ csrf_token_for_anchor() }} class="ec-cartRow__amountDownButton load-overlay" data-method="put" data-confirm="false">#}
-{#                                                    <span class="ec-cartRow__amountDownButton__icon"><img src="{{ asset('assets/icon/minus-dark.svg') }}" alt="reduce"></span>#}
-{#                                                </a>#}
-{#                                            {% else %}#}
-{#                                                <div class="ec-cartRow__amountDownButtonDisabled">#}
-{#                                                    <span class="ec-cartRow__amountDownButton__icon"><img src="{{ asset('assets/icon/minus.svg') }}" alt="reduce"></span>#}
-{#                                                </div>#}
-{#                                            {% endif %}#}
-{#                                            <a href="{{ url('cart_handle_item', {'operation': 'up', 'productClassId': ProductClass.id}) }}" {{ csrf_token_for_anchor() }} class="ec-cartRow__amountUpButton load-overlay" data-method="put" data-confirm="false">#}
-{#                                                <span class="ec-cartRow__amountUpButton__icon"><img src="{{ asset('assets/icon/plus-dark.svg') }}" alt="increase"></span>#}
-{#                                            </a>#}
-{#                                        </div>#}
-
                                         <input type="number" maxlength="5" class="inputCart" id="quantity{{ MstProduct.ec_product_id }}" productclassid="{{ ProductClass.id }}" name="quantity{{ MstProduct.ec_product_id }}" required="required" min="{{ MstProduct.quantity }}" maxlength="9" myid="{{ MstProduct.ec_product_id }}" title="" mymst_quantity="{{ MstProduct.quantity }}" class="quantity form-control" oldvalue="{{ (CartItem.quantity * MstProduct.quantity) }}" value="{{ (CartItem.quantity * MstProduct.quantity) }}" step="{{ MstProduct.quantity }}">
-
-
                                     </li>
                                     <li class="ec-cartRow__subtotalColumn">
-                                        <div class="ec-cartRow__sutbtotal">{{ roundPriceZeroTotal(CartItem.total_price) }}</div>
+                                        <div class="ec-cartRow__sutbtotal">{{ roundPriceZeroTotal(CartItem.total_price) | raw }}</div>
                                     </li>
                                 </ul>
                             {% endfor %}
@@ -407,26 +383,26 @@ function updateOne(objThis){
                             {% if is_delivery_free[cartKey] %}
                                 {{ 'front.cart.delivery_fee_free__now'|trans }}
                             {% else %}
-                                {{ 'front.cart.delivery_fee_free__price_and_quantity'|trans({ '%price%': roundPrice(least[cartKey]), '%quantity%': quantity[cartKey]|number_format })|raw }}
+                                {{ 'front.cart.delivery_fee_free__price_and_quantity'|trans({ '%price%': roundPrice(least[cartKey]), '%quantity%': quantity[cartKey]|number_format }) | raw }}
                             {% endif %}
                         {% elseif BaseInfo.delivery_free_amount %}
                             <br/>
                             {% if is_delivery_free[cartKey] %}
                                 {{ 'front.cart.delivery_fee_free__now'|trans }}
                             {% else %}
-                                {{ 'front.cart.delivery_fee_free__price'|trans({ '%price%': roundPrice(least[cartKey]) })|raw }}
+                                {{ 'front.cart.delivery_fee_free__price'|trans({ '%price%': roundPrice(least[cartKey]) }) | raw }}
                             {% endif %}
                         {% elseif BaseInfo.delivery_free_quantity %}
                             <br/>
                             {% if is_delivery_free[cartKey] %}
                                 {{ 'front.cart.delivery_fee_free__now'|trans }}
                             {% else %}
-                                {{ 'front.cart.delivery_fee_free__quantity'|trans({ '%quantity%': quantity[cartKey]|number_format })|raw }}
+                                {{ 'front.cart.delivery_fee_free__quantity'|trans({ '%quantity%': quantity[cartKey]|number_format }) | raw }}
                             {% endif %}
                         {% endif %}
                     </div>
                     <div class="ec-cartRole__actions">
-                        <div class="ec-cartRole__total">{{ 'common.total__with_separator'|trans }}<span class="ec-cartRole__totalAmount">{{ roundPriceZeroTotal(Cart.totalPrice) }}</span>
+                        <div class="ec-cartRole__total">{{ 'common.total__with_separator'|trans }}<span class="ec-cartRole__totalAmount">{{ roundPriceZeroTotal(Cart.totalPrice) | raw }}</span>
                         </div>
                         <a class="ec-blockBtn--action" href="javascript:;">{{ 'front.cart.checkout'|trans }}</a>
                         {% if loop.last %}

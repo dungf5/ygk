@@ -382,21 +382,6 @@ class MyCartController extends AbstractController
             }
             if(count($arProductCode)>0){
                 $hsMstProductCodeCheckShow = $commonS->setCartIndtPrice($arProductCode,$hsMstProductCodeCheckShow,$commonS,$customer_code);
-//                $arPriceAndTanaka = $commonS->getPriceFromDtPriceOfCusV2($customer_code,$arProductCode);
-//
-//                $arProductCodeInDtPrice = $arPriceAndTanaka[0];
-//                $arTanakaNumber = $arPriceAndTanaka[1];
-//
-//                if(count($arProductCodeInDtPrice)>0 && count($arTanakaNumber)>0){
-//                  $hsDtPriceProductCode =    $commonS->getPriceFromDtPriceTankaProductCode($arTanakaNumber,$arProductCodeInDtPrice,$customer_code);
-//
-//                }
-//
-//                foreach ($hsMstProductCodeCheckShow as $keyCheck=>$valueCheck){
-//                    if(isset($hsDtPriceProductCode[$keyCheck])){
-//                        $hsMstProductCodeCheckShow[$keyCheck]="good_price";
-//                    }
-//                }
             }
 
         }
