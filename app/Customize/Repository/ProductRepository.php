@@ -5,6 +5,7 @@ namespace Customize\Repository;
 
 use Customize\Entity\MstShipping;
 use Customize\Service\Common\MyCommonService;
+use Customize\Service\GlobalService;
 use Doctrine\ORM\Query\Expr\Join;
 use Eccube\Common\EccubeConfig;
 use Eccube\Doctrine\Query\Queries;
@@ -26,6 +27,11 @@ class ProductRepository extends AbstractRepository
      */
     protected $eccubeConfig;
 
+    /**
+     * @var GlobalService
+     */
+    protected $globalService;
+
     public const COLUMNS = [
         'product_id' => 'p.id'
         ,'name' => 'p.name'
@@ -45,11 +51,14 @@ class ProductRepository extends AbstractRepository
     public function __construct(
         RegistryInterface $registry,
         Queries $queries,
-        EccubeConfig $eccubeConfig)
+        EccubeConfig $eccubeConfig,
+        GlobalService $globalService
+    )
     {
         parent::__construct($registry, Product::class);
         $this->queries = $queries;
         $this->eccubeConfig = $eccubeConfig;
+        $this->globalService = $globalService;
     }
 
     /**
@@ -152,129 +161,104 @@ class ProductRepository extends AbstractRepository
 
     public function getQueryBuilderBySearchDataNewCustom($searchData, $user = false, $customer_code = '', $arProductCodeInDtPrice=[],$arTanakaNumber=[])
     {
-        $defaultSortLoginorderPrice =" (CASE
-                       WHEN price.price_s01  is null THEN mstProduct.unit_price
-                      ELSE price.price_s01  end) AS hidden orderPrice ";
-        $sqlColmnsP="p.id,p.description_list,p.free_area";
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb = $qb->andWhere('p.Status = 1');
-        $qb ->select($sqlColmnsP)
-            ->from('Customize\Entity\Product', 'p');
+        $defaultSortLoginorderPrice     = "
+            (CASE
+                WHEN price.price_s01  is null THEN mstProduct.unit_price
+                ELSE price.price_s01
+            END)
+                AS hidden orderPrice
+        ";
+
+        $sqlColmnsP             = "p.id, p.description_list, p.free_area";
+        $qb                     = $this->getEntityManager()->createQueryBuilder();
+        $qb                     = $qb->andWhere('p.Status = 1');
+
+        $qb ->select($sqlColmnsP)->from('Customize\Entity\Product', 'p');
         $qb->addSelect($defaultSortLoginorderPrice);
+
         // category
-        $categoryJoin = false;
+        $categoryJoin           = false;
+
         if (!empty($searchData['category_id']) && $searchData['category_id']) {
-            $Categories = $searchData['category_id'];//->getescendant();//getSelfAndDescendants
+            $Categories         = $searchData['category_id'];
 
             if ($Categories) {
-                $qb
-                    ->innerJoin('p.ProductCategories', 'pct')
+                $qb->innerJoin('p.ProductCategories', 'pct')
                     ->innerJoin('pct.Category', 'c')
                     ->andWhere($qb->expr()->in('pct.Category', ':Categories'))
                     ->setParameter('Categories', $Categories);
-                $categoryJoin = true;
+
+                $categoryJoin   = true;
             }
-        }else{
-            $qb
-                ->innerJoin('p.ProductCategories', 'pct')
-                ->innerJoin('pct.Category', 'c');
-            $categoryJoin = true;
         }
-        //=searchLeft
-       // if(isset(mode))
-        $newComs = new MyCommonService($this->getEntityManager());
-        if (isset($searchData['mode']) && $searchData['mode']=="searchLeft" ) {
+
+        else {
+            $qb->innerJoin('p.ProductCategories', 'pct')
+                ->innerJoin('pct.Category', 'c');
+
+            $categoryJoin       = true;
+        }
+
+        $newComs                = new MyCommonService($this->getEntityManager());
+
+        if (isset($searchData['mode']) && $searchData['mode'] == "searchLeft") {
             if (StringUtil::isNotBlank($searchData['s_product_name'])) {
-                $key = $searchData['s_product_name'];
+                $key        = $searchData['s_product_name'];
 
-                $arCode = $newComs->getSearchProductName($key);
-                $whereMore2 ='mstProduct.jan_code in(:jan_code_left)';
-                $qb->setParameter(":jan_code_left",$arCode);
-
+                $arCode     = $newComs->getSearchProductName($key);
+                $whereMore2 = 'mstProduct.jan_code in(:jan_code_left)';
+                $qb->setParameter(":jan_code_left", $arCode);
                 $qb->andWhere($whereMore2);
             }
+
             if (StringUtil::isNotBlank($searchData['s_jan'])) {
+                $whereMulti = "";
+                $key        = $searchData['s_jan'];
+                $arrK       = explode(' ',$key);
+                $countKey   = count($arrK);
 
-                $whereMulti ="";
-                $key = $searchData['s_jan'];
-
-//                $arCode = $newComs->getSearchJanCode($key);
-//                $whereMore2 ='mstProduct.jan_code in(:jan_code_from_jan)';
-//                $qb->setParameter(":jan_code_from_jan",$arCode);
-//
-//                $qb->andWhere($whereMore2);
-
-                $arrK  = explode(' ',$key);
-                $countKey = count($arrK);
-                foreach ($arrK as $item){
+                foreach ($arrK as $item) {
                     $countKey--;
-                    $item= trim($item);
-                    if($item==""){
+                    $item   = trim($item);
+
+                    if ($item == "") {
                         continue;
                     }
-                    if($countKey>0){
-                        $whereMulti.=" (mstProduct.jan_code like :jan_code{$countKey}) or ";
-                    }else{
-                        $whereMulti.=" (mstProduct.jan_code like :jan_code{$countKey}) ";
-                    }
-                    $qb->setParameter(":jan_code{$countKey}",'%'. $item.'%');
 
+                    if ($countKey > 0) {
+                        $whereMulti     .= " (mstProduct.jan_code like :jan_code{$countKey}) or ";
+                    }
+
+                    else {
+                        $whereMulti     .= " (mstProduct.jan_code like :jan_code{$countKey}) ";
+                    }
+
+                    $qb->setParameter(":jan_code{$countKey}",'%'. $item.'%');
                 }
+
                 $qb->andWhere($whereMulti);
             }
+
             if (StringUtil::isNotBlank($searchData['s_catalog_code'])) {
-                $key = $searchData['s_catalog_code'];
-                $arCode = $newComs->getSearchCatalogCode($key);
+                $key        = $searchData['s_catalog_code'];
+                $arCode     = $newComs->getSearchCatalogCode($key);
                 $whereMore2 ='mstProduct.jan_code in(:jan_code_s_catalog_code)';
                 $qb->setParameter(":jan_code_s_catalog_code",$arCode);
                 $qb->andWhere($whereMore2);
-
-//                $whereMulti ="";
-//                $arrK  = explode(' ',$key);
-//                $countKey = count($arrK);
-//                foreach ($arrK as $item){
-//                    $countKey--;
-//                    $item= trim($item);
-//                    if($item==""){
-//                        continue;
-//                    }
-//                    if($countKey>0){
-//                        $whereMulti.=" (mstProduct.catalog_code like :catalog_code{$countKey}) or ";
-//                    }else{
-//                        $whereMulti.=" (mstProduct.catalog_code like :catalog_code{$countKey}) ";
-//                    }
-//                    $qb->setParameter(":catalog_code{$countKey}",'%'. $item.'%');
-//
-//                }
-//                $qb->andWhere($whereMulti);
             }
         }
 
-
         // name
         if (isset($searchData['name']) && StringUtil::isNotBlank($searchData['name'])) {
-//            $keywords = preg_split('/[\s　]+/u', str_replace(['%', '_'], ['\\%', '\\_'], $searchData['name']), -1, PREG_SPLIT_NO_EMPTY);
-//
-//            foreach ($keywords as $index => $keyword) {
-//                $key = sprintf('keyword%s', $index);
-//                $qb
-//                    ->andWhere(sprintf('NORMALIZE(p.name) LIKE NORMALIZE(:%s) OR
-//                        NORMALIZE(p.search_word) LIKE NORMALIZE(:%s) OR
-//                        EXISTS (SELECT wpc%d FROM \Eccube\Entity\ProductClass wpc%d WHERE p = wpc%d.Product AND NORMALIZE(wpc%d.code) LIKE NORMALIZE(:%s))',
-//                        $key, $key, $index, $index, $index, $index, $key))
-//                    ->setParameter($key, '%'.$keyword.'%');
-//            }
-            $key = $searchData['name'];
-            $whereMore ='mstProduct.series_name like :product_name or mstProduct.product_name_abb like :product_name  or mstProduct.product_name like :product_name or mstProduct.jan_code like :product_name or mstProduct.product_code like :product_name';
-            $whereMore .=" or mstProduct.catalog_code like :product_name   ";
+            $key                = $searchData['name'];
+            $whereMore          = 'mstProduct.series_name like :product_name or mstProduct.product_name_abb like :product_name  or mstProduct.product_name like :product_name or mstProduct.jan_code like :product_name or mstProduct.product_code like :product_name';
+            $whereMore          .=" or mstProduct.catalog_code like :product_name   ";
 
             $qb->andWhere($whereMore)->setParameter(':product_name','%'. $key.'%');
-
-
         }
 
         // Order By
-        $config = $this->eccubeConfig;
+        $config                 = $this->eccubeConfig;
 
         // JANコード順
         if (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['eccube_product_jancd_lower']) {
@@ -333,40 +317,35 @@ class ProductRepository extends AbstractRepository
                 $qb->addOrderBy('orderPrice', 'desc');
             }
         }
-        
-       // $qb->andWhere("mstProduct.product_code = '100000-12-5-35-RD'");
+
         if(!$user) {
             $customer_code = '';
         }
 
         $qb->innerJoin('Customize\Entity\MstProduct', 'mstProduct',Join::WITH,'mstProduct.ec_product_id = p.id');
-        $curentDate = date('Y-m-d');
-        $stringCon=' price.product_code = mstProduct.product_code AND price.customer_code = :customer_code  ';
-        $stringCon .=" and '$curentDate' >= price.valid_date    AND '$curentDate' <= price.expire_date  and price.product_code in(:product_code)";
-        if(count($arTanakaNumber)>0){
-            $stringCon .=" and price.tanka_number in(:tanka_number)";
+        if (!$this->globalService->getSpecialOrderFlg()) {
+            $qb->andWhere("(mstProduct.special_order_flg <> 'Y' OR mstProduct.special_order_flg is null)");
         }
 
+        $curentDate         = date('Y-m-d');
+        $stringCon          = ' price.product_code = mstProduct.product_code AND price.customer_code = :customer_code  ';
+        $stringCon          .= " and '$curentDate' >= price.valid_date AND '$curentDate' <= price.expire_date  and price.product_code in (:product_code)";
 
-        //$arProductCode=["200000-150-150-0.8-1","200000-150-200-1-22-"];
+        if (count($arTanakaNumber) > 0) {
+            $stringCon      .= " and price.tanka_number in(:tanka_number)";
+        }
 
-        $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH,$stringCon)
+        $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH, $stringCon)
             ->setParameter(':customer_code', $customer_code)
             ->setParameter(':product_code', $arProductCodeInDtPrice);
-        if(count($arTanakaNumber)>0){
+
+        if (count($arTanakaNumber) > 0) {
             $qb->setParameter(':tanka_number', $arTanakaNumber);
         }
 
+        $listSelectMstProduct   = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name,mstProduct.size,mstProduct.color";
+        $listSelectMstProduct   .=",mstProduct.quantity as mst_quantity,mstProduct.jan_code,mstProduct.material,mstProduct.model, mstProduct.quantity_box ";
 
-
-        //valid_date = '2022/06/14'  AND '2022/06/14'<= expire_date and customer_code='9901'
-        if($user) {
-           // $curentDate = date('Y/m/d');
-            //$qb->andWhere("price.valid_date = '$curentDate'  AND '$curentDate'<= price.expire_date and price.customer_code='$customer_code'");
-
-        }
-        $listSelectMstProduct = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name,mstProduct.size,mstProduct.color";
-        $listSelectMstProduct.=",mstProduct.quantity as mst_quantity,mstProduct.jan_code,mstProduct.material,mstProduct.model, mstProduct.quantity_box ";
         $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');
 
@@ -380,5 +359,4 @@ class ProductRepository extends AbstractRepository
         //var_dump($qb->getQuery()->getSQL(),"-------");var_dump($qb->getParameters() );die();
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
-
 }

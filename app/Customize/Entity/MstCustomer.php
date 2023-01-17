@@ -102,6 +102,13 @@ if (!class_exists('\Customize\Entity\MstCustomer', false)) {
         private $update_date;
 
         /**
+         * @var int
+         *
+         * @ORM\Column(name="special_order_flg", type="integer", nullable=true)
+         */
+        private $special_order_flg;
+
+        /**
          * @return mixed
          */
         public function getEcCustomerId()
@@ -115,6 +122,22 @@ if (!class_exists('\Customize\Entity\MstCustomer', false)) {
         public function setEcCustomerId($ec_customer_id): void
         {
             $this->ec_customer_id = $ec_customer_id;
+        }
+
+        /**
+         * @return int
+         */
+        public function getSpecialOrderFlg(): int
+        {
+            return (int)$this->special_order_flg;
+        }
+
+        /**
+         * @param int $special_order_flg
+         */
+        public function setSpecialOrderFlg(int $special_order_flg): void
+        {
+            $this->special_order_flg = $special_order_flg;
         }
     }
 }

@@ -20,6 +20,7 @@ use Customize\Repository\PriceRepository;
 use Customize\Repository\ProductRepository as ProductCustomizeRepository;
 use Customize\Repository\StockListRepository;
 use Customize\Service\Common\MyCommonService;
+use Customize\Service\GlobalService;
 use Doctrine\DBAL\Types\Type;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
@@ -118,6 +119,11 @@ class MyProductController extends AbstractController
      */
     protected $encoderFactory;
 
+    /**
+     * @var GlobalService
+     */
+    protected $globalService;
+
     /***
      * MyProductController constructor.
      * @param PurchaseFlow $cartPurchaseFlow
@@ -142,7 +148,8 @@ class MyProductController extends AbstractController
         StockListRepository $stockListRepository,
         MstProductRepository $mstProductRepository,
         EncoderFactoryInterface $encoderFactory, ProductCustomizeRepository $productCustomizeRepository,
-        ProductClassRepository $productClassRepository
+        ProductClassRepository $productClassRepository,
+        GlobalService $globalService
     ) {
         $this->productClassRepository = $productClassRepository;
         $this->purchaseFlow = $cartPurchaseFlow;
@@ -158,6 +165,7 @@ class MyProductController extends AbstractController
         $this->productCustomizeRepository = $productCustomizeRepository;
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $this->encoderFactory = $encoderFactory;
+        $this->globalService = $globalService;
     }
 
     /**
@@ -174,62 +182,73 @@ class MyProductController extends AbstractController
      */
     public function detail(Request $request, Product $Product)
     {
-        $referer    = $request->headers->get('referer', '/products/list');
-
+        $referer        = $request->headers->get('referer', '/products/list');
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
         if (!$this->checkVisibility($Product)) {
             throw new NotFoundHttpException();
         }
 
-        $builder = $this->formFactory->createNamedBuilder(
+        $builder        = $this->formFactory->createNamedBuilder(
             '',
             AddCartType::class,
             null,
             [
-                'product' => $Product,
-                'id_add_product_id' => false,
+                'product'                   => $Product,
+                'id_add_product_id'         => false,
             ]
         );
 
         $event = new EventArgs(
             [
-                'builder' => $builder,
-                'Product' => $Product,
+                'builder'                   => $builder,
+                'Product'                   => $Product,
             ],
             $request
         );
+
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_DETAIL_INITIALIZE, $event);
 
-        $is_favorite = false;
-        $price = null;
-        $stock = null;
-        $mstProduct = $this->mstProductRepository->getData($Product->getId());
-        $cmS = new MyCommonService($this->entityManager);
+        $is_favorite        = false;
+        $price              = null;
+        $stock              = null;
+        $mstProduct         = $this->mstProductRepository->getData($Product->getId());
+
+        if (
+            empty($mstProduct) ||
+            (!$this->globalService->getSpecialOrderFlg() && strtoupper($mstProduct->getSpecialOrderFlg())  == 'Y')
+        ) {
+            return $this->redirect($referer);
+        }
+
+        $cmS                = new MyCommonService($this->entityManager);
+
         if ($this->isGranted('ROLE_USER')) {
-            $Customer = $this->getUser();
+            $Customer       = $this->getUser();
+            $customer_code  = $cmS->getMstCustomer($Customer->getId())['customer_code'];
+            $is_favorite    = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
+            $priceTxt       = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProduct->getProductCode());
+            $myPriceRe      = (object) ['price_s01' => $priceTxt];
 
-            $customer_code = $cmS->getMstCustomer($Customer->getId())['customer_code'];
-            $is_favorite = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
-
-            $priceTxt = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProduct->getProductCode());
-            $myPriceRe = (object) ['price_s01' => $priceTxt];
             if ($priceTxt == '') {
-                $myPriceRe = null;
+                $myPriceRe  = null;
             }
 
-            $price = $myPriceRe;
-            $stock = $this->stockListRepository->getData($mstProduct->getProductCode(), $Customer->getId());
+            $price          = $myPriceRe;
+            $stock          = $this->stockListRepository->getData($mstProduct->getProductCode(), $Customer->getId());
         }
+
         //check in cart
-        $ecProductId = $Product->getId();
-        $product_in_cart = $cmS->isProductEcIncart(MyCommon::getCarSession(), $ecProductId);
-        $productClassId = '';
-        $oneCartId = '';
+        $ecProductId        = $Product->getId();
+        $product_in_cart    = $cmS->isProductEcIncart(MyCommon::getCarSession(), $ecProductId);
+        $productClassId     = '';
+        $oneCartId          = '';
+
         if ($product_in_cart == 1) {
             //productClassId,b.cart_id,a.product_id
-            $cartInfoData = $cmS->getCartInfo(MyCommon::getCarSession(), $ecProductId);
+            $cartInfoData   = $cmS->getCartInfo(MyCommon::getCarSession(), $ecProductId);
             $productClassId = $cartInfoData[0]['productClassId'];
-            $oneCartId = $cartInfoData[0]['cart_id'];
+            $oneCartId      = $cartInfoData[0]['cart_id'];
         }
 
         return [
@@ -476,6 +495,7 @@ class MyProductController extends AbstractController
     public function index(Request $request, PaginatorInterface $paginator)
     {
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
         // Doctrine SQLFilter
         if ($this->BaseInfo->isOptionNostockHidden()) {
             $this->entityManager->getFilters()->enable('option_nostock_hidden');
@@ -488,7 +508,7 @@ class MyProductController extends AbstractController
 
         // searchForm
         /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
-        $builder = $this->formFactory->createNamedBuilder('', \Customize\Form\Type\SearchProductType::class);
+        $builder        = $this->formFactory->createNamedBuilder('', \Customize\Form\Type\SearchProductType::class);
 
         if ($request->getMethod() === 'GET') {
             $builder->setMethod('GET');
@@ -503,76 +523,71 @@ class MyProductController extends AbstractController
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_INITIALIZE, $event);
 
         /* @var $searchForm \Symfony\Component\Form\FormInterface */
-        $searchForm = $builder->getForm();
+        $searchForm         = $builder->getForm();
 
         $searchForm->handleRequest($request);
-        $commonService = new MyCommonService($this->entityManager);
+        $commonService      = new MyCommonService($this->entityManager);
+        $user               = false;
+        $customer_code      = '';
 
-        $user = false;
-        $customer_code = '';
         if ($this->isGranted('ROLE_USER')) {
-            $user = true;
-            $myC = new MyCommonService($this->entityManager);
-            $Customer = $this->getUser();
-            $customer_code = $myC->getMstCustomer($Customer->getId())['customer_code'];
+            $user           = true;
+            $myC            = new MyCommonService($this->entityManager);
+            $Customer       = $this->getUser();
+            $customer_code  = $myC->getMstCustomer($Customer->getId())['customer_code'];
         }
 
         // paginator
-        $searchData = $searchForm->getData();
-
+        $searchData             = $searchForm->getData();
         $arProductCodeInDtPrice = [];
-        $arPriceAndTanaka = $commonService->getPriceFromDtPriceOfCusV2($customer_code);
-        //var_dump($customer_code);
-
+        $arPriceAndTanaka       = $commonService->getPriceFromDtPriceOfCusV2($customer_code);
         $arProductCodeInDtPrice = $arPriceAndTanaka[0];
-        $arTanakaNumber = $arPriceAndTanaka[1];
-
-        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customer_code, $arProductCodeInDtPrice, $arTanakaNumber);
+        $arTanakaNumber         = $arPriceAndTanaka[1];
+        $qb                     = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customer_code, $arProductCodeInDtPrice, $arTanakaNumber);
 
         $event = new EventArgs(
             [
-                'searchData' => $searchData,
-                'qb' => $qb,
+                'searchData'    => $searchData,
+                'qb'            => $qb,
             ],
             $request
         );
-        $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_SEARCH, $event);
-        $searchData = $event->getArgument('searchData');
 
-        $query = $qb->getQuery()
-            ->useResultCache(true, $this->eccubeConfig['eccube_result_cache_lifetime_short']);
+        $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_SEARCH, $event);
+        $searchData             = $event->getArgument('searchData');
+        $query                  = $qb->getQuery()->useResultCache(true, $this->eccubeConfig['eccube_result_cache_lifetime_short']);
 
         /** @var SlidingPagination $pagination */
-        $pagination = $paginator->paginate(
+        $pagination             = $paginator->paginate(
             $query,
             !empty($searchData['pageno']) ? $searchData['pageno'] : 1,
             !empty($searchData['disp_number']) ? $searchData['disp_number']->getId() : $this->productListMaxRepository->findOneBy([], ['sort_no' => 'ASC'])->getId()
         );
 
-        $ids = [];
+        $ids                    = [];
 
         foreach ($pagination as $Product) {
-            $ids[] = $Product['id'];
+            $ids[]              = $Product['id'];
         }
 
         $ProductsAndClassCategories = $this->productRepository->findProductsWithSortedClassCategories($ids, 'p.id');
-        $listImgs = $commonService->getImageFromEcProductId($ids);
-        $hsKeyImg = [];
-        //a.file_name,a.product_id,b.product_code
+        $listImgs                   = $commonService->getImageFromEcProductId($ids);
+        $hsKeyImg                   = [];
+
         foreach ($listImgs as $itemImg) {
             $hsKeyImg[$itemImg['product_id']] = $itemImg['file_name'];
         }
 
         // addCart form
-        $forms = [];
+        $forms          = [];
 
         foreach ($pagination as $Product) {
             if (!isset($ProductsAndClassCategories[$Product['id']])) {
-                // var_dump($Product["id"]);die();
                 continue;
             }
+
             /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
-            $builder = $this->formFactory->createNamedBuilder(
+            $builder    = $this->formFactory->createNamedBuilder(
                 '',
                 AddCartType::class,
                 null,
@@ -582,13 +597,12 @@ class MyProductController extends AbstractController
                 ]
             );
 
-            $addCartForm = $builder->getForm();
-
-            $forms[$Product['id']] = $addCartForm->createView();
+            $addCartForm            = $builder->getForm();
+            $forms[$Product['id']]  = $addCartForm->createView();
         }
 
         // 表示件数
-        $builder    = $this->formFactory->createNamedBuilder(
+        $builder        = $this->formFactory->createNamedBuilder(
             'disp_number',
             ProductListMaxType::class,
             null,
@@ -603,55 +617,54 @@ class MyProductController extends AbstractController
             $builder->setMethod('GET');
         }
 
-        $event = new EventArgs(
+        $event          = new EventArgs(
             [
                 'builder' => $builder,
             ],
             $request
         );
+
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_DISP, $event);
-
         $dispNumberForm = $builder->getForm();
-
         $dispNumberForm->handleRequest($request);
 
         // ソート順
-        $builder = $this->formFactory->createNamedBuilder(
+        $builder        = $this->formFactory->createNamedBuilder(
             'orderby',
             ProductListOrderByType::class,
             null,
             [
-                'required' => false, 'choice_value' => 'sort_no',
-                'allow_extra_fields' => true,
+                'required'              => false, 'choice_value' => 'sort_no',
+                'allow_extra_fields'    => true,
             ]
         );
+
         if ($request->getMethod() === 'GET') {
             $builder->setMethod('GET');
         }
 
-        $event = new EventArgs(
+        $event      = new EventArgs(
             [
                 'builder' => $builder,
             ],
             $request
         );
+
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_ORDER, $event);
 
-        $orderByForm = $builder->getForm();
-
+        $orderByForm    = $builder->getForm();
         $orderByForm->handleRequest($request);
-
-        $Category = $searchForm->get('category_id')->getData();
+        $Category       = $searchForm->get('category_id')->getData();
 
         return [
-            'subtitle' => $this->getPageTitle($searchData),
-            'pagination' => $pagination,
-            'search_form' => $searchForm->createView(),
-            'disp_number_form' => $dispNumberForm->createView(),
-            'order_by_form' => $orderByForm->createView(),
-            'forms' => $forms,
-            'hsKeyImg' => $hsKeyImg,
-            'Category' => $Category,
+            'subtitle'          => $this->getPageTitle($searchData),
+            'pagination'        => $pagination,
+            'search_form'       => $searchForm->createView(),
+            'disp_number_form'  => $dispNumberForm->createView(),
+            'order_by_form'     => $orderByForm->createView(),
+            'forms'             => $forms,
+            'hsKeyImg'          => $hsKeyImg,
+            'Category'          => $Category,
         ];
     }
 

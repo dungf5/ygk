@@ -249,6 +249,13 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         private $ec_product_id;
 
         /**
+         * @var string
+         *
+         * @ORM\Column(name="special_order_flg", type="string", nullable=true)
+         */
+        private $special_order_flg;
+
+        /**
          * @return int
          */
         public function getEcProductId(): int
@@ -728,5 +735,20 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
             $this->model = $model;
         }
 
+        /**
+         * @return string
+         */
+        public function getSpecialOrderFlg()
+        {
+            return $this->special_order_flg;
+        }
+
+        /**
+         * @param string $special_order_flg
+         */
+        public function setSpecialOrderFlg(string $special_order_flg): void
+        {
+            $this->special_order_flg = $special_order_flg;
+        }
     }
 }

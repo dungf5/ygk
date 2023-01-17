@@ -169,4 +169,16 @@ class GlobalService
 
         return  0;
     }
+
+    public function getSpecialOrderFlg()
+    {
+        if ($this->getUser()) {
+            $Customer           = $this->getUser();
+            $SpecialOrderFlg    = $this->myCommon->getMstCustomer($Customer->getId())["special_order_flg"];
+
+            return $SpecialOrderFlg ?? 0;
+        }
+
+        return  0;
+    }
 }
