@@ -18,6 +18,7 @@ use Eccube\Form\Validator\Email;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -46,13 +47,13 @@ class CustomerLoginType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('login_email', EmailType::class, [
+        $builder->add('login_email', TextType::class, [
             'attr' => [
                 'maxlength' => $this->eccubeConfig['eccube_stext_len'],
             ],
             'constraints' => [
                 new Assert\NotBlank(),
-                new Email(['strict' => $this->eccubeConfig['eccube_rfc_email_check']]),
+                //new Email(['strict' => $this->eccubeConfig['eccube_rfc_email_check']]),
             ],
             'data' => $this->authenticationUtils->getLastUsername(),
         ]);

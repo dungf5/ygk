@@ -332,7 +332,6 @@ class MypageController extends AbstractController
      */
     public function login(Request $request, AuthenticationUtils $utils)
     {
-
         if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
             log_info('認証済のためログイン処理をスキップ');
 
@@ -340,8 +339,7 @@ class MypageController extends AbstractController
         }
 
         /* @var $form \Symfony\Component\Form\FormInterface */
-        $builder = $this->formFactory
-            ->createNamedBuilder('', CustomerLoginType::class);
+        $builder = $this->formFactory->createNamedBuilder('', CustomerLoginType::class);
 
         $builder->get('login_memory')->setData((bool) $request->getSession()->get('_security.login_memory'));
 
@@ -362,10 +360,11 @@ class MypageController extends AbstractController
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_MYPAGE_MYPAGE_LOGIN_INITIALIZE, $event);
 
         $form = $builder->getForm();
-        $this->session->set("is_update_cart",1);
+        $this->session->set("is_update_cart", 1);
+
         return [
-            'error' => $utils->getLastAuthenticationError(),
-            'form' => $form->createView(),
+            'error'     => $utils->getLastAuthenticationError(),
+            'form'      => $form->createView(),
         ];
     }
     /**
