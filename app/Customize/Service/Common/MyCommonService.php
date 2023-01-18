@@ -56,7 +56,8 @@ class MyCommonService extends AbstractRepository
      * @param EntityManagerInterface $entityManager
      * @required
      */
-    public function __construct(EntityManagerInterface $entityManager
+    public function __construct(
+        EntityManagerInterface $entityManager
     ) {
         $this->entityManager = $entityManager;
     }
@@ -298,65 +299,127 @@ class MyCommonService extends AbstractRepository
     /**
      * @param MoreOrder $moreOrder
      */
-    public function getMstShippingCustomer($customerId, MoreOrder $moreOrder = null)
+    public function getMstShippingCustomer($loginType, $customerId, MoreOrder $moreOrder = null)
     {
-        $column     = "
-                customer_code as shipping_no,
-                b.shipping_code,
-                ec_customer_id,
-                company_name as name01,
-                company_name,
-                company_name_abb,
-                department,
-                postal_code,
-                addr01,
-                addr02,
-                addr03,
-                email,
-                phone_number,
-                create_date,
-                update_date
-        ";
+        $column         = "
+                            mc.customer_code as shipping_no,
+                            dcur.shipping_code,
+                            mc.ec_customer_id,
+                            mc.company_name as name01,
+                            mc.company_name,
+                            mc.company_name_abb,
+                            mc.department,
+                            mc.postal_code,
+                            mc.addr01,
+                            mc.addr02,
+                            mc.addr03,
+                            mc.email,
+                            mc.phone_number,
+                            mc.create_date,
+                            mc.update_date
+                        ";
 
-        $sql    = " SELECT
-                        $column
-                    FROM
-                        mst_customer a
-                    join
-                        (SELECT
-                            b.shipping_code
-                        from
-                            dt_customer_relation b
-                        WHERE
-                            b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ?  LIMIT 1 )
-                        GROUP BY
-                            b.shipping_code
-                        ) AS b
-                    ON
-                        b.shipping_code = a.customer_code
-                ";
+        if ($loginType == "represent_code" || $loginType == "customer_code") {
+            $sql        = " SELECT
+                                $column
+                            FROM
+                                dtb_customer dc
+                            JOIN
+                                mst_customer mc
+                            ON
+                                dc.id = mc.ec_customer_id
+                            JOIN
+                                (SELECT
+                                    dcr.shipping_code
+                                from
+                                    dt_customer_relation dcr
+                                WHERE
+                                    dcr.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ?  LIMIT 1 )
+                                GROUP BY
+                                    dcr.shipping_code
+                                ) AS dcur
+                            ON
+                                mc.customer_code = dcur.shipping_code
+                        ";
+        }
 
-        $param      = [];
-        $param[]    = $customerId;
+        elseif ($loginType == "shipping_code") {
+            $sql        = " SELECT
+                                $column
+                            FROM
+                                dtb_customer dc
+                            JOIN
+                                mst_customer mc
+                            ON
+                                dc.id = mc.ec_customer_id
+                            JOIN
+                                (SELECT
+                                    dcr.shipping_code
+                                from
+                                    dt_customer_relation dcr
+                                WHERE
+                                    dcr.shipping_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ?  LIMIT 1 )
+                                GROUP BY
+                                    dcr.shipping_code
+                                ) AS dcur
+                            ON
+                                mc.customer_code = dcur.shipping_code
+                        ";
+        }
+
+        elseif ($loginType == "otodoke_code") {
+            $sql        = " SELECT
+                                $column
+                            FROM
+                                dtb_customer dc
+                            JOIN
+                                mst_customer mc
+                            ON
+                                dc.id = mc.ec_customer_id
+                            JOIN
+                                (SELECT
+                                    dcr.shipping_code
+                                from
+                                    dt_customer_relation dcr
+                                WHERE
+                                    dcr.otodoke_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ?  LIMIT 1 )
+                                GROUP BY
+                                    dcr.shipping_code
+                                ) AS dcur
+                            ON
+                                mc.customer_code = dcur.shipping_code
+                        ";
+        }
+
+        else {
+            $sql        = " SELECT
+                                $column
+                            FROM
+                                dtb_customer dc
+                            JOIN
+                                mst_customer mc
+                            ON
+                                dc.id = mc.ec_customer_id
+                            JOIN
+                                (SELECT
+                                    dcr.shipping_code
+                                from
+                                    dt_customer_relation dcr
+                                WHERE
+                                    dcr.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ?  LIMIT 1 )
+                                GROUP BY
+                                    dcr.shipping_code
+                                ) AS dcur
+                            ON
+                                mc.customer_code = dcur.shipping_code
+                        ";
+        }
+
+        $param          = [];
+        $param[]        = $customerId;
 
         if (null != $moreOrder) {
-            $sql        = " SELECT
-                            $column
-                            FROM
-                                mst_customer a
-                            join
-                                (SELECT
-                                    b.shipping_code
-                                from
-                                    dt_customer_relation b
-                                WHERE
-                                    b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id=?  LIMIT 1 )
-                                GROUP BY
-                                    b.shipping_code
-                                ) AS b
-                            ON
-                                b.shipping_code = a.customer_code and b.shipping_code = ?
-                    ";
+            $sql        .= " WHERE dcur.shipping_code = ? ";
             $param[]    = $moreOrder->getShippingCode();
         }
 
@@ -369,7 +432,7 @@ class MyCommonService extends AbstractRepository
             return $rows;
 
         } catch (Exception $e) {
-            return null;
+            return [];
         }
     }
 
@@ -378,9 +441,6 @@ class MyCommonService extends AbstractRepository
      */
     public function getMstProductsOrderNo($order_no)
     {
-
-
-
         $sql = " 	select b.id AS ec_order_lineno,a.order_no,b.product_id,c.product_code,c.jan_code,c.quantity as product_quantity ,b.quantity	 from
 				dtb_order as a  join dtb_order_item b on a.id = b.order_id
 				join mst_product as c   on c.ec_product_id = b.product_id
@@ -763,62 +823,52 @@ class MyCommonService extends AbstractRepository
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCustomerOtodoke($customer_id, $shipping_code, $moreOrder = null)
+    public function getCustomerOtodoke($loginType, $customer_id, $shipping_code, $moreOrder = null)
     {
-        //otodoke_code dia chi nhan hang
-        $column     = "
-                        a.customer_code as otodoke_code,
-                        ec_customer_id,
-                        company_name as name01,
-                        company_name,
-                        company_name_abb,
-                        department,
-                        postal_code,
-                        addr01,
-                        addr02,
-                        addr03,
-                        email,
-                        phone_number
+        $column         = "
+                            mc.customer_code as otodoke_code,
+                            mc.ec_customer_id,
+                            mc.company_name as name01,
+                            mc.company_name,
+                            mc.company_name_abb,
+                            mc.department,
+                            mc.postal_code,
+                            mc.addr01,
+                            mc.addr02,
+                            mc.addr03,
+                            mc.email,
+                            mc.phone_number
+                        ";
+
+        $sql            = " SELECT
+                                {$column}
+                            FROM mst_customer mc
+                            join
+                                (SELECT
+                                    dcr.otodoke_code
+                                FROM
+                                    dt_customer_relation dcr
+                                WHERE
+                                    dcr.shipping_code = ?
+                                AND
+                                    dcr.otodoke_code is not NULL
+                                AND
+                                    dcr.otodoke_code <> ''
+                                ) AS dcur
+                            ON
+                                dcur.otodoke_code = mc.customer_code
                     ";
 
-        $sql        = "  SELECT
-                            {$column}
-                        FROM mst_customer a
-                        join
-                            (SELECT
-                                b.otodoke_code
-                            from
-                                dt_customer_relation b
-                            where
-                                b.shipping_code = ?
-                            AND
-                                b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 )
-                            ) AS b
-                        ON
-                            b.otodoke_code = a.customer_code
-                ";
-        $myPara     = [ $shipping_code,$customer_id];
+        $myPara         = [];
+        $myPara[]       = $shipping_code;
+
+        if ($loginType == 'otodoke_code') {
+            $sql        .= " AND dcur.otodoke_code = (select customer_code from mst_customer where ec_customer_id = ?) ";
+            $myPara[]   = $customer_id;
+        }
 
         if ($moreOrder != null) {
-            $sql    = "  SELECT
-                            {$column}
-                        FROM
-                            mst_customer a
-                        join
-                            (SELECT
-                                b.otodoke_code
-                            from
-                                dt_customer_relation b
-                            where
-                                b.shipping_code =?
-                            AND
-                                b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 )
-                            ) AS b
-                        ON
-                            b.otodoke_code = a.customer_code
-                        and b.otodoke_code = ?
-                    ";
-
+            $sql        .= " AND dcur.otodoke_code = ? ";
             $myPara[]   = $moreOrder->getOtodokeCode();
         }
 

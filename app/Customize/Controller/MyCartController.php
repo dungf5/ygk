@@ -18,6 +18,7 @@ use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Repository\MstProductRepository;
 use Customize\Repository\PriceRepository;
 use Customize\Service\Common\MyCommonService;
+use Customize\Service\GlobalService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Controller\AbstractController;
@@ -65,6 +66,11 @@ class MyCartController extends AbstractController
     protected $mstProductRepository;
 
     /**
+     * @var GlobalService
+     */
+    protected $globalService;
+
+    /**
      * MyCartController constructor.
      *
      * @param ProductClassRepository $productClassRepository
@@ -80,7 +86,8 @@ class MyCartController extends AbstractController
         PurchaseFlow $cartPurchaseFlow,
         BaseInfoRepository $baseInfoRepository,
         PriceRepository $priceRepository,
-        MstProductRepository $mstProductRepository,EntityManagerInterface $entityManager
+        MstProductRepository $mstProductRepository,EntityManagerInterface $entityManager,
+        GlobalService $globalService
     ) {
         $this->productClassRepository = $productClassRepository;
         $this->cartService = $cartService;
@@ -89,8 +96,7 @@ class MyCartController extends AbstractController
         $this->priceRepository = $priceRepository;
         $this->mstProductRepository = $mstProductRepository;
         $this->entityManager =$entityManager;
-
-
+        $this->globalService = $globalService;
     }
 
     /**
@@ -119,7 +125,7 @@ class MyCartController extends AbstractController
             }
 
             $commonService->saveTempCart($shipping_code, $pre_order_id);
-            $arrOtoProductOrder     = $commonService->getCustomerOtodoke($customer_id, $shipping_code, null);
+            $arrOtoProductOrder     = $commonService->getCustomerOtodoke($this->globalService->getLoginType(), $customer_id, $shipping_code, null);
             $moreOrder              = $commonService->getMoreOrder($pre_order_id);
             $data                   = (object) [];
             $otodoke_code_checked   = '';

@@ -12,7 +12,7 @@
                 <div class="ec-halfInput select">
                     <select class="searchE" id="s_shipping_code" name="s_shipping_code" customerId="{{ global_service.customerId }}" onchange="handleChange(this)" value="{{ global_service.getShippingCode }}">
 
-                        {% set shoppingOpt = global_service.shippingOption(global_service.customerId) %}
+                        {% set shoppingOpt = global_service.shippingOption() %}
                         {% if shoppingOpt %}
                             {% if shoppingOpt|length > 1 %}
                                 <option value="" selected>---</option>
@@ -245,6 +245,7 @@
                 }
             }).done(function(data) {
                 loadingOverlay("hide");
+                $('#s_otodoke_code').val(otodoke_code);
 
             }).fail(function(data) {
                 loadingOverlay("hide");

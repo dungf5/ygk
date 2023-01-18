@@ -199,7 +199,7 @@ class MyShoppingController extends AbstractShoppingController
         //*****************
 
         $Order                      = $this->orderHelper->initializeOrder($Cart, $Customer);
-        $mstShip                    = $commonService->getMstShippingCustomer($Customer->getId());
+        $mstShip                    = $commonService->getMstShippingCustomer($this->globalService->getLoginType(), $Customer->getId());
         $Order->arCusLogin          = $arCusLogin;
         $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId());
         $Order->mstShips            = $mstShip;
@@ -440,11 +440,11 @@ class MyShoppingController extends AbstractShoppingController
                 $this->entityManager->flush();
             }
 
-            $mstShip                    = $commonService->getMstShippingCustomer($Customer->getId(), $moreOrder);
+            $mstShip                    = $commonService->getMstShippingCustomer($this->globalService->getLoginType(), $Customer->getId(), $moreOrder);
             $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $moreOrder);
             $arCusLogin                 = $commonService->getMstCustomer($Customer->getId());
             $Order->arCusLogin          = $arCusLogin;
-            $arrOtoProductOrder         = $commonService->getCustomerOtodoke($Customer->getId(), $moreOrder->getShippingCode(), $moreOrder);
+            $arrOtoProductOrder         = $commonService->getCustomerOtodoke($this->globalService->getLoginType(), $Customer->getId(), $moreOrder->getShippingCode(), $moreOrder);
             $Order->MoreOrder           = $moreOrder;
             $Order->mstShips            = $mstShip;
             $Order->dtBillSeikyuCode    = $dtBillSeikyuCode;

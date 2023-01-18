@@ -90,11 +90,11 @@ class GlobalService
         return  '';
     }
 
-    public function shippingOption($customer_id = '')
+    public function shippingOption()
     {
         try {
-            if ($customer_id != '') {
-                $arrSipping         = $this->myCommon->getMstShippingCustomer($customer_id, null);
+            if ($this->customerId() != '') {
+                $arrSipping         = $this->myCommon->getMstShippingCustomer($this->getLoginType(), $this->customerId(), null);
                 $arrSipping         = $arrSipping ?? [];
 
                 if (count($arrSipping) == 1 && isset($arrSipping[0]['shipping_no'])) {
@@ -114,7 +114,7 @@ class GlobalService
     public function otodokeOption ($customer_id = '', $shipping_code = '') {
         try {
             if ($customer_id != '' && $shipping_code != '') {
-                $arrOtodoke     = $this->myCommon->getCustomerOtodoke($customer_id, $shipping_code, null);
+                $arrOtodoke     = $this->myCommon->getCustomerOtodoke($this->getLoginType(), $customer_id, $shipping_code, null);
 
                 return $arrOtodoke ?? [];
             }
