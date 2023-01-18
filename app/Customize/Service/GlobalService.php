@@ -58,9 +58,9 @@ class GlobalService
     {
         if ($this->getUser()) {
             $Customer           = $this->getUser();
-            $cutomerID          = $this->myCommon->getMstCustomer($Customer->getId())["ec_customer_id"];
+            $cutomerId          = $Customer->getId();
 
-            return $cutomerID ?? '';
+            return $cutomerId ?? '';
         }
 
         return  '';
@@ -180,5 +180,19 @@ class GlobalService
         }
 
         return  0;
+    }
+
+    public function getLoginType()
+    {
+        try {
+            if (!empty($_SESSION["usc_" . $this->customerId()])) {
+                return $_SESSION["usc_" . $this->customerId()]['login_type'];
+            }
+
+            return '';
+
+        } catch (\Exception $e) {
+            return '';
+        }
     }
 }

@@ -111,19 +111,51 @@ class MyCommonService extends AbstractRepository
         }
     }
 
-    public function getEmailFromUserCode($customer_code)
+    public function getCustomerFromUserCode($login_code)
     {
-        $column = "a.customer_code as shipping_no,a.customer_code, a.ec_customer_id, a.company_name as name01, a.company_name, a.company_name_abb,
-         a.department, a.postal_code, a.addr01, a.addr02, a.addr03, dtcus.email, a.phone_number, a.create_date, a.update_date";
-        $sql = " SELECT $column   FROM mst_customer a join `dtb_customer` `dtcus` on((`dtcus`.`id` = `a`.`ec_customer_id`))  WHERE a.customer_code=? or dtcus.email =?";
-        $param = [];
-        $param[] = $customer_code;
-        $param[] = $customer_code;
-        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $column     = "
+                        a.customer_code as shipping_no,
+                        a.customer_code,
+                        a.ec_customer_id,
+                        a.company_name as name01,
+                        a.company_name,
+                        a.company_name_abb,
+                        a.department,
+                        a.postal_code,
+                        a.addr01,
+                        a.addr02,
+                        a.addr03,
+                        dtcus.email,
+                        a.phone_number,
+                        a.create_date,
+                        a.update_date
+                    ";
+
+        $sql        = "
+                        SELECT $column
+                        FROM
+                            mst_customer `a`
+                        JOIN
+                            `dtb_customer` `dtcus`
+                        ON
+                            (`dtcus`.`id` = `a`.`ec_customer_id`)
+                        WHERE
+                            `a`.`customer_code` = ?
+                        OR
+                            `dtcus`.`id` = ?
+                    ";
+
+        $param      = [];
+        $param[]    = $login_code;
+        $param[]    = $login_code;
+        $statement  = $this->entityManager->getConnection()->prepare($sql);
+
         try {
             $result = $statement->executeQuery($param);
-            $rows = $result->fetchAllAssociative();
+            $rows   = $result->fetchAllAssociative();
+
             return $rows;
+
         } catch (Exception $e) {
             return null;
         }
@@ -1582,6 +1614,179 @@ AND          pri.product_code=?
 
         $this->entityManager->persist($orderItem);
         $this->entityManager->flush();
+    }
+
+    public function checkLoginType($login_code)
+    {
+        if (!empty($login_code) && str_starts_with($login_code, 'c')) {
+            return 'represent_code';
+        }
+
+        elseif (!empty($login_code) && str_starts_with($login_code, 's')) {
+            return 'shipping_code';
+        }
+
+        elseif (!empty($login_code) && str_starts_with($login_code, 't')) {
+            return 'otodoke_code';
+        }
+
+        return 'customer_code';
+    }
+
+    public function getCustomerByRepresentType($login_code)
+    {
+        $column     = "
+                        dtcur.represent_code,
+                        dtcur.shipping_code as shipping_no,
+                        mstcus.customer_code,
+                        mstcus.ec_customer_id,
+                        mstcus.company_name as name01,
+                        mstcus.company_name,
+                        mstcus.company_name_abb,
+                        mstcus.department,
+                        mstcus.postal_code,
+                        mstcus.addr01,
+                        mstcus.addr02,
+                        mstcus.addr03,
+                        dtcus.email,
+                        mstcus.phone_number,
+                        mstcus.create_date,
+                        mstcus.update_date
+                    ";
+
+        $sql        = "
+                        SELECT $column
+                        FROM
+                            dt_customer_relation `dtcur`
+                        JOIN
+                            `mst_customer` `mstcus`
+                        ON
+                            (`mstcus`.`customer_code` = `dtcur`.`customer_code`)
+                        JOIN
+                            `dtb_customer` `dtcus`
+                        ON
+                            (`dtcus`.`id` = `mstcus`.`ec_customer_id`)
+                        WHERE
+                            `dtcur`.`represent_code` = ?
+                    ";
+
+        $param      = [];
+        $param[]    = $login_code;
+        $statement  = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result = $statement->executeQuery($param);
+            $rows   = $result->fetchAllAssociative();
+
+            return $rows;
+
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    public function getCustomerByShippingType($login_code)
+    {
+        $column     = "
+                        dtcur.represent_code,
+                        dtcur.shipping_code as shipping_no,
+                        mstcus.customer_code,
+                        mstcus.ec_customer_id,
+                        mstcus.company_name as name01,
+                        mstcus.company_name,
+                        mstcus.company_name_abb,
+                        mstcus.department,
+                        mstcus.postal_code,
+                        mstcus.addr01,
+                        mstcus.addr02,
+                        mstcus.addr03,
+                        dtcus.email,
+                        mstcus.phone_number,
+                        mstcus.create_date,
+                        mstcus.update_date
+                    ";
+
+        $sql        = "
+                        SELECT $column
+                        FROM
+                            dt_customer_relation `dtcur`
+                        JOIN
+                            `mst_customer` `mstcus`
+                        ON
+                            (`mstcus`.`customer_code` = `dtcur`.`shipping_code`)
+                        JOIN
+                            `dtb_customer` `dtcus`
+                        ON
+                            (`dtcus`.`id` = `mstcus`.`ec_customer_id`)
+                        WHERE
+                            `dtcur`.`represent_code` = ?
+                    ";
+
+        $param      = [];
+        $param[]    = $login_code;
+        $statement  = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result = $statement->executeQuery($param);
+            $rows   = $result->fetchAllAssociative();
+
+            return $rows;
+
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    public function getCustomerByOtodokeType($login_code)
+    {
+        $column     = "
+                        dtcur.represent_code,
+                        dtcur.shipping_code as shipping_no,
+                        mstcus.customer_code,
+                        mstcus.ec_customer_id,
+                        mstcus.company_name as name01,
+                        mstcus.company_name,
+                        mstcus.company_name_abb,
+                        mstcus.department,
+                        mstcus.postal_code,
+                        mstcus.addr01,
+                        mstcus.addr02,
+                        mstcus.addr03,
+                        dtcus.email,
+                        mstcus.phone_number,
+                        mstcus.create_date,
+                        mstcus.update_date
+                    ";
+
+        $sql        = "
+                        SELECT $column
+                        FROM
+                            dt_customer_relation `dtcur`
+                        JOIN
+                            `mst_customer` `mstcus`
+                        ON
+                            (`mstcus`.`customer_code` = `dtcur`.`otodoke_code`)
+                        JOIN
+                            `dtb_customer` `dtcus`
+                        ON
+                            (`dtcus`.`id` = `mstcus`.`ec_customer_id`)
+                        WHERE
+                            `dtcur`.`represent_code` = ?
+                    ";
+
+        $param      = [];
+        $param[]    = $login_code;
+        $statement  = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result = $statement->executeQuery($param);
+            $rows   = $result->fetchAllAssociative();
+
+            return $rows;
+
+        } catch (Exception $e) {
+            return null;
+        }
     }
 }
 

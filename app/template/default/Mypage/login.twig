@@ -12,34 +12,6 @@ file that was distributed with this source code.
 
 {% set body_class = 'mypage' %}
 
-
-{% block javascript %}
-<script>
-function checkLogin(){
-    $.ajax({
-        url: '{{ url('mypage_login_check') }}',
-                type: 'POST',
-                dataType: 'html',
-                data: {
-                    'login_code': $('#login_code').val(),
-                    '_csrf_token': '{{ csrf_token('authenticate') }}'
-                }
-            }).done(function(data) {
-               let objR = $.parseJSON(data);
-               $('#login_email').val( objR.email);
-               $('#login_mypage').submit();
-
-            }).fail(function(data) {
-                alert('search product failed.');
-            });
-
-
-}
-
-
-    </script>
-
-{% endblock javascript %}
 {% block main %}
     <div class="ec-role">
         <div class="ec-pageHeader">
@@ -85,8 +57,6 @@ function checkLogin(){
                         <div class="ec-grid2">
                             <div class="ec-grid2__cell">
                                 <div class="ec-login__actions">
-{#                                    <button type="button" onclick="checkLogin()"#}
-{#                                            class="ec-blockBtn--cancel">{{ 'common.login'|trans }}</button>#}
                                     <button type="submit"
                                             class="ec-blockBtn--cancel">{{ 'common.login'|trans }}</button>
                                 </div>

@@ -323,7 +323,8 @@ if (!class_exists('\Eccube\Entity\Customer')) {
          */
         public function getUsername()
         {
-            return $this->email;
+            //return $this->email;
+            return $this->id;
         }
 
         /**

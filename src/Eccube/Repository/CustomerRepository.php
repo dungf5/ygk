@@ -100,22 +100,62 @@ class CustomerRepository extends AbstractRepository
 
         return $Customer;
     }
+
     public function getUserByCode($login_code)
     {
-        $myCommon = new MyCommonService($this->getEntityManager());
+        $myCommon       = new MyCommonService($this->getEntityManager());
 
-        $dataGet = $myCommon->getEmailFromUserCode($login_code);
-        $strRe ="";
-        if(count($dataGet)==1){
-            $strRe =  $dataGet[0]["email"];
+        //Check login type
+        $loginType      = $myCommon->checkLoginType($login_code);
+
+        if (!empty($_SESSION["usc_{$login_code}"])) {
+            $loginType              = $_SESSION["usc_{$login_code}"]['login_type'];
+
+            $Customer               = $this->findOneBy([
+                'id'                => $login_code,
+                'Status'            => CustomerStatus::REGULAR,
+            ]);
+
+            if (!empty($Customer)) return $Customer;
         }
-        $Customer = $this->findOneBy([
-            'email' => $strRe,
-            'Status' => CustomerStatus::REGULAR,
+
+        if ($loginType == "represent_code") {
+            $dataGet    = $myCommon->getCustomerByRepresentType($login_code);
+        }
+
+        elseif ($loginType == "shipping_code") {
+            $dataGet    = $myCommon->getCustomerByShippingType($login_code);
+        }
+
+        elseif ($loginType == "otodoke_code") {
+            $dataGet    = $myCommon->getCustomerByOtodokeType($login_code);
+        }
+
+        else {
+            $dataGet    = $myCommon->getCustomerFromUserCode($login_code);
+        }
+
+        $id             = "";
+
+        if (count($dataGet)) {
+            $id         =  $dataGet[0]["ec_customer_id"];
+        }
+
+        //Push to session
+        if (!empty($id)) {
+            $_SESSION["usc_{$id}"]  = [
+                "login_type"        => $loginType,
+            ];
+        }
+
+        $Customer       = $this->findOneBy([
+            'id'        => $id,
+            'Status'    => CustomerStatus::REGULAR,
         ]);
 
         return $Customer;
     }
+
     public function getQueryBuilderBySearchData($searchData)
     {
         $qb = $this->createQueryBuilder('c')
