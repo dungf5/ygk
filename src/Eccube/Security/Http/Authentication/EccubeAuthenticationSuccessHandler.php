@@ -13,6 +13,7 @@
 
 namespace Eccube\Security\Http\Authentication;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -35,6 +36,20 @@ class EccubeAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHan
         if (preg_match('/^https?:\\\\/i', $response->getTargetUrl())) {
             $response->setTargetUrl($request->getUriForPath('/'));
         }
+
+        $customerId     = $_SESSION["customer_id"] ?? '';
+        if (!empty($customerId)) {
+            try {
+                $loginType  = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
+
+                if (!empty($loginType) && $loginType == "represent_code") {
+                    $_SESSION["choose_shipping"]    = true;
+                    return new RedirectResponse('/mypage/login');
+                }
+
+            } catch (\Exception $e) {}
+        }
+
 
         return $response;
     }

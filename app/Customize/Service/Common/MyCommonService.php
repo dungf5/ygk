@@ -391,6 +391,32 @@ class MyCommonService extends AbstractRepository
                         ";
         }
 
+        elseif ($loginType == "change_type") {
+            $shipping_code  = $_SESSION['s_shipping_code'] ?? '';
+
+            $sql        = " SELECT
+                                $column
+                            FROM
+                                dtb_customer dc
+                            JOIN
+                                mst_customer mc
+                            ON
+                                dc.id = mc.ec_customer_id
+                            JOIN
+                                (SELECT
+                                    dcr.shipping_code
+                                from
+                                    dt_customer_relation dcr
+                                WHERE
+                                    dcr.shipping_code = {$shipping_code}
+                                GROUP BY
+                                    dcr.shipping_code
+                                ) AS dcur
+                            ON
+                                mc.customer_code = dcur.shipping_code
+                        ";
+        }
+
         else {
             $sql        = " SELECT
                                 $column

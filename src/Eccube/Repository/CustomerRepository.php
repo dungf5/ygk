@@ -143,6 +143,8 @@ class CustomerRepository extends AbstractRepository
 
         //Push to session
         if (!empty($id)) {
+            $_SESSION["customer_id"]= $id;
+
             $_SESSION["usc_{$id}"]  = [
                 "login_type"        => $loginType,
             ];

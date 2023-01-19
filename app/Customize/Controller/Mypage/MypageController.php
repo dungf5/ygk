@@ -332,6 +332,14 @@ class MypageController extends AbstractController
      */
     public function login(Request $request, AuthenticationUtils $utils)
     {
+        // Check case must to choose shipping
+        if(!empty($_SESSION["choose_shipping"])) {
+
+            return [
+                'shipping'      => TRUE,
+            ];
+        }
+
         if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
             log_info('認証済のためログイン処理をスキップ');
 
@@ -363,6 +371,7 @@ class MypageController extends AbstractController
         $this->session->set("is_update_cart", 1);
 
         return [
+            'shipping'  => FALSE,
             'error'     => $utils->getLastAuthenticationError(),
             'form'      => $form->createView(),
         ];
@@ -402,5 +411,43 @@ class MypageController extends AbstractController
         return [
             'pagination' => $pagination,
         ];
+    }
+
+    /**
+     * Change Shipping Code.
+     *
+     * @Route("/mypage/shipping/change", name="mypage_shipping", methods={"POST"})
+     * @Template("Mypage/login.twig")
+     */
+    public function changeShippingCode (Request $request)
+    {
+        try {
+            if ('POST' === $request->getMethod()) {
+                $shipping_code                  = $request->get('shipping_code', '');
+                $customerId                     = $_SESSION["customer_id"] ?? '';
+
+                if (!empty($customerId)) {
+                    try {
+                        $loginType  = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
+
+                        if (!empty($loginType) && $loginType == "represent_code") {
+                            $_SESSION["choose_shipping"]                    = FALSE;
+                            $_SESSION['s_shipping_code']                    = $shipping_code;
+                            $_SESSION["usc_{$customerId}"]['login_type']    = "change_type";
+                        }
+
+                    } catch (\Exception $e) {
+                        return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
+                    }
+                }
+
+                return $this->json(['status' => 1], 200);
+            }
+
+            return $this->json(['status' => 0], 400);
+
+        } catch (\Exception $e) {
+            return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
+        }
     }
 }
