@@ -319,6 +319,9 @@ class MyCommonService extends AbstractRepository
                             mc.update_date
                         ";
 
+        $param          = [];
+        $param[]        = $customerId;
+
         if ($loginType == "represent_code" || $loginType == "customer_code") {
             $sql        = " SELECT
                                 $column
@@ -393,6 +396,7 @@ class MyCommonService extends AbstractRepository
 
         elseif ($loginType == "change_type") {
             $shipping_code  = $_SESSION['s_shipping_code'] ?? '';
+            $param          = [];
 
             $sql        = " SELECT
                                 $column
@@ -440,9 +444,6 @@ class MyCommonService extends AbstractRepository
                                 mc.customer_code = dcur.shipping_code
                         ";
         }
-
-        $param          = [];
-        $param[]        = $customerId;
 
         if (null != $moreOrder) {
             $sql        .= " WHERE dcur.shipping_code = ? ";
