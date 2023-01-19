@@ -4,14 +4,14 @@
 <div class="header">
     {% set userCode= getUserCode() %}
     {% set urlCart= url('cart') %}
-    {% if userCode=="6000" %}
-        <script>
-            let messAl =  "{{ 'messge.cannotcart.all'|trans }}";
-        </script>
-        {%  set urlCart= "javascript:alert(messAl);"%}
+{#    {% if userCode=="6000" %}#}
+{#        <script>#}
+{#            let messAl =  "{{ 'messge.cannotcart.all'|trans }}";#}
+{#        </script>#}
+{#        {%  set urlCart= "javascript:alert(messAl);"%}#}
 
-    {% else %}
-    {% endif %}
+{#    {% else %}#}
+{#    {% endif %}#}
     <div class="headerLogo">
         <div class="logo">
             <h1>ショップキャッチショップキャッチショップキチ</h1>

@@ -3,14 +3,14 @@
 {% set totalQuantity = get_carts_total_quantity() %}
     {% set userCode= getUserCode() %}
     {% set urlCart= url('cart') %}
-    {% if userCode=="6000" %}
-        <script>
-            let messAl =  "{{ 'messge.cannotcart.all'|trans }}";
-        </script>
-        {%  set urlCart= "javascript:alert(messAl);"%}
+{#    {% if userCode=="6000" %}#}
+{#        <script>#}
+{#            let messAl =  "{{ 'messge.cannotcart.all'|trans }}";#}
+{#        </script>#}
+{#        {%  set urlCart= "javascript:alert(messAl);"%}#}
 
-    {% else %}
-    {% endif %}
+{#    {% else %}#}
+{#    {% endif %}#}
 
 <div class="header">
 

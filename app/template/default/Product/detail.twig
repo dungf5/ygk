@@ -161,10 +161,10 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
             $('.add-cart').on('click', function(event) {
 
                  let userCode='{{getUserCode()}}';
-                if(userCode=="6000"){
-                      alert("{{ 'messge.cannotcart.all'|trans }}");
-                    return ;
-                }
+                {#if(userCode=="6000"){#}
+                {#      alert("{{ 'messge.cannotcart.all'|trans }}");#}
+                {#    return ;#}
+                {#}#}
 
                 {% if form.classcategory_id1 is defined %}
                 // 規格1フォームの必須チェック

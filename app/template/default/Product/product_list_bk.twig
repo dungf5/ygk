@@ -43,11 +43,11 @@ file that was distributed with this source code.
 
             $('.add-cart').on('click', function(e) {
                 let userCode='{{getUserCode()}}';
-                if(userCode=="6000"){
-                    alert("{{ 'messge.cannotcart.all'|trans }}");
+                {#if(userCode=="6000"){#}
+                {#    alert("{{ 'messge.cannotcart.all'|trans }}");#}
 
-                    return ;
-                }
+                {#    return ;#}
+                {#}#}
 
                 var $form = $(this).parents('tr').find('form');
 
