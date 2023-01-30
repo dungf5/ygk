@@ -48,17 +48,17 @@
         var $save_button = $('#save-button');
         editor.getSession().on("changeAnnotation", function(){
             var annot = editor.getSession().getAnnotations();
-            for (var key in annot){
-                if (annot.hasOwnProperty(key)) {
-                    console.log(annot[key]);
-                    if (annot[key].type && annot[key].type == 'error') {
-                        $save_button.prop('disabled', true);
-                        break;
-                    } else {
-                        $save_button.prop('disabled', false);
-                    }
-                }
-            }
+            // for (var key in annot){
+            //     if (annot.hasOwnProperty(key)) {
+            //         console.log(annot[key]);
+            //         if (annot[key].type && annot[key].type == 'error') {
+            //             $save_button.prop('disabled', true);
+            //             break;
+            //         } else {
+            //             $save_button.prop('disabled', false);
+            //         }
+            //     }
+            // }
             if (typeof(annot) == 'object' && annot.length < 1) {
                 $save_button.prop('disabled', false);
             }

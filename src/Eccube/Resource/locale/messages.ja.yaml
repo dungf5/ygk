@@ -272,6 +272,9 @@ front.mypage.withdraw_complete_message__title: 退会が完了いたしました
 front.mypage.withdraw_complete_message__body: |
   ご利用いただき誠にありがとうございました。
   またのご来店をお待ちしております。
+front.mypage.nav_order__history: 注文履歴
+front.mypage.nav_shipping__history: 出荷履歴
+front.mypage.nav_delivery__history: 納品書一覧
 
 #------------------------------------------------------------------------------------
 # 商品
