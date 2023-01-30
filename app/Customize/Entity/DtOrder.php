@@ -549,9 +549,9 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         }
 
         /**
-         * @param string $dyna_model_seg6
+         * @param string|null $dyna_model_seg6
          */
-        public function setDynaModelSeg6(string $dyna_model_seg6): void
+        public function setDynaModelSeg6($dyna_model_seg6 = null): void
         {
             $this->dyna_model_seg6 = $dyna_model_seg6;
         }
@@ -565,9 +565,9 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         }
 
         /**
-         * @param string $dyna_model_seg7
+         * @param string|null $dyna_model_seg7
          */
-        public function setDynaModelSeg7(string $dyna_model_seg7): void
+        public function setDynaModelSeg7($dyna_model_seg7 = null): void
         {
             $this->dyna_model_seg7 = $dyna_model_seg7;
         }
