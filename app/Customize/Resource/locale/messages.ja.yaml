@@ -25,11 +25,12 @@ front.shopping.error_bill_address: 請求先を選んでください。
 front.order.order_no_type: 区分
 front.order.order_no: 注文番号
 front.order.order_lineno: 明細
+front.order.order_date: 注文日
 front.order.image: 画像
 front.order.product_name: 商品名
 front.order.product_code: 商品コード
 front.order.jan_code: JAN コード
-front.order.order_status: 受注<br/>ステータス
+front.order.order_status: 注文<br/>ステータス
 front.order.shipping_status: 出荷</br>ステータス
 front.order.order_plus: 注文数
 front.order.reserve_stock_num: 確保数
@@ -49,6 +50,7 @@ front.shopping.shipping_date_err_month: １か月を超える日付は指定で�
 front.mypage.shipping_no: 出荷指示№
 front.mypage.customer_code: 顧客
 front.mypage.shipping_code: 出荷先
+front.mypage.otodoke_code: 届け先
 front.mypage.product_code: 製品コード
 front.mypage.shipping_status: 出荷ステータス
 front.mypage.shipping_num: 出荷数
@@ -56,6 +58,7 @@ front.mypage.shipping_plan_date: 出荷指示日
 front.mypage.inquiry_no: 荷送伝票番号
 front.mypage.shipping_company_code: 運送会社
 front.mypage.shipping_no_no: 出荷進展
+front.mypage.remarks: 備考
 #login
 common.mail_address: ユーザーコード
 #alert

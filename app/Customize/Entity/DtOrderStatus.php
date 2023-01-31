@@ -3,6 +3,7 @@ namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Eccube\Entity\AbstractEntity;
+use Symfony\Component\Validator\Constraints\Date;
 
 if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
     /**
@@ -18,34 +19,14 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
          *
          * @ORM\Column(name="order_no",nullable=true, type="string", length=15, options={"comment":"STRA注文番号"})
          */
-
         private $order_no;
-
 
         /**
          * @var string
          *
          * @ORM\Column(name="product_code",nullable=true, type="string", length=45, options={"comment":"product_code"})
          */
-
         private $product_code;
-
-        /**
-         * @return string
-         */
-        public function getProductCode(): string
-        {
-            return $this->product_code;
-        }
-
-        /**
-         * @param string $product_code
-         */
-        public function setProductCode(string $product_code): void
-        {
-            $this->product_code = $product_code;
-        }
-
 
         /**
          * @var string
@@ -53,6 +34,7 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
          * @ORM\Column(name="order_line_no",nullable=true, type="string", length=15, options={"comment":"STRA注文明細番号"})
          */
         private $order_line_no;
+
         /**
          * @ORM\Column(name="order_status",type="integer",nullable=false, options={"comment":"受注ステータス
 ステータス種類
@@ -64,14 +46,13 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
          * @var string
          *
          * @ORM\Column(name="ec_order_no", type="string", length=15,options={"comment":"EC発注番号"}, nullable=false)
-
          */
         private $ec_order_no;
+
         /**
          * @var string
          *
          * @ORM\Column(name="ec_order_lineno", type="string", length=15,options={"comment":"EC発注明細番号"}, nullable=false)
-
          */
         private $ec_order_lineno;
 
@@ -92,25 +73,96 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
          * @var string
          *
          * @ORM\Column(name="cus_order_lineno", type="string", length=2,options={"comment":"客先発注No"}, nullable=false)
-
          */
         private $cus_order_lineno;
-
 
         /**
          * @var string
          *
          * @ORM\Column(name="customer_code", type="string", length=25,options={"comment":"顧客"}, nullable=true)
-
          */
         private $customer_code;
+
         /**
          * @var string
          *
          * @ORM\Column(name="shipping_code", type="string", length=25,options={"comment":"顧客"}, nullable=true)
-
          */
         private $shipping_code;
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="otodoke_code", type="string", length=25,options={"comment":"届け先コード"}, nullable=true)
+         */
+        private $otodoke_code;
+
+        /**
+         * @ORM\Column(name="order_remain_num",type="integer",nullable=true, options={"comment":"受注残"  })
+         */
+        private $order_remain_num;
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="flow_type",nullable=true, type="string", length=10, options={"comment":"商流区分(ダイナ規格セグメント03)"})
+         */
+        private $flow_type;
+        /**
+         * @var \DateTime
+         *
+         * @ORM\Column(name="create_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ登録日時'")
+         */
+        private $create_date;
+        /**
+         * @var \DateTime
+         *
+         * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ更新日時'")
+         */
+        private $update_date;
+
+        /**
+         * @var \DateTime|null
+         *
+         * @ORM\Column(name="order_date", type="date", nullable=true, options={"comment":"受注日"})
+         */
+        private $order_date;
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="ec_type", nullable=true, type="string", length=10, options={"comment":"EC1区分"})
+         */
+        private $ec_type;
+
+        /**
+         * @var string|null
+         *
+         * @ORM\Column(name="remarks1", type="text",options={"comment":"備考１"}, nullable=true)
+         */
+        private $remarks1;
+
+        /**
+         * @var string|null
+         *
+         * @ORM\Column(name="remarks2", type="text",options={"comment":"備考２"}, nullable=true)
+         */
+        private $remarks2;
+
+        /**
+         * @return string
+         */
+        public function getProductCode(): string
+        {
+            return $this->product_code;
+        }
+
+        /**
+         * @param string $product_code
+         */
+        public function setProductCode(string $product_code): void
+        {
+            $this->product_code = $product_code;
+        }
 
         /**
          * @return string
@@ -129,6 +181,22 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         }
 
         /**
+         * @return string
+         */
+        public function getOtodokeCode(): string
+        {
+            return $this->otodoke_code;
+        }
+
+        /**
+         * @param string $otodoke_code
+         */
+        public function setOtodokeCode(string $otodoke_code): void
+        {
+            $this->otodoke_code = $otodoke_code;
+        }
+
+        /**
          * @return mixed
          */
         public function getCustomerCode()
@@ -143,9 +211,6 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         {
             $this->customer_code = $customer_code;
         }
-
-
-
 
         /**
          * @return mixed
@@ -178,30 +243,6 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         {
             $this->cus_order_no = $cus_order_no;
         }
-
-
-        /**
-         * @ORM\Column(name="order_remain_num",type="integer",nullable=true, options={"comment":"受注残"  })
-         */
-        private $order_remain_num;
-        /**
-         * @var string
-         *
-         * @ORM\Column(name="flow_type",nullable=true, type="string", length=10, options={"comment":"商流区分(ダイナ規格セグメント03)"})
-         */
-        private $flow_type;
-        /**
-         * @var \DateTime
-         *
-         * @ORM\Column(name="create_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ登録日時'")
-         */
-        private $create_date;
-        /**
-         * @var \DateTime
-         *
-         * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ更新日時'")
-         */
-        private $update_date;
 
         /**
          * @return string
@@ -361,6 +402,82 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         public function setUpdateDate(\DateTime $update_date): void
         {
             $this->update_date = $update_date;
+        }
+
+        /**
+         * Set orderDate.
+         *
+         * @param \DateTime|null $orderDate
+         */
+        public function setOrderDate(\DateTime $orderDate = null) : void
+        {
+            $this->order_date = $orderDate;
+        }
+
+        /**
+         * Get orderDate.
+         *
+         * @return Date|null
+         */
+        public function getOrderDate(): Date
+        {
+            return $this->order_date;
+        }
+
+        /**
+         * @return string | null
+         */
+        public function getEcType(): string
+        {
+            return $this->ec_type;
+        }
+
+        /**
+         * @param string | null $ec_type
+         */
+        public function setEcType($ec_type = null): void
+        {
+            $this->ec_type = $ec_type;
+        }
+
+        /**
+         * Set remarks1.
+         *
+         * @param string|null $remarks1
+         */
+        public function setRemarks1($remarks1 = null)
+        {
+            $this->remarks1 = $remarks1;
+        }
+
+        /**
+         * Get remarks1.
+         *
+         * @return string|null
+         */
+        public function getRemarks1()
+        {
+            return $this->remarks1;
+        }
+
+        /**
+         * Set remarks2.
+         *
+         * @param string|null $remarks2
+         */
+        public function setRemarks2($remarks2 = null)
+        {
+            $this->remarks2 = $remarks2;
+        }
+
+        /**
+         * Get remarks2.
+         *
+         * @return string|null
+         */
+        public function getRemarks2()
+        {
+            return $this->remarks2;
         }
     }
 }

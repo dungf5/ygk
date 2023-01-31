@@ -23,6 +23,7 @@ use Customize\Repository\OrderItemRepository;
 use Customize\Repository\OrderRepository;
 use Customize\Repository\ProductImageRepository;
 use Customize\Service\Common\MyCommonService;
+use Customize\Service\GlobalService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Controller\AbstractController;
@@ -78,6 +79,11 @@ class MypageController extends AbstractController
     protected $customerFavoriteProductRepository;
 
     /**
+     * @var GlobalService
+     */
+    protected $globalService;
+
+    /**
      * MypageController constructor.
      *
      * @param OrderRepository $orderRepository
@@ -87,24 +93,30 @@ class MypageController extends AbstractController
      * @param PurchaseFlow $purchaseFlow
      */
     public function __construct(
-        OrderRepository $orderRepository, ProductImageRepository $productImageRepository,OrderItemRepository $orderItemRepository,  \Twig_Environment $twig
-    ,EntityManagerInterface $entityManager,BaseInfoRepository $baseInfoRepository, CustomerFavoriteProductRepository $customerFavoriteProductRepository) {
-        $this->orderRepository = $orderRepository;
-        $this->productImageRepository = $productImageRepository;
-        $this->orderItemRepository = $orderItemRepository;
-         $this->twig = $twig;
-        $this->entityManager =$entityManager;
-        $myCm = new MyCommonService($this->entityManager);
-        if($this->twig->getGlobals()["app"]->getUser()!=null){
-            $MyDataMstCustomer = $myCm->getMstCustomer($this->twig->getGlobals()["app"]->getUser()->getId());
-            $this->twig->getGlobals()["app"]->MyDataMstCustomer=$MyDataMstCustomer;
+        OrderRepository $orderRepository,
+        ProductImageRepository $productImageRepository,
+        OrderItemRepository $orderItemRepository,
+        \Twig_Environment $twig,
+        EntityManagerInterface $entityManager,
+        BaseInfoRepository $baseInfoRepository,
+        CustomerFavoriteProductRepository $customerFavoriteProductRepository,
+        GlobalService $globalService
+    ) {
+        $this->orderRepository          = $orderRepository;
+        $this->productImageRepository   = $productImageRepository;
+        $this->orderItemRepository      = $orderItemRepository;
+         $this->twig                    = $twig;
+        $this->entityManager            = $entityManager;
+        $myCm                           = new MyCommonService($this->entityManager);
+
+        if ($this->twig->getGlobals()["app"]->getUser() != null) {
+            $MyDataMstCustomer                                  = $myCm->getMstCustomer($this->twig->getGlobals()["app"]->getUser()->getId());
+            $this->twig->getGlobals()["app"]->MyDataMstCustomer = $MyDataMstCustomer;
         }
 
-        $this->BaseInfo = $baseInfoRepository->get();
-        $this->customerFavoriteProductRepository = $customerFavoriteProductRepository;
-
-
-
+        $this->BaseInfo                             = $baseInfoRepository->get();
+        $this->customerFavoriteProductRepository    = $customerFavoriteProductRepository;
+        $this->globalService                        = $globalService;
     }
 
     /**
@@ -115,7 +127,6 @@ class MypageController extends AbstractController
      */
     public function shippingList(Request $request)
     {
-        $arRe               = [];
         $comS               = new MyCommonService($this->entityManager);
         $customer_code      = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
         $type               = $request->get("type");
@@ -123,6 +134,8 @@ class MypageController extends AbstractController
         $order_no           = $request->get("order_no");
         $jan_code           = $request->get("jan_code");
         $arRe               = $comS->getShipList($type, $customer_code, $shipping_no, $order_no, $jan_code);
+        $otodoke_code       = '';
+        $shipping_code      = '';
 
         if (count($arRe) > 0) {
             $otodoke_code   = $arRe[0]["otodoke_code"];
@@ -229,18 +242,20 @@ class MypageController extends AbstractController
     {
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-        $Customer = $this->getUser();
+        $Customer       = $this->getUser();
 
         // 購入処理中/決済処理中ステータスの受注を非表示にする.
-        $this->entityManager
-            ->getFilters()
-            ->enable('incomplete_order_status_hidden');
-        $nf = new MstShipping();
-        // paginator
-        $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
-        $qb = $this->orderItemRepository->getQueryBuilderByCustomer($customer_code);
+        $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
 
-        $pagination = $paginator->paginate(
+        // Query data
+        $customer_code  = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
+        $shipping_code  = $this->globalService->getShippingCode();
+        $otodoke_code   = $this->globalService->getOtodokeCode();
+        $login_type     = $this->globalService->getLoginType();
+        $qb             = $this->orderItemRepository->getQueryBuilderByCustomer($customer_code, $shipping_code, $otodoke_code, $login_type);
+
+        // Paginator
+        $pagination     = $paginator->paginate(
             $qb,
             $request->get('pageno', 1),
             $this->eccubeConfig['eccube_search_pmax'],
@@ -248,35 +263,45 @@ class MypageController extends AbstractController
         );
 
 
-        $listItem = [];
-        $listItem = $pagination->getItems();
-        $arProductId = [];
-        $arOrderNo = [];
+        $listItem       = $pagination->getItems();
+        $arProductId    = [];
+        $arOrderNo      = [];
+
         //modify data
         foreach ($listItem as &$myItem) {
-            $arProductId[] = $myItem['product_id'];
+            $arProductId[]                  = $myItem['product_id'];
             $arOrderNo[$myItem['ec_order_no']][$myItem['ec_order_lineno']] = $myItem['order_line_no'];
+
             if (is_object($myItem['update_date'])) {
-                $myItem['update_date'] = $myItem['update_date']->format('Y-m-d');
+                $myItem['update_date']      = $myItem['update_date']->format('Y-m-d');
                 if (MyCommon::checkExistText($myItem['update_date'], '.000000')) {
-                    $myItem['update_date'] = str_replace('.000000', '', $myItem['update_date']);
-                } else {
-                    $myItem['update_date'] = str_replace('000', '', $myItem['update_date']);
+                    $myItem['update_date']  = str_replace('.000000', '', $myItem['update_date']);
+                }
+
+                else {
+                    $myItem['update_date']  = str_replace('000', '', $myItem['update_date']);
                 }
             }
-            if (isset(MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']])) {
-                $myItem['order_status'] = MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']];
-            }
-            if (isset(MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']])) {
-                $myItem['shipping_status'] = MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']];
-            }
-            $myItem['order_remain_num'] = $myItem['order_remain_num']*$myItem['quantity'];
-            $myItem['reserve_stock_num'] = $myItem['reserve_stock_num']*$myItem['quantity'];
 
-            $myItem['order_type'] = '';
-             if (isset($myItem['flow_type'])) {
-                 if($myItem['flow_type']=="2"){
-                     $myItem['order_type'] = 'EC';
+            if (isset(MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']])) {
+                $myItem['order_status']     = MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']];
+            }
+
+            if (isset(MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']])) {
+                $myItem['shipping_status']  = MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']];
+            }
+
+            $myItem['order_remain_num']     = $myItem['order_remain_num']*$myItem['quantity'];
+            $myItem['reserve_stock_num']    = $myItem['reserve_stock_num']*$myItem['quantity'];
+
+            $myItem['order_type']           = '';
+             if (!empty($myItem['ec_type'])) {
+                 if ($myItem['ec_type'] == "1") {
+                     $myItem['order_type']  = 'EC';
+                 }
+
+                 if ($myItem['ec_type'] == "2") {
+                     $myItem['order_type']  = 'EOS';
                  }
             }
         }

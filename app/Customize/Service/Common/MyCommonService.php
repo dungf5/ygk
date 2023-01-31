@@ -214,7 +214,7 @@ class MyCommonService extends AbstractRepository
                 on c.customer_code = d.customer_code
                 left join mst_customer AS cus2 ON  cus2.customer_code = c.shipping_code
                 left join mst_delivery  as f on concat(c.ec_order_no, '-', c.ec_order_lineno) = f.order_no
-                where a.customer_code = ? and c.shipping_no = ? and a.ec_order_no = ?
+                where a.customer_code = ? and c.shipping_no = ? and a.ec_order_no = ? and delete_flg <> 0
             ";
 
         $param      = [];
@@ -238,24 +238,21 @@ class MyCommonService extends AbstractRepository
     }
     public function getShipListExtend($otodoke_code,$shipping_code)
     {
-
-
         $sql = " SELECT
                     (SELECT company_name  FROM mst_customer ccc WHERE ccc.customer_code= ?) as shipping_company_name
                     ,(SELECT company_name  FROM mst_customer ccc WHERE ccc.customer_code= ?) as otodoke_company_name
 
                 ";
-        $param = [$shipping_code,$otodoke_code];
 
+        $param      = [$shipping_code, $otodoke_code];
+        $statement  = $this->entityManager->getConnection()->prepare($sql);
 
-
-
-        $statement = $this->entityManager->getConnection()->prepare($sql);
         try {
             $result = $statement->executeQuery($param);
-            $rows = $result->fetchAllAssociative();
-            if(count($rows)==0){
-                $rows[] =["shipping_company_name"=>"","otodoke_company_name"=>""];
+            $rows   = $result->fetchAllAssociative();
+
+            if (count($rows) == 0) {
+                $rows[] = ["shipping_company_name" => "", "otodoke_company_name" => ""];
             }
 
             return $rows;

@@ -1,26 +1,24 @@
 <div style="    display: flex;
     justify-content: space-between;">
     <div>
-    <div>
-        お客様：<b>{{myData[0].user_created_company_name }}</b>
-    </div>
-    <div>
-        出荷先：<b>{{arMore[0].shipping_company_name }}</b>
-    </div>
-    <div>
-        届け先：<b>{{arMore[0].otodoke_company_name }}</b>
-    </div>
+        <div>
+            お客様：<b>{% if myData|length > 0 %} {{myData[0].user_created_company_name}} {% endif %}</b>
+        </div>
+        <div>
+            出荷先：<b>{% if myData|length > 0 %} {{arMore[0].shipping_company_name}} {% endif %}</b>
+        </div>
+        <div>
+            届け先：<b>{% if myData|length > 0 %} {{arMore[0].otodoke_company_name}} {% endif %}</b>
+        </div>
     </div>
 
     <div>
-        {% if myData[0].deli_order_no %}
-
+        {% if myData|length > 0 and myData[0].deli_order_no %}
             <a class=" btn btn-primary actBg"  target="_blank" href="/mypage/exportOrderPdf?order_no_line_no={{myData[0].ec_order_no}}-{{myData[0].ec_order_lineno}}&delivery_no={{myData[0].delivery_no}}">納品書</a>
         {% else %}
             <div class=" btn btn-primary disabled disBg"> 納品書</div>
         {% endif %}
         <button class=" btn  " onclick="javascript:$('.closeBtn').click()"> Close</button>
-
     </div>
 
 </div>
