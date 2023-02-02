@@ -38,7 +38,7 @@ class OrderItemRepository extends AbstractRepository
      *
      * @return QueryBuilder
      */
-    public function getQueryBuilderByCustomer($customerCode, $shippingCode = '', $otodokeCode = '', $loginType = null)
+    public function getQueryBuilderByCustomer($paramSearch = [], $customerCode, $shippingCode = '', $otodokeCode = '', $loginType = null)
     {
         if ($loginType == "represent_code" || $loginType == "customer_code" || $loginType == "change_type") {
             $condition      = ' and ordStatus.customer_code  = :customerCode ';
@@ -84,6 +84,7 @@ class OrderItemRepository extends AbstractRepository
         $qb         = $this->getEntityManager()->createQueryBuilder();
         $where      = " ordStatus.order_date >= :orderDate {$condition}";
 
+        // Add condition
         if (!empty($shippingCode)) {
             $where .= ' AND ordStatus.shipping_code  = :shippingCode ';
         }
@@ -91,6 +92,24 @@ class OrderItemRepository extends AbstractRepository
         if (!empty($otodokeCode)) {
             $where .= ' AND ordStatus.otodoke_code  = :otodokeCode ';
         }
+
+        if (isset($paramSearch['search_status_type'])) {
+            if (in_array((int)$paramSearch['search_status_type'], [0, 1, 2, 3, 4, 9])) {
+                $where .= ' AND ordStatus.order_status  in (:orderStatus) ';
+            }
+        }
+
+        if (!empty($paramSearch['search_order_date'])) {
+            $where .= ' AND (';
+
+            foreach ($paramSearch['search_order_date'] as $key => $value) {
+                $where .= ' ordStatus.order_date  like :orderDate'.$key.' OR';
+            }
+
+            $where  = trim($where, 'OR');
+            $where .= ' ) ';
+        }
+        // End - Add condition
 
         $qb = $qb->select($col)
             ->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = ordStatus.shipping_code) shipping_name')
@@ -120,6 +139,33 @@ class OrderItemRepository extends AbstractRepository
 
         if (!empty($otodokeCode)) {
             $qb = $qb->setParameter(':otodokeCode', "$otodokeCode");
+        }
+
+        if (isset($paramSearch['search_status_type'])) {
+            if ((int)$paramSearch['search_status_type'] == 0) {
+                $qb = $qb->setParameter(':orderStatus', [0]);
+            }
+            if ((int)$paramSearch['search_status_type'] == 1) {
+                $qb = $qb->setParameter(':orderStatus', [1]);
+            }
+            if ((int)$paramSearch['search_status_type'] == 2) {
+                $qb = $qb->setParameter(':orderStatus', [2]);
+            }
+            if ((int)$paramSearch['search_status_type'] == 3) {
+                $qb = $qb->setParameter(':orderStatus', [3]);
+            }
+            if ((int)$paramSearch['search_status_type'] == 4) {
+                $qb = $qb->setParameter(':orderStatus', [4]);
+            }
+            if ((int)$paramSearch['search_status_type'] == 9) {
+                $qb = $qb->setParameter(':orderStatus', [9]);
+            }
+        }
+
+        if (!empty($paramSearch['search_order_date'])) {
+            foreach ($paramSearch['search_order_date'] as $key => $value) {
+                $qb = $qb->setParameter(':orderDate' . $key, $value."-%");
+            }
         }
         /*End - Set param search */
 

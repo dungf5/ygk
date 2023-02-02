@@ -14,120 +14,226 @@ file that was distributed with this source code.
 
 {% set body_class = 'mypage' %}
 
+{% block stylesheet %}
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap-multiselect.min.css') }}">
+{% endblock stylesheet %}
+
 {% block main %}
-<div class="ec-layoutRole__main">
-    <div class="ec-mypageRole">
-        <div class="ec-pageHeader">
-            <h1>{{ 'front.mypage.title'|trans }}/{{ 'front.mypage.nav_order__history'|trans }}</h1>
-        </div>
-        {% include 'Mypage/navi.twig' %}
-    </div>
-
     <style>
-        .myTable>thead>tr>th {
-            white-space: nowrap;
+        div.multiselect-container.dropdown-menu {
+            color: black;
+        }
+        div.open>.dropdown-menu {
+            display: inline-grid;
+        }
+        .dropdown-item.multiselect-all {
+            width: 100%;
+            border: none;
+            padding-bottom: 5px;
+        }
+        .multiselect-option.dropdown-item {
+            width: 100%;
+            border: none;
+        }
+        .multiselect-container .multiselect-all .form-check {
+            float: left;
+            padding: 0 5px 0 45px;
+        }
+        .multiselect-container .multiselect-option .form-check {
+            padding: 0;
+        }
+        .multiselect-container .multiselect-all .form-check .form-check-label {
+            margin-left: 10px;
+        }
+        .multiselect-container .multiselect-option .form-check .form-check-label {
+            margin-left: 10px;
+        }
+        button.multiselect.dropdown-toggle.custom-select.text-center {
+            height: 34px;
+        }
+        div.multiselect-filter.d-flex.align-items-center {
+            width: 100%;
+            display: inline-flex;
+        }
+        div.multiselect-filter.d-flex.align-items-center i {
+            display: inline-flex;
+            margin-top: 10px;
+        }
+        button.multiselect.dropdown-toggle.custom-select.text-center {
+            display: none;
         }
     </style>
 
-    <iframe id="my_iframe" style="display:none;"></iframe>
-    <script>
-            function Download(url) {
-                document.getElementById('my_iframe').src = url;
-            };
-    </script>
-
-    <style>
-        .disBg {
-            background: #A7A7A7;
-            border-color: #A7A7A7;
-        }
-        .actBg {
-         background: #0065ff;
-        }
-    </style>
-
-    <div class="ec-mypageRole">
-        {% if pagination.totalItemCount > 0 %}
-            <p class="ec-para-normal">{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}</p>
-            <table class="table myTable">
-                <thead>
-                <tr>
-                    <th title="order_no_type">{{ 'front.order.order_no_type'|trans| raw }}</th>
-                    <th title="order_no">{{ 'front.order.order_no'|trans| raw }}</th>
-                    <th title="order_lineno">{{ 'front.order.order_lineno'|trans| raw }}</th>
-                    <th title="order_date">{{ 'front.order.order_date'|trans| raw }}</th>
-                    <th title="shipping_code otodoke_code">{{ 'front.mypage.shipping_code'|trans| raw }}<br/>{{ 'front.mypage.otodoke_code'|trans| raw }}</th>
-                    <th title="image">{{ 'front.order.image'|trans| raw }}</th>
-                    <th style="text-align: left;" title="product_code product_name remarks1 remarks2">
-                        {{ 'front.order.jan_code'|trans| raw }}<br/>
-                        {{ 'front.order.product_name'|trans| raw }}<br/>
-                        {{ 'front.mypage.remarks'|trans| raw }}１<br/>
-                        {{ 'front.mypage.remarks'|trans| raw }}２
-                    </th>
-                    <th title="order_status" style="text-align: left;">{{ 'front.order.order_status'|trans| raw }}</th>
-                    <th  title="shipping_status"  class="hide" style="text-align: center;" >{{ 'front.order.shipping_status'|trans| raw }}</th>
-                    <th title="order_plus" style="text-align: right">{{ 'front.order.order_plus'|trans| raw }}</th>
-                    <th title="reserve_stock_num" style="text-align: right">{{ 'front.order.reserve_stock_num'|trans| raw }}</th>
-                    <th title="order_remain_num" style="text-align: right">{{ 'front.order.order_remain_num'|trans| raw }}</th>
-                    <th title="update_date" class="hide">{{ 'front.order.update_date'|trans| raw }}</th>
-                    <th class="hide" title="shipping_date">{{ 'front.order.shipping_date'|trans| raw }}</th>
-                    <th title="shipping_no"  style="" >{{ 'front.mypage.shipping_no_no'|trans| raw }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for Order in pagination %}
-                    <tr>
-                        <td>{{Order.order_type}}</td>
-                        <td>{{Order.cus_order_no}}</td>
-                        <td>{{Order.cus_order_lineno}}</td>
-                        <td>{{Order.order_date|date_format('','Y-m-d')}}</td>
-                        <td >{{Order.shipping_name}}<br/>{{Order.otodoke_name}}</td>
-                        <td>
-                            {% if Order.main_img is null %}
-                            <img style="width: 100px" src="{{ asset(''|no_image_product, 'save_image') }}"/>
-                            {% else %}
-                                <img  style="width: 100px"  src="{{ asset(Order.main_img|no_image_product, 'save_image') }}">
-                            {% endif %}
-                        </td>
-                        <td >{{Order.jan_code}}<br/>{{Order.product_name}}<br/>{{Order.remarks1}}<br/>{{Order.remarks2}}</td>
-                        <td>{{Order.order_status}}</td>
-                        <td class="hide">{{Order.shipping_status}}</td>
-                        <td style="text-align: right">{{Order.order_remain_num}}</td>
-                        <td style="text-align: right">{{Order.reserve_stock_num}}</td>
-                        <td style="text-align: right">{{Order.order_remain_num - Order.reserve_stock_num}}</td>
-                        <td class="hide" >>{{Order.update_date}}</td>
-                        <td class="hide" >{{Order.shipping_date}}</td>
-                        <td>
-                            {% if Order.shipping_no %}
-                                <a class=" btn btn-primary actBg " onclick="loadDataFor('all', '{{Order.ec_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest">
-                                    注文出荷状況
-                                </a>
-                                <br/><br/>
-                                <a class=" btn btn-primary actBg " onclick="loadDataFor('one', '{{Order.ec_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest">
-                                    個別出荷状況
-                                </a>
-                            {% else %}
-                                <div class=" btn btn-primary disabled disBg">注文出荷状況</div>
-                                <br/><br/>
-                                <div class=" btn btn-primary disabled disBg">個別出荷状況</div>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            <div class="ec-pagerRole">
-                {% include "pager.twig" with {'pages': pagination.paginationData} %}
+    <div class="ec-layoutRole__main">
+        <div class="ec-mypageRole">
+            <div class="ec-pageHeader">
+                <h1>{{ 'front.mypage.title'|trans }}/{{ 'front.mypage.nav_order__history'|trans }}</h1>
             </div>
-        {% else %}
-            <p class="ec-para-normal">{{ 'front.mypage.history_not_found'|trans }}</p>
-        {% endif %}
-    </div>
-    {% include "Mypage/modal_list.twig" with {'shipping_no':'Test' } %}
-</div>
+            {% include 'Mypage/navi.twig' %}
+        </div>
 
+        <style>
+            .myTable>thead>tr>th {
+                white-space: nowrap;
+            }
+        </style>
+
+        <iframe id="my_iframe" style="display:none;"></iframe>
+        <script>
+                function Download(url) {
+                    document.getElementById('my_iframe').src = url;
+                };
+        </script>
+
+        <style>
+            .disBg {
+                background: #A7A7A7;
+                border-color: #A7A7A7;
+            }
+            .actBg {
+             background: #0065ff;
+            }
+        </style>
+
+        <div class="ec-mypageRole">
+            {% if pagination.totalItemCount > 0 %}
+                <p class="ec-para-normal">{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}</p>
+                <table class="table myTable">
+                    <thead>
+                        <tr>
+                            <th title="order_no_type">{{ 'front.order.order_no_type'|trans| raw }}</th>
+                            <th title="order_no">{{ 'front.order.order_no'|trans| raw }}</th>
+                            <th title="order_lineno">{{ 'front.order.order_lineno'|trans| raw }}</th>
+                            <th title="order_date">
+                                {{ 'front.order.order_date'|trans| raw }}
+                                <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </a>
+                                <br/>
+                                <select id="search_order_date" name="search_order_date" multiple="multiple" onchange="handleSearch(this)">
+                                    {% for orderDate in orderDateOpt %}
+                                        <option value="{{orderDate.key}}">{{orderDate.value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </th>
+                            <th title="shipping_code otodoke_code" style="min-width: 150px">{{ 'front.mypage.shipping_code'|trans| raw }}<br/>{{ 'front.mypage.otodoke_code'|trans| raw }}</th>
+                            <th title="image">{{ 'front.order.image'|trans| raw }}</th>
+                            <th style="text-align: left;" title="product_code product_name remarks1 remarks2">
+                                {{ 'front.order.jan_code'|trans| raw }}<br/>
+                                {{ 'front.order.product_name'|trans| raw }}<br/>
+                                {{ 'front.mypage.remarks'|trans| raw }}１<br/>
+                                {{ 'front.mypage.remarks'|trans| raw }}２
+                            </th>
+                            <th title="order_status" style="text-align: left;">{{ 'front.order.order_status'|trans| raw }}</th>
+                            <th title="shipping_status"  class="hide" style="text-align: center;" >{{ 'front.order.shipping_status'|trans| raw }}</th>
+                            <th title="order_plus" style="text-align: right">{{ 'front.order.order_plus'|trans| raw }}</th>
+                            <th title="reserve_stock_num" style="text-align: right">{{ 'front.order.reserve_stock_num'|trans| raw }}</th>
+                            <th title="order_remain_num" style="text-align: right">{{ 'front.order.order_remain_num'|trans| raw }}</th>
+                            <th title="update_date" class="hide">{{ 'front.order.update_date'|trans| raw }}</th>
+                            <th class="hide" title="shipping_date">{{ 'front.order.shipping_date'|trans| raw }}</th>
+                            <th title="shipping_no">{{ 'front.mypage.shipping_no_no'|trans| raw }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for Order in pagination %}
+                        <tr>
+                            <td>{{Order.order_type}}</td>
+                            <td>{{Order.cus_order_no}}</td>
+                            <td>{{Order.cus_order_lineno}}</td>
+                            <td>{{Order.order_date|date_format('','Y-m-d')}}</td>
+                            <td>{{Order.shipping_name}}<br/>{{Order.otodoke_name}}</td>
+                            <td>
+                                {% if Order.main_img is null %}
+                                <img style="width: 100px" src="{{ asset(''|no_image_product, 'save_image') }}"/>
+                                {% else %}
+                                    <img  style="width: 100px"  src="{{ asset(Order.main_img|no_image_product, 'save_image') }}">
+                                {% endif %}
+                            </td>
+                            <td>{{Order.jan_code}}<br/>{{Order.product_name}}<br/>{{Order.remarks1}}<br/>{{Order.remarks2}}</td>
+                            <td>{{Order.order_status}}</td>
+                            <td class="hide">{{Order.shipping_status}}</td>
+                            <td style="text-align: right">{{Order.order_remain_num}}</td>
+                            <td style="text-align: right">{{Order.reserve_stock_num}}</td>
+                            <td style="text-align: right">{{Order.order_remain_num - Order.reserve_stock_num}}</td>
+                            <td class="hide">{{Order.update_date}}</td>
+                            <td class="hide">{{Order.shipping_date}}</td>
+                            <td>
+                                {% if Order.shipping_no %}
+                                    <a class=" btn btn-primary actBg " onclick="loadDataFor('all', '{{Order.ec_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest">
+                                        注文出荷状況
+                                    </a>
+                                    <br/><br/>
+                                    <a class=" btn btn-primary actBg " onclick="loadDataFor('one', '{{Order.ec_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest">
+                                        個別出荷状況
+                                    </a>
+                                {% else %}
+                                    <div class=" btn btn-primary disabled disBg">注文出荷状況</div>
+                                    <br/><br/>
+                                    <div class=" btn btn-primary disabled disBg">個別出荷状況</div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <div class="ec-pagerRole">
+                    {% include "pager.twig" with {'pages': pagination.paginationData} %}
+                </div>
+            {% else %}
+                {# No data #}
+                <table class="table myTable">
+                    <thead>
+                        <tr>
+                            <th title="order_no_type">{{ 'front.order.order_no_type'|trans| raw }}</th>
+                            <th title="order_no">{{ 'front.order.order_no'|trans| raw }}</th>
+                            <th title="order_lineno">{{ 'front.order.order_lineno'|trans| raw }}</th>
+                            <th title="order_date">
+                                {{ 'front.order.order_date'|trans| raw }}
+                                <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </a>
+                                <br/>
+                                <select id="search_order_date" name="search_order_date" multiple="multiple" onchange="handleSearch(this)">
+                                    {% for orderDate in orderDateOpt %}
+                                        <option value="{{orderDate.key}}">{{orderDate.value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </th>
+                            <th title="shipping_code otodoke_code" style="min-width: 150px">{{ 'front.mypage.shipping_code'|trans| raw }}<br/>{{ 'front.mypage.otodoke_code'|trans| raw }}</th>
+                            <th title="image">{{ 'front.order.image'|trans| raw }}</th>
+                            <th style="text-align: left;" title="product_code product_name remarks1 remarks2">
+                                {{ 'front.order.jan_code'|trans| raw }}<br/>
+                                {{ 'front.order.product_name'|trans| raw }}<br/>
+                                {{ 'front.mypage.remarks'|trans| raw }}１<br/>
+                                {{ 'front.mypage.remarks'|trans| raw }}２
+                            </th>
+                            <th title="order_status" style="text-align: left;">{{ 'front.order.order_status'|trans| raw }}</th>
+                            <th title="shipping_status"  class="hide" style="text-align: center;" >{{ 'front.order.shipping_status'|trans| raw }}</th>
+                            <th title="order_plus" style="text-align: right">{{ 'front.order.order_plus'|trans| raw }}</th>
+                            <th title="reserve_stock_num" style="text-align: right">{{ 'front.order.reserve_stock_num'|trans| raw }}</th>
+                            <th title="order_remain_num" style="text-align: right">{{ 'front.order.order_remain_num'|trans| raw }}</th>
+                            <th title="update_date" class="hide">{{ 'front.order.update_date'|trans| raw }}</th>
+                            <th class="hide" title="shipping_date">{{ 'front.order.shipping_date'|trans| raw }}</th>
+                            <th title="shipping_no">{{ 'front.mypage.shipping_no_no'|trans| raw }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="12">
+                                <p>{{ 'front.mypage.history_not_found'|trans }}</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+        {% include "Mypage/modal_list.twig" with {'shipping_no':'Test' } %}
+    </div>
 {% endblock %}
+
 {% block javascript %}
+<script src="{{ asset('assets/js/bootstrap-multiselect.min.js') }}"></script>
+
 <script>
 function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
     $('.showbody').html("loading...");
@@ -152,8 +258,131 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
     });
 }
 
-function loadDataFor(type, ec_order_no, shipping_no, jan_code) {
-    updateShipingAddress(type, shipping_no,ec_order_no, jan_code);
-}
+    function loadDataFor(type, ec_order_no, shipping_no, jan_code) {
+        updateShipingAddress(type, shipping_no,ec_order_no, jan_code);
+    }
+
+    /*Set default value for selected*/
+    let search_status_type  = {{ search_status_type }};
+    $("#search_status_type").val(search_status_type);
+
+    $('#search_order_date').multiselect({
+        includeSelectAllOption: true,
+        selectAllText: 'すべて',
+        enableFiltering: true,
+        filterPlaceholder: '検索',
+        checkboxName: function(option) {
+            return 'multiselect[]';
+        },
+        buttonWidth: '180px',
+        buttonHeight: '34px',
+        buttonText: function(options, select) {
+            if (options.length === 0) {
+                return '未選択';
+            }
+            else if (options.length == 14) {
+                return 'すべて';
+            }
+            else if (options.length > 2) {
+                return options.length + 'ヶ月選択済み';
+            }
+            else {
+                 var labels = [];
+                 options.each(function() {
+                     if ($(this).attr('label') !== undefined) {
+                         labels.push($(this).attr('label'));
+                     }
+                     else {
+                         labels.push($(this).html());
+                     }
+                 });
+                 labels.reverse();
+                 return labels.join(', ') + '';
+            }
+        },
+        buttonTitle: function(options, select) {
+            if (options.length === 0) {
+                return '未選択';
+            }
+            else {
+                 var labels = [];
+                 options.each(function() {
+                     if ($(this).attr('label') !== undefined) {
+                         labels.push($(this).attr('label'));
+                     }
+                     else {
+                         labels.push($(this).html());
+                     }
+                 });
+                 labels.reverse();
+                 return labels.join(', ') + '';
+            }
+        },
+        nonSelectedText: '注文日検索',
+    });
+
+     let search_order_date  = '{{ search_order_date }}';
+     search_order_date      = search_order_date.split(",");
+     $.each(search_order_date, function(key, value) {
+        $('#search_order_date').multiselect('select', [value]);
+     });
+
+    var typingTimer;
+    var doneTypingInterval      = 2000;
+
+    function handleSearch(target) {
+        let name                = target.name;
+        let value               = target.value;
+        let origin              = window.location.origin;
+        let pathname            = window.location.pathname;
+        let search              = window.location.search;
+        let search_order_date   = '{{ search_order_date }}';
+        pathname                += "?pageno=1";
+
+        if (name == 'search_status_type') {
+            loadingOverlay();
+            pathname            += "&status_type=" + value;
+
+            value               = $("#search_order_date").val();
+            $.each(value, function(key, item) {
+                pathname        += "&order_date[]=" + item;
+            });
+
+            window.location.href    = origin + pathname;
+        }
+
+        if (name == 'search_order_date') {
+            clearTimeout(typingTimer);
+            loadingOverlay('hide');
+
+            typingTimer         = setTimeout(function () {
+                loadingOverlay();
+                handelChangeDate(origin, pathname, search);
+            }, doneTypingInterval);
+        }
+    }
+
+    function handelChangeDate(origin, pathname, search) {
+        let value       = $("#search_order_date").val();
+        $.each(value, function(key, item) {
+            pathname    += "&order_date[]=" + item;
+        });
+
+        if (search.indexOf('status_type') > -1) {
+            pathname    += "&status_type=" + {{ search_status_type }};
+        }
+
+        window.location.href     = origin + pathname;
+    }
+
+    $("a.multiselect.dropdown-toggle").on("click", function() {
+        let button          = $("button.multiselect.dropdown-toggle.custom-select.text-center");
+        let aria_expanded   = button.attr("aria-expanded");
+        if (!aria_expanded || aria_expanded == 'false') {
+            setTimeout(function() {
+                button.click();
+            }, 100);
+        }
+    })
 </script>
 {% endblock %}

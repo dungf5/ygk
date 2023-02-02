@@ -242,17 +242,23 @@ class MypageController extends AbstractController
     {
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-        $Customer       = $this->getUser();
 
         // 購入処理中/決済処理中ステータスの受注を非表示にする.
         $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
+
+        //Params
+        $param                      = [
+            'pageno'                => $request->get('pageno', 1),
+            'search_status_type'    => $request->get('status_type', -1),
+            'search_order_date'     => $request->get('order_date', []),
+        ];
 
         // Query data
         $customer_code  = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
         $shipping_code  = $this->globalService->getShippingCode();
         $otodoke_code   = $this->globalService->getOtodokeCode();
         $login_type     = $this->globalService->getLoginType();
-        $qb             = $this->orderItemRepository->getQueryBuilderByCustomer($customer_code, $shipping_code, $otodoke_code, $login_type);
+        $qb             = $this->orderItemRepository->getQueryBuilderByCustomer($param, $customer_code, $shipping_code, $otodoke_code, $login_type);
 
         // Paginator
         $pagination     = $paginator->paginate(
@@ -344,8 +350,27 @@ class MypageController extends AbstractController
 
         $pagination->setItems($listItem);
 
+        /*create list order date*/
+        $orderDateList          = [];
+        $orderDateList[]        = [
+            'key'               => (string)date("Y-m", ),
+            'value'             => (string)date("Y-m", ),
+        ];
+
+        for ($i = 1; $i < 14; $i++) {
+            $date               = date("Y-m", strtotime("- $i month"));
+            $orderDateList[]    = [
+                'key'           => (string)$date,
+                'value'         => (string)$date,
+            ];
+        }
+
         return [
-            'pagination' => $pagination, 'hsProductImgMain' => $hsProductImgMain
+            'pagination'                => $pagination,
+            'hsProductImgMain'          => $hsProductImgMain,
+            'orderDateOpt'              => $orderDateList,
+            'search_order_date'         => implode(",", $param['search_order_date']),
+            'search_status_type'        => $param['search_status_type'],
         ];
     }
 

@@ -354,8 +354,8 @@ class ProductRepository extends AbstractRepository
             Join::WITH,
             "stock_list.product_code = mstProduct.product_code");
         $qb->addSelect('stock_list.stock_num');
+        $qb->groupBy('mstProduct.product_code');
 
-        $qb->distinct();
         //var_dump($qb->getQuery()->getSQL(),"-------");var_dump($qb->getParameters() );die();
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
