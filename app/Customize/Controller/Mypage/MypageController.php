@@ -249,7 +249,7 @@ class MypageController extends AbstractController
         //Params
         $param                      = [
             'pageno'                => $request->get('pageno', 1),
-            'search_status_type'    => $request->get('status_type', -1),
+            'search_order_status'   => $request->get('order_status', []),
             'search_order_date'     => $request->get('order_date', []),
         ];
 
@@ -365,12 +365,22 @@ class MypageController extends AbstractController
             ];
         }
 
+        /*create list order status*/
+        $orderStatusList        = [];
+        $orderStatusList[]      = ['key' => '0', 'value' => '調査要'];
+        $orderStatusList[]      = ['key' => '1', 'value' => '未確保'];
+        $orderStatusList[]      = ['key' => '2', 'value' => '一部確保'];
+        $orderStatusList[]      = ['key' => '3', 'value' => '確保済み'];
+        $orderStatusList[]      = ['key' => '4', 'value' => 'キャンセル'];
+        $orderStatusList[]      = ['key' => '9', 'value' => '注文完了'];
+
         return [
             'pagination'                => $pagination,
             'hsProductImgMain'          => $hsProductImgMain,
             'orderDateOpt'              => $orderDateList,
             'search_order_date'         => implode(",", $param['search_order_date']),
-            'search_status_type'        => $param['search_status_type'],
+            'orderStatusOpt'            => $orderStatusList,
+            'search_order_status'       => implode(",", $param['search_order_status']),
         ];
     }
 

@@ -37,10 +37,10 @@ file that was distributed with this source code.
         }
         .multiselect-container .multiselect-all .form-check {
             float: left;
-            padding: 0 5px 0 45px;
+            /*padding: 0 5px 0 45px;*/
         }
         .multiselect-container .multiselect-option .form-check {
-            padding: 0;
+            float: left;
         }
         .multiselect-container .multiselect-all .form-check .form-check-label {
             margin-left: 10px;
@@ -59,7 +59,7 @@ file that was distributed with this source code.
             display: inline-flex;
             margin-top: 10px;
         }
-        button.multiselect.dropdown-toggle.custom-select.text-center {
+        button.multiselect {
             display: none;
         }
     </style>
@@ -106,7 +106,7 @@ file that was distributed with this source code.
                             <th title="order_lineno">{{ 'front.order.order_lineno'|trans| raw }}</th>
                             <th title="order_date">
                                 {{ 'front.order.order_date'|trans| raw }}
-                                <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle">
+                                <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_order_date">
                                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                                 </a>
                                 <br/>
@@ -124,7 +124,18 @@ file that was distributed with this source code.
                                 {{ 'front.mypage.remarks'|trans| raw }}１<br/>
                                 {{ 'front.mypage.remarks'|trans| raw }}２
                             </th>
-                            <th title="order_status" style="text-align: left;">{{ 'front.order.order_status'|trans| raw }}</th>
+                            <th title="order_status" style="text-align: left;">
+                                {{ 'front.order.order_status'|trans| raw }}
+                                <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_order_status">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </a>
+                                <br/>
+                                <select id="search_order_status" name="search_order_status" multiple="multiple" onchange="handleSearch(this)">
+                                    {% for orderStatus in orderStatusOpt %}
+                                        <option value="{{orderStatus.key}}">{{orderStatus.value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </th>
                             <th title="shipping_status"  class="hide" style="text-align: center;" >{{ 'front.order.shipping_status'|trans| raw }}</th>
                             <th title="order_plus" style="text-align: right">{{ 'front.order.order_plus'|trans| raw }}</th>
                             <th title="reserve_stock_num" style="text-align: right">{{ 'front.order.reserve_stock_num'|trans| raw }}</th>
@@ -189,7 +200,7 @@ file that was distributed with this source code.
                             <th title="order_lineno">{{ 'front.order.order_lineno'|trans| raw }}</th>
                             <th title="order_date">
                                 {{ 'front.order.order_date'|trans| raw }}
-                                <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle">
+                                <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_order_date">
                                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                                 </a>
                                 <br/>
@@ -207,7 +218,18 @@ file that was distributed with this source code.
                                 {{ 'front.mypage.remarks'|trans| raw }}１<br/>
                                 {{ 'front.mypage.remarks'|trans| raw }}２
                             </th>
-                            <th title="order_status" style="text-align: left;">{{ 'front.order.order_status'|trans| raw }}</th>
+                            <th title="order_status" style="text-align: left;">
+                                {{ 'front.order.order_status'|trans| raw }}
+                                <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_order_status">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </a>
+                                <br/>
+                                <select id="search_order_status" name="search_order_status" multiple="multiple" onchange="handleSearch(this)">
+                                    {% for orderStatus in orderStatusOpt %}
+                                        <option value="{{orderStatus.key}}">{{orderStatus.value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </th>
                             <th title="shipping_status"  class="hide" style="text-align: center;" >{{ 'front.order.shipping_status'|trans| raw }}</th>
                             <th title="order_plus" style="text-align: right">{{ 'front.order.order_plus'|trans| raw }}</th>
                             <th title="reserve_stock_num" style="text-align: right">{{ 'front.order.reserve_stock_num'|trans| raw }}</th>
@@ -262,10 +284,6 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
         updateShipingAddress(type, shipping_no,ec_order_no, jan_code);
     }
 
-    /*Set default value for selected*/
-    let search_status_type  = {{ search_status_type }};
-    $("#search_status_type").val(search_status_type);
-
     $('#search_order_date').multiselect({
         includeSelectAllOption: true,
         selectAllText: 'すべて',
@@ -274,7 +292,7 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
         checkboxName: function(option) {
             return 'multiselect[]';
         },
-        buttonWidth: '180px',
+        buttonWidth: '150px',
         buttonHeight: '34px',
         buttonText: function(options, select) {
             if (options.length === 0) {
@@ -318,13 +336,77 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
                  return labels.join(', ') + '';
             }
         },
+        buttonClass:'search_order_date',
         nonSelectedText: '注文日検索',
     });
 
+    $('#search_order_status').multiselect({
+        includeSelectAllOption: true,
+        selectAllText: 'すべて',
+        // enableFiltering: true,
+        // filterPlaceholder: '検索',
+        checkboxName: function(option) {
+            return 'multiselect[]';
+        },
+        buttonWidth: '150px',
+        buttonHeight: '34px',
+        buttonText: function(options, select) {
+            if (options.length === 0) {
+                return '未選択';
+            }
+            else if (options.length == 14) {
+                return 'すべて';
+            }
+            else if (options.length > 2) {
+                return options.length + 'ヶ月選択済み';
+            }
+            else {
+                 var labels = [];
+                 options.each(function() {
+                     if ($(this).attr('label') !== undefined) {
+                         labels.push($(this).attr('label'));
+                     }
+                     else {
+                         labels.push($(this).html());
+                     }
+                 });
+                 labels.reverse();
+                 return labels.join(', ') + '';
+            }
+        },
+        buttonTitle: function(options, select) {
+            if (options.length === 0) {
+                return '未選択';
+            }
+            else {
+                 var labels = [];
+                 options.each(function() {
+                     if ($(this).attr('label') !== undefined) {
+                         labels.push($(this).attr('label'));
+                     }
+                     else {
+                         labels.push($(this).html());
+                     }
+                 });
+                 labels.reverse();
+                 return labels.join(', ') + '';
+            }
+        },
+        buttonClass:'search_order_status',
+        nonSelectedText: '注文日検索',
+    });
+
+    /*Set default value for selected*/
      let search_order_date  = '{{ search_order_date }}';
      search_order_date      = search_order_date.split(",");
      $.each(search_order_date, function(key, value) {
         $('#search_order_date').multiselect('select', [value]);
+     });
+
+     let search_order_status  = '{{ search_order_status }}';
+     search_order_status      = search_order_status.split(",");
+     $.each(search_order_status, function(key, value) {
+        $('#search_order_status').multiselect('select', [value]);
      });
 
     var typingTimer;
@@ -339,16 +421,14 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
         let search_order_date   = '{{ search_order_date }}';
         pathname                += "?pageno=1";
 
-        if (name == 'search_status_type') {
-            loadingOverlay();
-            pathname            += "&status_type=" + value;
+        if (name == 'search_order_status') {
+            clearTimeout(typingTimer);
+            loadingOverlay('hide');
 
-            value               = $("#search_order_date").val();
-            $.each(value, function(key, item) {
-                pathname        += "&order_date[]=" + item;
-            });
-
-            window.location.href    = origin + pathname;
+            typingTimer         = setTimeout(function () {
+                loadingOverlay();
+                handelChangeStatus(origin, pathname, search);
+            }, doneTypingInterval);
         }
 
         if (name == 'search_order_date') {
@@ -367,16 +447,29 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
         $.each(value, function(key, item) {
             pathname    += "&order_date[]=" + item;
         });
-
-        if (search.indexOf('status_type') > -1) {
-            pathname    += "&status_type=" + {{ search_status_type }};
-        }
-
         window.location.href     = origin + pathname;
     }
 
-    $("a.multiselect.dropdown-toggle").on("click", function() {
-        let button          = $("button.multiselect.dropdown-toggle.custom-select.text-center");
+    function handelChangeStatus(origin, pathname, search) {
+        let value       = $("#search_order_status").val();
+        $.each(value, function(key, item) {
+            pathname    += "&order_status[]=" + item;
+        });
+        window.location.href     = origin + pathname;
+    }
+
+    $("a.multiselect.dropdown-toggle.search_order_date").on("click", function() {
+        let button          = $("button.search_order_date");
+        let aria_expanded   = button.attr("aria-expanded");
+        if (!aria_expanded || aria_expanded == 'false') {
+            setTimeout(function() {
+                button.click();
+            }, 100);
+        }
+    })
+
+    $("a.multiselect.dropdown-toggle.search_order_status").on("click", function() {
+        let button          = $("button.search_order_status");
         let aria_expanded   = button.attr("aria-expanded");
         if (!aria_expanded || aria_expanded == 'false') {
             setTimeout(function() {

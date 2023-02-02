@@ -93,10 +93,8 @@ class OrderItemRepository extends AbstractRepository
             $where .= ' AND ordStatus.otodoke_code  = :otodokeCode ';
         }
 
-        if (isset($paramSearch['search_status_type'])) {
-            if (in_array((int)$paramSearch['search_status_type'], [0, 1, 2, 3, 4, 9])) {
-                $where .= ' AND ordStatus.order_status  in (:orderStatus) ';
-            }
+        if (!empty($paramSearch['search_order_status'])) {
+            $where .= ' AND ordStatus.order_status  in (:orderStatus) ';
         }
 
         if (!empty($paramSearch['search_order_date'])) {
@@ -141,25 +139,8 @@ class OrderItemRepository extends AbstractRepository
             $qb = $qb->setParameter(':otodokeCode', "$otodokeCode");
         }
 
-        if (isset($paramSearch['search_status_type'])) {
-            if ((int)$paramSearch['search_status_type'] == 0) {
-                $qb = $qb->setParameter(':orderStatus', [0]);
-            }
-            if ((int)$paramSearch['search_status_type'] == 1) {
-                $qb = $qb->setParameter(':orderStatus', [1]);
-            }
-            if ((int)$paramSearch['search_status_type'] == 2) {
-                $qb = $qb->setParameter(':orderStatus', [2]);
-            }
-            if ((int)$paramSearch['search_status_type'] == 3) {
-                $qb = $qb->setParameter(':orderStatus', [3]);
-            }
-            if ((int)$paramSearch['search_status_type'] == 4) {
-                $qb = $qb->setParameter(':orderStatus', [4]);
-            }
-            if ((int)$paramSearch['search_status_type'] == 9) {
-                $qb = $qb->setParameter(':orderStatus', [9]);
-            }
+        if (!empty($paramSearch['search_order_status'])) {
+            $qb = $qb->setParameter(':orderStatus', $paramSearch['search_order_status']);
         }
 
         if (!empty($paramSearch['search_order_date'])) {
