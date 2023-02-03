@@ -223,7 +223,7 @@ front.guide.title: ご利用ガイド
 #------------------------------------------------------------------------------------
 
 front.mypage.welcome: 'ようこそ%last_name% %first_name%さん'
-front.mypage.welcome_company: 'ようこそ%company_name%さん'
+front.mypage.welcome_company: 'ようこそ%company_name%様'
 front.mypage.title: マイページ
 front.mypage.welcome__point: '現在の所持ポイントは %point%pt です。'
 front.mypage.nav__history: ご注文履歴
