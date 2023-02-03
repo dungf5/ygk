@@ -325,33 +325,30 @@ $(function() {
                                                 {% endif %}
                                                 {#  set end#}
 
-                                                {# Check mst_customer.price_view_flg #}
-                                                {% if global_service.getPriceViewFlg %}
-                                                    <dl>
-                                                        {% if  classShow=="good_price" %}
-                                                            <dt class="{{ classShow }}">販売単価</dt>
-                                                        {% else %}
-                                                            <dt class="{{ classShow }}">標準単価</dt>
-                                                        {% endif %}
+                                                <dl>
+                                                    {% if  classShow=="good_price" %}
+                                                        <dt class="{{ classShow }}">販売単価</dt>
+                                                    {% else %}
+                                                        <dt class="{{ classShow }}">標準単価</dt>
+                                                    {% endif %}
 
-                                                        {% if app.user -%}
-                                                            {% if Product.price_s01 is not empty %}
-                                                                <dd class="{{ classShow }}">
-                                                                    : {{ roundPrice(Product.price_s01) }} {{ tax_str }}
-                                                                </dd>
-                                                            {% else %}
-                                                                <dd class="{{ classShow }}">
-                                                                    : {{ roundPriceZero(Product.mst_unit_price )|raw}} {{ tax_str }}
-                                                                </dd>
-                                                            {% endif %}
-
+                                                    {% if app.user -%}
+                                                        {% if Product.price_s01 is not empty %}
+                                                            <dd class="{{ classShow }}">
+                                                                : {{ roundPrice(Product.price_s01) }} {{ tax_str }}
+                                                            </dd>
                                                         {% else %}
                                                             <dd class="{{ classShow }}">
-                                                                : {{ roundPriceZero(Product.mst_unit_price)|raw }} {{ tax_str }}
+                                                                : {{ roundPriceZero(Product.mst_unit_price )|raw}} {{ tax_str }}
                                                             </dd>
                                                         {% endif %}
-                                                    </dl>
-                                                {% endif %}
+
+                                                    {% else %}
+                                                        <dd class="{{ classShow }}">
+                                                            : {{ roundPriceZero(Product.mst_unit_price)|raw }} {{ tax_str }}
+                                                        </dd>
+                                                    {% endif %}
+                                                </dl>
 
                                                 {# Show stock num #}
                                                 <dl class="product-stock_default">

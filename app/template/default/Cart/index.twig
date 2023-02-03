@@ -282,12 +282,9 @@ function updateOne(objThis){
         {% endfor %}
         {% if totalQuantity > 0 %}
             <div class="ec-cartRole__totalText">
-                {# Check mst_customer.price_view_flg #}
-                {% if global_service.getPriceViewFlg %}
-                    <p>
-                        {{ 'front.cart.total_price'|trans({ '%price%': roundPriceZeroTotal(totalPrice) }) | raw }}
-                    </p>
-                {% endif %}
+                <p>
+                    {{ 'front.cart.total_price'|trans({ '%price%': roundPriceZeroTotal(totalPrice) }) | raw }}
+                </p>
             </div>
 
             {% if Carts|length > 1 %}
@@ -358,23 +355,15 @@ function updateOne(objThis){
                                                     販売単位：{{ MstProduct.quantity }}個～
                                                 {% endif %}
                                                 {% set classShow=hsMstProductCodeCheckShow[MstProduct.product_code] -%}
-
-                                                {# Check mst_customer.price_view_flg #}
-                                                {% if global_service.getPriceViewFlg %}
-                                                    {% if  classShow=="good_price" %}
-                                                        <span class="{{ classShow }}"> 販売単価：</span>
-                                                    {% else %}
-                                                        <span class="{{ classShow }}"> 標準単価：</span>
-                                                    {% endif %}
-                                                    <span class="{{ classShow }}">{{ roundPriceZero(CartItem.price) | raw }}</span>
+                                                {% if  classShow=="good_price" %}
+                                                    <span class="{{ classShow }}"> 販売単価：</span>
+                                                {% else %}
+                                                    <span class="{{ classShow }}"> 標準単価：</span>
                                                 {% endif %}
+                                                <span class="{{ classShow }}">     {{ roundPriceZero(CartItem.price) | raw }}</span>
 
                                                </div>
-
-                                            {# Check mst_customer.price_view_flg #}
-                                            {% if global_service.getPriceViewFlg %}
-                                                <div class="ec-cartRow__sutbtotalSP">{{ 'common.subtotal__with_separator'|trans }}{{ roundPriceZeroTotal(CartItem.total_price) | raw }}</div>
-                                            {% endif %}
+                                            <div class="ec-cartRow__sutbtotalSP">{{ 'common.subtotal__with_separator'|trans }}{{ roundPriceZeroTotal(CartItem.total_price) | raw }}</div>
                                         </div>
                                     </li>
                                     <li class="ec-cartRow__amountColumn">
@@ -382,10 +371,7 @@ function updateOne(objThis){
                                         <input type="number" maxlength="5" class="inputCart" id="quantity{{ MstProduct.ec_product_id }}" productclassid="{{ ProductClass.id }}" name="quantity{{ MstProduct.ec_product_id }}" required="required" min="{{ MstProduct.quantity }}" maxlength="9" myid="{{ MstProduct.ec_product_id }}" title="" mymst_quantity="{{ MstProduct.quantity }}" class="quantity form-control" oldvalue="{{ (CartItem.quantity * MstProduct.quantity) }}" value="{{ (CartItem.quantity * MstProduct.quantity) }}" step="{{ MstProduct.quantity }}">
                                     </li>
                                     <li class="ec-cartRow__subtotalColumn">
-                                        {# Check mst_customer.price_view_flg #}
-                                        {% if global_service.getPriceViewFlg %}
-                                            <div class="ec-cartRow__sutbtotal">{{ roundPriceZeroTotal(CartItem.total_price) | raw }}</div>
-                                        {% endif %}
+                                        <div class="ec-cartRow__sutbtotal">{{ roundPriceZeroTotal(CartItem.total_price) | raw }}</div>
                                     </li>
                                 </ul>
                             {% endfor %}
@@ -397,20 +383,14 @@ function updateOne(objThis){
                             {% if is_delivery_free[cartKey] %}
                                 {{ 'front.cart.delivery_fee_free__now'|trans }}
                             {% else %}
-                                {# Check mst_customer.price_view_flg #}
-                                {% if global_service.getPriceViewFlg %}
-                                    {{ 'front.cart.delivery_fee_free__price_and_quantity'|trans({ '%price%': roundPrice(least[cartKey]), '%quantity%': quantity[cartKey]|number_format }) | raw }}
-                                {% endif %}
+                                {{ 'front.cart.delivery_fee_free__price_and_quantity'|trans({ '%price%': roundPrice(least[cartKey]), '%quantity%': quantity[cartKey]|number_format }) | raw }}
                             {% endif %}
                         {% elseif BaseInfo.delivery_free_amount %}
                             <br/>
                             {% if is_delivery_free[cartKey] %}
                                 {{ 'front.cart.delivery_fee_free__now'|trans }}
                             {% else %}
-                                {# Check mst_customer.price_view_flg #}
-                                {% if global_service.getPriceViewFlg %}
-                                    {{ 'front.cart.delivery_fee_free__price'|trans({ '%price%': roundPrice(least[cartKey]) }) | raw }}
-                                {% endif %}
+                                {{ 'front.cart.delivery_fee_free__price'|trans({ '%price%': roundPrice(least[cartKey]) }) | raw }}
                             {% endif %}
                         {% elseif BaseInfo.delivery_free_quantity %}
                             <br/>
@@ -422,10 +402,7 @@ function updateOne(objThis){
                         {% endif %}
                     </div>
                     <div class="ec-cartRole__actions">
-                        {# Check mst_customer.price_view_flg #}
-                        {% if global_service.getPriceViewFlg %}
-                            <div class="ec-cartRole__total">{{ 'common.total__with_separator'|trans }}<span class="ec-cartRole__totalAmount">{{ roundPriceZeroTotal(Cart.totalPrice) | raw }}</span>
-                        {% endif %}
+                        <div class="ec-cartRole__total">{{ 'common.total__with_separator'|trans }}<span class="ec-cartRole__totalAmount">{{ roundPriceZeroTotal(Cart.totalPrice) | raw }}</span>
                         </div>
                         <a class="ec-blockBtn--action" href="javascript:;">{{ 'front.cart.checkout'|trans }}</a>
                         {% if loop.last %}

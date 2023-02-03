@@ -161,25 +161,16 @@ console.log(Math.random());
                                             <p>{{ orderItem.productClass.classCategory2.className.name }}：{{ orderItem.productClass.classCategory2 }}</p>
                                         {% endif %}
                                         <p>
-                                            {# Check mst_customer.price_view_flg #}
-                                            {% if global_service.getPriceViewFlg %}
-                                                 <span class="{{ classShow }}">
-                                                    {{ roundPriceZero(orderItem.priceIncTax) | raw }}
-                                                </span>
-                                                ×
-                                            {% endif %}
-
-                                            {{ orderItem.quantity|number_format }}
+                                             <span class="{{ classShow }}">
+                                            {{ roundPriceZero(orderItem.priceIncTax) | raw }}
+                                            </span>
+                                            × {{ orderItem.quantity|number_format }}
                                             {% if MstProduct.quantity>1 %}
                                                 箱({{ orderItem.quantity*MstProduct.quantity }}個)
                                             {% else %}
                                                 個
                                             {% endif %}
-
-                                            {# Check mst_customer.price_view_flg #}
-                                            {% if global_service.getPriceViewFlg %}
-                                                <span>{{ 'common.subtotal__with_separator'|trans }}{{ roundPriceZeroTotal(orderItem.totalPrice) | raw }}</span></p>
-                                            {% endif %}
+                                            <span>{{ 'common.subtotal__with_separator'|trans }}{{ roundPriceZeroTotal(orderItem.totalPrice) | raw }}</span></p>
                                     </div>
                                 </div>
                             </li>
@@ -200,11 +191,7 @@ console.log(Math.random());
                                 {% for item in shipping.order_items if item.isDeliveryFee %}
                                     {% set delivery_fee = item.total_price %}
                                 {% endfor %}
-
-                                {# Check mst_customer.price_view_flg #}
-                                {% if global_service.getPriceViewFlg %}
-                                    {{ Order.Shippings[idx].Delivery }}({{ roundPrice(delivery_fee) | raw }})
-                                {% endif %}
+                                {{ Order.Shippings[idx].Delivery }}({{ roundPrice(delivery_fee) | raw }})
                             </div>
                             <div class="ec-select ec-select__delivery">
                                 <label>{{ 'front.shopping.delivery_date'|trans }}</label>
@@ -363,11 +350,7 @@ console.log(Math.random());
                     {% for item in Order.order_items if item.isCharge %}
                         {% set charge = item.total_price %}
                     {% endfor %}
-
-                    {# Check mst_customer.price_view_flg #}
-                    {% if global_service.getPriceViewFlg %}
-                        {{ Order.Payment }}({{ roundPrice(charge) | raw }})
-                    {% endif %}
+                    {{ Order.Payment }}({{ roundPrice(charge) | raw }})
                 </div>
             </div>
             {% if BaseInfo.isOptionPoint and Order.Customer is not null %}
@@ -425,55 +408,25 @@ console.log(Math.random());
             <div class="ec-totalBox">
                 <dl class="ec-totalBox__spec">
                     <dt>{{ 'common.subtotal'|trans }}</dt>
-                    {# Check mst_customer.price_view_flg #}
-                    {% if global_service.getPriceViewFlg %}
-                        <dd class="ec-totalBox__specTotal">{{ roundPriceZeroTotal(Order.subtotal) | raw }}</dd>
-                    {% endif %}
+                    <dd class="ec-totalBox__specTotal">{{ roundPriceZeroTotal(Order.subtotal) | raw }}</dd>
                 </dl>
                 <dl class="ec-totalBox__spec">
                     <dt>{{ 'common.tax'|trans }}</dt>
-                    {# Check mst_customer.price_view_flg #}
-                    {% if global_service.getPriceViewFlg %}
-                        <dd>{{ roundPriceZeroTax(Order.tax) | raw }}</dd>
-                    {% endif %}
+                    <dd>{{ roundPriceZeroTax(Order.tax) | raw }}</dd>
                 </dl>
                 <dl class="ec-totalBox__spec hide">
                     <dt>{{ 'common.delivery_fee'|trans }}</dt>
-                    {# Check mst_customer.price_view_flg #}
-                    {% if global_service.getPriceViewFlg %}
-                        <dd>{{ roundPrice(Order.deliveryFeeTotal) | raw }}</dd>
-                    {% endif %}
+                    <dd>{{ roundPrice(Order.deliveryFeeTotal) | raw }}</dd>
                 </dl>
 
-                <div class="ec-totalBox__total hidden">{{ 'common.total'|trans }}
-                    {# Check mst_customer.price_view_flg #}
-                    {% if global_service.getPriceViewFlg %}
-                        <span class="ec-totalBox__price">
-                            {{ roundPriceZero(Order.payment_total) | raw }}
-                        </span>
-                        <span class="ec-totalBox__taxLabel">
-                            {{ 'common.tax_include'|trans }}
-                        </span>
-                    {% endif %}
-                </div>
+                <div class="ec-totalBox__total hidden">{{ 'common.total'|trans }}<span class="ec-totalBox__price">{{ roundPriceZero(Order.payment_total) | raw }}</span><span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span></div>
                 <dl class="ec-totalBox__taxRate hidden">
                     <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': Order.rate }) }}</dt>
-                    {# Check mst_customer.price_view_flg #}
-                    {% if global_service.getPriceViewFlg %}
-                        <dd>{{ roundPriceZeroTotalAll(Order.total) | raw }}</dd>
-                    {% endif %}
+                    <dd>{{ roundPriceZeroTotalAll(Order.total) | raw }}</dd>
                 </dl>
-                <div class="ec-totalBox__paymentTotal">{{ 'common.payment_total'|trans }}
-                    {# Check mst_customer.price_view_flg #}
-                    {% if global_service.getPriceViewFlg %}
-                        <span class="ec-totalBox__price">
-                            {{ roundPriceZeroTotalAll(Order.payment_total) | raw }}
-                        </span>
-                        {% if roundPriceZeroTotal(Order.payment_total) != "" %}
-                            <span class="ec-totalBox__taxLabel">
-                                {{ 'common.tax_include'|trans }}
-                            </span>
-                        {% endif %}
+                <div class="ec-totalBox__paymentTotal">{{ 'common.payment_total'|trans }}<span class="ec-totalBox__price">{{ roundPriceZeroTotalAll(Order.payment_total) | raw }}</span>
+                    {% if roundPriceZeroTotal(Order.payment_total) != "" %}
+                        <span class="ec-totalBox__taxLabel">{{ 'common.tax_include'|trans }}</span>
                     {% endif %}
                 </div>
                 {% if BaseInfo.isOptionPoint and Order.Customer is not null %}
