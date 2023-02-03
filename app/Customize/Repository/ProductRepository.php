@@ -202,12 +202,21 @@ class ProductRepository extends AbstractRepository
         $newComs                = new MyCommonService($this->getEntityManager());
 
         if (isset($searchData['mode']) && $searchData['mode'] == "searchLeft") {
+            if (StringUtil::isNotBlank($searchData['s_product_name_kana'])) {
+                $key        = $searchData['s_product_name_kana'];
+
+                $arCode     = $newComs->getSearchProductNameKana($key);
+                $whereMore2 = 'mstProduct.jan_code in(:jan_code_name_kana)';
+                $qb->setParameter(":jan_code_name_kana", $arCode);
+                $qb->andWhere($whereMore2);
+            }
+
             if (StringUtil::isNotBlank($searchData['s_product_name'])) {
                 $key        = $searchData['s_product_name'];
 
                 $arCode     = $newComs->getSearchProductName($key);
-                $whereMore2 = 'mstProduct.jan_code in(:jan_code_left)';
-                $qb->setParameter(":jan_code_left", $arCode);
+                $whereMore2 = 'mstProduct.jan_code in(:jan_code_name)';
+                $qb->setParameter(":jan_code_name", $arCode);
                 $qb->andWhere($whereMore2);
             }
 
@@ -356,7 +365,10 @@ class ProductRepository extends AbstractRepository
         $qb->addSelect('stock_list.stock_num');
         $qb->groupBy('mstProduct.product_code');
 
-        //var_dump($qb->getQuery()->getSQL(),"-------");var_dump($qb->getParameters() );die();
+        // echo($qb->getQuery()->getSQL());
+        // var_dump($qb->getParameters());
+        // var_dump($searchData);
+        // die();
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 }

@@ -1579,6 +1579,42 @@ AND          pri.product_code=?
 //        }
 
     }
+
+    public function getSearchProductNameKana($productNameKana)
+    {
+        $arrSpaceName  =  explode(" ",$productNameKana);
+
+        $myPara = [ ];
+        $whereLike = "";
+        if(count($arrSpaceName)>0){
+            $arK = array_keys($arrSpaceName) ;
+            $last_key = end($arK);
+            foreach ($arrSpaceName as $key=>$itemR){
+                $myPara []= "%".$itemR."%";
+                if ($key == $last_key) {
+                    $whereLike .= " a.product_name_kana like ?  ";
+                }else{
+                    $whereLike .= " a.product_name_kana like ? and ";
+                }
+
+            }
+        }else{
+            $whereLike = " a.product_name_kana like ?  ";
+            $myPara = [ "%".$productNameKana."%"];
+        }
+        $sql = "SELECT jan_code FROM  mst_product a WHERE  ".$whereLike;
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery($myPara);
+        $rows = $result->fetchAllAssociative();
+        $arrProductCode = [];
+        foreach ($rows as $itemR){
+            $arrProductCode[] =$itemR["jan_code"];
+        }
+
+        return $arrProductCode;
+    }
+
     public function getSearchCatalogCode($catalog_code)
     {
         $sql = "SELECT jan_code FROM  mst_product a WHERE  match(a.catalog_code )

@@ -64,6 +64,12 @@ class SearchProductType extends AbstractType
                 'maxlength' => 50,
             ],
         ]);
+        $builder->add('s_product_name_kana', SearchType::class, [
+            'required' => false,
+            'attr' => [
+                'maxlength' => 300,
+            ],
+        ]);
         $builder->add('s_product_name', SearchType::class, [
             'required' => false,
             'attr' => [

@@ -44,6 +44,14 @@
     <div class="ec-borderedDefs menu search">
         <div class="ec-shipping">
             <div>
+                <label class="ec-label" for="s_product_name_kana">商品カナ文字</label>
+                <div class="ec-halfInput">
+                    <input type="text" class="searchE" id="s_product_name_kana" name="s_product_name_kana" placeholder="" value="{{ getFromUrl('s_product_name_kana') }}" >
+                </div>
+            </div>
+        </div>
+        <div class="ec-shipping">
+            <div>
                 <label class="ec-label" for="s_product_name">商品名</label>
                 <div class="ec-halfInput">
                     <input type="text"   class="searchE" id="s_product_name" name="s_product_name" placeholder="" value="{{ getFromUrl('s_product_name') }}" >
