@@ -353,7 +353,7 @@ class ProductRepository extends AbstractRepository
         }
 
         $listSelectMstProduct   = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name,mstProduct.size,mstProduct.color";
-        $listSelectMstProduct   .=",mstProduct.quantity as mst_quantity,mstProduct.jan_code,mstProduct.material,mstProduct.model, mstProduct.quantity_box ";
+        $listSelectMstProduct   .=",mstProduct.quantity as mst_quantity,mstProduct.jan_code,mstProduct.material,mstProduct.model, mstProduct.quantity, mstProduct.quantity_box ";
 
         $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');
@@ -363,6 +363,17 @@ class ProductRepository extends AbstractRepository
             Join::WITH,
             "stock_list.product_code = mstProduct.product_code");
         $qb->addSelect('stock_list.stock_num');
+
+        $qb->leftJoin('Customize\Entity\MstDeliveryPlan',
+            'mst_delivery_plan',
+            Join::WITH,
+            "mst_delivery_plan.product_code = mstProduct.product_code AND mst_delivery_plan.delivery_date >= CURRENT_DATE()");
+        $qb->addSelect('mst_delivery_plan.delivery_date AS dp_delivery_date');
+        $qb->addSelect('mst_delivery_plan.quanlity AS dp_quanlity');
+        $qb->orderBy("ABS( DATE_DIFF( mst_delivery_plan.delivery_date, CURRENT_DATE() ) )", 'ASC');
+        $qb->groupBy('mst_delivery_plan.product_code');
+        $qb->groupBy('mst_delivery_plan.stock_location');
+
         $qb->groupBy('mstProduct.product_code');
 
         // echo($qb->getQuery()->getSQL());
