@@ -974,18 +974,26 @@ function updateDeliverydAdress(delivery_code) {
                                                 {% if orderItem.productClass is not null and orderItem.productClass.classCategory2 %}
                                                     {{ orderItem.productClass.classCategory2.className.name }}：{{ orderItem.productClass.classCategory2 }}
                                                 {% endif %}
-                                                <span class="{{ classShow }}">
-                                                {{ roundPriceZero(orderItem.priceIncTax,classShow) | raw }}
-                                                </span>
 
-                                                × {{ orderItem.quantity|number_format }}
+                                                {# Check mst_customer.price_view_flg #}
+                                                {% if global_service.getPriceViewFlg %}
+                                                    <span class="{{ classShow }}">
+                                                        {{ roundPriceZero(orderItem.priceIncTax,classShow) | raw }}
+                                                    </span>
+                                                    ×
+                                                {% endif %}
+
+                                                {{ orderItem.quantity|number_format }}
                                                 {% if MstProduct.quantity>1 %}
                                                     箱({{ orderItem.quantity*MstProduct.quantity }}個)
                                                 {% else %}
                                                     個
                                                 {% endif %}
 
-                                                {{ 'common.subtotal__with_separator'|trans }}{{ roundPriceZeroTotal(orderItem.totalPrice) | raw }}
+                                                {# Check mst_customer.price_view_flg #}
+                                                {% if global_service.getPriceViewFlg %}
+                                                    {{ 'common.subtotal__with_separator'|trans }}{{ roundPriceZeroTotal(orderItem.totalPrice) | raw }}
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </li>
@@ -1262,33 +1270,51 @@ function updateDeliverydAdress(delivery_code) {
                 <div class="ec-totalBox">
                     <dl class="ec-totalBox__spec">
                         <dt>{{ 'common.subtotal' | trans }}</dt>
-                        <dd class="ec-totalBox__specTotal">{{ roundPriceZeroTotal(Order.subtotal) | raw }}</dd>
+                        {# Check mst_customer.price_view_flg #}
+                        {% if global_service.getPriceViewFlg %}
+                            <dd class="ec-totalBox__specTotal">{{ roundPriceZeroTotal(Order.subtotal) | raw }}</dd>
+                        {% endif %}
                     </dl>
                     <dl class="ec-totalBox__spec">
                         <dt>{{ 'common.tax'  | trans }}</dt>
-                        <dd>{{ roundPriceZeroTax(Order.tax) | raw }}</dd>
+                        {# Check mst_customer.price_view_flg #}
+                        {% if global_service.getPriceViewFlg %}
+                            <dd>{{ roundPriceZeroTax(Order.tax) | raw }}</dd>
+                        {% endif %}
                     </dl>
                     <dl class="ec-totalBox__spec hide">
                         <dt>{{ 'common.delivery_fee' | trans }}</dt>
-                        <dd>{{ roundPrice(Order.deliveryFeeTotal) | raw }}</dd>
+                        {# Check mst_customer.price_view_flg #}
+                        {% if global_service.getPriceViewFlg %}
+                            <dd>{{ roundPrice(Order.deliveryFeeTotal) | raw }}</dd>
+                        {% endif %}
                     </dl>
                     <div class="ec-totalBox__total">{{ 'common.total' | trans }}
-                        <span class="ec-totalBox__price">{{ roundPriceZeroTotalAll(Order.payment_total) | raw }}</span>
-                        <span class="ec-totalBox__taxLabel">{{ 'common.tax_include' | trans }}</span>
+                        {# Check mst_customer.price_view_flg #}
+                        {% if global_service.getPriceViewFlg %}
+                            <span class="ec-totalBox__price">{{ roundPriceZeroTotalAll(Order.payment_total) | raw }}</span>
+                            <span class="ec-totalBox__taxLabel">{{ 'common.tax_include' | trans }}</span>
+                        {% endif %}
                     </div>
                     <dl class="ec-totalBox__taxRate hidden">
                         <dt>{{ 'common.tax_rate_target' | trans({ '%rate%': Order.rate }) }}</dt>
-                        <dd>{{ roundPriceZeroTotalAll(Order.total) | raw }}</dd>
+                        {# Check mst_customer.price_view_flg #}
+                        {% if global_service.getPriceViewFlg %}
+                            <dd>{{ roundPriceZeroTotalAll(Order.total) | raw }}</dd>
+                        {% endif %}
                     </dl>
                     <div class="ec-totalBox__paymentTotal hidden">
                         {{ 'common.payment_total' | trans }}
-                        <span class="ec-totalBox__price">
-                            {{ roundPriceZeroTotalAll(Order.payment_total) | raw }}
-                        </span>
-                        {% if roundPriceZeroTotal(Order.payment_total) != "" %}
-                            <span class="ec-totalBox__taxLabel">
-                            {{ 'common.tax_include'|trans }}
-                        </span>
+                        {# Check mst_customer.price_view_flg #}
+                        {% if global_service.getPriceViewFlg %}
+                            <span class="ec-totalBox__price">
+                                {{ roundPriceZeroTotalAll(Order.payment_total) | raw }}
+                            </span>
+                            {% if roundPriceZeroTotal(Order.payment_total) != "" %}
+                                <span class="ec-totalBox__taxLabel">
+                                    {{ 'common.tax_include'|trans }}
+                                </span>
+                            {% endif %}
                         {% endif %}
                     </div>
                     {% if BaseInfo.isOptionPoint and Order.Customer is not null %}
