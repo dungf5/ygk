@@ -61,7 +61,11 @@ file that was distributed with this source code.
                             {% if Order.company_name %}
                                 会社名：{{ Order.company_name }}<br/>
                             {% endif %}
-                            担当者：{{ Order.name }} 様<br/>
+                            {% if Order.name %}
+                                担当者：{{ Order.name }} 様<br/>
+                            {% else %}
+                                担当者：ご担当者様<br/>
+                            {% endif %}
                             郵便番号：〒{{ Order.postal_code }}<br/>
                             住所：{{ Order.addr01 }}{{ Order.addr02 }}{{ Order.addr03 }}<br/>
                             電話番号：{{ Order.phone_number }}<br/>
