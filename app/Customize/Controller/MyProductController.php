@@ -16,6 +16,7 @@ namespace Customize\Controller;
 use Customize\Common\MyCommon;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Repository\MstProductRepository;
+use Customize\Repository\MstDeliveryPlanRepository;
 use Customize\Repository\PriceRepository;
 use Customize\Repository\ProductRepository as ProductCustomizeRepository;
 use Customize\Repository\StockListRepository;
@@ -109,6 +110,11 @@ class MyProductController extends AbstractController
      */
     protected $mstProductRepository;
 
+        /**
+     * @var $mstDeliveryPlanRepository
+     */
+    protected $mstDeliveryPlanRepository;
+
     /**
      * @var ProductCustomizeRepository
      */
@@ -147,6 +153,7 @@ class MyProductController extends AbstractController
         PriceRepository $priceRepository,
         StockListRepository $stockListRepository,
         MstProductRepository $mstProductRepository,
+        MstDeliveryPlanRepository $mstDeliveryPlanRepository,
         EncoderFactoryInterface $encoderFactory, ProductCustomizeRepository $productCustomizeRepository,
         ProductClassRepository $productClassRepository,
         GlobalService $globalService
@@ -162,6 +169,7 @@ class MyProductController extends AbstractController
         $this->priceRepository = $priceRepository;
         $this->stockListRepository = $stockListRepository;
         $this->mstProductRepository = $mstProductRepository;
+        $this->mstDeliveryPlanRepository = $mstDeliveryPlanRepository;
         $this->productCustomizeRepository = $productCustomizeRepository;
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $this->encoderFactory = $encoderFactory;
@@ -209,10 +217,10 @@ class MyProductController extends AbstractController
 
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_DETAIL_INITIALIZE, $event);
 
-        $is_favorite        = false;
-        $price              = null;
-        $stock              = null;
-        $mstProduct         = $this->mstProductRepository->getData($Product->getId());
+        $is_favorite     = false;
+        $price           = null;
+        $stock           = null;
+        $mstProduct      = $this->mstProductRepository->getData($Product->getId());
 
         if (
             empty($mstProduct) ||
@@ -221,6 +229,7 @@ class MyProductController extends AbstractController
             return $this->redirect($referer);
         }
 
+        $mstDeliveryPlan = $this->mstDeliveryPlanRepository->getData($mstProduct->getProductCode());
         $cmS                = new MyCommonService($this->entityManager);
 
         if ($this->isGranted('ROLE_USER')) {
@@ -236,7 +245,7 @@ class MyProductController extends AbstractController
 
             $price          = $myPriceRe;
             $stock          = $this->stockListRepository->getData($mstProduct->getProductCode(), $Customer->getId());
-        }
+        } 
 
         //check in cart
         $ecProductId        = $Product->getId();
@@ -250,20 +259,21 @@ class MyProductController extends AbstractController
             $productClassId = $cartInfoData[0]['productClassId'];
             $oneCartId      = $cartInfoData[0]['cart_id'];
         }
-
+        // var_dump($mstProduct);die;
         return [
-            'title'             => $this->title,
-            'subtitle'          => $Product->getName(),
-            'form'              => $builder->getForm()->createView(),
-            'product_in_cart'   => $product_in_cart,
-            'Product'           => $Product,
-            'is_favorite'       => $is_favorite,
-            'productClassId'    => $productClassId,
-            'oneCartId'         => $oneCartId,
-            'Price'             => $price,
-            'Stock'             => $stock,
-            'MstProduct'        => $mstProduct,
-            'url_referer'       => $referer,
+            'title'           => $this->title,
+            'subtitle'        => $Product->getName(),
+            'form'            => $builder->getForm()->createView(),
+            'product_in_cart' => $product_in_cart,
+            'Product'         => $Product,
+            'is_favorite'     => $is_favorite,
+            'productClassId'  => $productClassId,
+            'oneCartId'       => $oneCartId,
+            'Price'           => $price,
+            'Stock'           => $stock,
+            'MstProduct'      => $mstProduct,
+            'MstDeliveryPlan' => $mstDeliveryPlan,
+            'url_referer'     => $referer,
         ];
     }
 
@@ -563,7 +573,7 @@ class MyProductController extends AbstractController
             !empty($searchData['pageno']) ? $searchData['pageno'] : 1,
             !empty($searchData['disp_number']) ? $searchData['disp_number']->getId() : $this->productListMaxRepository->findOneBy([], ['sort_no' => 'ASC'])->getId()
         );
-
+        
         $ids                    = [];
 
         foreach ($pagination as $Product) {
