@@ -394,10 +394,35 @@ class MypageController extends AbstractController
     {
         // Check case must to choose shipping
         if(!empty($_SESSION["choose_shipping"])) {
+            $shippingList           = $this->globalService->shippingOption();
 
-            return [
-                'shipping'      => TRUE,
-            ];
+            if (count($shippingList) > 1) {
+                return [
+                    'shipping'      => TRUE,
+                ];
+            }
+
+            if (count($shippingList) == 1) {
+                $shipping_code                  = $shippingList[0]['shipping_no'];
+                $customerId                     = $_SESSION["customer_id"] ?? '';
+
+                if (!empty($customerId)) {
+                    try {
+                        $loginType              = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
+
+                        if (!empty($loginType) && $loginType == "represent_code") {
+                            $_SESSION["choose_shipping"]                    = FALSE;
+                            $_SESSION['s_shipping_code']                    = $shipping_code;
+                            $_SESSION["usc_{$customerId}"]['login_type']    = "change_type";
+                        }
+
+                    } catch (\Exception $e) {
+                        $_SESSION["choose_shipping"]                    = TRUE;
+                        $_SESSION['s_shipping_code']                    = '';
+                        $_SESSION["usc_{$customerId}"]['login_type']    = "represent_code";
+                    }
+                }
+            }
         }
 
         if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
