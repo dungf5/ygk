@@ -156,7 +156,7 @@ function loadingOverlay(action) {
     if (action == 'hide') {
         $('.bg-load-overlay').remove();
     } else {
-        $overlay = $('<div class="bg-load-overlay">');
+        $overlay = $('<div class="bg-load-overlay"><div class="loading"></div></div>');
         $('body').append($overlay);
     }
 }

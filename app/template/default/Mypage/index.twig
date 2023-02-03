@@ -124,7 +124,22 @@ file that was distributed with this source code.
                                 {{ 'front.mypage.remarks'|trans| raw }}１<br/>
                                 {{ 'front.mypage.remarks'|trans| raw }}２
                             </th>
-                            <th title="order_status" style="text-align: left;">{{ 'front.order.order_status'|trans| raw }}</th>
+                            <th title="order_status" style="text-align: left;">
+                                {{ 'front.order.order_status'|trans| raw }}
+                                <a href="javascript:void(0)" style="color: red;" class="search_status_type">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </a>
+                                <br/>
+                                <select id="search_status_type" name="search_status_type" class="form-control" onchange="handleSearch(this)">
+                                    <option value="-1">すべて</option>
+                                    <option value="0">調査要</option>
+                                    <option value="1">未確保</option>
+                                    <option value="2">一部確保</option>
+                                    <option value="3">確保済み</option>
+                                    <option value="4">キャンセル</option>
+                                    <option value="9">注文完了</option>
+                                </select>
+                            </th>
                             <th title="shipping_status"  class="hide" style="text-align: center;" >{{ 'front.order.shipping_status'|trans| raw }}</th>
                             <th title="order_plus" style="text-align: right">{{ 'front.order.order_plus'|trans| raw }}</th>
                             <th title="reserve_stock_num" style="text-align: right">{{ 'front.order.reserve_stock_num'|trans| raw }}</th>
@@ -207,7 +222,22 @@ file that was distributed with this source code.
                                 {{ 'front.mypage.remarks'|trans| raw }}１<br/>
                                 {{ 'front.mypage.remarks'|trans| raw }}２
                             </th>
-                            <th title="order_status" style="text-align: left;">{{ 'front.order.order_status'|trans| raw }}</th>
+                            <th title="order_status" style="text-align: left;">
+                                {{ 'front.order.order_status'|trans| raw }}
+                                <a href="javascript:void(0)" style="color: red;" class="search_status_type">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </a>
+                                <br/>
+                                <select id="search_status_type" name="search_status_type" class="form-control" onchange="handleSearch(this)">
+                                    <option value="-1">すべて</option>
+                                    <option value="0">調査要</option>
+                                    <option value="1">未確保</option>
+                                    <option value="2">一部確保</option>
+                                    <option value="3">確保済み</option>
+                                    <option value="4">キャンセル</option>
+                                    <option value="9">注文完了</option>
+                                </select>
+                            </th>
                             <th title="shipping_status"  class="hide" style="text-align: center;" >{{ 'front.order.shipping_status'|trans| raw }}</th>
                             <th title="order_plus" style="text-align: right">{{ 'front.order.order_plus'|trans| raw }}</th>
                             <th title="reserve_stock_num" style="text-align: right">{{ 'front.order.reserve_stock_num'|trans| raw }}</th>
@@ -383,6 +413,16 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
                 button.click();
             }, 100);
         }
+    })
+
+    $("a.search_status_type").on("click", function() {
+        let select          = $("select#search_status_type");
+        setTimeout(function() {
+            let event;
+            event = document.createEvent('MouseEvents');
+            event.initMouseEvent('mousedown', true, true, window);
+            select.dispatchEvent(event);
+        }, 100);
     })
 </script>
 {% endblock %}
