@@ -672,8 +672,8 @@ class MyShoppingController extends AbstractShoppingController
                             'dyna_model_seg3'       => 2,
                             'dyna_model_seg4'       => $orderNo,                                    // ・ダイナ規格セグメント04←EC注文番号
                             'dyna_model_seg5'       => count($itemList),                            // ・ダイナ規格セグメント05←EC注文明細番号
-                            'dyna_model_seg6'       => $remarks1,
-                            'dyna_model_seg7'       => $remarks2,
+                            'remarks1'              => $remarks1,
+                            'remarks2'              => $remarks2,
                             // No41 注文情報送信I/F end
                             ];
                     }
