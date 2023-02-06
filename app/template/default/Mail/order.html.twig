@@ -81,7 +81,11 @@ file that was distributed with this source code.
                             {% if Order.Shipping.company_name %}
                                 会社名：{{ Order.Shipping.company_name }}<br/>
                             {% endif %}
-                            担当者：{{ Order.Shipping.customer_name }} 様<br/>
+                            {% if Order.Shipping.customer_name %}
+                                担当者：{{ Order.Shipping.customer_name }} 様<br/>
+                            {% else %}
+                                担当者：ご担当者様<br/>
+                            {% endif %}
                             郵便番号：〒{{ Order.Shipping.postal_code }}<br/>
                             住所：{{ Order.Shipping.addr01 }}{{ Order.Shipping.addr02 }}{{ Order.Shipping.addr03 }}<br/>
                             電話番号：{{ Order.Shipping.phone_number }}<br/>
