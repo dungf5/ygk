@@ -370,17 +370,20 @@ class ProductRepository extends AbstractRepository
                 ->setParameter(':customerCode', $shipping_route['customer_code'])
                 ->setParameter(':stockLocation', $shipping_route['stock_location']);
             $qb->addSelect('stock_list.stock_num');
+            
+            $qb->leftJoin('Customize\Entity\MstDeliveryPlan',
+                'mst_delivery_plan',
+                Join::WITH,
+                "mst_delivery_plan.product_code = mstProduct.product_code
+                AND mst_delivery_plan.stock_location = :stockLocation
+                AND mst_delivery_plan.delivery_date >= CURRENT_DATE()")
+                ->setParameter(':stockLocation', $shipping_route['stock_location']);
+            $qb->addSelect('mst_delivery_plan.delivery_date AS dp_delivery_date');
+            $qb->addSelect('mst_delivery_plan.quanlity AS dp_quanlity');
+            $qb->orderBy("ABS( DATE_DIFF( mst_delivery_plan.delivery_date, CURRENT_DATE() ) )", 'ASC');
+            $qb->groupBy('mst_delivery_plan.product_code');
+            $qb->groupBy('mst_delivery_plan.stock_location');
         }
-
-        $qb->leftJoin('Customize\Entity\MstDeliveryPlan',
-            'mst_delivery_plan',
-            Join::WITH,
-            "mst_delivery_plan.product_code = mstProduct.product_code AND mst_delivery_plan.delivery_date >= CURRENT_DATE()");
-        $qb->addSelect('mst_delivery_plan.delivery_date AS dp_delivery_date');
-        $qb->addSelect('mst_delivery_plan.quanlity AS dp_quanlity');
-        $qb->orderBy("ABS( DATE_DIFF( mst_delivery_plan.delivery_date, CURRENT_DATE() ) )", 'ASC');
-        $qb->groupBy('mst_delivery_plan.product_code');
-        $qb->groupBy('mst_delivery_plan.stock_location');
 
         $qb->groupBy('mstProduct.product_code');
 

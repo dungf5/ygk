@@ -103,6 +103,22 @@ if (!class_exists('\Customize\Entity\StockList', false)) {
         /**
          * @return mixed
          */
+        public function getStockLocation()
+        {
+            return $this->stock_location;
+        }
+
+        /**
+         * @param mixed $stock_location
+         */
+        public function setStockLocation($stock_location): void
+        {
+            $this->stock_location = $stock_location;
+        }
+
+        /**
+         * @return mixed
+         */
         public function getReserveNum()
         {
             return $this->reserve_num;

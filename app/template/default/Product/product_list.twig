@@ -375,7 +375,7 @@ $(function() {
                                                             : ×
                                                         {% endif %}
                                                         <span style="margin-left: 40px;">在庫数31以上＝〇、在庫数30以下＝△、在庫切れ＝×</span>
-                                                        {% if (Product.dp_delivery_date is defined) and (Product.stock_num is defined and Product.stock_num is not null and Product.stock_num == 0) -%}
+                                                        {% if (Product.dp_delivery_date is defined and Product.dp_delivery_date is not null) and (Product.stock_num is defined and Product.stock_num is not null and Product.stock_num == 0) -%}
                                                             <p>※{{ Product.dp_delivery_date|date("Y年m月d日") }}{{Product.dp_quanlity * Product.quantity}}個納入予定</p>
                                                         {% endif %}
                                                     </dd>
