@@ -27,12 +27,16 @@ class MstDeliveryPlanRepository extends AbstractRepository
      * @return ArrayCollection|null
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getData($product_code = '')
+    public function getData($product_code = '', $stock = '')
     {
+        if( is_null($stock) ) return null;
+
         $qb     = $this->createQueryBuilder('s');
         $qb
             ->where('s.product_code = :product_code')
             ->setParameter('product_code', $product_code)
+            ->andWhere('s.stock_location = :stock_location')
+            ->setParameter('stock_location', $stock->getStockLocation())
             ->andWhere('s.delivery_date >= CURRENT_DATE()')
             ->orderBy("ABS( DATE_DIFF( s.delivery_date, CURRENT_DATE() ) )", 'ASC')
             ->groupBy('s.stock_location');

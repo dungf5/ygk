@@ -220,6 +220,7 @@ class MyProductController extends AbstractController
         $is_favorite     = false;
         $price           = null;
         $stock           = null;
+        $mstDeliveryPlan = null;
         $mstProduct      = $this->mstProductRepository->getData($Product->getId());
 
         if (
@@ -229,7 +230,6 @@ class MyProductController extends AbstractController
             return $this->redirect($referer);
         }
 
-        $mstDeliveryPlan = $this->mstDeliveryPlanRepository->getData($mstProduct->getProductCode());
         $cmS             = new MyCommonService($this->entityManager);
         $login_type      = '';
 
@@ -247,6 +247,9 @@ class MyProductController extends AbstractController
             $shipping_route = $cmS->getShippingRouteFromUser($customer_code, $login_type);
             $price          = $myPriceRe;
             $stock          = $this->stockListRepository->getData($mstProduct->getProductCode(), $shipping_route);
+            if( $stock ) {
+                $mstDeliveryPlan = $this->mstDeliveryPlanRepository->getData($mstProduct->getProductCode(), $stock);
+            }
         } 
 
         //check in cart
@@ -261,7 +264,7 @@ class MyProductController extends AbstractController
             $productClassId = $cartInfoData[0]['productClassId'];
             $oneCartId      = $cartInfoData[0]['cart_id'];
         }
-        // var_dump($stock);die;
+        // var_dump($mstDeliveryPlan);die;
         return [
             'title'           => $this->title,
             'subtitle'        => $Product->getName(),
