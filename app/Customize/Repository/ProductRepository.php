@@ -159,7 +159,7 @@ class ProductRepository extends AbstractRepository
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 
-    public function getQueryBuilderBySearchDataNewCustom($searchData, $user = false, $customer_code = '', $arProductCodeInDtPrice=[],$arTanakaNumber=[])
+    public function getQueryBuilderBySearchDataNewCustom($searchData, $user = false, $customer_code = '', $arProductCodeInDtPrice=[],$arTanakaNumber=[], $login_type='')
     {
         $defaultSortLoginorderPrice     = "
             (CASE
@@ -358,11 +358,19 @@ class ProductRepository extends AbstractRepository
         $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');
 
-        $qb->leftJoin('Customize\Entity\StockList',
-            'stock_list',
-            Join::WITH,
-            "stock_list.product_code = mstProduct.product_code");
-        $qb->addSelect('stock_list.stock_num');
+        $shipping_route = $newComs->getShippingRouteFromUser($customer_code, $login_type);
+        if( $shipping_route ) {
+            $qb->leftJoin('Customize\Entity\StockList',
+                'stock_list',
+                Join::WITH,
+                "stock_list.product_code = mstProduct.product_code
+                AND stock_list.customer_code = :customerCode
+                AND stock_list.stock_location = :stockLocation
+                ")
+                ->setParameter(':customerCode', $shipping_route['customer_code'])
+                ->setParameter(':stockLocation', $shipping_route['stock_location']);
+            $qb->addSelect('stock_list.stock_num');
+        }
 
         $qb->leftJoin('Customize\Entity\MstDeliveryPlan',
             'mst_delivery_plan',

@@ -28,6 +28,10 @@ if (!class_exists('\Customize\Entity\StockList', false)) {
          */
         private $customer_code;
         /**
+         * @ORM\Column(name="stock_location", type="string", length=10,options={"comment":"保管場所"}, nullable=false)
+         */
+        private $stock_location;
+        /**
          * @ORM\Column(type="integer",nullable=false, options={"comment":"トータル在庫"})
          */
         private $stock_num;

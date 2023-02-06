@@ -1899,5 +1899,40 @@ AND          pri.product_code=?
             return null;
         }
     }
+
+    public function getShippingRouteFromUser($customer_code='', $login_type='') {
+        $where = '';
+        switch( $login_type ) {
+            case 'shipping_code':
+                $where = ' cr.shipping_code  = :customerCode ';
+                break;
+            case 'otodoke_code':
+                $where = ' cr.otodoke_code  = :customerCode ';
+                break;
+            case 'represent_code':
+            case 'customer_code':
+            case 'change_type':
+            default:
+                $where = ' cr.customer_code  = :customerCode ';
+                break;
+        }
+        $sql = "SELECT
+                sr.customer_code, sr.stock_location
+            FROM
+                `mst_shipping_route` sr
+            JOIN dt_customer_relation cr on cr.customer_code = sr.customer_code
+            WHERE
+                {$where}
+            GROUP BY cr.customer_code;";
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery([ 'customerCode'=>$customer_code ]);
+            $rows = $result->fetchAllAssociative();
+            return $rows[0] ?? null;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
 }
 

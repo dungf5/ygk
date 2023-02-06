@@ -230,7 +230,8 @@ class MyProductController extends AbstractController
         }
 
         $mstDeliveryPlan = $this->mstDeliveryPlanRepository->getData($mstProduct->getProductCode());
-        $cmS                = new MyCommonService($this->entityManager);
+        $cmS             = new MyCommonService($this->entityManager);
+        $login_type      = '';
 
         if ($this->isGranted('ROLE_USER')) {
             $Customer       = $this->getUser();
@@ -238,13 +239,14 @@ class MyProductController extends AbstractController
             $is_favorite    = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
             $priceTxt       = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProduct->getProductCode());
             $myPriceRe      = (object) ['price_s01' => $priceTxt];
+            $login_type     = $this->globalService->getLoginType();
 
             if ($priceTxt == '') {
                 $myPriceRe  = null;
             }
-
+            $shipping_route = $cmS->getShippingRouteFromUser($customer_code, $login_type);
             $price          = $myPriceRe;
-            $stock          = $this->stockListRepository->getData($mstProduct->getProductCode(), $Customer->getId());
+            $stock          = $this->stockListRepository->getData($mstProduct->getProductCode(), $shipping_route);
         } 
 
         //check in cart
@@ -259,7 +261,7 @@ class MyProductController extends AbstractController
             $productClassId = $cartInfoData[0]['productClassId'];
             $oneCartId      = $cartInfoData[0]['cart_id'];
         }
-        // var_dump($mstProduct);die;
+        // var_dump($stock);die;
         return [
             'title'           => $this->title,
             'subtitle'        => $Product->getName(),
@@ -539,12 +541,14 @@ class MyProductController extends AbstractController
         $commonService      = new MyCommonService($this->entityManager);
         $user               = false;
         $customer_code      = '';
+        $login_type = '';
 
         if ($this->isGranted('ROLE_USER')) {
             $user           = true;
             $myC            = new MyCommonService($this->entityManager);
             $Customer       = $this->getUser();
             $customer_code  = $myC->getMstCustomer($Customer->getId())['customer_code'];
+            $login_type     = $this->globalService->getLoginType();
         }
 
         // paginator
@@ -553,7 +557,7 @@ class MyProductController extends AbstractController
         $arPriceAndTanaka       = $commonService->getPriceFromDtPriceOfCusV2($customer_code);
         $arProductCodeInDtPrice = $arPriceAndTanaka[0];
         $arTanakaNumber         = $arPriceAndTanaka[1];
-        $qb                     = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customer_code, $arProductCodeInDtPrice, $arTanakaNumber);
+        $qb                     = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customer_code, $arProductCodeInDtPrice, $arTanakaNumber, $login_type);
 
         $event = new EventArgs(
             [
@@ -665,7 +669,7 @@ class MyProductController extends AbstractController
         $orderByForm    = $builder->getForm();
         $orderByForm->handleRequest($request);
         $Category       = $searchForm->get('category_id')->getData();
-
+        
         return [
             'subtitle'          => $this->getPageTitle($searchData),
             'pagination'        => $pagination,
