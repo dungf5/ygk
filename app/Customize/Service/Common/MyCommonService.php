@@ -1083,8 +1083,8 @@ class MyCommonService extends AbstractRepository
             $orderItem->setDynaModelSeg3($itemSave['dyna_model_seg3']);
             $orderItem->setDynaModelSeg4($itemSave['dyna_model_seg4']);                                     // ・ダイナ規格セグメント04←EC注文番号
             $orderItem->setDynaModelSeg5($ec_order_lineno);                                                 // ・ダイナ規格セグメント05←EC注文明細番号
-            $orderItem->setDynaModelSeg6($itemSave['dyna_model_seg6']);                                     // ・ダイナ規格セグメント04←EC注文番号
-            $orderItem->setDynaModelSeg7($itemSave['dyna_model_seg7']);                                     // ・ダイナ規格セグメント04←EC注文番号
+            $orderItem->setDynaModelSeg6($itemSave['remarks1']);                                     // ・ダイナ規格セグメント04←EC注文番号
+            $orderItem->setDynaModelSeg7($itemSave['remarks2']);                                     // ・ダイナ規格セグメント04←EC注文番号
             $orderItem->setUnitPriceStatus('FOR');
             $orderItem->setDeploy('XB');
             $orderItem->setCompanyId('XB');
@@ -1126,6 +1126,8 @@ class MyCommonService extends AbstractRepository
             $orderItem->setShippingCode($itemSave['shipping_code']);
             $orderItem->setOrderRemainNum($itemSave['order_remain_num']);
             $orderItem->setProductCode($itemSave['product_code']);
+            $orderItem->setRemarks1($itemSave['remarks1']);
+            $orderItem->setRemarks2($itemSave['remarks2']);
 
 
             $this->entityManager->persist($orderItem);
