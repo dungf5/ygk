@@ -1116,6 +1116,8 @@ class MyCommonService extends AbstractRepository
                 $orderItem->setOrderStatus('1');
             }
             // $orderItem->setPropertiesFromArray($keyFind,['create_date']);
+            $time       = new \DateTime();
+            $orderItem->setOrderDate($time);
             $orderItem->setEcOrderLineno($ec_order_lineno);
             $orderItem->setEcOrderNo($ec_order);
             $orderItem->setOrderNo($ec_order);
@@ -1125,6 +1127,7 @@ class MyCommonService extends AbstractRepository
             $orderItem->setCusOrderLineno($cusOrderLineno);
             $orderItem->setCustomerCode($itemSave['customer_code']);
             $orderItem->setShippingCode($itemSave['shipping_code']);
+            $orderItem->setOtodokeCode($itemSave['otodoke_code']);
             $orderItem->setOrderRemainNum($itemSave['order_remain_num']);
             $orderItem->setProductCode($itemSave['product_code']);
             $orderItem->setRemarks1($itemSave['remarks1']);
