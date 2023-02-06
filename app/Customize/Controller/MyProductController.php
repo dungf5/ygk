@@ -672,7 +672,7 @@ class MyProductController extends AbstractController
         $orderByForm    = $builder->getForm();
         $orderByForm->handleRequest($request);
         $Category       = $searchForm->get('category_id')->getData();
-        
+        // var_dump($pagination);die;
         return [
             'subtitle'          => $this->getPageTitle($searchData),
             'pagination'        => $pagination,
