@@ -58,7 +58,11 @@ JANコード：{{ OrderItem.jan_code }}
 {% if Order.Shipping.company_name %}
 会社名：{{ Order.Shipping.company_name }}
 {% endif %}
+{% if Order.Shipping.customer_name %}
 担当者：{{ Order.Shipping.customer_name }} 様
+{% else %}
+担当者：ご担当者様
+{% endif %}
 郵便番号：〒{{ Order.Shipping.postal_code }}
 住所：{{ Order.Shipping.addr01 }}{{ Order.Shipping.addr02 }}{{ Order.Shipping.addr03 }}
 電話番号：{{ Order.Shipping.phone_number }}
