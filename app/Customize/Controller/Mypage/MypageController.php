@@ -249,12 +249,19 @@ class MypageController extends AbstractController
         //Params
         $param                      = [
             'pageno'                => $request->get('pageno', 1),
-            'search_order_status'   => $request->get('order_status', []),
             'search_order_date'     => $request->get('order_date', []),
+            'search_order_status'   => $request->get('order_status', []),
+            'search_order_shippping'=> $request->get('order_shipping', []),
+            'search_order_otodoke'  => $request->get('order_otodoke', []),
         ];
+
+        if (empty($param['search_order_shippping'])) {
+            $param['search_order_otodoke']  = [];
+        }
 
         // Query data
         $customer_code  = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
+        $customer_id    = $this->twig->getGlobals()["app"]->MyDataMstCustomer["ec_customer_id"];
         $shipping_code  = $this->globalService->getShippingCode();
         $otodoke_code   = $this->globalService->getOtodokeCode();
         $login_type     = $this->globalService->getLoginType();
@@ -374,13 +381,41 @@ class MypageController extends AbstractController
         $orderStatusList[]      = ['key' => '4', 'value' => 'キャンセル'];
         $orderStatusList[]      = ['key' => '9', 'value' => '注文完了'];
 
+        /*create list shipping code*/
+        $orderShippingList      = [];
+        $shippingList           = $this->globalService->shippingOption();
+        if (count($shippingList) > 1) {
+            foreach ($shippingList AS $item) {
+                $orderShippingList[]    = [
+                    'key'               => $item["shipping_no"],
+                    'value'             => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
+                ];
+            }
+        }
+
+        /*create list otodoke code*/
+        $orderOtodeokeList      = [];
+        $otodokeList            = $this->globalService->otodokeOption($customer_id, $param['search_order_shippping'][0] ?? '');
+        if (count($otodokeList)) {
+            foreach ($otodokeList AS $item) {
+                $orderOtodeokeList[]    = [
+                    'key'               => $item["otodoke_code"],
+                    'value'             => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
+                ];
+            }
+        }
+
         return [
             'pagination'                => $pagination,
             'hsProductImgMain'          => $hsProductImgMain,
             'orderDateOpt'              => $orderDateList,
-            'search_order_date'         => implode(",", $param['search_order_date']),
             'orderStatusOpt'            => $orderStatusList,
+            'orderShippingOpt'          => $orderShippingList,
+            'orderOtodokeOpt'           => $orderOtodeokeList,
+            'search_order_date'         => implode(",", $param['search_order_date']),
             'search_order_status'       => implode(",", $param['search_order_status']),
+            'search_order_shipping'     => implode(",", $param['search_order_shippping']),
+            'search_order_otodoke'      => implode(",", $param['search_order_otodoke']),
         ];
     }
 
