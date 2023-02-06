@@ -94,14 +94,14 @@ class GlobalService
     {
         try {
             if ($this->customerId() != '') {
-                $arrSipping         = $this->myCommon->getMstShippingCustomer($this->getLoginType(), $this->customerId(), null);
-                $arrSipping         = $arrSipping ?? [];
+                $arrShipping         = $this->myCommon->getMstShippingCustomer($this->getLoginType(), $this->customerId(), null);
+                $arrShipping         = $arrShipping ?? [];
 
-                if (count($arrSipping) == 1 && isset($arrSipping[0]['shipping_no'])) {
-                    $_SESSION['s_shipping_code']    = $arrSipping[0]['shipping_no'] ?? '';
+                if (count($arrShipping) == 1 && isset($arrShipping[0]['shipping_no'])) {
+                    $_SESSION['s_shipping_code']    = $arrShipping[0]['shipping_no'] ?? '';
                 }
 
-                return $arrSipping;
+                return $arrShipping;
             }
 
             return [];

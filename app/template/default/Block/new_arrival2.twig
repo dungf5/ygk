@@ -1,0 +1,80 @@
+<div class="topContentColumn topNewitem">
+    <div class="topContentInner">
+        <div class="titleArea">
+            <h2 class="fnDIN">NEW ITEM</h2>
+            <span>新商品</span>
+        </div>
+
+        <script>
+            $(function() {
+                $('.ec-newItemRole__list').slick({
+                    slidesToShow: 3,
+                    slidesToScroll: 1,
+                    adaptiveHeight: true,
+                    swipeToSlide: true,
+                    dots: true,
+                    arrows: true,
+                    responsive: [{
+                        breakpoint: 1280,
+                        settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 1,
+                        }
+                    },{
+                        breakpoint: 640,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1,
+                        }
+                    }]
+                });
+            });
+        </script>
+<!---
+        <div class="ec-newItemRole">
+            <div class="ec-newItemRole__list">
+                                            <div class="ec-newItemRole__listItem1">
+                            <a href="https://staging-ecuoya.xbraid.net/products/detail/133872" >
+                                <img src="https://ecuoya.xbraid.net/html/upload/save_image/UPGLEADERV12.jpg">
+                                <p class="ec-newItemRole__listItemTitle">特注 ｽｸﾗﾑ16  20号</p>
+                                <span class="btn01" style="margin: 1em auto 0;"><i class="fas fa-angle-double-right"></i>and more</span>
+                            </a>
+                        </div>
+--->
+<!---
+        <div class="ec-newItemRole">
+            <div class="ec-newItemRole__list">
+                                            <div class="ec-newItemRole__listItem1">
+                            <a href="/products/list?category_id=84" style="color:#07c;">
+                                <img src="/html/upload/save_image/UPGLEADERV12.jpg">
+                                <p class="ec-newItemRole__listItemTitle">
+                                    <span style="font-size:68.75%;">エックスブレイド アップジーリーダーV12ハード</span><br>
+                                    X-BRAID UP-G LEADER V12 HARD
+                                </p>
+                                <span class="btn01" style="margin: 1em auto 0;"><i class="fas fa-angle-double-right"></i>and more</span>
+                            </a>
+                        </div>
+--->
+
+<div class="ec-newItemRole">
+            <div class="ec-newItemRole__list">
+                                            <div class="ec-newItemRole__listItem1">
+                            <a href="/products/list?category_id=84" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
+                                <img src="/html/upload/save_image/UPGLEADERV12.jpg">
+                                <p class="ec-newItemRole__listItemTitle">
+                                    <span style="font-size:68.75%;">エックスブレイド アップジーリーダーV12ハード</span><br>
+                                    X-BRAID UP-G LEADER V12 HARD
+                                </p>
+                                {% if is_granted('ROLE_USER') %}
+                                <span class="btn01" style="margin: 1em auto 0;"><i class="fas fa-angle-double-right"></i>and more</span>
+                                {% endif %}
+                            </a>
+</div>
+
+
+                                                </div>
+        </div>
+
+
+            </div>
+</div>
