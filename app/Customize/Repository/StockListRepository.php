@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Eccube\Repository\AbstractRepository;
 use Customize\Entity\StockList;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Customize\Service\Common\MyCommonService;
 
 class StockListRepository extends AbstractRepository
 {
@@ -27,10 +28,15 @@ class StockListRepository extends AbstractRepository
      * @return ArrayCollection|null
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getData($product_code = '', $customer_code ='')
+    public function getData($product_code = '', $shipping_route = mull)
     {
+        if( is_null($shipping_route) ) return null;
+        
         $qb     = $this->createQueryBuilder('s');
-        $qb->where('s.product_code = :product_code')->setParameter('product_code', $product_code);
+        $qb->where('s.product_code = :product_code AND s.customer_code = :customer_code AND s.stock_location = :stock_location')
+        ->setParameter('product_code', $product_code)
+        ->setParameter('customer_code', $shipping_route['customer_code'])
+        ->setParameter('stock_location', $shipping_route['stock_location']);
 
         return $qb->getQuery()->getOneOrNullResult();
     }
