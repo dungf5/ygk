@@ -59,6 +59,21 @@ front.mypage.inquiry_no: 荷送伝票番号
 front.mypage.shipping_company_code: 運送会社
 front.mypage.shipping_no_no: 出荷進展
 front.mypage.remarks: 備考
+front.mypage.shipping.customer_name: 顧客名
+front.mypage.shipping.no: 件数
+front.mypage.shipping.delivery_no: 出荷指示№
+front.mypage.shipping.destination: 出荷先
+front.mypage.shipping.company_name: 届け先
+front.mypage.shipping.jan_code: JANコード
+front.mypage.shipping.product_name: 商品名
+front.mypage.shipping.status: 出荷<br/>ステータス
+front.mypage.shipping.plan_date: 出荷指示日
+front.mypage.shipping.date: 出荷日
+front.mypage.shipping.num: 出荷数
+front.mypage.shipping.note_no: 納品書№
+front.mypage.shipping.packing_slip: 荷送伝票番号
+front.mypage.shipping.order_number: 注文番号
+front.mypage.shipping.detail: 明細
 #login
 common.mail_address: ユーザーコード
 #alert

@@ -582,7 +582,7 @@ class MypageController extends AbstractController
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $Customer = $this->getUser();
-
+        /*
         // 購入処理中/決済処理中ステータスの受注を非表示にする.
         $this->entityManager
             ->getFilters()
@@ -670,10 +670,12 @@ class MypageController extends AbstractController
         }
 
         $pagination->setItems($listItem);
-
+        
         return [
             'pagination' => $pagination, 'hsProductImgMain' => $hsProductImgMain
         ];
+        */
+       return [];
     }
 
     /**

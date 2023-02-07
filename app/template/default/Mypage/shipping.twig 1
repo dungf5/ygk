@@ -1,0 +1,150 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends 'default_frame.twig' %}
+
+{% set mypageno = 'shipping' %}
+
+{% set body_class = 'mypage' %}
+
+{% block main %}
+<div class="ec-layoutRole__main">
+    <div class="ec-mypageRole">
+        <div class="ec-pageHeader">
+            <h1>{{ 'front.mypage.title'|trans }}/{{ 'front.mypage.nav_shipping__history'|trans }}</h1>
+        </div>
+        {% include 'Mypage/navi.twig' %}
+    </div>
+
+    <style>
+        .myTable>thead>tr>th {
+            white-space: nowrap;
+        }
+    </style>
+
+    <iframe id="my_iframe" style="display:none;"></iframe>
+    <script>
+            function Download(url) {
+                document.getElementById('my_iframe').src = url;
+            };
+    </script>
+
+    <style>
+        .disBg {
+            background: #A7A7A7;
+            border-color: #A7A7A7;
+        }
+        .actBg {
+         background: #0065ff;
+        }
+    </style>
+
+    <div class="ec-mypageRole">
+        {% if pagination.totalItemCount > 0 %}
+            <p class="ec-para-normal">{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}</p>
+            <table class="table myTable">
+                <thead>
+                <tr>
+                    <th title="order_no_type">{{ 'front.order.order_no_type'|trans| raw }}</th>
+                    <th title="order_no">{{ 'front.order.order_no'|trans| raw }}</th>
+                    <th title="order_lineno">{{ 'front.order.order_lineno'|trans| raw }}</th>
+                    <th title="image">{{ 'front.order.image'|trans| raw }}</th>
+                    <th style="text-align: left;" title="product_code product_name">{{ 'front.order.jan_code'|trans| raw }}<br/>{{ 'front.order.product_name'|trans| raw }}</th>
+                    <th title="order_status" style="text-align: left;">{{ 'front.order.order_status'|trans| raw }}</th>
+                    <th  title="shipping_status"  class="hide" style="text-align: center;" >{{ 'front.order.shipping_status'|trans| raw }}</th>
+                    <th title="order_plus" style="text-align: right">{{ 'front.order.order_plus'|trans| raw }}</th>
+                    <th title="reserve_stock_num" style="text-align: right">{{ 'front.order.reserve_stock_num'|trans| raw }}</th>
+                    <th title="order_remain_num" style="text-align: right">{{ 'front.order.order_remain_num'|trans| raw }}</th>
+                    <th title="update_date" class="hide">{{ 'front.order.update_date'|trans| raw }}</th>
+                    <th class="hide" title="shipping_date">{{ 'front.order.shipping_date'|trans| raw }}</th>
+                    <th title="shipping_no"  style="" >{{ 'front.mypage.shipping_no_no'|trans| raw }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for Order in pagination %}
+                    <tr>
+                        <td>{{Order.order_type}}</td>
+                        <td>{{Order.cus_order_no}}</td>
+                        <td>{{Order.cus_order_lineno}}</td>
+                        <td>
+                            {% if Order.main_img is null %}
+                            <img style="width: 100px" src="{{ asset(''|no_image_product, 'save_image') }}"/>
+                            {% else %}
+                                <img  style="width: 100px"  src="{{ asset(Order.main_img|no_image_product, 'save_image') }}">
+                            {% endif %}
+                        </td>
+                        <td >{{Order.jan_code}}<br/>{{Order.product_name}}</td>
+                        <td>{{Order.order_status}}</td>
+                        <td class="hide">{{Order.shipping_status}}</td>
+                        <td style="text-align: right">{{Order.order_remain_num}}</td>
+                        <td style="text-align: right">{{Order.reserve_stock_num}}</td>
+                        <td style="text-align: right">{{Order.order_remain_num-Order.reserve_stock_num}}</td>
+                        <td class="hide" >>{{Order.update_date}}</td>
+                        <td class="hide" >{{Order.shipping_date}}</td>
+                        <td>
+                            {% if Order.shipping_no %}
+                                <a class=" btn btn-primary actBg " onclick="loadDataFor('all', '{{Order.ec_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest">
+                                    注文出荷状況
+                                </a>
+                                <br/><br/>
+                                <a class=" btn btn-primary actBg " onclick="loadDataFor('one', '{{Order.ec_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest">
+                                    個別出荷状況
+                                </a>
+                            {% else %}
+                                <div class=" btn btn-primary disabled disBg">注文出荷状況</div>
+                                <br/><br/>
+                                <div class=" btn btn-primary disabled disBg">個別出荷状況</div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="ec-pagerRole">
+                {% include "pager.twig" with {'pages': pagination.paginationData} %}
+            </div>
+        {% else %}
+            <p class="ec-para-normal">{{ 'front.mypage.history_not_found'|trans }}</p>
+        {% endif %}
+    </div>
+    {% include "Mypage/modal_list.twig" with {'shipping_no':'Test' } %}
+</div>
+
+{% endblock %}
+{% block javascript %}
+<script>
+function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
+    $('.showbody').html("loading...");
+
+    let dataSend    = {
+        type : type,
+        shipping_no:shipping_no,
+        order_no:ec_order_no,
+        jan_code:jan_code,
+        '_token':'{{ csrf_token('_token') }}',
+    };
+
+    $.ajax({
+        url: '/mypage/shipping_list',
+        type: 'GET',
+        data: dataSend
+    })
+    .done(function(htmlRe, statusText, jqXHR) {
+        $('.showbody').html(htmlRe);
+    })
+    .fail(function(jqXHR, statusText, errorThrown) {
+    });
+}
+
+function loadDataFor(type, ec_order_no, shipping_no, jan_code) {
+    updateShipingAddress(type, shipping_no,ec_order_no, jan_code);
+}
+</script>
+{% endblock %}
