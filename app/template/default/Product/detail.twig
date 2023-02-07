@@ -517,7 +517,7 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                                 {% if Stock.stock_num is defined and Stock.stock_num is not null and Stock.stock_num == 0 -%}
                                     {% if MstDeliveryPlan is defined and MstDeliveryPlan is not null %}
                                         {% if MstDeliveryPlan.delivery_date is defined and MstDeliveryPlan.delivery_date is not null %}
-                                            <p style="margin-left: 40px;">※{{ MstDeliveryPlan.delivery_date|date("Y年m月d日") }}{{MstDeliveryPlan.quanlity * MstProduct.quantity}}個納入予定</p>
+                                            <p style="margin-left: 40px;">※{{ MstDeliveryPlan.delivery_date|date("Y年m月d日") }}{{MstDeliveryPlan.quanlity * MstProduct.quantity}}個入庫予定</p>
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
