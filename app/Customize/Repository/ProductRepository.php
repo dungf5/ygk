@@ -364,10 +364,7 @@ class ProductRepository extends AbstractRepository
                 'stock_list',
                 Join::WITH,
                 "stock_list.product_code = mstProduct.product_code
-                AND stock_list.customer_code = :customerCode
-                AND stock_list.stock_location = :stockLocation
-                ")
-                ->setParameter(':customerCode', $shipping_route['customer_code'])
+                AND stock_list.stock_location = :stockLocation")
                 ->setParameter(':stockLocation', $shipping_route['stock_location']);
             $qb->addSelect('stock_list.stock_num');
             
