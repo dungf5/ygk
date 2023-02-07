@@ -463,7 +463,7 @@ class MypageController extends AbstractController
         if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
             log_info('認証済のためログイン処理をスキップ');
 
-            return $this->redirectToRoute('product_list');
+            return $this->redirectToRoute('homepage');
         }
 
         /* @var $form \Symfony\Component\Form\FormInterface */

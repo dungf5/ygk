@@ -118,7 +118,7 @@ file that was distributed with this source code.
                             </th>
                             <th title="shipping_code otodoke_code" style="min-width: 150px">
                                 {{ 'front.mypage.shipping_code'|trans| raw }}
-                                <a href="javascript:void(0)" style="color: red; {% if orderShippingOpt|length == 0 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_shipping">
+                                <a href="javascript:void(0)" style="color: red; {% if orderShippingOpt|length < 2 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_shipping" onclick="handleGetLastSelected()">
                                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                                 </a>
                                 <br/>
@@ -127,9 +127,10 @@ file that was distributed with this source code.
                                         <option value="{{orderShipping.key}}">{{orderShipping.value}}</option>
                                     {% endfor %}
                                 </select>
+                                <input type="text" value="" id="last_order_shipping" hidden>
                                 <br/>
                                 {{ 'front.mypage.otodoke_code'|trans| raw }}
-                                <a href="javascript:void(0)" style="color: red; {% if orderOtodokeOpt|length == 0 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_otodoke">
+                                <a href="javascript:void(0)" style="color: red; {% if orderOtodokeOpt|length < 2 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_otodoke">
                                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                                 </a>
                                 <br/>
@@ -232,7 +233,30 @@ file that was distributed with this source code.
                                     {% endfor %}
                                 </select>
                             </th>
-                            <th title="shipping_code otodoke_code" style="min-width: 150px">{{ 'front.mypage.shipping_code'|trans| raw }}<br/>{{ 'front.mypage.otodoke_code'|trans| raw }}</th>
+                            <th title="shipping_code otodoke_code" style="min-width: 150px">
+                                {{ 'front.mypage.shipping_code'|trans| raw }}
+                                <a href="javascript:void(0)" style="color: red; {% if orderShippingOpt|length < 2 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_shipping" onclick="handleGetLastSelected()">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </a>
+                                <br/>
+                                <select id="search_order_shipping" name="search_order_shipping" multiple="multiple" onchange="handleSearch(this)">
+                                    {% for orderShipping in orderShippingOpt %}
+                                        <option value="{{orderShipping.key}}">{{orderShipping.value}}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="text" value="" id="last_order_shipping" hidden>
+                                <br/>
+                                {{ 'front.mypage.otodoke_code'|trans| raw }}
+                                <a href="javascript:void(0)" style="color: red; {% if orderOtodokeOpt|length < 2 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_otodoke">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </a>
+                                <br/>
+                                <select id="search_order_otodoke" name="search_order_otodoke" multiple="multiple" onchange="handleSearch(this)">
+                                    {% for orderOtodoke in orderOtodokeOpt %}
+                                        <option value="{{orderOtodoke.key}}">{{orderOtodoke.value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </th>
                             <th title="image">{{ 'front.order.image'|trans| raw }}</th>
                             <th style="text-align: left;" title="product_code product_name remarks1 remarks2">
                                 {{ 'front.order.jan_code'|trans| raw }}<br/>
@@ -566,7 +590,6 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
         let origin              = window.location.origin;
         let pathname            = window.location.pathname;
         let search              = window.location.search;
-        let search_order_date   = '{{ search_order_date }}';
         pathname                += "?pageno=1";
 
         if (name == 'search_order_date') {
@@ -589,20 +612,22 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
             }, doneTypingInterval);
         }
 
-        console.log(name);
-        console.log(value);
-        console.log($("#search_order_shipping option:selected").last().val());
+        if (name == 'search_order_shipping') {
+            loadingOverlay();
+            let previousSelected    = $("input#last_order_shipping").val();
+            let lastSelected        = $("#search_order_shipping option:selected").last().val();
 
-        // if (name == 'search_order_shipping') {
-        //     value   = $("#search_order_shipping option:selected").last().val();
-        //     $('#search_order_shipping').multiselect('deselectAll');
-        //
-        //     loadingOverlay();
-        //     setTimeout(function () {
-        //         $('#search_order_shipping').multiselect('select', value);
-        //         handelChangeShipping(origin, pathname);
-        //     }, 200);
-        // }
+            if (value == previousSelected) {
+                value               = lastSelected;
+            }
+
+            $('#search_order_shipping').multiselect('deselectAll');
+
+            setTimeout(function () {
+                $('#search_order_shipping').multiselect('select', value);
+                handelChangeShipping(origin, pathname);
+            }, 200);
+        }
 
         if (name == 'search_order_otodoke') {
             clearTimeout(typingTimer);
@@ -612,6 +637,17 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
                 loadingOverlay();
                 handelChangeOtodoke(origin, pathname, search);
             }, doneTypingInterval);
+        }
+    }
+
+    function handleGetLastSelected() {
+        let lastSelected        = $("#search_order_shipping option:selected").last().val();
+        if (lastSelected) {
+            $("input#last_order_shipping").val(lastSelected);
+        }
+
+        else {
+            $("input#last_order_shipping").val('');
         }
     }
 
@@ -640,9 +676,12 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
     }
 
     function handelChangeOtodoke(origin, pathname, search) {
-        let value       = $("#search_order_otodoke").val();
+        let value           = $("#search_order_otodoke").val();
+        let shipping_code   = $("#search_order_shipping option:selected").last().val();
+        pathname            += "&order_shipping[]=" + shipping_code;
+
         $.each(value, function(key, item) {
-            pathname    += "&order_otodoke[]=" + item;
+            pathname        += "&order_otodoke[]=" + item;
         });
         window.location.href     = origin + pathname;
     }
