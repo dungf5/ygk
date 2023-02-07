@@ -251,11 +251,11 @@ class MypageController extends AbstractController
             'pageno'                => $request->get('pageno', 1),
             'search_order_date'     => $request->get('order_date', []),
             'search_order_status'   => $request->get('order_status', []),
-            'search_order_shippping'=> $request->get('order_shipping', []),
+            'search_order_shipping' => $request->get('order_shipping', []),
             'search_order_otodoke'  => $request->get('order_otodoke', []),
         ];
 
-        if (empty($param['search_order_shippping'])) {
+        if (empty($param['search_order_shipping'])) {
             $param['search_order_otodoke']  = [];
         }
 
@@ -267,7 +267,7 @@ class MypageController extends AbstractController
         $login_type     = $this->globalService->getLoginType();
 
         //Override data
-        if (!empty($param['search_order_shippping'])) {
+        if (!empty($param['search_order_shipping'])) {
             $shipping_code  = '';
         }
 
@@ -284,8 +284,6 @@ class MypageController extends AbstractController
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
-
-
         $listItem       = $pagination->getItems();
         $arProductId    = [];
         $arOrderNo      = [];
@@ -340,6 +338,7 @@ class MypageController extends AbstractController
                 }
             }
         }
+
         //get one image of product
         $hsProductImgMain = $this->productImageRepository->getImageMain($arProductId);
         $commonService = new MyCommonService($this->entityManager);
@@ -353,9 +352,12 @@ class MypageController extends AbstractController
         foreach ($listItem as &$myItem) {
             if (isset($hsKeyImg[$myItem['product_id']])) {
                 $myItem['main_img'] = $hsKeyImg[$myItem['product_id']];
-            }else{
+            }
+
+            else {
                 $myItem['main_img'] = null;
             }
+
             if (MyCommon::isEmptyOrNull($myItem['order_line_no'])) {
                 if (isset($arOrderNoAf[$myItem['ec_order_no']])) {
                     if (isset($arOrderNoAf[$myItem['ec_order_no']][$myItem['ec_order_lineno']])) {
@@ -424,7 +426,7 @@ class MypageController extends AbstractController
             'orderOtodokeOpt'           => $orderOtodeokeList,
             'search_order_date'         => implode(",", $param['search_order_date']),
             'search_order_status'       => implode(",", $param['search_order_status']),
-            'search_order_shipping'     => implode(",", $param['search_order_shippping']),
+            'search_order_shipping'     => implode(",", $param['search_order_shipping']),
             'search_order_otodoke'      => implode(",", $param['search_order_otodoke']),
         ];
     }
