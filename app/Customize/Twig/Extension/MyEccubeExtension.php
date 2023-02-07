@@ -126,7 +126,7 @@ class MyEccubeExtension extends AbstractExtension
         }
 
         $numAf      = str_replace(",","", $numAf);
-        $roundUp    = round($numAf);
+        $roundUp    = (int)$numAf;
         $roundUp    = number_format($roundUp);
 
         return "￥" . $roundUp;
