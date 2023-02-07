@@ -107,6 +107,14 @@ class OrderItemRepository extends AbstractRepository
             $where  = trim($where, 'OR');
             $where .= ' ) ';
         }
+
+        if (!empty($paramSearch['search_order_shipping'])) {
+            $where .= ' AND ordStatus.shipping_code  in (:orderShipping) ';
+        }
+
+        if (!empty($paramSearch['search_order_otodoke'])) {
+            $where .= ' AND ordStatus.otodoke_code  in (:orderOtodoke) ';
+        }
         // End - Add condition
 
         $qb = $qb->select($col)
@@ -147,6 +155,14 @@ class OrderItemRepository extends AbstractRepository
             foreach ($paramSearch['search_order_date'] as $key => $value) {
                 $qb = $qb->setParameter(':orderDate' . $key, $value."-%");
             }
+        }
+
+        if (!empty($paramSearch['search_order_shipping'])) {
+            $qb = $qb->setParameter(':orderShipping', $paramSearch['search_order_shipping']);
+        }
+
+        if (!empty($paramSearch['search_order_otodoke'])) {
+            $qb = $qb->setParameter(':orderOtodoke', $paramSearch['search_order_otodoke']);
         }
         /*End - Set param search */
 
