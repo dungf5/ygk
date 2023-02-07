@@ -116,7 +116,29 @@ file that was distributed with this source code.
                                     {% endfor %}
                                 </select>
                             </th>
-                            <th title="shipping_code otodoke_code" style="min-width: 150px">{{ 'front.mypage.shipping_code'|trans| raw }}<br/>{{ 'front.mypage.otodoke_code'|trans| raw }}</th>
+                            <th title="shipping_code otodoke_code" style="min-width: 150px">
+                                {{ 'front.mypage.shipping_code'|trans| raw }}
+                                <a href="javascript:void(0)" style="color: red; {% if orderShippingOpt|length == 0 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_shipping">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </a>
+                                <br/>
+                                <select id="search_order_shipping" name="search_order_shipping" multiple="multiple" onchange="handleSearch(this)">
+                                    {% for orderShipping in orderShippingOpt %}
+                                        <option value="{{orderShipping.key}}">{{orderShipping.value}}</option>
+                                    {% endfor %}
+                                </select>
+                                <br/>
+                                {{ 'front.mypage.otodoke_code'|trans| raw }}
+                                <a href="javascript:void(0)" style="color: red; {% if orderOtodokeOpt|length == 0 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_otodoke">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </a>
+                                <br/>
+                                <select id="search_order_otodoke" name="search_order_otodoke" multiple="multiple" onchange="handleSearch(this)">
+                                    {% for orderOtodoke in orderOtodokeOpt %}
+                                        <option value="{{orderOtodoke.key}}">{{orderOtodoke.value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </th>
                             <th title="image">{{ 'front.order.image'|trans| raw }}</th>
                             <th style="text-align: left;" title="product_code product_name remarks1 remarks2">
                                 {{ 'front.order.jan_code'|trans| raw }}<br/>
@@ -396,6 +418,120 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
         nonSelectedText: '注文日検索',
     });
 
+    $('#search_order_shipping').multiselect({
+        includeSelectAllOption: false,
+        selectAllText: 'すべて',
+        // enableFiltering: true,
+        // filterPlaceholder: '検索',
+        disableIfEmpty: true,
+        checkboxName: function(option) {
+            return 'multiselect[]';
+        },
+        buttonWidth: '150px',
+        buttonHeight: '34px',
+        buttonText: function(options, select) {
+            if (options.length === 0) {
+                return '未選択';
+            }
+            else if (options.length == 14) {
+                return 'すべて';
+            }
+            else if (options.length > 2) {
+                return options.length + 'ヶ月選択済み';
+            }
+            else {
+                 var labels = [];
+                 options.each(function() {
+                     if ($(this).attr('label') !== undefined) {
+                         labels.push($(this).attr('label'));
+                     }
+                     else {
+                         labels.push($(this).html());
+                     }
+                 });
+                 labels.reverse();
+                 return labels.join(', ') + '';
+            }
+        },
+        buttonTitle: function(options, select) {
+            if (options.length === 0) {
+                return '未選択';
+            }
+            else {
+                 var labels = [];
+                 options.each(function() {
+                     if ($(this).attr('label') !== undefined) {
+                         labels.push($(this).attr('label'));
+                     }
+                     else {
+                         labels.push($(this).html());
+                     }
+                 });
+                 labels.reverse();
+                 return labels.join(', ') + '';
+            }
+        },
+        buttonClass:'search_order_shipping',
+        nonSelectedText: '注文日検索',
+    });
+
+    $('#search_order_otodoke').multiselect({
+        includeSelectAllOption: false,
+        selectAllText: 'すべて',
+        // enableFiltering: true,
+        // filterPlaceholder: '検索',
+        disableIfEmpty: true,
+        checkboxName: function(option) {
+            return 'multiselect[]';
+        },
+        buttonWidth: '150px',
+        buttonHeight: '34px',
+        buttonText: function(options, select) {
+            if (options.length === 0) {
+                return '未選択';
+            }
+            else if (options.length == 14) {
+                return 'すべて';
+            }
+            else if (options.length > 2) {
+                return options.length + 'ヶ月選択済み';
+            }
+            else {
+                 var labels = [];
+                 options.each(function() {
+                     if ($(this).attr('label') !== undefined) {
+                         labels.push($(this).attr('label'));
+                     }
+                     else {
+                         labels.push($(this).html());
+                     }
+                 });
+                 labels.reverse();
+                 return labels.join(', ') + '';
+            }
+        },
+        buttonTitle: function(options, select) {
+            if (options.length === 0) {
+                return '未選択';
+            }
+            else {
+                 var labels = [];
+                 options.each(function() {
+                     if ($(this).attr('label') !== undefined) {
+                         labels.push($(this).attr('label'));
+                     }
+                     else {
+                         labels.push($(this).html());
+                     }
+                 });
+                 labels.reverse();
+                 return labels.join(', ') + '';
+            }
+        },
+        buttonClass:'search_order_otodoke',
+        nonSelectedText: '注文日検索',
+    });
+
     /*Set default value for selected*/
      let search_order_date  = '{{ search_order_date }}';
      search_order_date      = search_order_date.split(",");
@@ -407,6 +543,18 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
      search_order_status      = search_order_status.split(",");
      $.each(search_order_status, function(key, value) {
         $('#search_order_status').multiselect('select', [value]);
+     });
+
+     let search_order_shipping  = '{{ search_order_shipping }}';
+     search_order_shipping      = search_order_shipping.split(",");
+     $.each(search_order_shipping, function(key, value) {
+        $('#search_order_shipping').multiselect('select', [value]);
+     });
+
+     let search_order_otodoke  = '{{ search_order_otodoke }}';
+     search_order_otodoke      = search_order_otodoke.split(",");
+     $.each(search_order_otodoke, function(key, value) {
+        $('#search_order_otodoke').multiselect('select', [value]);
      });
 
     var typingTimer;
@@ -421,6 +569,16 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
         let search_order_date   = '{{ search_order_date }}';
         pathname                += "?pageno=1";
 
+        if (name == 'search_order_date') {
+            clearTimeout(typingTimer);
+            loadingOverlay('hide');
+
+            typingTimer         = setTimeout(function () {
+                loadingOverlay();
+                handelChangeDate(origin, pathname, search);
+            }, doneTypingInterval);
+        }
+
         if (name == 'search_order_status') {
             clearTimeout(typingTimer);
             loadingOverlay('hide');
@@ -431,13 +589,28 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
             }, doneTypingInterval);
         }
 
-        if (name == 'search_order_date') {
+        console.log(name);
+        console.log(value);
+        console.log($("#search_order_shipping option:selected").last().val());
+
+        // if (name == 'search_order_shipping') {
+        //     value   = $("#search_order_shipping option:selected").last().val();
+        //     $('#search_order_shipping').multiselect('deselectAll');
+        //
+        //     loadingOverlay();
+        //     setTimeout(function () {
+        //         $('#search_order_shipping').multiselect('select', value);
+        //         handelChangeShipping(origin, pathname);
+        //     }, 200);
+        // }
+
+        if (name == 'search_order_otodoke') {
             clearTimeout(typingTimer);
             loadingOverlay('hide');
 
             typingTimer         = setTimeout(function () {
                 loadingOverlay();
-                handelChangeDate(origin, pathname, search);
+                handelChangeOtodoke(origin, pathname, search);
             }, doneTypingInterval);
         }
     }
@@ -458,6 +631,22 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
         window.location.href     = origin + pathname;
     }
 
+    function handelChangeShipping(origin, pathname) {
+        let value       = $("#search_order_shipping").val();
+        $.each(value, function(key, item) {
+            pathname    += "&order_shipping[]=" + item;
+        });
+        window.location.href     = origin + pathname;
+    }
+
+    function handelChangeOtodoke(origin, pathname, search) {
+        let value       = $("#search_order_otodoke").val();
+        $.each(value, function(key, item) {
+            pathname    += "&order_otodoke[]=" + item;
+        });
+        window.location.href     = origin + pathname;
+    }
+
     $("a.multiselect.dropdown-toggle.search_order_date").on("click", function() {
         let button          = $("button.search_order_date");
         let aria_expanded   = button.attr("aria-expanded");
@@ -470,6 +659,26 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
 
     $("a.multiselect.dropdown-toggle.search_order_status").on("click", function() {
         let button          = $("button.search_order_status");
+        let aria_expanded   = button.attr("aria-expanded");
+        if (!aria_expanded || aria_expanded == 'false') {
+            setTimeout(function() {
+                button.click();
+            }, 100);
+        }
+    })
+
+    $("a.multiselect.dropdown-toggle.search_order_shipping").on("click", function() {
+        let button          = $("button.search_order_shipping");
+        let aria_expanded   = button.attr("aria-expanded");
+        if (!aria_expanded || aria_expanded == 'false') {
+            setTimeout(function() {
+                button.click();
+            }, 100);
+        }
+    })
+
+    $("a.multiselect.dropdown-toggle.search_order_otodoke").on("click", function() {
+        let button          = $("button.search_order_otodoke");
         let aria_expanded   = button.attr("aria-expanded");
         if (!aria_expanded || aria_expanded == 'false') {
             setTimeout(function() {

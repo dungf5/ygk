@@ -31,11 +31,11 @@ class StockListRepository extends AbstractRepository
     public function getData($product_code = '', $shipping_route = mull)
     {
         if( is_null($shipping_route) ) return null;
-        
+        //AND s.customer_code = :customer_code //figo command 20230206
         $qb     = $this->createQueryBuilder('s');
-        $qb->where('s.product_code = :product_code AND s.customer_code = :customer_code AND s.stock_location = :stock_location')
+        $qb->where('s.product_code = :product_code  AND s.stock_location = :stock_location')
         ->setParameter('product_code', $product_code)
-        ->setParameter('customer_code', $shipping_route['customer_code'])
+       // ->setParameter('customer_code', $shipping_route['customer_code'])//figo command 20230206
         ->setParameter('stock_location', $shipping_route['stock_location']);
 
         return $qb->getQuery()->getOneOrNullResult();

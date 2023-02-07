@@ -359,6 +359,7 @@ class ProductRepository extends AbstractRepository
         $qb->addSelect('price.price_s01 as  price_s01');
 
         $shipping_route = $newComs->getShippingRouteFromUser($customer_code, $login_type);
+        // AND stock_list.customer_code = :customerCode figo comment 20230106
         if( $shipping_route ) {
             $qb->leftJoin('Customize\Entity\StockList',
                 'stock_list',
