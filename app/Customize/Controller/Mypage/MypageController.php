@@ -407,7 +407,7 @@ class MypageController extends AbstractController
 
         /*create list otodoke code*/
         $orderOtodeokeList      = [];
-        $otodokeList            = $this->globalService->otodokeOption($customer_id, $param['search_order_shippping'][0] ?? '');
+        $otodokeList            = $this->globalService->otodokeOption($customer_id, $param['search_order_shipping'][0] ?? '');
         if (count($otodokeList)) {
             foreach ($otodokeList AS $item) {
                 $orderOtodeokeList[]    = [
