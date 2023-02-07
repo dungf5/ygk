@@ -534,15 +534,21 @@ function updateDeliverydAdress(delivery_code) {
             maxDate: maxDate,
             minDate: minDate,
             defaultDate:defaultDate,
-            useStrict: false,
-            keepInvalid: false,
+            useStrict: true,
+            keepInvalid: true,
             buttons: {
-                showToday: true,
-                showClose: true
+            showToday: true,
+            showClose: true
             }
         });
 
-        $("#date_picker_delivery").keydown(false);
+        $("#date_picker_delivery").on("keyup.datetimepicker", function (e) {
+            checkDate()
+        });
+
+        $("#date_picker_delivery").on("hide.datetimepicker", function (e) {
+            checkDate()
+        });
 
         function dateIsValid(dateStr) {
             const regex         = /^\d{4}-\d{2}-\d{2}$/;
@@ -563,7 +569,7 @@ function updateDeliverydAdress(delivery_code) {
 
         $("#date_picker_delivery").on("change.datetimepicker", function (e) {
             if (e.date != undefined) {
-                let dateChoose = e.date.format('YYYY-MM-DD');
+                let dateChoose  = e.date.format('YYYY-MM-DD');
 
                 if (checkDate()) {
                     updateDateDeli(dateChoose);
