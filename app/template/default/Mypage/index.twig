@@ -118,7 +118,7 @@ file that was distributed with this source code.
                             </th>
                             <th title="shipping_code otodoke_code" style="min-width: 150px">
                                 {{ 'front.mypage.shipping_code'|trans| raw }}
-                                <a href="javascript:void(0)" style="color: red; {% if orderShippingOpt|length == 0 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_shipping">
+                                <a href="javascript:void(0)" style="color: red; {% if orderShippingOpt|length <= 1 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_shipping">
                                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                                 </a>
                                 <br/>
@@ -232,7 +232,29 @@ file that was distributed with this source code.
                                     {% endfor %}
                                 </select>
                             </th>
-                            <th title="shipping_code otodoke_code" style="min-width: 150px">{{ 'front.mypage.shipping_code'|trans| raw }}<br/>{{ 'front.mypage.otodoke_code'|trans| raw }}</th>
+                            <th title="shipping_code otodoke_code" style="min-width: 150px">
+                                {{ 'front.mypage.shipping_code'|trans| raw }}
+                                <a href="javascript:void(0)" style="color: red; {% if orderShippingOpt|length <= 1 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_shipping">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </a>
+                                <br/>
+                                <select id="search_order_shipping" name="search_order_shipping" multiple="multiple" onchange="handleSearch(this)">
+                                    {% for orderShipping in orderShippingOpt %}
+                                        <option value="{{orderShipping.key}}">{{orderShipping.value}}</option>
+                                    {% endfor %}
+                                </select>
+                                <br/>
+                                {{ 'front.mypage.otodoke_code'|trans| raw }}
+                                <a href="javascript:void(0)" style="color: red; {% if orderOtodokeOpt|length == 0 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_otodoke">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </a>
+                                <br/>
+                                <select id="search_order_otodoke" name="search_order_otodoke" multiple="multiple" onchange="handleSearch(this)">
+                                    {% for orderOtodoke in orderOtodokeOpt %}
+                                        <option value="{{orderOtodoke.key}}">{{orderOtodoke.value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </th>
                             <th title="image">{{ 'front.order.image'|trans| raw }}</th>
                             <th style="text-align: left;" title="product_code product_name remarks1 remarks2">
                                 {{ 'front.order.jan_code'|trans| raw }}<br/>
