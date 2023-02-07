@@ -500,10 +500,10 @@ function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
     });
 
     $('#search_order_otodoke').multiselect({
-        includeSelectAllOption: false,
+        includeSelectAllOption: true,
         selectAllText: 'すべて',
-        // enableFiltering: true,
-        // filterPlaceholder: '検索',
+        enableFiltering: true,
+        filterPlaceholder: '検索',
         disableIfEmpty: true,
         checkboxName: function(option) {
             return 'multiselect[]';
