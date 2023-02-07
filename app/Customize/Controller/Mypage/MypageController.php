@@ -265,6 +265,16 @@ class MypageController extends AbstractController
         $shipping_code  = $this->globalService->getShippingCode();
         $otodoke_code   = $this->globalService->getOtodokeCode();
         $login_type     = $this->globalService->getLoginType();
+
+        //Override data
+        if (!empty($param['search_order_shippping'])) {
+            $shipping_code  = '';
+        }
+
+        if (!empty($param['search_order_otodoke'])) {
+            $otodoke_code   = '';
+        }
+
         $qb             = $this->orderItemRepository->getQueryBuilderByCustomer($param, $customer_code, $shipping_code, $otodoke_code, $login_type);
 
         // Paginator
@@ -590,7 +600,7 @@ class MypageController extends AbstractController
         $nf = new MstShipping();
         // paginator
         $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
-        $qb = $this->orderItemRepository->getQueryBuilderByCustomer($customer_code);
+        $qb = $this->orderItemRepository->getQueryBuilderByCustomer([], $customer_code);
 
         $pagination = $paginator->paginate(
             $qb,
@@ -694,7 +704,7 @@ class MypageController extends AbstractController
         $nf = new MstShipping();
         // paginator
         $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
-        $qb = $this->orderItemRepository->getQueryBuilderByCustomer($customer_code);
+        $qb = $this->orderItemRepository->getQueryBuilderByCustomer([], $customer_code);
 
         $pagination = $paginator->paginate(
             $qb,
