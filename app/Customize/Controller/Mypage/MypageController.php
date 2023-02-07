@@ -22,6 +22,7 @@ use Customize\Entity\MstShipping;
 use Customize\Repository\OrderItemRepository;
 use Customize\Repository\OrderRepository;
 use Customize\Repository\ProductImageRepository;
+use Customize\Repository\MstShippingRepository;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\GlobalService;
 use Doctrine\DBAL\Types\Type;
@@ -68,6 +69,11 @@ class MypageController extends AbstractController
      */
     protected $productImageRepository;
 
+     /**
+     * @var MstShippingRepository
+     */
+    protected $mstShippingRepository;
+
     /**
      * @var \Twig_Environment
      */
@@ -95,6 +101,7 @@ class MypageController extends AbstractController
     public function __construct(
         OrderRepository $orderRepository,
         ProductImageRepository $productImageRepository,
+        MstShippingRepository $mstShippingRepository,
         OrderItemRepository $orderItemRepository,
         \Twig_Environment $twig,
         EntityManagerInterface $entityManager,
@@ -102,12 +109,13 @@ class MypageController extends AbstractController
         CustomerFavoriteProductRepository $customerFavoriteProductRepository,
         GlobalService $globalService
     ) {
-        $this->orderRepository          = $orderRepository;
-        $this->productImageRepository   = $productImageRepository;
-        $this->orderItemRepository      = $orderItemRepository;
-         $this->twig                    = $twig;
-        $this->entityManager            = $entityManager;
-        $myCm                           = new MyCommonService($this->entityManager);
+        $this->orderRepository        = $orderRepository;
+        $this->productImageRepository = $productImageRepository;
+        $this->mstShippingRepository  = $mstShippingRepository;
+        $this->orderItemRepository    = $orderItemRepository;
+        $this->twig                   = $twig;
+        $this->entityManager          = $entityManager;
+        $myCm                         = new MyCommonService($this->entityManager);
 
         if ($this->twig->getGlobals()["app"]->getUser() != null) {
             $MyDataMstCustomer                                  = $myCm->getMstCustomer($this->twig->getGlobals()["app"]->getUser()->getId());
@@ -582,15 +590,17 @@ class MypageController extends AbstractController
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $Customer = $this->getUser();
-        /*
+        
         // 購入処理中/決済処理中ステータスの受注を非表示にする.
-        $this->entityManager
-            ->getFilters()
-            ->enable('incomplete_order_status_hidden');
-        $nf = new MstShipping();
+        // $this->entityManager
+        //     ->getFilters()
+        //     ->enable('incomplete_order_status_hidden');
+        // $nf = new MstShipping();
         // paginator
         $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
-        $qb = $this->orderItemRepository->getQueryBuilderByCustomer($customer_code);
+        $login_type    = $this->globalService->getLoginType();
+
+        $qb = $this->mstShippingRepository->getQueryBuilderByCustomer($customer_code, $login_type);
 
         $pagination = $paginator->paginate(
             $qb,
@@ -599,83 +609,9 @@ class MypageController extends AbstractController
             ['distinct' => false]
         );
 
-
-        $listItem = [];
-        $listItem = $pagination->getItems();
-        $arProductId = [];
-        $arOrderNo = [];
-        //modify data
-        foreach ($listItem as &$myItem) {
-            $arProductId[] = $myItem['product_id'];
-            $arOrderNo[$myItem['ec_order_no']][$myItem['ec_order_lineno']] = $myItem['order_line_no'];
-            if (is_object($myItem['update_date'])) {
-                $myItem['update_date'] = $myItem['update_date']->format('Y-m-d');
-                if (MyCommon::checkExistText($myItem['update_date'], '.000000')) {
-                    $myItem['update_date'] = str_replace('.000000', '', $myItem['update_date']);
-                } else {
-                    $myItem['update_date'] = str_replace('000', '', $myItem['update_date']);
-                }
-            }
-            if (isset(MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']])) {
-                $myItem['order_status'] = MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']];
-            }
-            if (isset(MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']])) {
-                $myItem['shipping_status'] = MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']];
-            }
-            $myItem['order_remain_num'] = $myItem['order_remain_num']*$myItem['quantity'];
-            $myItem['reserve_stock_num'] = $myItem['reserve_stock_num']*$myItem['quantity'];
-
-            $myItem['order_type'] = '';
-            if (isset($myItem['flow_type'])) {
-                if($myItem['flow_type']=="2"){
-                    $myItem['order_type'] = 'EC';
-                }
-            }
-        }
-
-        //auto fill lino
-        $arOrderNoAf = [];
-        foreach ($arOrderNo as $keyOrder => $arEc) {
-            $autoFileId = 1;
-            foreach ($arEc as $keyLine => $valNo) {
-                if (MyCommon::isEmptyOrNull($valNo)) {
-                    $arOrderNoAf[$keyOrder][$keyLine] = $autoFileId;
-                    $autoFileId++;
-                }
-            }
-        }
-        //get one image of product
-        $hsProductImgMain = $this->productImageRepository->getImageMain($arProductId);
-        $commonService = new MyCommonService($this->entityManager);
-        $listImgs = $commonService->getImageFromEcProductId($arProductId);
-        $hsKeyImg = [];
-        //a.file_name,a.product_id,b.product_code
-        foreach ($listImgs as $itemImg){
-            $hsKeyImg[$itemImg["product_id"]] = $itemImg["file_name"];
-        }
-
-        foreach ($listItem as &$myItem) {
-            if (isset($hsKeyImg[$myItem['product_id']])) {
-                $myItem['main_img'] = $hsKeyImg[$myItem['product_id']];
-            }else{
-                $myItem['main_img'] = null;
-            }
-            if (MyCommon::isEmptyOrNull($myItem['order_line_no'])) {
-                if (isset($arOrderNoAf[$myItem['ec_order_no']])) {
-                    if (isset($arOrderNoAf[$myItem['ec_order_no']][$myItem['ec_order_lineno']])) {
-                        $myItem['order_line_no'] = $arOrderNoAf[$myItem['ec_order_no']][$myItem['ec_order_lineno']];
-                    }
-                }
-            }
-        }
-
-        $pagination->setItems($listItem);
-        
         return [
-            'pagination' => $pagination, 'hsProductImgMain' => $hsProductImgMain
+            'pagination' => $pagination,
         ];
-        */
-       return [];
     }
 
     /**

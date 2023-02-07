@@ -47,6 +47,8 @@ file that was distributed with this source code.
     </style>
 
     <div class="ec-mypageRole">
+        {% if pagination.totalItemCount > 0 %}
+            <p class="ec-para-normal">{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}</p>
             <table class="table myTable">
                 <thead>
                     <tr>
@@ -74,11 +76,40 @@ file that was distributed with this source code.
                     </tr>
                 </thead>
                 <tbody>
-
+                    {% for Shipping in pagination %}
+                        <tr>
+                            <td>{{ Shipping.shipping_no }}</td>
+                            <td>
+                                {{ Shipping.customer_name }}
+                                <br/>
+                                {{ Shipping.company_name }}
+                            </td>
+                            <td>
+                                {{ Shipping.jan_code }}
+                                <br/>
+                                {{ Shipping.product_name }}
+                            </td>
+                            <td>
+                                {% if Shipping.shipping_status == 1 %} 出荷指示済 {% endif %}
+                                {% if Shipping.shipping_status == 2 %} 出荷済 {% endif %}
+                            </td>
+                            <td>{{ Shipping.shipping_plan_date|date("Y年m月d日") }}</td>
+                            <td>{{ Shipping.shipping_date|date("Y年m月d日") }}</td>
+                            <td>{{ Shipping.shipping_num }}</td>
+                            <td></td>
+                            <td>{{ Shipping.order_lineno }}</td>
+                            <td>{{ Shipping.cus_order_no }}</td>
+                            <td>{{ Shipping.cus_order_lineno }}</td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
-           
-       
+           <div class="ec-pagerRole">
+                {% include "pager.twig" with {'pages': pagination.paginationData} %}
+            </div>
+        {% else %}
+            <p class="ec-para-normal">{{ 'front.mypage.history_not_found'|trans }}</p>
+        {% endif %}
     </div>
     {% include "Mypage/modal_list.twig" with {'shipping_no':'Test' } %}
 </div>
