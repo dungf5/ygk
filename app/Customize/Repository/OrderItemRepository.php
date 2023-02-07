@@ -161,8 +161,8 @@ class OrderItemRepository extends AbstractRepository
             $qb = $qb->setParameter(':orderShipping', $paramSearch['search_order_shipping']);
         }
 
-        if (!empty($paramSearch['search_order_otodeke'])) {
-            $qb = $qb->setParameter(':orderOtodoke', $paramSearch['search_order_otodeke']);
+        if (!empty($paramSearch['search_order_otodoke'])) {
+            $qb = $qb->setParameter(':orderOtodoke', $paramSearch['search_order_otodoke']);
         }
         /*End - Set param search */
 
