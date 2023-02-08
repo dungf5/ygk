@@ -650,6 +650,9 @@ class MyShoppingController extends AbstractShoppingController
                 //dd($itemList);
                 foreach ($itemList as $itemOr) {
                     if ($itemOr->isProduct()) {
+                        //Get product location
+                        $location                   = $comS->getProductLocation($hsArrEcProductCusProduct[$itemOr->getId()]);
+
                         $arEcLData[] = [
                             'ec_order_no'           => $orderNo,
                             'ec_order_lineno'       => $itemOr->getId(),
@@ -674,6 +677,7 @@ class MyShoppingController extends AbstractShoppingController
                             'dyna_model_seg5'       => count($itemList),                            // ・ダイナ規格セグメント05←EC注文明細番号
                             'remarks1'              => $remarks1,
                             'remarks2'              => $remarks2,
+                            'location'              => !empty($location) ? $location : "XB0101001",
                             // No41 注文情報送信I/F end
                             ];
                     }

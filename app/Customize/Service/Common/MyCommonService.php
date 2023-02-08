@@ -1089,6 +1089,7 @@ class MyCommonService extends AbstractRepository
             $orderItem->setUnitPriceStatus('FOR');
             $orderItem->setDeploy('XB');
             $orderItem->setCompanyId('XB');
+            $orderItem->setShipingDepositCode($itemSave['location']);
 
             // No41 注文情報送信I/F end
             $this->entityManager->persist($orderItem);
@@ -1967,6 +1968,33 @@ AND          pri.product_code=?
             $result    = $statement->executeQuery([ 'customerCode'=>$customer_code ]);
             $rows      = $result->fetchAllAssociative();
             return @$rows[0];
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param
+     */
+    public function getProductLocation($product_code)
+    {
+        $sql = "
+                SELECT
+                    *
+                FROM
+				    stock_list
+                WHERE
+                    product_code = ?
+			    ";
+
+        $param      = [$product_code];
+        $statement  = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result = $statement->executeQuery($param);
+            $rows   = $result->fetchAllAssociative();
+            return $rows[0]['stock_location'];
+
         } catch (Exception $e) {
             return null;
         }
