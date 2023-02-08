@@ -245,10 +245,10 @@ file that was distributed with this source code.
         });
 
         $('#search_order_shipping').multiselect({
-            includeSelectAllOption: false,
+            includeSelectAllOption: true,
             selectAllText: 'すべて',
-            // enableFiltering: true,
-            // filterPlaceholder: '検索',
+            enableFiltering: true,
+            filterPlaceholder: '検索',
             disableIfEmpty: true,
             checkboxName: function(option) {
                 return 'multiselect[]';
