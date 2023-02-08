@@ -226,6 +226,13 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         private $shipping_company_code;
 
         /**
+         * @var string
+         *
+         * @ORM\Column(name="delete_flg", type="integer")
+         */
+        private $delete_flg;
+
+        /**
          * @var \DateTime
          *
          * @ORM\Column(name="create_date", type="datetimetz")

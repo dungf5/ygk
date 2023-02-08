@@ -174,6 +174,12 @@ if (!class_exists('\Customize\Entity\MstDelivery', false)) {
          * @ORM\Column(type="integer",nullable=true, options={"comment":"消費税"})
          */
         protected $tax;
+
+        /**
+         * @ORM\Column(type="string")
+         */
+        protected $shipping_no;
+
         /**
          * @var string
          *
