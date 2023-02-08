@@ -646,13 +646,10 @@ class MyShoppingController extends AbstractShoppingController
                 $otodoke_code       = $moreOrder->getOtodokeCode();
                 $remarks1           = $moreOrder->getRemarks1();
                 $remarks2           = $moreOrder->getRemarks2();
+                $location           = $comS->getCustomerLocation($customerCode);
 
-                //dd($itemList);
                 foreach ($itemList as $itemOr) {
                     if ($itemOr->isProduct()) {
-                        //Get product location
-                        $location                   = $comS->getProductLocation($hsArrEcProductCusProduct[$itemOr->getId()]);
-
                         $arEcLData[] = [
                             'ec_order_no'           => $orderNo,
                             'ec_order_lineno'       => $itemOr->getId(),

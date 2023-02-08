@@ -1999,5 +1999,32 @@ AND          pri.product_code=?
             return null;
         }
     }
+
+    /**
+     * @param
+     */
+    public function getCustomerLocation($customer_code)
+    {
+        $sql = "
+                SELECT
+                    *
+                FROM
+				    mst_shipping_route
+                WHERE
+                    customer_code = ?
+			    ";
+
+        $param      = [$customer_code];
+        $statement  = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result = $statement->executeQuery($param);
+            $rows   = $result->fetchAllAssociative();
+            return $rows[0]['stock_location'];
+
+        } catch (Exception $e) {
+            return null;
+        }
+    }
 }
 
