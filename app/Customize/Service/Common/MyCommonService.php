@@ -1939,5 +1939,37 @@ AND          pri.product_code=?
             return null;
         }
     }
+
+    public function getCustomerRelationFromUser($customer_code='', $login_type='') {
+        $where = '';
+        switch( $login_type ) {
+            case 'shipping_code':
+                $where = ' shipping_code  = :customerCode ';
+                break;
+            case 'otodoke_code':
+                $where = ' otodoke_code  = :customerCode ';
+                break;
+            case 'represent_code':
+            case 'customer_code':
+            case 'change_type':
+            default:
+                $where = ' customer_code  = :customerCode ';
+                break;
+        }
+        $sql = "SELECT
+                `represent_code`, `customer_code`, `seikyu_code`, `shipping_code`, `otodoke_code`
+            FROM `dt_customer_relation`
+            WHERE
+                {$where}";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result    = $statement->executeQuery([ 'customerCode'=>$customer_code ]);
+            $rows      = $result->fetchAllAssociative();
+            return @$rows[0];
+        } catch (Exception $e) {
+            return null;
+        }
+    }
 }
 

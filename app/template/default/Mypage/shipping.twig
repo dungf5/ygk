@@ -96,7 +96,13 @@ file that was distributed with this source code.
                             <td>{{ Shipping.shipping_plan_date|date("Y年m月d日") }}</td>
                             <td>{{ Shipping.shipping_date|date("Y年m月d日") }}</td>
                             <td>{{ Shipping.shipping_num }}</td>
-                            <td></td>
+                            <td>
+                                {% if Shipping.delivery_no is null %}
+                                    空白
+                                {% else %}
+                                    {{ Shipping.delivery_no }}
+                                {% endif %}
+                            </td>
                             <td>{{ Shipping.order_lineno }}</td>
                             <td>{{ Shipping.cus_order_no }}</td>
                             <td>{{ Shipping.cus_order_lineno }}</td>

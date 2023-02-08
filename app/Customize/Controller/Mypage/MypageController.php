@@ -608,11 +608,14 @@ class MypageController extends AbstractController
         //     ->getFilters()
         //     ->enable('incomplete_order_status_hidden');
         // $nf = new MstShipping();
+        $common_service = new MyCommonService($this->entityManager);
+
         // paginator
         $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
         $login_type    = $this->globalService->getLoginType();
+        $customer_relation = $common_service->getCustomerRelationFromUser($customer_code, $login_type);
 
-        $qb = $this->mstShippingRepository->getQueryBuilderByCustomer($customer_code, $login_type);
+        $qb = $this->mstShippingRepository->getQueryBuilderByCustomer($customer_relation['customer_code'] ?? $customer_code, $login_type);
         
         $pagination = $paginator->paginate(
             $qb,
@@ -620,7 +623,7 @@ class MypageController extends AbstractController
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
-
+        // var_dump($pagination);die;
         return [
             'pagination' => $pagination,
         ];
