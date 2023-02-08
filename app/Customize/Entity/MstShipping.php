@@ -240,6 +240,13 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         private $update_date;
 
         /**
+         * @var int
+         *
+         * @ORM\Column(name="delete_flg", type="integer", nullable=true, options={"default":1})
+         */
+        private $delete_flg;
+
+        /**
          * @return string
          */
         public function getShippingNo(): string
@@ -449,27 +456,20 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
             $this->update_date = $update_date;
         }
 
+        /**
+         * @return int
+         */
+        public function getDeleteFlg(): int
+        {
+            return $this->delete_flg;
+        }
 
-//        /**
-//         * @var \Eccube\Entity\Order
-//         *
-//         * @ORM\OneToOne(targetEntity="Eccube\Entity\Order")
-//         * @ORM\JoinColumns({
-//         *   @ORM\JoinColumn(name="order_id", referencedColumnName="id")
-//         * })
-//         */
-//        private $Order;
-//
-//        /**
-//         * @param mixed $Order
-//         */
-//        public function setOrder($Order): void
-//        {
-//            $this->Order = $Order;
-//        }
-
-
-
-
+        /**
+         * @param int $delete_flg
+         */
+        public function setDeleteFlg(int $delete_flg): void
+        {
+            $this->delete_flg = $delete_flg;
+        }
     }
 }

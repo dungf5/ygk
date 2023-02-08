@@ -180,4 +180,116 @@ class OrderItemRepository extends AbstractRepository
 
         return $qb;
     }
+
+    /**
+     *
+     *
+     * @return QueryBuilder
+     */
+    public function getDeliveryByCustomer($paramSearch = [], $customerCode, $loginType = null)
+    {
+        if ($loginType == "represent_code" || $loginType == "customer_code" || $loginType == "change_type") {
+            $condition      = ' and dos.customer_code  = :customerCode ';
+        }
+
+        elseif ($loginType == "shipping_code") {
+            $condition      = ' and dos.shipping_code  = :customerCode ';
+        }
+
+        elseif ($loginType == "otodoke_code") {
+            $condition      = ' and dos.otodoke_code  = :customerCode ';
+        }
+
+        else {
+            $condition      = ' and dos.customer_code  = :customerCode ';
+        }
+
+        $col        = "
+                        md.delivery_no,
+                        md.delivery_lineno,
+                        ms.shipping_date,
+                        md.shiping_name,
+                        md.otodoke_name,
+                        ms.shipping_no
+                    ";
+
+        $qb         = $this->getEntityManager()->createQueryBuilder();
+        $where      = " ms.delete_flg <> 0 AND ms.shipping_date > :shippingDate {$condition}";
+
+        // Add condition
+        if (!empty($paramSearch['delivery_no'])) {
+            $where .= ' AND md.delivery_no = :deliveryNo ';
+        }
+
+        if (!empty($paramSearch['search_shipping_date'])) {
+            $where .= ' AND (';
+
+            foreach ($paramSearch['search_shipping_date'] as $key => $value) {
+                $where .= ' ms.shipping_date  like :shippingDate'.$key.' OR';
+            }
+
+            $where  = trim($where, 'OR');
+            $where .= ' ) ';
+        }
+
+        if (!empty($paramSearch['search_order_shipping'])) {
+            $where .= ' AND md.shiping_name = (select mc3.company_name from Customize\Entity\MstCustomer mc3 where mc3.customer_code in (:orderShipping)) ';
+        }
+
+        if (!empty($paramSearch['search_order_otodoke'])) {
+            $where .= ' AND md.otodoke_name in (select mc4.company_name from Customize\Entity\MstCustomer mc4 where mc4.customer_code in (:orderOtodoke)) ';
+        }
+        // End - Add condition
+
+        $qb = $qb->select($col)
+            ->from('Customize\Entity\DtOrderStatus', 'dos')
+            ->innerJoin(
+                'Customize\Entity\MstShipping',
+                'ms',
+                Join::WITH,
+                'ms.order_no = dos.order_no and
+		        ms.order_lineno = dos.order_line_no'
+            )
+            ->innerJoin(
+                'Customize\Entity\MstDelivery',
+                'md',
+                Join::WITH,
+                "md.order_no = concat(dos.order_no, '-', dos.order_line_no)"
+            )
+            ->where($where)
+            ->setParameter(':customerCode', $customerCode)
+            ->setParameter(':shippingDate', Date("Y-m-d", strtotime("- 14 months")));
+
+        /*Set param search */
+        if (!empty($paramSearch['delivery_no'])) {
+            $qb = $qb->setParameter(':deliveryNo', $paramSearch['delivery_no']);
+        }
+
+        if (!empty($paramSearch['search_shipping_date'])) {
+            foreach ($paramSearch['search_shipping_date'] as $key => $value) {
+                $qb = $qb->setParameter(':shippingDate' . $key, $value."-%");
+            }
+        }
+
+        if (!empty($paramSearch['search_order_shipping'])) {
+            $qb = $qb->setParameter(':orderShipping', $paramSearch['search_order_shipping']);
+        }
+
+        if (!empty($paramSearch['search_order_otodoke'])) {
+            $qb = $qb->setParameter(':orderOtodoke', $paramSearch['search_order_otodoke']);
+        }
+        /*End - Set param search */
+
+        //group
+        $qb->addGroupBy('dos.order_no');
+        $qb->addGroupBy('dos.order_line_no');
+
+        // Order By
+        $qb->addOrderBy('ms.shipping_date', 'DESC');
+
+        //dd( $qb->getQuery()->getSQL(), $paramSearch, $customerCode, $shippingCode, $otodokeCode);
+        //$this->queries->customize("", $qb, []);
+
+        return $qb;
+    }
 }
