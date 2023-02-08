@@ -38,7 +38,7 @@ class OrderItemRepository extends AbstractRepository
      *
      * @return QueryBuilder
      */
-    public function getQueryBuilderByCustomer($paramSearch = [], $customerCode, $shippingCode = '', $otodokeCode = '', $loginType = null)
+    public function getQueryBuilderByCustomer($paramSearch = [], $customerCode, $loginType = null)
     {
         if ($loginType == "represent_code" || $loginType == "customer_code" || $loginType == "change_type") {
             $condition      = ' and ordStatus.customer_code  = :customerCode ';
@@ -85,14 +85,6 @@ class OrderItemRepository extends AbstractRepository
         $where      = " ordStatus.order_date >= :orderDate {$condition}";
 
         // Add condition
-        if (!empty($shippingCode)) {
-            $where .= ' AND ordStatus.shipping_code  = :shippingCode ';
-        }
-
-        if (!empty($otodokeCode)) {
-            $where .= ' AND ordStatus.otodoke_code  = :otodokeCode ';
-        }
-
         if (!empty($paramSearch['search_order_status'])) {
             $where .= ' AND ordStatus.order_status  in (:orderStatus) ';
         }
@@ -139,14 +131,6 @@ class OrderItemRepository extends AbstractRepository
             ->setParameter(':orderDate', Date("Y-m-d", strtotime("- 14 months")));
 
         /*Set param search */
-        if (!empty($shippingCode)) {
-            $qb = $qb->setParameter(':shippingCode', "$shippingCode");
-        }
-
-        if (!empty($otodokeCode)) {
-            $qb = $qb->setParameter(':otodokeCode', "$otodokeCode");
-        }
-
         if (!empty($paramSearch['search_order_status'])) {
             $qb = $qb->setParameter(':orderStatus', $paramSearch['search_order_status']);
         }

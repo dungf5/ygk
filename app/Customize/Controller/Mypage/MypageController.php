@@ -262,20 +262,9 @@ class MypageController extends AbstractController
         // Query data
         $customer_code  = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
         $customer_id    = $this->twig->getGlobals()["app"]->MyDataMstCustomer["ec_customer_id"];
-        $shipping_code  = $this->globalService->getShippingCode();
-        $otodoke_code   = $this->globalService->getOtodokeCode();
         $login_type     = $this->globalService->getLoginType();
 
-        //Override data
-        if (!empty($param['search_order_shipping'])) {
-            $shipping_code  = '';
-        }
-
-        if (!empty($param['search_order_otodoke'])) {
-            $otodoke_code   = '';
-        }
-
-        $qb             = $this->orderItemRepository->getQueryBuilderByCustomer($param, $customer_code, $shipping_code, $otodoke_code, $login_type);
+        $qb             = $this->orderItemRepository->getQueryBuilderByCustomer($param, $customer_code, $login_type);
 
         // Paginator
         $pagination     = $paginator->paginate(
