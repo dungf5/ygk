@@ -608,24 +608,55 @@ class MypageController extends AbstractController
         //     ->getFilters()
         //     ->enable('incomplete_order_status_hidden');
         // $nf = new MstShipping();
-        $common_service = new MyCommonService($this->entityManager);
+        // $common_service = new MyCommonService($this->entityManager);
 
         // paginator
         $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
+        $customer_id   = $this->twig->getGlobals()["app"]->MyDataMstCustomer["ec_customer_id"];
         $login_type    = $this->globalService->getLoginType();
-        $customer_relation = $common_service->getCustomerRelationFromUser($customer_code, $login_type);
+        // $customer_relation = $common_service->getCustomerRelationFromUser($customer_code, $login_type);
 
-        $qb = $this->mstShippingRepository->getQueryBuilderByCustomer($customer_relation['customer_code'] ?? $customer_code, $login_type);
-        
+        $search_parameter = [
+            'shipping_status' => $request->get('shipping_status', []),
+            'order_shipping' => $request->get('order_shipping', []),
+            'shipping_status' => $request->get('shipping_status', []),
+        ];
+        $qb = $this->mstShippingRepository->getQueryBuilderByCustomer($search_parameter, $customer_code, $login_type);
+
         $pagination = $paginator->paginate(
             $qb,
             $request->get('pageno', 1),
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
-        // var_dump($pagination);die;
+
+        $orderShippingList      = [];
+        $shippingList           = $this->globalService->shippingOption();
+        if (count($shippingList) > 1) {
+            foreach ($shippingList AS $item) {
+                $orderShippingList[]    = [
+                    'key'               => $item["shipping_no"],
+                    'value'             => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
+                ];
+            }
+        }
+        $orderOtodeokeList      = [];
+        $otodokeList            = $this->globalService->otodokeOption($customer_id, $param['search_order_shipping'][0] ?? '');
+        if (count($otodokeList)) {
+            foreach ($otodokeList AS $item) {
+                $orderOtodeokeList[]    = [
+                    'key'               => $item["otodoke_code"],
+                    'value'             => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
+                ];
+            }
+        }
+
+        // var_dump($orderOtodeokeList);die;
         return [
-            'pagination' => $pagination,
+            'pagination'       => $pagination,
+            'search_parameter' => $search_parameter,
+            'orderShippingOpt' => $orderShippingList,
+            'orderOtodokeOpt'  => $orderOtodeokeList,
         ];
     }
 

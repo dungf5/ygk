@@ -25,10 +25,83 @@ class MstShippingRepository extends AbstractRepository
     /**
      * @return QueryBuilder
      */
-    public function getQueryBuilderByCustomer($customer_code = '', $login_type = '')
+    public function getQueryBuilderByCustomer($search_parameter=[], $customer_code='', $login_type='')
     {
+        var_dump($search_parameter);die;
+
         $qb = $this->createQueryBuilder('shipping');
         $qb->select('shipping.shipping_no', 'shipping.customer_code', 'shipping.shipping_status', 'shipping.shipping_plan_date', 'shipping.shipping_date', 'shipping.shipping_num', 'shipping.order_lineno', 'shipping.cus_order_no', 'shipping.cus_order_lineno');
+
+        $qb->innerJoin(
+                '\Customize\Entity\DtOrderStatus',
+                'order_status',
+                Join::WITH,
+                'order_status.order_no = shipping.order_no AND order_status.order_line_no = shipping.order_lineno');
+        $qb->innerJoin(
+                '\Customize\Entity\MstProduct',
+                'product',
+                Join::WITH,
+                'product.product_code = shipping.product_code');
+        $qb->leftJoin(
+                '\Customize\Entity\MstDelivery',
+                'delivery',
+                Join::WITH,
+                'delivery.shipping_no = shipping.shipping_no');
+
+        $qb->where('shipping.delete_flg <> 0')
+            ->andWhere('shipping.shipping_date >= :shipping_date')
+            ->setParameter('shipping_date', date("Y-m-d", strtotime("-14 MONTH")));
+
+        switch( $login_type ) {
+            case 'shipping_code':
+                $qb->andWhere('order_status.shipping_code = :customer_code')
+                    ->setParameter('customer_code', $customer_code);
+                break;
+            case 'otodoke_code':
+                $qb->andWhere('order_status.otodoke_code = :customer_code')
+                    ->setParameter('customer_code', $customer_code);
+                break;
+            case 'represent_code':
+            case 'customer_code':
+            case 'change_type':
+            default:
+                $qb->andWhere('order_status.customer_code = :customer_code')
+                    ->setParameter('customer_code', $customer_code);
+                break;
+        }
+
+        if( count($search_parameter['shipping_status']) > 0 ) {
+            if( in_array( 1, $search_parameter['shipping_status'] )
+                && ! in_array( 2, $search_parameter['shipping_status'] ) ) {
+                $qb->andWhere('shipping.shipping_status = :shipping_status')
+                    ->setParameter('shipping_status', 1);
+            }
+            if( ! in_array( 1, $search_parameter['shipping_status'] )
+                && in_array( 2, $search_parameter['shipping_status'] ) ) {
+                $qb->andWhere('shipping.shipping_status = :shipping_status')
+                    ->setParameter('shipping_status', 2);
+            }
+        }
+
+        $qb->addSelect('product.jan_code', 'product.product_name', 'delivery.delivery_no');
+        $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = order_status.shipping_code) shipping_name');
+        $qb->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = order_status.otodoke_code) otodoke_name');
+
+        $qb->addGroupBy('shipping.order_no');
+        $qb->addGroupBy('shipping.order_lineno');
+        
+        $qb->addOrderBy('shipping.shipping_date', 'DESC');
+
+        return $qb;
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    public function getAllCustomer($customer_code='', $login_type='')
+    {
+        $qb = $this->createQueryBuilder('shipping');
+        $qb->select('customer.customer_code', 'customer.customer_name', 'customer.company_name');
 
         $qb->leftJoin(
                 '\Customize\Entity\MstCustomer',
@@ -52,17 +125,14 @@ class MstShippingRepository extends AbstractRepository
         $qb->andWhere('shipping.customer_code = :customer_code')
             ->setParameter('customer_code', $customer_code);
 
-        $qb->addSelect('customer.customer_name', 'customer.company_name', 'product.jan_code', 'product.product_name', 'delivery.delivery_no');
-
-        $qb->addGroupBy('shipping.order_no');
-        $qb->addGroupBy('shipping.order_lineno');
+        $qb->addGroupBy('customer.customer_code');
         
         $qb->addOrderBy('shipping.shipping_date', 'DESC');
 
         // echo($qb->getQuery()->getSQL());
         // var_dump($qb->getParameters());
         // die();
-        return $qb;
+        return $qb->getQuery()->getResult();
     }
 }
 
