@@ -189,6 +189,13 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         private $request_flg;
 
         /**
+         * @var string
+         *
+         * @ORM\Column(name="shiping_deposit_code",type="string",nullable=false, options={"comment":"出荷在庫場所", "default":"XB0101001" })
+         */
+        private $shiping_deposit_code;
+
+        /**
          * @return string
          */
         public function getCustomerCode(): string
@@ -711,5 +718,21 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
          * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ更新日時'")
          */
         private $update_date;
+
+        /**
+         * @return string
+         */
+        public function getShipingDepositCode()
+        {
+            return $this->shiping_deposit_code;
+        }
+
+        /**
+         * @param string $shiping_deposit_code
+         */
+        public function setShipingDepositCode($shiping_deposit_code): void
+        {
+            $this->shiping_deposit_code = $shiping_deposit_code;
+        }
     }
 }

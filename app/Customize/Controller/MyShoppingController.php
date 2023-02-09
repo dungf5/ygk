@@ -646,8 +646,8 @@ class MyShoppingController extends AbstractShoppingController
                 $otodoke_code       = $moreOrder->getOtodokeCode();
                 $remarks1           = $moreOrder->getRemarks1();
                 $remarks2           = $moreOrder->getRemarks2();
+                $location           = $comS->getCustomerLocation($customerCode);
 
-                //dd($itemList);
                 foreach ($itemList as $itemOr) {
                     if ($itemOr->isProduct()) {
                         $arEcLData[] = [
@@ -674,6 +674,7 @@ class MyShoppingController extends AbstractShoppingController
                             'dyna_model_seg5'       => count($itemList),                            // ・ダイナ規格セグメント05←EC注文明細番号
                             'remarks1'              => $remarks1,
                             'remarks2'              => $remarks2,
+                            'location'              => !empty($location) ? $location : "XB0101001",
                             // No41 注文情報送信I/F end
                             ];
                     }

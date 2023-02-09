@@ -248,7 +248,6 @@ class MypageController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
-
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // 購入処理中/決済処理中ステータスの受注を非表示にする.
@@ -270,20 +269,9 @@ class MypageController extends AbstractController
         // Query data
         $customer_code  = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
         $customer_id    = $this->twig->getGlobals()["app"]->MyDataMstCustomer["ec_customer_id"];
-        $shipping_code  = $this->globalService->getShippingCode();
-        $otodoke_code   = $this->globalService->getOtodokeCode();
         $login_type     = $this->globalService->getLoginType();
 
-        //Override data
-        if (!empty($param['search_order_shipping'])) {
-            $shipping_code  = '';
-        }
-
-        if (!empty($param['search_order_otodoke'])) {
-            $otodoke_code   = '';
-        }
-
-        $qb             = $this->orderItemRepository->getQueryBuilderByCustomer($param, $customer_code, $shipping_code, $otodoke_code, $login_type);
+        $qb             = $this->orderItemRepository->getQueryBuilderByCustomer($param, $customer_code, $login_type);
 
         // Paginator
         $pagination     = $paginator->paginate(
@@ -602,7 +590,7 @@ class MypageController extends AbstractController
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $Customer = $this->getUser();
-        
+
         // 購入処理中/決済処理中ステータスの受注を非表示にする.
         // $this->entityManager
         //     ->getFilters()
@@ -669,98 +657,94 @@ class MypageController extends AbstractController
     public function delivery(Request $request, PaginatorInterface $paginator)
     {
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-        $Customer = $this->getUser();
 
         // 購入処理中/決済処理中ステータスの受注を非表示にする.
-        $this->entityManager
-            ->getFilters()
-            ->enable('incomplete_order_status_hidden');
-        $nf = new MstShipping();
-        // paginator
-        $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
-        $qb = $this->orderItemRepository->getQueryBuilderByCustomer([], $customer_code);
+        $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
 
-        $pagination = $paginator->paginate(
+        //Params
+        $param                      = [
+            'pageno'                => $request->get('pageno', 1),
+            'delivery_no'           => $request->get('delivery_no'),
+            'search_shipping_date'  => $request->get('shipping_date', []),
+            'search_order_shipping' => $request->get('order_shipping', []),
+            'search_order_otodoke'  => $request->get('order_otodoke', []),
+        ];
+
+        if (empty($param['search_order_shipping'])) {
+            $param['search_order_otodoke']  = [];
+        }
+
+        // Query data
+        $customer_code  = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
+        $customer_id    = $this->twig->getGlobals()["app"]->MyDataMstCustomer["ec_customer_id"];
+        $login_type     = $this->globalService->getLoginType();
+
+        $qb             = $this->orderItemRepository->getDeliveryByCustomer($param, $customer_code, $login_type);
+
+        // Paginator
+        $pagination     = $paginator->paginate(
             $qb,
             $request->get('pageno', 1),
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
 
+        /*create list order date*/
+        $shippingDateList       = [];
+        $shippingDateList[]     = [
+            'key'               => (string)date("Y-m", ),
+            'value'             => (string)date("Y-m", ),
+        ];
 
-        $listItem = [];
-        $listItem = $pagination->getItems();
-        $arProductId = [];
-        $arOrderNo = [];
-        //modify data
-        foreach ($listItem as &$myItem) {
-            $arProductId[] = $myItem['product_id'];
-            $arOrderNo[$myItem['ec_order_no']][$myItem['ec_order_lineno']] = $myItem['order_line_no'];
-            if (is_object($myItem['update_date'])) {
-                $myItem['update_date'] = $myItem['update_date']->format('Y-m-d');
-                if (MyCommon::checkExistText($myItem['update_date'], '.000000')) {
-                    $myItem['update_date'] = str_replace('.000000', '', $myItem['update_date']);
-                } else {
-                    $myItem['update_date'] = str_replace('000', '', $myItem['update_date']);
-                }
-            }
-            if (isset(MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']])) {
-                $myItem['order_status'] = MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']];
-            }
-            if (isset(MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']])) {
-                $myItem['shipping_status'] = MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']];
-            }
-            $myItem['order_remain_num'] = $myItem['order_remain_num']*$myItem['quantity'];
-            $myItem['reserve_stock_num'] = $myItem['reserve_stock_num']*$myItem['quantity'];
+        for ($i = 1; $i < 14; $i++) {
+            $date               = date("Y-m", strtotime("- $i month"));
+            $shippingDateList[] = [
+                'key'           => (string)$date,
+                'value'         => (string)$date,
+            ];
+        }
 
-            $myItem['order_type'] = '';
-            if (isset($myItem['flow_type'])) {
-                if($myItem['flow_type']=="2"){
-                    $myItem['order_type'] = 'EC';
-                }
+        /*create list order status*/
+        $orderStatusList        = [];
+        $orderStatusList[]      = ['key' => '0', 'value' => '調査要'];
+        $orderStatusList[]      = ['key' => '1', 'value' => '未確保'];
+        $orderStatusList[]      = ['key' => '2', 'value' => '一部確保'];
+        $orderStatusList[]      = ['key' => '3', 'value' => '確保済み'];
+        $orderStatusList[]      = ['key' => '4', 'value' => 'キャンセル'];
+        $orderStatusList[]      = ['key' => '9', 'value' => '注文完了'];
+
+        /*create list shipping code*/
+        $orderShippingList      = [];
+        $shippingList           = $this->globalService->shippingOption();
+        if (count($shippingList) > 1) {
+            foreach ($shippingList AS $item) {
+                $orderShippingList[]    = [
+                    'key'               => $item["shipping_no"],
+                    'value'             => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
+                ];
             }
         }
 
-        //auto fill lino
-        $arOrderNoAf = [];
-        foreach ($arOrderNo as $keyOrder => $arEc) {
-            $autoFileId = 1;
-            foreach ($arEc as $keyLine => $valNo) {
-                if (MyCommon::isEmptyOrNull($valNo)) {
-                    $arOrderNoAf[$keyOrder][$keyLine] = $autoFileId;
-                    $autoFileId++;
-                }
+        /*create list otodoke code*/
+        $orderOtodeokeList      = [];
+        $otodokeList            = $this->globalService->otodokeOption($customer_id, $param['search_order_shipping'][0] ?? '');
+        if (count($otodokeList)) {
+            foreach ($otodokeList AS $item) {
+                $orderOtodeokeList[]    = [
+                    'key'               => $item["otodoke_code"],
+                    'value'             => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
+                ];
             }
         }
-        //get one image of product
-        $hsProductImgMain = $this->productImageRepository->getImageMain($arProductId);
-        $commonService = new MyCommonService($this->entityManager);
-        $listImgs = $commonService->getImageFromEcProductId($arProductId);
-        $hsKeyImg = [];
-        //a.file_name,a.product_id,b.product_code
-        foreach ($listImgs as $itemImg){
-            $hsKeyImg[$itemImg["product_id"]] = $itemImg["file_name"];
-        }
-
-        foreach ($listItem as &$myItem) {
-            if (isset($hsKeyImg[$myItem['product_id']])) {
-                $myItem['main_img'] = $hsKeyImg[$myItem['product_id']];
-            }else{
-                $myItem['main_img'] = null;
-            }
-            if (MyCommon::isEmptyOrNull($myItem['order_line_no'])) {
-                if (isset($arOrderNoAf[$myItem['ec_order_no']])) {
-                    if (isset($arOrderNoAf[$myItem['ec_order_no']][$myItem['ec_order_lineno']])) {
-                        $myItem['order_line_no'] = $arOrderNoAf[$myItem['ec_order_no']][$myItem['ec_order_lineno']];
-                    }
-                }
-            }
-        }
-
-        $pagination->setItems($listItem);
 
         return [
-            'pagination' => $pagination, 'hsProductImgMain' => $hsProductImgMain
+            'pagination'                => $pagination,
+            'shippingDateOpt'           => $shippingDateList,
+            'orderShippingOpt'          => $orderShippingList,
+            'orderOtodokeOpt'           => $orderOtodeokeList,
+            'search_shipping_date'      => implode(",", $param['search_shipping_date']),
+            'search_order_shipping'     => implode(",", $param['search_order_shipping']),
+            'search_order_otodoke'      => implode(",", $param['search_order_otodoke']),
         ];
     }
 }
