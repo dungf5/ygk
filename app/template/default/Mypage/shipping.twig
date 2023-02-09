@@ -189,7 +189,9 @@ file that was distributed with this source code.
                                 {% if Shipping.delivery_no is null %}
                                     空白
                                 {% else %}
-                                    {{ Shipping.delivery_no }}
+                                    <a href="/mypage/delivery/history?delivery_no={{Shipping.delivery_no}}" target="_blank">
+                                        {{ Shipping.delivery_no }}
+                                    </a>
                                 {% endif %}
                             </td>
                             <td>{{ Shipping.order_lineno }}</td>
