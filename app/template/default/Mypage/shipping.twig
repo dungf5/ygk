@@ -110,7 +110,12 @@ file that was distributed with this source code.
                         <br/>
                         <select id="search_order_shipping" name="search_order_shipping" multiple="multiple" onchange="handleSearch(this)">
                             {% for orderShipping in orderShippingOpt %}
-                                <option value="{{orderShipping.key}}">{{orderShipping.value}}</option>
+                                <option
+                                    value="{{orderShipping.key}}"
+                                    {% if orderShipping.key in search_parameter.order_shipping %}selected{%  endif %}
+                                >
+                                    {{orderShipping.value}}
+                                </option>
                             {% endfor %}
                         </select>
                         <br/>
@@ -120,7 +125,12 @@ file that was distributed with this source code.
                         <br/>
                         <select id="search_order_otodoke" name="search_order_otodoke" multiple="multiple" onchange="handleSearch(this)">
                             {% for orderOtodoke in orderOtodokeOpt %}
-                                <option value="{{orderOtodoke.key}}">{{orderOtodoke.value}}</option>
+                                <option
+                                    value="{{orderOtodoke.key}}"
+                                    {% if orderOtodoke.key in search_parameter.order_otodoke %}selected{%  endif %}
+                                >
+                                    {{orderOtodoke.value}}
+                                </option>
                             {% endfor %}
                         </select>
                     </th>
@@ -220,7 +230,7 @@ file that was distributed with this source code.
     <script>
         var typingTimer;
         $('#search_order_shipping').multiselect({
-            includeSelectAllOption: true,
+            includeSelectAllOption: false,
             selectAllText: 'すべて',
             enableFiltering: true,
             filterPlaceholder: '検索',
@@ -285,7 +295,7 @@ file that was distributed with this source code.
             }
         })
         $('#search_order_otodoke').multiselect({
-            includeSelectAllOption: true,
+            includeSelectAllOption: false,
             selectAllText: 'すべて',
             enableFiltering: true,
             filterPlaceholder: '検索',
