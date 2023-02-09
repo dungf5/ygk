@@ -159,13 +159,10 @@ class ProductRepository extends AbstractRepository
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 
-    public function getQueryBuilderBySearchDataNewCustom($searchData, $user = false, $customer_code = '', $arProductCodeInDtPrice=[],$arTanakaNumber=[], $login_type='')
+    public function getQueryBuilderBySearchDataNewCustom($searchData, $user = false, $customer_code = '', $login_type='')
     {
         $defaultSortLoginorderPrice     = "
-            (CASE
-                WHEN price.price_s01  is null THEN mstProduct.unit_price
-                ELSE price.price_s01
-            END)
+            mstProduct.unit_price
                 AS hidden orderPrice
         ";
 
@@ -339,27 +336,23 @@ class ProductRepository extends AbstractRepository
             $qb->andWhere("(mstProduct.special_order_flg <> 'Y' OR mstProduct.special_order_flg is null)");
         }
 
-        $curentDate         = date('Y-m-d');
-        $stringCon          = ' price.product_code = mstProduct.product_code AND price.customer_code = :customer_code  ';
-        $stringCon          .= " and '$curentDate' >= price.valid_date AND '$curentDate' <= price.expire_date  and price.product_code in (:product_code)";
-
-        if (count($arTanakaNumber) > 0) {
-            $stringCon      .= " and price.tanka_number in(:tanka_number)";
-        }
-
-        $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH, $stringCon)
-            ->setParameter(':customer_code', $customer_code)
-            ->setParameter(':product_code', $arProductCodeInDtPrice);
-
-        if (count($arTanakaNumber) > 0) {
-            $qb->setParameter(':tanka_number', $arTanakaNumber);
-        }
-
         $listSelectMstProduct   = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name,mstProduct.size,mstProduct.color";
         $listSelectMstProduct   .=",mstProduct.quantity as mst_quantity,mstProduct.jan_code,mstProduct.material,mstProduct.model, mstProduct.quantity, mstProduct.quantity_box ";
 
         $qb->addSelect($listSelectMstProduct);
-        $qb->addSelect('price.price_s01 as  price_s01');
+        $qb->addSelect("
+            (select dp.price_s01
+            from Customize\Entity\Price dp
+            where dp.product_code = mstProduct.product_code
+            and dp.customer_code = :customerCode
+            and dp.valid_date <= :currentDate
+            and dp.expire_date >= :currentDate
+            order by dp.tanka_number asc
+            )
+            as  price_s01
+        ")->setMaxResults(1);
+        $qb->setParameter(":customerCode", $customer_code);
+        $qb->setParameter(":currentDate", date('Y-m-d'));
 
         $shipping_route = $newComs->getShippingRouteFromUser($customer_code, $login_type);
         // AND stock_list.customer_code = :customerCode figo comment 20230106
@@ -371,7 +364,7 @@ class ProductRepository extends AbstractRepository
                 AND stock_list.stock_location = :stockLocation")
                 ->setParameter(':stockLocation', $shipping_route['stock_location']);
             $qb->addSelect('stock_list.stock_num');
-            
+
             $qb->leftJoin('Customize\Entity\MstDeliveryPlan',
                 'mst_delivery_plan',
                 Join::WITH,
@@ -381,8 +374,8 @@ class ProductRepository extends AbstractRepository
                 ->setParameter(':stockLocation', $shipping_route['stock_location']);
             $qb->addSelect('mst_delivery_plan.delivery_date AS dp_delivery_date');
             $qb->addSelect('mst_delivery_plan.quanlity AS dp_quanlity');
-            $qb->groupBy('mst_delivery_plan.product_code');
-            $qb->groupBy('mst_delivery_plan.stock_location');
+            //$qb->groupBy('mst_delivery_plan.product_code');
+            //$qb->groupBy('mst_delivery_plan.stock_location');
             //$qb->orderBy("ABS( DATE_DIFF( mst_delivery_plan.delivery_date, CURRENT_DATE() ) )", 'ASC');
         }
 

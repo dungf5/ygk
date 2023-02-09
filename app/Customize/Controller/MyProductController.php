@@ -250,7 +250,7 @@ class MyProductController extends AbstractController
             if( $stock ) {
                 $mstDeliveryPlan = $this->mstDeliveryPlanRepository->getData($mstProduct->getProductCode(), $stock);
             }
-        } 
+        }
 
         //check in cart
         $ecProductId        = $Product->getId();
@@ -556,11 +556,11 @@ class MyProductController extends AbstractController
 
         // paginator
         $searchData             = $searchForm->getData();
-        $arProductCodeInDtPrice = [];
-        $arPriceAndTanaka       = $commonService->getPriceFromDtPriceOfCusV2($customer_code);
-        $arProductCodeInDtPrice = $arPriceAndTanaka[0];
-        $arTanakaNumber         = $arPriceAndTanaka[1];
-        $qb                     = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customer_code, $arProductCodeInDtPrice, $arTanakaNumber, $login_type);
+//        $arProductCodeInDtPrice = [];
+//        $arPriceAndTanaka       = $commonService->getPriceFromDtPriceOfCusV2($customer_code);
+//        $arProductCodeInDtPrice = $arPriceAndTanaka[0];
+//        $arTanakaNumber         = $arPriceAndTanaka[1];
+        $qb                     = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customer_code, $login_type);
 
         $event = new EventArgs(
             [
@@ -573,14 +573,14 @@ class MyProductController extends AbstractController
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_SEARCH, $event);
         $searchData             = $event->getArgument('searchData');
         $query                  = $qb->getQuery()->useResultCache(true, $this->eccubeConfig['eccube_result_cache_lifetime_short']);
-        
+
         /** @var SlidingPagination $pagination */
         $pagination             = $paginator->paginate(
             $query,
             !empty($searchData['pageno']) ? $searchData['pageno'] : 1,
             !empty($searchData['disp_number']) ? $searchData['disp_number']->getId() : $this->productListMaxRepository->findOneBy([], ['sort_no' => 'ASC'])->getId()
         );
-        
+
         $ids                    = [];
 
         foreach ($pagination as $Product) {
