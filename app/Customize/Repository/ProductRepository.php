@@ -332,6 +332,9 @@ class ProductRepository extends AbstractRepository
         }
 
         $qb->innerJoin('Customize\Entity\MstProduct', 'mstProduct',Join::WITH,'mstProduct.ec_product_id = p.id');
+        $qb->andWhere("(mstProduct.jan_code is not null)");
+        $qb->andWhere("(mstProduct.jan_code <> '')");
+
         if (!$this->globalService->getSpecialOrderFlg()) {
             $qb->andWhere("(mstProduct.special_order_flg <> 'Y' OR mstProduct.special_order_flg is null)");
         }
