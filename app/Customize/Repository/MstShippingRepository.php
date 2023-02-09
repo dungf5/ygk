@@ -27,8 +27,6 @@ class MstShippingRepository extends AbstractRepository
      */
     public function getQueryBuilderByCustomer($search_parameter=[], $customer_code='', $login_type='')
     {
-        var_dump($search_parameter);die;
-
         $qb = $this->createQueryBuilder('shipping');
         $qb->select('shipping.shipping_no', 'shipping.customer_code', 'shipping.shipping_status', 'shipping.shipping_plan_date', 'shipping.shipping_date', 'shipping.shipping_num', 'shipping.order_lineno', 'shipping.cus_order_no', 'shipping.cus_order_lineno');
 
@@ -81,6 +79,16 @@ class MstShippingRepository extends AbstractRepository
                 $qb->andWhere('shipping.shipping_status = :shipping_status')
                     ->setParameter('shipping_status', 2);
             }
+        }
+
+        if( ! empty( $search_parameter['order_shipping'] ) ) {
+            $qb->andWhere('order_status.shipping_code = :shipping_code')
+                ->setParameter('shipping_code', $search_parameter['order_shipping']);
+        }
+
+        if( ! empty( $search_parameter['order_otodoke'] ) ) {
+            $qb->andWhere('order_status.otodoke_code = :order_otodoke')
+                ->setParameter('order_otodoke', $search_parameter['order_otodoke']);
         }
 
         $qb->addSelect('product.jan_code', 'product.product_name', 'delivery.delivery_no');
