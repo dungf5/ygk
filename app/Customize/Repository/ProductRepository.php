@@ -381,17 +381,14 @@ class ProductRepository extends AbstractRepository
                 ->setParameter(':stockLocation', $shipping_route['stock_location']);
             $qb->addSelect('mst_delivery_plan.delivery_date AS dp_delivery_date');
             $qb->addSelect('mst_delivery_plan.quanlity AS dp_quanlity');
-            $qb->orderBy("ABS( DATE_DIFF( mst_delivery_plan.delivery_date, CURRENT_DATE() ) )", 'ASC');
             $qb->groupBy('mst_delivery_plan.product_code');
             $qb->groupBy('mst_delivery_plan.stock_location');
+            //$qb->orderBy("ABS( DATE_DIFF( mst_delivery_plan.delivery_date, CURRENT_DATE() ) )", 'ASC');
         }
 
         $qb->groupBy('mstProduct.product_code');
 
-        // echo($qb->getQuery()->getSQL());
-        // var_dump($qb->getParameters());
-        // var_dump($searchData);
-        // die();
+        //dd( $qb->getQuery()->getSQL(), $searchData);
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 }
