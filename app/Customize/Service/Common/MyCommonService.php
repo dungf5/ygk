@@ -1423,7 +1423,7 @@ class MyCommonService extends AbstractRepository
             return "";
         }
 
-        $newComs    = new MyCommonService($this->getEntityManager());
+        $newComs    = new MyCommonService($this->entityManager);
         $shippingNo = $newComs->getShippingCodeByCustomerCode($customer_code, $login_type);
 
         $sql = "SELECT
