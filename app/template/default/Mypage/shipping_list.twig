@@ -39,8 +39,8 @@
     {% for item in myData %}
         <tr {% if item.highlight %} style="border: solid red;"  {% endif %}>
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>
-                <a href="/mypage/shipping/history?shipping_no={{item.shipping_no}}" target="_blank">
-                    {{item.shipping_no}}
+                <a href="/mypage/delivery/history?delivery_no={{item.delivery_no}}" target="_blank">
+                    {{item.delivery_no}}
                 </a>
             </td>
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.jan_code }}</td>
@@ -50,6 +50,11 @@
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.shipping_plan_date }}</td>
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.shipping_date }}</td>
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.shipping_company_code }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>
+                <a href="/mypage/shipping/history?shipping_no={{item.shipping_no}}" target="_blank">
+                    {{item.shipping_no}}
+                </a>
+            </td>
         </tr>
     {% endfor %}
     </tbody>
