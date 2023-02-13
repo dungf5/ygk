@@ -230,7 +230,7 @@ class MyCommonService extends AbstractRepository
                 join mst_customer as d
                 on c.customer_code = d.customer_code
                 left join mst_customer AS cus2 ON  cus2.customer_code = c.shipping_code
-                left join mst_delivery  as f on concat(c.cus_order_no, '-', c.cus_order_lineno) = f.order_no
+                left join mst_delivery  as f on concat(c.ec_order_no, '-', c.ec_order_lineno) = f.order_no
                 where {$condition} and c.shipping_no = ? and a.ec_order_no = ? and delete_flg <> 0
             ";
 
