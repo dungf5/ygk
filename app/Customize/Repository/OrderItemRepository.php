@@ -82,7 +82,7 @@ class OrderItemRepository extends AbstractRepository
         ";
 
         $qb         = $this->getEntityManager()->createQueryBuilder();
-        $where      = " ordStatus.order_date >= :orderDate {$condition}";
+        $where      = " ordStatus.order_date >= :orderDate {$condition} AND mstShip.delete_flg <> 0";
 
         // Add condition
         if ( $paramSearch['search_order_status'] != '') {
@@ -150,7 +150,7 @@ class OrderItemRepository extends AbstractRepository
         $qb->addOrderBy('ordStatus.cus_order_no', 'DESC');
         $qb->addOrderBy('ordStatus.cus_order_lineno', 'asc');
 
-        //dd( $qb->getQuery()->getSQL(), $customerCode, $shippingCode, $otodokeCode);
+        //dd( $qb->getQuery()->getSQL(), $customerCode);
         //$this->queries->customize("", $qb, []);
 
         return $qb;
