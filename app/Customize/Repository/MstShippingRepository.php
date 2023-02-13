@@ -34,7 +34,7 @@ class MstShippingRepository extends AbstractRepository
                 '\Customize\Entity\DtOrderStatus',
                 'order_status',
                 Join::WITH,
-                'order_status.order_no = shipping.order_no AND order_status.order_line_no = shipping.order_lineno');
+                'order_status.cus_order_no = shipping.cus_order_no');
         $qb->innerJoin(
                 '\Customize\Entity\MstProduct',
                 'product',
@@ -99,7 +99,10 @@ class MstShippingRepository extends AbstractRepository
         $qb->addGroupBy('shipping.order_lineno');
         
         $qb->addOrderBy('shipping.shipping_date', 'DESC');
-
+        
+        // echo($qb->getQuery()->getSQL());
+        // var_dump($qb->getParameters());
+        // die();
         return $qb;
     }
 
