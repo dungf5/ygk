@@ -189,7 +189,7 @@ class OrderItemRepository extends AbstractRepository
                     ";
 
         $qb         = $this->getEntityManager()->createQueryBuilder();
-        $where      = " ms.delete_flg <> 0 AND ms.shipping_date > :shippingDate {$condition}";
+        $where      = " ms.delete_flg <> 0 AND ms.shipping_date >= :shippingDate {$condition}";
 
         // Add condition
         if (!empty($paramSearch['delivery_no'])) {
