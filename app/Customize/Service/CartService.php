@@ -40,6 +40,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Eccube\Service\CartService as Service;
+use Customize\Service\GlobalService;
 
 
 class CartService extends Service
@@ -116,6 +117,28 @@ class CartService extends Service
      */
     protected $mstProductRepository;
 
+    /**
+     * @var GlobalService
+     */
+    protected $globalService;
+
+    public function __construct(
+        GlobalService $globalService,
+        EntityManagerInterface $entityManager,
+        TokenStorageInterface $tokenStorage,
+        CartRepository  $cartRepository,
+        CartItemAllocator   $cartItemAllocator,
+        SessionInterface    $session,
+        CartItemComparator  $cartItemComparator
+    ) {
+        $this->globalService        = $globalService;
+        $this->entityManager        = $entityManager;
+        $this->tokenStorage         = $tokenStorage;
+        $this->cartRepository       = $cartRepository;
+        $this->cartItemAllocator    = $cartItemAllocator;
+        $this->session              = $session;
+        $this->cartItemComparator   = $cartItemComparator;
+    }
 
     /**
      * 現在のカートの配列を取得する.
@@ -385,24 +408,21 @@ class CartService extends Service
         }
 
         if ($this->getUser()) {
-            $Customer = $this->getUser();
-            $commonS = new MyCommonService($this->entityManager);
-            $customer_code = $commonS->getMstCustomer($Customer->getId())["customer_code"];
-//            $priceClass = $this->entityManager
-//                ->getRepository(Price::class)
-//                ->findOneBy(['product_code'=>$mstProductClass->getProductCode(),'customer_code'=>$customer_code ]);
-            $priceR = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProductClass->getProductCode());
+            $Customer           = $this->getUser();
+            $commonS            = new MyCommonService($this->entityManager);
+            $customer_code      = $commonS->getMstCustomer($Customer->getId())["customer_code"];
+            $login_type         = $this->globalService->getLoginType();
+            $priceR             = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProductClass->getProductCode(), $login_type);
 
-            if($priceR!==""){
-                $price = $priceR;//$priceClass->getPriceS01();
+            if ($priceR!=="") {
+                $price = $priceR;
             }
-
         }
 
-        $newItem = new CartItem();
+        $newItem                = new CartItem();
         $newItem->setQuantity($quantity / $lot);
+
         // 標準単価 || 価格
-        //$newItem->setPrice($ProductClass->getPrice02IncTax());
         $newItem->setPrice($price);
         $newItem->setProductClass($ProductClass);
         $allCartItems = $this->mergeAllCartItems([$newItem]);
@@ -444,21 +464,20 @@ class CartService extends Service
         }
 
         if ($this->getUser()) {
-            $Customer = $this->getUser();
-            $commonS = new MyCommonService($this->entityManager);
-            $customer_code = $commonS->getMstCustomer($Customer->getId())["customer_code"];
+            $Customer           = $this->getUser();
+            $commonS            = new MyCommonService($this->entityManager);
+            $customer_code      = $commonS->getMstCustomer($Customer->getId())["customer_code"];
+            $login_type         = $this->globalService->getLoginType();
+            $priceR             = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProductClass->getProductCode(), $login_type);
 
-            $priceR = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProductClass->getProductCode());
-
-            if($priceR!==""){
-                $price = $priceR;//$priceClass->getPriceS01();
+            if ($priceR !== "") {
+                $price  = $priceR;
             }
-
         }
-        $myQuantity = $quantity / $lot;
 
-        $cmS = new MyCommonService($this->entityManager);
-        $resultUp =  $cmS->updateCartItemOne($oneCartId,$productClassId,$myQuantity);
+        $myQuantity     = $quantity / $lot;
+        $cmS            = new MyCommonService($this->entityManager);
+        $resultUp       =  $cmS->updateCartItemOne($oneCartId,$productClassId,$myQuantity);
 
         return $resultUp;
     }
@@ -495,24 +514,21 @@ class CartService extends Service
         }
 
         if ($this->getUser()) {
-            $Customer = $this->getUser();
-            $commonS = new MyCommonService($this->entityManager);
-            $customer_code = $commonS->getMstCustomer($Customer->getId())["customer_code"];
-//            $priceClass = $this->entityManager
-//                ->getRepository(Price::class)
-//                ->findOneBy(['product_code'=>$mstProductClass->getProductCode(),'customer_code'=>$customer_code ]);
-            $priceR = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProductClass->getProductCode());
+            $Customer           = $this->getUser();
+            $commonS            = new MyCommonService($this->entityManager);
+            $customer_code      = $commonS->getMstCustomer($Customer->getId())["customer_code"];
+            $login_type         = $this->globalService->getLoginType();
+            $priceR             = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProductClass->getProductCode(), $login_type);
 
-            if($priceR!==""){
-                $price = $priceR;//$priceClass->getPriceS01();
+            if ($priceR!=="") {
+                $price          = $priceR;
             }
-
         }
 
-        $newItem = new CartItem();
+        $newItem                = new CartItem();
         $newItem->setQuantity($quantity / $lot);
+
         // 標準単価 || 価格
-        //$newItem->setPrice($ProductClass->getPrice02IncTax());
         $newItem->setPrice($price);
         $newItem->setKeyEccube($carSession);
         $newItem->setProductClass($ProductClass);

@@ -1417,33 +1417,42 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
-    public function getPriceFromDtPriceOfCusProductcodeV2($customer_code="",$productCode)
+    public function getPriceFromDtPriceOfCusProductcodeV2($customer_code="", $productCode, $login_type = null)
     {
-        $arR = [];
-        $arRTana = [];
-        if($customer_code=="") {
+        if ($customer_code == "") {
             return "";
         }
 
-        //pri.customer_code = pri.shipping_no cho giao hang phai giong de co gia tot
-        $sql = " SELECT  a.price_s01 FROM  dt_price a
-			 JOIN
-( select pri.product_code,MIN(pri.tanka_number) AS min_tanka_number from dt_price pri
-                WHERE pri.customer_code=?
-                and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
+        $newComs    = new MyCommonService($this->getEntityManager());
+        $shippingNo = $newComs->getShippingCodeByCustomerCode($customer_code, $login_type);
 
-AND          pri.product_code=?
-                GROUP BY product_code ) AS b ON b.min_tanka_number = a.tanka_number AND a.product_code=b.product_code
-                ; ";
+        $sql = "SELECT
+                    a.price_s01
+                FROM
+                    dt_price a
+                JOIN
+                    (SELECT pri.product_code, MIN(pri.tanka_number) AS min_tanka_number
+                    FROM dt_price pri
+                    WHERE pri.shipping_no = ?
+                    AND DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date
+                    AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
+                    AND pri.product_code = ?
+                GROUP BY product_code ) AS b
+                ON
+                    b.min_tanka_number = a.tanka_number
+                AND
+                    a.product_code=b.product_code
+                ";
 
-        $param = [$customer_code,$productCode];
-        $statement = $this->entityManager->getConnection()->prepare($sql);
-        $price_s01 ="";
+        $param      = [$shippingNo, $productCode];
+        $statement  = $this->entityManager->getConnection()->prepare($sql);
+        $price_s01  = "";
+
         try {
             $result = $statement->executeQuery($param);
-            $rows = $result->fetchAllAssociative();
+            $rows   = $result->fetchAllAssociative();
 
-           if(count($rows)>0){
+           if (count($rows) > 0) {
                 $price_s01 = $rows[0]["price_s01"];
            }
 
@@ -1454,6 +1463,7 @@ AND          pri.product_code=?
             return "";
         }
     }
+
     public function getPriceFromDtPriceOfCusProductcode($customer_code="",$productCode)
     {
         $arR = [];
