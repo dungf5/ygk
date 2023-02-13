@@ -68,25 +68,22 @@ class MstShippingRepository extends AbstractRepository
                 break;
         }
 
-        if( count($search_parameter['shipping_status']) > 0 ) {
-            if( in_array( 1, $search_parameter['shipping_status'] )
-                && ! in_array( 2, $search_parameter['shipping_status'] ) ) {
+        switch( $search_parameter['shipping_status'] ) {
+            case 1:
                 $qb->andWhere('shipping.shipping_status = :shipping_status')
                     ->setParameter('shipping_status', 1);
-            }
-            if( ! in_array( 1, $search_parameter['shipping_status'] )
-                && in_array( 2, $search_parameter['shipping_status'] ) ) {
+                break;
+            case 2:
                 $qb->andWhere('shipping.shipping_status = :shipping_status')
                     ->setParameter('shipping_status', 2);
-            }
+                break;
         }
-
-        if( ! empty( $search_parameter['order_shipping'] ) ) {
+        if( $search_parameter['order_shipping'] > 0 ) {
             $qb->andWhere('order_status.shipping_code = :shipping_code')
                 ->setParameter('shipping_code', $search_parameter['order_shipping']);
         }
 
-        if( ! empty( $search_parameter['order_otodoke'] ) ) {
+        if( $search_parameter['order_otodoke'] > 0 ) {
             $qb->andWhere('order_status.otodoke_code = :order_otodoke')
                 ->setParameter('order_otodoke', $search_parameter['order_otodoke']);
         }

@@ -607,9 +607,9 @@ class MypageController extends AbstractController
         // $customer_relation = $common_service->getCustomerRelationFromUser($customer_code, $login_type);
 
         $search_parameter = [
-            'shipping_status' => $request->get('shipping_status', []),
-            'order_shipping' => $request->get('order_shipping', []),
-            'order_otodoke' => $request->get('order_otodoke', []),
+            'shipping_status' => $request->get('shipping_status', 0),
+            'order_shipping' => $request->get('order_shipping', 0),
+            'order_otodoke' => $request->get('order_otodoke', 0),
         ];
         $qb = $this->mstShippingRepository->getQueryBuilderByCustomer($search_parameter, $customer_code, $login_type);
 
