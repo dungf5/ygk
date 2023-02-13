@@ -35,29 +35,21 @@ file that was distributed with this source code.
             width: 100%;
             border: none;
         }
-        .multiselect-container .multiselect-all .form-check {
-            float: left;
-            /*padding: 0 5px 0 45px;*/
+        .multiselect-option .form-check {
+            padding: 0;
+        }
+        .multiselect-container .multiselect-option .form-check-input {
+            display: none;
         }
         .multiselect-container .multiselect-option .form-check {
             float: left;
         }
-        .multiselect-container .multiselect-all .form-check .form-check-label {
-            margin-left: 10px;
+        .multiselect-container .multiselect-filter>input.multiselect-search {
+            margin-left: 0;
         }
-        .multiselect-container .multiselect-option .form-check .form-check-label {
-            margin-left: 10px;
-        }
-        button.multiselect.dropdown-toggle.custom-select.text-center {
-            height: 34px;
-        }
-        div.multiselect-filter.d-flex.align-items-center {
-            width: 100%;
-            display: inline-flex;
-        }
-        div.multiselect-filter.d-flex.align-items-center i {
-            display: inline-flex;
-            margin-top: 10px;
+        .multiselect-container .multiselect-filter>.fa-search {
+            position: absolute;
+            margin: 9px 0px 0 -3px;
         }
         button.multiselect {
             display: none;
@@ -112,9 +104,10 @@ file that was distributed with this source code.
                                 <span class="glyphicon glyphicon-triangle-bottom"></span>
                             </a>
                             <br/>
-                            <select id="search_order_date" name="search_order_date" multiple="multiple" onchange="handleSearch(this)">
+                            <select id="search_order_date" name="search_order_date" onchange="handleSearch(this)">
+                                <option value="0" {% if 0 == search_order_date %}selected{%  endif %}>すべて</option>
                                 {% for orderDate in orderDateOpt %}
-                                    <option value="{{orderDate.key}}">{{orderDate.value}}</option>
+                                    <option value="{{orderDate.key}}" {% if orderDate.key == search_order_date %}selected{%  endif %}>{{orderDate.value}}</option>
                                 {% endfor %}
                             </select>
                         </th>
@@ -124,9 +117,10 @@ file that was distributed with this source code.
                                 <span class="glyphicon glyphicon-triangle-bottom"></span>
                             </a>
                             <br/>
-                            <select id="search_order_shipping" name="search_order_shipping" multiple="multiple" onchange="handleSearch(this)">
+                            <select id="search_order_shipping" name="search_order_shipping" onchange="handleSearch(this)">
+                                <option value="0" {% if 0 == search_order_shipping %}selected{%  endif %}>すべて</option>
                                 {% for orderShipping in orderShippingOpt %}
-                                    <option value="{{orderShipping.key}}">{{orderShipping.value}}</option>
+                                    <option value="{{orderShipping.key}}" {% if orderShipping.key == search_order_shipping %}selected{%  endif %}>{{orderShipping.value}}</option>
                                 {% endfor %}
                             </select>
                             <input type="text" value="" id="last_order_shipping" hidden>
@@ -136,9 +130,10 @@ file that was distributed with this source code.
                                 <span class="glyphicon glyphicon-triangle-bottom"></span>
                             </a>
                             <br/>
-                            <select id="search_order_otodoke" name="search_order_otodoke" multiple="multiple" onchange="handleSearch(this)">
+                            <select id="search_order_otodoke" name="search_order_otodoke" onchange="handleSearch(this)">
+                                <option value="0" {% if 0 == search_order_otodoke %}selected{%  endif %}>すべて</option>
                                 {% for orderOtodoke in orderOtodokeOpt %}
-                                    <option value="{{orderOtodoke.key}}">{{orderOtodoke.value}}</option>
+                                    <option value="{{orderOtodoke.key}}" {% if orderOtodoke.key == search_order_otodoke %}selected{%  endif %}>{{orderOtodoke.value}}</option>
                                 {% endfor %}
                             </select>
                         </th>
@@ -155,9 +150,10 @@ file that was distributed with this source code.
                                 <span class="glyphicon glyphicon-triangle-bottom"></span>
                             </a>
                             <br/>
-                            <select id="search_order_status" name="search_order_status" multiple="multiple" onchange="handleSearch(this)">
+                            <select id="search_order_status" name="search_order_status" onchange="handleSearch(this)">
+                                <option value="" {% if '' == search_order_status %}selected{%  endif %}>すべて</option>
                                 {% for orderStatus in orderStatusOpt %}
-                                    <option value="{{orderStatus.key}}">{{orderStatus.value}}</option>
+                                    <option value="{{orderStatus.key}}" {% if orderStatus.key == search_order_status %}selected{%  endif %}>{{orderStatus.value}}</option>
                                 {% endfor %}
                             </select>
                         </th>
@@ -275,8 +271,8 @@ file that was distributed with this source code.
         }
 
         $('#search_order_date').multiselect({
-            includeSelectAllOption: true,
-            selectAllText: 'すべて',
+            // includeSelectAllOption: true,
+            // selectAllText: 'すべて',
             enableFiltering: true,
             filterPlaceholder: '検索',
             checkboxName: function(option) {
@@ -331,8 +327,8 @@ file that was distributed with this source code.
         });
 
         $('#search_order_status').multiselect({
-            includeSelectAllOption: true,
-            selectAllText: 'すべて',
+            // includeSelectAllOption: true,
+            // selectAllText: 'すべて',
             // enableFiltering: true,
             // filterPlaceholder: '検索',
             checkboxName: function(option) {
@@ -444,8 +440,8 @@ file that was distributed with this source code.
         });
 
         $('#search_order_otodoke').multiselect({
-            includeSelectAllOption: true,
-            selectAllText: 'すべて',
+            // includeSelectAllOption: true,
+            // selectAllText: 'すべて',
             enableFiltering: true,
             filterPlaceholder: '検索',
             disableIfEmpty: true,
@@ -499,31 +495,6 @@ file that was distributed with this source code.
             buttonClass:'search_order_otodoke',
             nonSelectedText: '注文日検索',
         });
-
-        /*Set default value for selected*/
-         let search_order_date  = '{{ search_order_date }}';
-         search_order_date      = search_order_date.split(",");
-         $.each(search_order_date, function(key, value) {
-            $('#search_order_date').multiselect('select', [value]);
-         });
-
-         let search_order_status  = '{{ search_order_status }}';
-         search_order_status      = search_order_status.split(",");
-         $.each(search_order_status, function(key, value) {
-            $('#search_order_status').multiselect('select', [value]);
-         });
-
-         let search_order_shipping  = '{{ search_order_shipping }}';
-         search_order_shipping      = search_order_shipping.split(",");
-         $.each(search_order_shipping, function(key, value) {
-            $('#search_order_shipping').multiselect('select', [value]);
-         });
-
-         let search_order_otodoke  = '{{ search_order_otodoke }}';
-         search_order_otodoke      = search_order_otodoke.split(",");
-         $.each(search_order_otodoke, function(key, value) {
-            $('#search_order_otodoke').multiselect('select', [value]);
-         });
 
         var typingTimer;
         var doneTypingInterval      = 2000;
@@ -596,38 +567,23 @@ file that was distributed with this source code.
         }
 
         function handelChangeDate(origin, pathname, search) {
-            let value       = $("#search_order_date").val();
-            $.each(value, function(key, item) {
-                pathname    += "&order_date[]=" + item;
-            });
-            window.location.href     = origin + pathname;
+            pathname += "&order_date=" + $("#search_order_date").val();
+            window.location.href = origin + pathname;
         }
 
         function handelChangeStatus(origin, pathname, search) {
-            let value       = $("#search_order_status").val();
-            $.each(value, function(key, item) {
-                pathname    += "&order_status[]=" + item;
-            });
-            window.location.href     = origin + pathname;
+            pathname += "&order_status=" + $("#search_order_status").val();
+            window.location.href = origin + pathname;
         }
 
         function handelChangeShipping(origin, pathname) {
-            let value       = $("#search_order_shipping").val();
-            $.each(value, function(key, item) {
-                pathname    += "&order_shipping[]=" + item;
-            });
+            pathname    += "&order_shipping=" + $("#search_order_shipping").val();
             window.location.href     = origin + pathname;
         }
 
         function handelChangeOtodoke(origin, pathname, search) {
-            let value           = $("#search_order_otodoke").val();
-            let shipping_code   = $("#search_order_shipping option:selected").last().val();
-            pathname            += "&order_shipping[]=" + shipping_code;
-
-            $.each(value, function(key, item) {
-                pathname        += "&order_otodoke[]=" + item;
-            });
-            window.location.href     = origin + pathname;
+            pathname += "&order_otodoke=" +  $("#search_order_otodoke").val();
+            window.location.href = origin + pathname;
         }
 
         $("a.multiselect.dropdown-toggle.search_order_date").on("click", function() {

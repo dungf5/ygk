@@ -85,27 +85,27 @@ class OrderItemRepository extends AbstractRepository
         $where      = " ordStatus.order_date >= :orderDate {$condition}";
 
         // Add condition
-        if (!empty($paramSearch['search_order_status'])) {
-            $where .= ' AND ordStatus.order_status  in (:orderStatus) ';
+        if ( $paramSearch['search_order_status'] != '') {
+            $where .= ' AND ordStatus.order_status  = :orderStatus ';
         }
 
-        if (!empty($paramSearch['search_order_date'])) {
-            $where .= ' AND (';
+        // if (!empty($paramSearch['search_order_date'])) {
+        //     $where .= ' AND (';
 
-            foreach ($paramSearch['search_order_date'] as $key => $value) {
-                $where .= ' ordStatus.order_date  like :orderDate'.$key.' OR';
-            }
+        //     foreach ($paramSearch['search_order_date'] as $key => $value) {
+        //         $where .= ' ordStatus.order_date  like :orderDate'.$key.' OR';
+        //     }
 
-            $where  = trim($where, 'OR');
-            $where .= ' ) ';
-        }
+        //     $where  = trim($where, 'OR');
+        //     $where .= ' ) ';
+        // }
 
         if (!empty($paramSearch['search_order_shipping'])) {
-            $where .= ' AND ordStatus.shipping_code  in (:orderShipping) ';
+            $where .= ' AND ordStatus.shipping_code  = :orderShipping ';
         }
 
         if (!empty($paramSearch['search_order_otodoke'])) {
-            $where .= ' AND ordStatus.otodoke_code  in (:orderOtodoke) ';
+            $where .= ' AND ordStatus.otodoke_code  = :orderOtodoke ';
         }
         // End - Add condition
 
@@ -131,15 +131,15 @@ class OrderItemRepository extends AbstractRepository
             ->setParameter(':orderDate', Date("Y-m-d", strtotime("- 14 months")));
 
         /*Set param search */
-        if (!empty($paramSearch['search_order_status'])) {
+        if ( $paramSearch['search_order_status'] != '' ) {
             $qb = $qb->setParameter(':orderStatus', $paramSearch['search_order_status']);
         }
 
-        if (!empty($paramSearch['search_order_date'])) {
-            foreach ($paramSearch['search_order_date'] as $key => $value) {
-                $qb = $qb->setParameter(':orderDate' . $key, $value."-%");
-            }
-        }
+        // if (!empty($paramSearch['search_order_date'])) {
+        //     foreach ($paramSearch['search_order_date'] as $key => $value) {
+        //         $qb = $qb->setParameter(':orderDate' . $key, $value."-%");
+        //     }
+        // }
 
         if (!empty($paramSearch['search_order_shipping'])) {
             $qb = $qb->setParameter(':orderShipping', $paramSearch['search_order_shipping']);
