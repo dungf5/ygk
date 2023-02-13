@@ -172,23 +172,23 @@
                     }
                 }).done(function(data) {
                     if (data.status == 1) {
-                        if (data.data.length > 0) {
-                            $('#s_otodoke_code')
+                        $('#s_otodoke_code')
                                 .val("")
                                 .find('option')
                                 .remove()
                                 .end()
                                 .append('<option value="">---</option>');
+
+                        if (data.data.length > 0) {
+                            $.each(data.data, function(index, value) {
+                                let selected = value.otodoke_code == "{{ global_service.getOtodokeCode }}" ? 'selected' : '';
+
+                                $('#s_otodoke_code')
+                                .find('option')
+                                .end()
+                                .append('<option value="' + (value.otodoke_code ? value.otodoke_code : '') +'" ' + selected + '>'+ (value.name01 ? value.name01 : '') + " 〒 " + (value.postal_code ? value.postal_code : '') + " " + (value.addr01 ? value.addr01 : '') + " " + (value.addr02 ? value.addr02 : '') + " " + (value.addr03 ? value.addr03 : '') +'</option>');
+                            })
                         }
-
-                        $.each(data.data, function(index, value) {
-                            let selected = value.otodoke_code == "{{ global_service.getOtodokeCode }}" ? 'selected' : '';
-
-                            $('#s_otodoke_code')
-                            .find('option')
-                            .end()
-                            .append('<option value="' + (value.otodoke_code ? value.otodoke_code : '') +'" ' + selected + '>'+ (value.name01 ? value.name01 : '') + " 〒 " + (value.postal_code ? value.postal_code : '') + " " + (value.addr01 ? value.addr01 : '') + " " + (value.addr02 ? value.addr02 : '') + " " + (value.addr03 ? value.addr03 : '') +'</option>');
-                        })
 
                         if (data.data.length == 1) {
                             //Khi select chỉ có 1 option, thì kích hoạt hàm change otodoke_code, cho chọn luôn
