@@ -89,22 +89,15 @@ class OrderItemRepository extends AbstractRepository
             $where .= ' AND ordStatus.order_status  = :orderStatus ';
         }
 
-        // if (!empty($paramSearch['search_order_date'])) {
-        //     $where .= ' AND (';
+        if ( $paramSearch['search_order_date'] != 0 ) {
+            $where .= ' AND ordStatus.order_date like :search_order_date ';
+        }
 
-        //     foreach ($paramSearch['search_order_date'] as $key => $value) {
-        //         $where .= ' ordStatus.order_date  like :orderDate'.$key.' OR';
-        //     }
-
-        //     $where  = trim($where, 'OR');
-        //     $where .= ' ) ';
-        // }
-
-        if (!empty($paramSearch['search_order_shipping'])) {
+        if ( $paramSearch['search_order_shipping'] != 0 ) {
             $where .= ' AND ordStatus.shipping_code  = :orderShipping ';
         }
 
-        if (!empty($paramSearch['search_order_otodoke'])) {
+        if ( $paramSearch['search_order_otodoke'] != 0 ) {
             $where .= ' AND ordStatus.otodoke_code  = :orderOtodoke ';
         }
         // End - Add condition
@@ -135,17 +128,15 @@ class OrderItemRepository extends AbstractRepository
             $qb = $qb->setParameter(':orderStatus', $paramSearch['search_order_status']);
         }
 
-        // if (!empty($paramSearch['search_order_date'])) {
-        //     foreach ($paramSearch['search_order_date'] as $key => $value) {
-        //         $qb = $qb->setParameter(':orderDate' . $key, $value."-%");
-        //     }
-        // }
+        if ( $paramSearch['search_order_date'] != 0 ) {
+            $qb = $qb->setParameter(':search_order_date', $paramSearch['search_order_date']."-%");
+        }
 
-        if (!empty($paramSearch['search_order_shipping'])) {
+        if ( $paramSearch['search_order_shipping'] != 0 ) {
             $qb = $qb->setParameter(':orderShipping', $paramSearch['search_order_shipping']);
         }
 
-        if (!empty($paramSearch['search_order_otodoke'])) {
+        if ( $paramSearch['search_order_otodoke'] != 0 ) {
             $qb = $qb->setParameter(':orderOtodoke', $paramSearch['search_order_otodoke']);
         }
         /*End - Set param search */
@@ -205,23 +196,16 @@ class OrderItemRepository extends AbstractRepository
             $where .= ' AND md.delivery_no = :deliveryNo ';
         }
 
-        if (!empty($paramSearch['search_shipping_date'])) {
-            $where .= ' AND (';
-
-            foreach ($paramSearch['search_shipping_date'] as $key => $value) {
-                $where .= ' ms.shipping_date  like :shippingDate'.$key.' OR';
-            }
-
-            $where  = trim($where, 'OR');
-            $where .= ' ) ';
+        if ( $paramSearch['search_shipping_date'] != 0 ) {
+            $where .= ' AND  ms.shipping_date  like :shippingDate ';
         }
 
-        if (!empty($paramSearch['search_order_shipping'])) {
-            $where .= ' AND md.shiping_name = (select mc3.company_name from Customize\Entity\MstCustomer mc3 where mc3.customer_code in (:orderShipping)) ';
+        if ( $paramSearch['search_order_shipping'] != 0 ) {
+            $where .= ' AND md.shiping_name = (select mc3.company_name from Customize\Entity\MstCustomer mc3 where mc3.customer_code = :orderShipping) ';
         }
 
-        if (!empty($paramSearch['search_order_otodoke'])) {
-            $where .= ' AND md.otodoke_name in (select mc4.company_name from Customize\Entity\MstCustomer mc4 where mc4.customer_code in (:orderOtodoke)) ';
+        if ( $paramSearch['search_order_otodoke'] != 0 ) {
+            $where .= ' AND md.otodoke_name in (select mc4.company_name from Customize\Entity\MstCustomer mc4 where mc4.customer_code = :orderOtodoke) ';
         }
         // End - Add condition
 
@@ -249,17 +233,15 @@ class OrderItemRepository extends AbstractRepository
             $qb = $qb->setParameter(':deliveryNo', $paramSearch['delivery_no']);
         }
 
-        if (!empty($paramSearch['search_shipping_date'])) {
-            foreach ($paramSearch['search_shipping_date'] as $key => $value) {
-                $qb = $qb->setParameter(':shippingDate' . $key, $value."-%");
-            }
+        if ( $paramSearch['search_shipping_date'] != 0 ) {
+            $qb = $qb->setParameter(':shippingDate', $paramSearch['search_shipping_date']."-%");
         }
 
-        if (!empty($paramSearch['search_order_shipping'])) {
+        if ( $paramSearch['search_order_shipping'] != 0 ) {
             $qb = $qb->setParameter(':orderShipping', $paramSearch['search_order_shipping']);
         }
 
-        if (!empty($paramSearch['search_order_otodoke'])) {
+        if ( $paramSearch['search_order_otodoke'] != 0 ) {
             $qb = $qb->setParameter(':orderOtodoke', $paramSearch['search_order_otodoke']);
         }
         /*End - Set param search */
