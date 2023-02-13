@@ -257,15 +257,15 @@ class MypageController extends AbstractController
         //Params
         $param                      = [
             'pageno'                => $request->get('pageno', 1),
-            'search_order_date'     => $request->get('order_date', []),
-            'search_order_status'   => $request->get('order_status', []),
-            'search_order_shipping' => $request->get('order_shipping', []),
-            'search_order_otodoke'  => $request->get('order_otodoke', []),
+            'search_order_date'     => $request->get('order_date', 0),
+            'search_order_status'   => $request->get('order_status', ''),
+            'search_order_shipping' => $request->get('order_shipping', 0),
+            'search_order_otodoke'  => $request->get('order_otodoke', 0),
         ];
 
-        if (empty($param['search_order_shipping'])) {
-            $param['search_order_otodoke']  = [];
-        }
+        // if (empty($param['search_order_shipping'])) {
+        //     $param['search_order_otodoke']  = [];
+        // }
 
         // Query data
         $customer_code  = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
@@ -422,10 +422,10 @@ class MypageController extends AbstractController
             'orderStatusOpt'            => $orderStatusList,
             'orderShippingOpt'          => $orderShippingList,
             'orderOtodokeOpt'           => $orderOtodeokeList,
-            'search_order_date'         => implode(",", $param['search_order_date']),
-            'search_order_status'       => implode(",", $param['search_order_status']),
-            'search_order_shipping'     => implode(",", $param['search_order_shipping']),
-            'search_order_otodoke'      => implode(",", $param['search_order_otodoke']),
+            'search_order_date'         => $param['search_order_date'],
+            'search_order_status'       => $param['search_order_status'],
+            'search_order_shipping'     => $param['search_order_shipping'],
+            'search_order_otodoke'      => $param['search_order_otodoke'],
         ];
     }
 
@@ -669,14 +669,10 @@ class MypageController extends AbstractController
         $param                      = [
             'pageno'                => $request->get('pageno', 1),
             'delivery_no'           => $request->get('delivery_no'),
-            'search_shipping_date'  => $request->get('shipping_date', []),
-            'search_order_shipping' => $request->get('order_shipping', []),
-            'search_order_otodoke'  => $request->get('order_otodoke', []),
+            'search_shipping_date'  => $request->get('shipping_date', 0),
+            'search_order_shipping' => $request->get('order_shipping', 0),
+            'search_order_otodoke'  => $request->get('order_otodoke', 0),
         ];
-
-        if (empty($param['search_order_shipping'])) {
-            $param['search_order_otodoke']  = [];
-        }
 
         // Query data
         $customer_code  = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
@@ -741,15 +737,15 @@ class MypageController extends AbstractController
                 ];
             }
         }
-
+        
         return [
             'pagination'                => $pagination,
             'shippingDateOpt'           => $shippingDateList,
             'orderShippingOpt'          => $orderShippingList,
             'orderOtodokeOpt'           => $orderOtodeokeList,
-            'search_shipping_date'      => implode(",", $param['search_shipping_date']),
-            'search_order_shipping'     => implode(",", $param['search_order_shipping']),
-            'search_order_otodoke'      => implode(",", $param['search_order_otodoke']),
+            'search_shipping_date'      => $param['search_shipping_date'],
+            'search_order_shipping'     => $param['search_order_shipping'],
+            'search_order_otodoke'      => $param['search_order_otodoke'],
         ];
     }
 }
