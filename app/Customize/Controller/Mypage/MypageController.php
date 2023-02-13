@@ -629,8 +629,10 @@ class MypageController extends AbstractController
                 ];
             }
         }
+
+        $s_order_shipping       = $param['search_order_shipping'][0] ?? ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
-        $otodokeList            = $this->globalService->otodokeOption($customer_id, $param['search_order_shipping'][0] ?? '');
+        $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
             foreach ($otodokeList AS $item) {
                 $orderOtodeokeList[]    = [
@@ -727,8 +729,9 @@ class MypageController extends AbstractController
         }
 
         /*create list otodoke code*/
+        $s_order_shipping       = $param['search_order_shipping'][0] ?? ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
-        $otodokeList            = $this->globalService->otodokeOption($customer_id, $param['search_order_shipping'][0] ?? '');
+        $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
             foreach ($otodokeList AS $item) {
                 $orderOtodeokeList[]    = [
