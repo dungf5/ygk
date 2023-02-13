@@ -341,16 +341,23 @@ class ProductRepository extends AbstractRepository
 
         $curentDate         = date('Y-m-d');
         $shippingNo         = $newComs->getShippingCodeByCustomerCode($customer_code, $login_type);
-        $stringCon          = ' price.product_code = mstProduct.product_code AND price.shipping_no = :shipping_no  ';
-        $stringCon          .= " and '$curentDate' >= price.valid_date AND '$curentDate' <= price.expire_date  and price.product_code in (:product_code)";
+        $stringCon          = ' price.product_code = mstProduct.product_code AND price.shipping_no = :shipping_no ';
+        $stringCon          .= " and '$curentDate' >= price.valid_date AND '$curentDate' <= price.expire_date ";
+
+        if (count($arProductCodeInDtPrice) > 0) {
+            $stringCon      .= " and price.product_code in (:product_code) ";
+        }
 
         if (count($arTanakaNumber) > 0) {
-            $stringCon      .= " and price.tanka_number in(:tanka_number)";
+            $stringCon      .= " and price.tanka_number in (:tanka_number) ";
         }
 
         $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH, $stringCon)
-            ->setParameter(':shipping_no', $shippingNo)
-            ->setParameter(':product_code', $arProductCodeInDtPrice);
+            ->setParameter(':shipping_no', $shippingNo);
+
+        if (count($arProductCodeInDtPrice) > 0) {
+            $qb->setParameter(':product_code', $arProductCodeInDtPrice);
+        }
 
         if (count($arTanakaNumber) > 0) {
             $qb->setParameter(':tanka_number', $arTanakaNumber);
@@ -360,7 +367,7 @@ class ProductRepository extends AbstractRepository
         $listSelectMstProduct   .=",mstProduct.quantity as mst_quantity,mstProduct.jan_code,mstProduct.material,mstProduct.model, mstProduct.quantity, mstProduct.quantity_box ";
 
         $qb->addSelect($listSelectMstProduct);
-        $qb->addSelect('price.price_s01 as  price_s01');
+        $qb->addSelect('price.price_s01 as price_s01');
 
         $location   = $newComs->getCustomerLocation($customer_code);
 
@@ -389,7 +396,7 @@ class ProductRepository extends AbstractRepository
 
         $qb->groupBy('mstProduct.product_code');
 
-        //dd( $qb->getQuery()->getSQL(), $customer_code, $searchData, $login_type, $location, $customer_relation_code);
+        //dd( $qb->getQuery()->getSQL(), $customer_code, $searchData, $login_type, $location, $shippingNo);
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 }
