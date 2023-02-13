@@ -263,10 +263,6 @@ class MypageController extends AbstractController
             'search_order_otodoke'  => $request->get('order_otodoke', 0),
         ];
 
-        // if (empty($param['search_order_shipping'])) {
-        //     $param['search_order_otodoke']  = [];
-        // }
-
         // Query data
         $customer_code  = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
         $customer_id    = $this->twig->getGlobals()["app"]->MyDataMstCustomer["ec_customer_id"];
@@ -403,7 +399,7 @@ class MypageController extends AbstractController
         }
 
         /*create list otodoke code*/
-        $s_order_shipping       = $param['search_order_shipping'][0] ?? ($this->globalService->getShippingCode());
+        $s_order_shipping       = !empty($param['search_order_shipping']) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
@@ -631,7 +627,7 @@ class MypageController extends AbstractController
             }
         }
 
-        $s_order_shipping       = $param['search_order_shipping'][0] ?? ($this->globalService->getShippingCode());
+        $s_order_shipping       = !empty($param['search_order_shipping']) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
@@ -726,7 +722,7 @@ class MypageController extends AbstractController
         }
 
         /*create list otodoke code*/
-        $s_order_shipping       = $param['search_order_shipping'][0] ?? ($this->globalService->getShippingCode());
+        $s_order_shipping       = !empty($param['search_order_shipping']) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
@@ -737,7 +733,7 @@ class MypageController extends AbstractController
                 ];
             }
         }
-        
+
         return [
             'pagination'                => $pagination,
             'shippingDateOpt'           => $shippingDateList,
