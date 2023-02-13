@@ -231,14 +231,14 @@ class OrderItemRepository extends AbstractRepository
                 'Customize\Entity\MstShipping',
                 'ms',
                 Join::WITH,
-                'ms.order_no = dos.order_no and
-		        ms.order_lineno = dos.order_line_no'
+                'ms.cus_order_no = dos.cus_order_no and
+		        ms.cus_order_lineno = dos.cus_order_lineno'
             )
-            ->innerJoin(
+            ->leftJoin(
                 'Customize\Entity\MstDelivery',
                 'md',
                 Join::WITH,
-                "md.order_no = concat(dos.order_no, '-', dos.order_line_no)"
+                "md.shipping_no = ms.shipping_no"
             )
             ->where($where)
             ->setParameter(':customerCode', $customerCode)
@@ -271,7 +271,7 @@ class OrderItemRepository extends AbstractRepository
         // Order By
         $qb->addOrderBy('ms.shipping_date', 'DESC');
 
-        //dd( $qb->getQuery()->getSQL(), $paramSearch, $customerCode, $shippingCode, $otodokeCode);
+        //dd( $qb->getQuery()->getSQL(), $paramSearch, $customerCode);
         //$this->queries->customize("", $qb, []);
 
         return $qb;
