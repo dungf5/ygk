@@ -1423,8 +1423,8 @@ class MyCommonService extends AbstractRepository
             return "";
         }
 
-        $newComs    = new MyCommonService($this->entityManager);
-        $shippingNo = $newComs->getShippingCodeByCustomerCode($customer_code, $login_type);
+        $newComs        = new MyCommonService($this->entityManager);
+        $relationCus    = $newComs->getRelationCustomerCode($customer_code, $login_type);
 
         $sql = "SELECT
                     a.price_s01
@@ -1433,7 +1433,7 @@ class MyCommonService extends AbstractRepository
                 JOIN
                     (SELECT pri.product_code, MIN(pri.tanka_number) AS min_tanka_number
                     FROM dt_price pri
-                    WHERE pri.shipping_no = ?
+                    WHERE pri.customer_code = ?
                     AND DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date
                     AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
                     AND pri.product_code = ?
@@ -1444,7 +1444,7 @@ class MyCommonService extends AbstractRepository
                     a.product_code=b.product_code
                 ";
 
-        $param      = [$shippingNo, $productCode];
+        $param      = [$relationCus, $productCode];
         $statement  = $this->entityManager->getConnection()->prepare($sql);
         $price_s01  = "";
 
@@ -2053,7 +2053,7 @@ class MyCommonService extends AbstractRepository
         }
     }
 
-    public function getShippingCodeByCustomerCode ($customerCode, $loginType = 'customer_code')
+    public function getRelationCustomerCode ($customerCode, $loginType = 'customer_code')
     {
         if ($loginType == "represent_code" || $loginType == "customer_code" || $loginType == "change_type") {
             return $customerCode;
@@ -2089,7 +2089,7 @@ class MyCommonService extends AbstractRepository
         try {
             $result         = $statement->executeQuery($param);
             $rows           = $result->fetchAllAssociative();
-            return $rows[0]['shipping_code'] ?? $customerCode;
+            return $rows[0]['customer_code'] ?? $customerCode;
 
         } catch (Exception $e) {
             return $customerCode;

@@ -340,8 +340,8 @@ class ProductRepository extends AbstractRepository
         }
 
         $curentDate         = date('Y-m-d');
-        $shippingNo         = $newComs->getShippingCodeByCustomerCode($customer_code, $login_type);
-        $stringCon          = ' price.product_code = mstProduct.product_code AND price.shipping_no = :shipping_no ';
+        $relationCus        = $newComs->getRelationCustomerCode($customer_code, $login_type);
+        $stringCon          = ' price.product_code = mstProduct.product_code AND price.customer_code = :customer_code ';
         $stringCon          .= " and '$curentDate' >= price.valid_date AND '$curentDate' <= price.expire_date ";
 
         if (count($arProductCodeInDtPrice) > 0) {
@@ -353,7 +353,7 @@ class ProductRepository extends AbstractRepository
         }
 
         $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH, $stringCon)
-            ->setParameter(':shipping_no', $shippingNo);
+            ->setParameter(':customer_code', $relationCus);
 
         if (count($arProductCodeInDtPrice) > 0) {
             $qb->setParameter(':product_code', $arProductCodeInDtPrice);
@@ -396,7 +396,7 @@ class ProductRepository extends AbstractRepository
 
         $qb->groupBy('mstProduct.product_code');
 
-        //dd( $qb->getQuery()->getSQL(), $customer_code, $searchData, $login_type, $location, $shippingNo);
+        //dd( $qb->getQuery()->getSQL(), $customer_code, $searchData, $login_type, $location, $relationCus);
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 }
