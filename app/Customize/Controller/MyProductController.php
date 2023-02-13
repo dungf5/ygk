@@ -244,13 +244,13 @@ class MyProductController extends AbstractController
             if ($priceTxt == '') {
                 $myPriceRe  = null;
             }
-            $shipping_route = $cmS->getShippingRouteFromUser($customer_code, $login_type);
+            $location       = $cmS->getCustomerLocation($customer_code);
             $price          = $myPriceRe;
-            $stock          = $this->stockListRepository->getData($mstProduct->getProductCode(), $shipping_route);
+            $stock          = $this->stockListRepository->getData($mstProduct->getProductCode(), $location);
             if( $stock ) {
                 $mstDeliveryPlan = $this->mstDeliveryPlanRepository->getData($mstProduct->getProductCode(), $stock);
             }
-        } 
+        }
 
         //check in cart
         $ecProductId        = $Product->getId();
@@ -573,14 +573,14 @@ class MyProductController extends AbstractController
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_SEARCH, $event);
         $searchData             = $event->getArgument('searchData');
         $query                  = $qb->getQuery()->useResultCache(true, $this->eccubeConfig['eccube_result_cache_lifetime_short']);
-        
+
         /** @var SlidingPagination $pagination */
         $pagination             = $paginator->paginate(
             $query,
             !empty($searchData['pageno']) ? $searchData['pageno'] : 1,
             !empty($searchData['disp_number']) ? $searchData['disp_number']->getId() : $this->productListMaxRepository->findOneBy([], ['sort_no' => 'ASC'])->getId()
         );
-        
+
         $ids                    = [];
 
         foreach ($pagination as $Product) {

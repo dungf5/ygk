@@ -1958,7 +1958,6 @@ AND          pri.product_code=?
     }
 
     public function getCustomerRelationFromUser($customer_code='', $login_type='') {
-        $where = '';
         switch( $login_type ) {
             case 'shipping_code':
                 $where = ' shipping_code  = :customerCode ';
@@ -1973,6 +1972,7 @@ AND          pri.product_code=?
                 $where = ' customer_code  = :customerCode ';
                 break;
         }
+
         $sql = "SELECT
                 `represent_code`, `customer_code`, `seikyu_code`, `shipping_code`, `otodoke_code`
             FROM `dt_customer_relation`

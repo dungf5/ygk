@@ -339,7 +339,15 @@ class ProductRepository extends AbstractRepository
             $qb->andWhere("(mstProduct.special_order_flg <> 'Y' OR mstProduct.special_order_flg is null)");
         }
 
-        $curentDate         = date('Y-m-d');
+        $curentDate                     = date('Y-m-d');
+        $customer_relation_code         = $newComs->getCustomerRelationFromUser($customer_code);
+        if ($customer_relation_code) {
+            $customer_relation_code     = $customer_relation_code['customer_code'];
+        }
+        else {
+            $customer_relation_code     = $customer_code;
+        }
+
         $stringCon          = ' price.product_code = mstProduct.product_code AND price.customer_code = :customer_code  ';
         $stringCon          .= " and '$curentDate' >= price.valid_date AND '$curentDate' <= price.expire_date  and price.product_code in (:product_code)";
 
@@ -348,7 +356,7 @@ class ProductRepository extends AbstractRepository
         }
 
         $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH, $stringCon)
-            ->setParameter(':customer_code', $customer_code)
+            ->setParameter(':customer_code', $customer_relation_code)
             ->setParameter(':product_code', $arProductCodeInDtPrice);
 
         if (count($arTanakaNumber) > 0) {
@@ -361,29 +369,29 @@ class ProductRepository extends AbstractRepository
         $qb->addSelect($listSelectMstProduct);
         $qb->addSelect('price.price_s01 as  price_s01');
 
-        $shipping_route = $newComs->getShippingRouteFromUser($customer_code, $login_type);
-        // AND stock_list.customer_code = :customerCode figo comment 20230106
-        if( $shipping_route ) {
+        $location   = $newComs->getCustomerLocation($customer_code);
+
+        if( $location ) {
             $qb->leftJoin('Customize\Entity\StockList',
                 'stock_list',
                 Join::WITH,
                 "stock_list.product_code = mstProduct.product_code
                 AND stock_list.stock_location = :stockLocation")
-                ->setParameter(':stockLocation', $shipping_route['stock_location']);
+                ->setParameter(':stockLocation', $location);
             $qb->addSelect('stock_list.stock_num');
-            
+
             $qb->leftJoin('Customize\Entity\MstDeliveryPlan',
                 'mst_delivery_plan',
                 Join::WITH,
                 "mst_delivery_plan.product_code = mstProduct.product_code
                 AND mst_delivery_plan.stock_location = :stockLocation
                 AND mst_delivery_plan.delivery_date >= CURRENT_DATE()")
-                ->setParameter(':stockLocation', $shipping_route['stock_location']);
+                ->setParameter(':stockLocation', $location);
+
             $qb->addSelect('mst_delivery_plan.delivery_date AS dp_delivery_date');
             $qb->addSelect('mst_delivery_plan.quanlity AS dp_quanlity');
             $qb->groupBy('mst_delivery_plan.product_code');
             $qb->groupBy('mst_delivery_plan.stock_location');
-            //$qb->orderBy("ABS( DATE_DIFF( mst_delivery_plan.delivery_date, CURRENT_DATE() ) )", 'ASC');
         }
 
         $qb->groupBy('mstProduct.product_code');

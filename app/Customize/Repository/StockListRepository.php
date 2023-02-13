@@ -28,15 +28,14 @@ class StockListRepository extends AbstractRepository
      * @return ArrayCollection|null
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getData($product_code = '', $shipping_route = mull)
+    public function getData($product_code = '', $location = null)
     {
-        if( is_null($shipping_route) ) return null;
-        //AND s.customer_code = :customer_code //figo command 20230206
+        if ( is_null($location)) return null;
+
         $qb     = $this->createQueryBuilder('s');
         $qb->where('s.product_code = :product_code  AND s.stock_location = :stock_location')
-        ->setParameter('product_code', $product_code)
-       // ->setParameter('customer_code', $shipping_route['customer_code'])//figo command 20230206
-        ->setParameter('stock_location', $shipping_route['stock_location']);
+            ->setParameter('product_code', $product_code)
+            ->setParameter('stock_location', $location);
 
         return $qb->getQuery()->getOneOrNullResult();
     }
