@@ -141,7 +141,8 @@ class MypageController extends AbstractController
         $shipping_no        = $request->get("shipping_no");
         $order_no           = $request->get("order_no");
         $jan_code           = $request->get("jan_code");
-        $arRe               = $comS->getShipList($type, $customer_code, $shipping_no, $order_no, $jan_code);
+        $login_type         = $this->globalService->getLoginType();
+        $arRe               = $comS->getShipList($type, $customer_code, $shipping_no, $order_no, $jan_code, $login_type);
         $otodoke_code       = '';
         $shipping_code      = '';
 

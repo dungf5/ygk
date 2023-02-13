@@ -178,8 +178,24 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
-    public function getShipList($type, $customer_code, $shipping_no, $order_no, $jan_code)
+    public function getShipList($type, $customer_code, $shipping_no, $order_no, $jan_code, $loginType = null)
     {
+        if ($loginType == "represent_code" || $loginType == "customer_code" || $loginType == "change_type") {
+            $condition      = ' a.customer_code  = ? ';
+        }
+
+        elseif ($loginType == "shipping_code") {
+            $condition      = ' a.shipping_code = ? ';
+        }
+
+        elseif ($loginType == "otodoke_code") {
+            $condition      = ' a.otodoke_code = ? ';
+        }
+
+        else {
+            $condition      = ' a.customer_code  = ? ';
+        }
+
         $sql = " select
                     c.otodoke_code,
                     d.company_name as user_created_company_name,
@@ -215,7 +231,7 @@ class MyCommonService extends AbstractRepository
                 on c.customer_code = d.customer_code
                 left join mst_customer AS cus2 ON  cus2.customer_code = c.shipping_code
                 left join mst_delivery  as f on concat(c.ec_order_no, '-', c.ec_order_lineno) = f.order_no
-                where a.customer_code = ? and c.shipping_no = ? and a.ec_order_no = ? and delete_flg <> 0
+                where {$condition} and c.shipping_no = ? and a.ec_order_no = ? and delete_flg <> 0
             ";
 
         $param      = [];
