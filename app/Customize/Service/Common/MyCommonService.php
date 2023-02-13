@@ -225,8 +225,8 @@ class MyCommonService extends AbstractRepository
                 join mst_product as b
                 on a.product_code = b.product_code
                 join mst_shipping as c
-                on a.order_no = c.order_no
-                and a.order_line_no = c.order_lineno
+                on a.cus_order_no = c.cus_order_no
+                and a.cus_order_lineno = c.cus_order_lineno
                 join mst_customer as d
                 on c.customer_code = d.customer_code
                 left join mst_customer AS cus2 ON  cus2.customer_code = c.shipping_code
