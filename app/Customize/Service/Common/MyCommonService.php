@@ -2073,7 +2073,7 @@ class MyCommonService extends AbstractRepository
 
         $sql                = "
                                 SELECT
-                                    shipping_code
+                                    customer_code
                                 FROM
                                     dt_customer_relation
                                 WHERE
