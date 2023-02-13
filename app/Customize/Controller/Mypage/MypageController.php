@@ -587,14 +587,7 @@ class MypageController extends AbstractController
     {
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-        $Customer = $this->getUser();
-
-        // 購入処理中/決済処理中ステータスの受注を非表示にする.
-        // $this->entityManager
-        //     ->getFilters()
-        //     ->enable('incomplete_order_status_hidden');
-        // $nf = new MstShipping();
-        // $common_service = new MyCommonService($this->entityManager);
+        $Customer       = $this->getUser();
 
         // paginator
         $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
@@ -627,7 +620,7 @@ class MypageController extends AbstractController
             }
         }
 
-        $s_order_shipping       = !empty($param['search_order_shipping']) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
+        $s_order_shipping       = !empty($search_parameter['order_shipping']) ? $search_parameter['order_shipping'] : ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
