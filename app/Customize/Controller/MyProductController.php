@@ -557,9 +557,10 @@ class MyProductController extends AbstractController
         // paginator
         $searchData             = $searchForm->getData();
         $arProductCodeInDtPrice = [];
-        $arPriceAndTanaka       = $commonService->getPriceFromDtPriceOfCusV2($customer_code);
-        $arProductCodeInDtPrice = $arPriceAndTanaka[0];
-        $arTanakaNumber         = $arPriceAndTanaka[1];
+        $arTanakaNumber         = [];
+        //$arPriceAndTanaka       = $commonService->getPriceFromDtPriceOfCusV2($customer_code);
+        //$arProductCodeInDtPrice = $arPriceAndTanaka[0];
+        //$arTanakaNumber         = $arPriceAndTanaka[1];
         $qb                     = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customer_code, $arProductCodeInDtPrice, $arTanakaNumber, $login_type);
 
         $event = new EventArgs(
