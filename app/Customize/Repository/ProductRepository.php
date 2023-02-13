@@ -159,7 +159,7 @@ class ProductRepository extends AbstractRepository
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 
-    public function getQueryBuilderBySearchDataNewCustom($searchData, $user = false, $customer_code = '', $arProductCodeInDtPrice=[],$arTanakaNumber=[], $login_type='')
+    public function getQueryBuilderBySearchDataNewCustom($searchData, $user = false, $customer_code = '', $arProductCodeInDtPrice=[],$arTanakaNumber=[], $login_type = null)
     {
         $defaultSortLoginorderPrice     = "
             (CASE
@@ -339,16 +339,9 @@ class ProductRepository extends AbstractRepository
             $qb->andWhere("(mstProduct.special_order_flg <> 'Y' OR mstProduct.special_order_flg is null)");
         }
 
-        $curentDate                     = date('Y-m-d');
-        $customer_relation_code         = $newComs->getCustomerRelationFromUser($customer_code);
-        if ($customer_relation_code) {
-            $customer_relation_code     = $customer_relation_code['customer_code'];
-        }
-        else {
-            $customer_relation_code     = $customer_code;
-        }
-
-        $stringCon          = ' price.product_code = mstProduct.product_code AND price.customer_code = :customer_code  ';
+        $curentDate         = date('Y-m-d');
+        $shippingNo         = $newComs->getShippingCodeByCustomerCode($customer_code, $login_type);
+        $stringCon          = ' price.product_code = mstProduct.product_code AND price.shipping_no = :shipping_no  ';
         $stringCon          .= " and '$curentDate' >= price.valid_date AND '$curentDate' <= price.expire_date  and price.product_code in (:product_code)";
 
         if (count($arTanakaNumber) > 0) {
@@ -356,7 +349,7 @@ class ProductRepository extends AbstractRepository
         }
 
         $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH, $stringCon)
-            ->setParameter(':customer_code', $customer_relation_code)
+            ->setParameter(':shipping_no', $shippingNo)
             ->setParameter(':product_code', $arProductCodeInDtPrice);
 
         if (count($arTanakaNumber) > 0) {
@@ -396,7 +389,7 @@ class ProductRepository extends AbstractRepository
 
         $qb->groupBy('mstProduct.product_code');
 
-        //dd( $qb->getQuery()->getSQL(), $searchData);
+        //dd( $qb->getQuery()->getSQL(), $customer_code, $searchData, $login_type, $location, $customer_relation_code);
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 }

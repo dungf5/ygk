@@ -1983,7 +1983,7 @@ AND          pri.product_code=?
             $statement = $this->entityManager->getConnection()->prepare($sql);
             $result    = $statement->executeQuery([ 'customerCode'=>$customer_code ]);
             $rows      = $result->fetchAllAssociative();
-            return @$rows[0];
+            return $rows[0] ?? null;
         } catch (Exception $e) {
             return null;
         }
@@ -2036,10 +2036,53 @@ AND          pri.product_code=?
         try {
             $result = $statement->executeQuery($param);
             $rows   = $result->fetchAllAssociative();
-            return $rows[0]['stock_location'];
+            return $rows[0]['stock_location'] ?? null;
 
         } catch (Exception $e) {
             return null;
+        }
+    }
+
+    public function getShippingCodeByCustomerCode ($customerCode, $loginType = 'customer_code')
+    {
+        if ($loginType == "represent_code" || $loginType == "customer_code" || $loginType == "change_type") {
+            return $customerCode;
+        }
+
+        elseif ($loginType == "shipping_code") {
+            $condition      = ' shipping_code = ? ';
+        }
+
+        elseif ($loginType == "otodoke_code") {
+            $condition      = ' otodoke_code = ? ';
+        }
+
+        else {
+            return $customerCode;
+        }
+
+        $sql                = "
+                                SELECT
+                                    shipping_code
+                                FROM
+                                    dt_customer_relation
+                                WHERE
+                                    {$condition}
+                                LIMIT 1
+                            ";
+
+
+        $param              = [];
+        $param[]            = $customerCode;
+        $statement          = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result         = $statement->executeQuery($param);
+            $rows           = $result->fetchAllAssociative();
+            return $rows[0]['shipping_code'] ?? $customerCode;
+
+        } catch (Exception $e) {
+            return $customerCode;
         }
     }
 }
