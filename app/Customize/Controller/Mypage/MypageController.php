@@ -174,71 +174,62 @@ class MypageController extends AbstractController
     public function exportOrderPdf(Request $request)
     {
 
-        $htmlFileName = "Mypage/exportOrderPdf.twig";
-        $delivery_no =MyCommon::getPara("delivery_no");
-        $order_no_line_no =MyCommon::getPara("order_no_line_no");
-        $myData  =(object)[];
-
-       $mstDelivery = $this->entityManager->getRepository(MstDelivery::class);
-      // $arRe = $mstDelivery->getQueryBuilderByDeli($delivery_no,$order_no_line_no);
-        $comS = new MyCommonService($this->entityManager);
-        $orderNo = explode("-",$order_no_line_no)[0];
-        $arRe = $comS->getPdfDelivery($orderNo);
-
-
+        $htmlFileName       = "Mypage/exportOrderPdf.twig";
+        $delivery_no        = MyCommon::getPara("delivery_no");
+        $order_no_line_no   = MyCommon::getPara("order_no_line_no");
+        $comS               = new MyCommonService($this->entityManager);
+        $orderNo            = explode("-",$order_no_line_no)[0];
+        $arRe               = $comS->getPdfDelivery($orderNo);
 
         //add special line
-        $totalTax = 0;
-        $totalaAmount = 0;
-        $totalaAmountTax = 0;
-        $inCr = 0;
-        $totalTaxRe = 0;
-        foreach ($arRe as  &$item){
+        $totalTax           = 0;
+        $totalaAmount       = 0;
+        $totalaAmountTax    = 0;
+        $inCr               = 0;
+        $totalTaxRe         = 0;
+
+        foreach ($arRe as &$item) {
             $inCr ++;
-            $totalTax = $totalTax + $item["tax"];
-            $totalaAmount = $totalaAmount + $item["amount"];
-            $totalTaxRe = $totalTaxRe +  (10/100)*(int) $item["amount"];
+            $totalTax               = $totalTax + $item["tax"];
+            $totalaAmount           = $totalaAmount + $item["amount"];
+            $totalTaxRe             = $totalTaxRe +  (10/100)*(int) $item["amount"];
             //$totalaAmountTax = $totalaAmountTax +$item["amount"]+$totalTaxRe;//$item["tax"];
-            $item['is_total'] = 0;
-            $item['autoIncr'] = $inCr;
-            $item['delivery_date'] = explode(" ",$item['delivery_date'])[0] ;
+            $item['is_total']       = 0;
+            $item['autoIncr']       = $inCr;
+            $item['delivery_date']  = explode(" ",$item['delivery_date'])[0] ;
         }
-        $totalaAmountTax = $totalaAmount + $totalTaxRe;//$item["tax"];
-        $arSpecial = ["is_total"=>1,'totalaAmount'=>$totalaAmount,'totalTax'=>$totalTax];
-        $arRe[] =$arSpecial;
 
+        $totalaAmountTax            = $totalaAmount + $totalTaxRe;//$item["tax"];
+        $arSpecial                  = ["is_total"=>1,'totalaAmount'=>$totalaAmount,'totalTax'=>$totalTax];
+        $arRe[]                     = $arSpecial;
 
-        $dirPdf = MyCommon::getHtmluserDataDir()."/pdf";
+        $dirPdf                 = MyCommon::getHtmluserDataDir()."/pdf";
         FileUtil::makeDirectory($dirPdf);
-        $arReturn = ["myData"=>$arRe,"OrderTotal"=>$totalaAmount,"totalTaxRe"=>$totalTaxRe,"totalaAmountTax"=>$totalaAmountTax ];
-        $namePdf = "ship_".$delivery_no.".pdf";
-        $file = $dirPdf."/".$namePdf;
-        if(getenv("APP_IS_LOCAL")==0){
-          $htmlBody = $this->twig->render($htmlFileName, $arReturn);
+        $arReturn               = [
+            "myData"            => $arRe,
+            "OrderTotal"        => $totalaAmount,
+            "totalTaxRe"        => $totalTaxRe,
+            "totalaAmountTax"   => $totalaAmountTax
+        ];
+        $namePdf                = "ship_".$delivery_no.".pdf";
+        $file                   = $dirPdf."/".$namePdf;
+
+        if (getenv("APP_IS_LOCAL") == 0) {
+          $htmlBody             = $this->twig->render($htmlFileName, $arReturn);
 
             MyCommon::converHtmlToPdf($dirPdf,$namePdf,$htmlBody);
-
             header("Content-Description: File Transfer");
             header("Content-Type: application/octet-stream");
             header("Content-Disposition: attachment; filename=\"". basename($file) ."\"");
-
             readfile ($file);
             exit();
-        }else{
+        }
 
+        else {
             exec('"C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe" c:/wamp/www/test/pdf.html c:/wamp/www/test/pdf.pdf');
         }
 
-
-
-
-       // MyCommon::converHtmlToPdf($dirPdf,$namePdf,$htmlBody);
-        //$mpdf->WriteHTML($htmlBody);
-      //  $mpdf->Output($inquiry_no.'.pdf', 'D');
-        //$mpdf->Output();
         return $arReturn;
-
-
     }
 
     /**
