@@ -112,6 +112,41 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
+    public function getMstCustomer2($customer_code)
+    {
+        $sql        = "
+        SELECT
+            a.customer_code,
+            dtcus.company_name 
+        FROM
+            dt_customer_relation AS a
+            JOIN mst_customer dtcus ON
+            CASE
+                WHEN LEFT ( a.represent_code, 1 ) = 't' THEN a.otodoke_code 
+                WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code ELSE a.customer_code 
+            END = dtcus.customer_code 
+        WHERE
+            CASE
+                WHEN LEFT ( a.represent_code, 1 ) = 't' THEN a.otodoke_code 
+                WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code ELSE a.customer_code 
+            END = ? 
+        LIMIT 1;
+        ";
+        
+        $param      = [];
+        $param[]    = $customer_code;
+        $statement  = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result = $statement->executeQuery($param);
+            $rows   = $result->fetchAllAssociative();
+
+            return $rows[0];
+
+        } catch (Exception $e) {
+            return null;
+        }
+    }
 
     public function getCustomerFromUserCode($login_code)
     {
