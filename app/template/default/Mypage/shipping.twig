@@ -180,8 +180,8 @@ file that was distributed with this source code.
                                 {% if Shipping.shipping_status == 1 %} 出荷指示済 {% endif %}
                                 {% if Shipping.shipping_status != 1 %} 出荷済 {% endif %}
                             </td>
-                            <td>{{ Shipping.shipping_plan_date|date("Y年m月d日") }}</td>
-                            <td>{{ Shipping.shipping_date|date("Y年m月d日") }}</td>
+                            <td><strong>{{ Shipping.shipping_plan_date|date("Y-m-d") }}</strong></td>
+                            <td>{{ Shipping.shipping_date|date("Y-m-d") }}</td>
                             <td>{{ Shipping.shipping_num }}</td>
                             <td>
                                 {% if Shipping.delivery_no is null %}
