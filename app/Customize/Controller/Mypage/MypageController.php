@@ -269,7 +269,6 @@ class MypageController extends AbstractController
         $login_type     = $this->globalService->getLoginType();
 
         $qb             = $this->orderItemRepository->getQueryBuilderByCustomer($param, $customer_code, $login_type);
-
         // Paginator
         $pagination     = $paginator->paginate(
             $qb,
@@ -277,6 +276,7 @@ class MypageController extends AbstractController
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
+        
         $listItem       = $pagination->getItems();
         $arProductId    = [];
         $arOrderNo      = [];

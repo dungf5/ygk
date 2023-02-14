@@ -105,23 +105,41 @@ class OrderItemRepository extends AbstractRepository
         $qb = $qb->select($col)
             ->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = ordStatus.shipping_code) shipping_name')
             ->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = ordStatus.otodoke_code) otodoke_name')
-            ->from('Customize\Entity\DtOrderStatus', 'ordStatus')
-            ->innerJoin(
+            ->from('Customize\Entity\MstCustomer', 'customer');
+            $qb->innerJoin(
+                'Customize\Entity\DtCustomerRelation',
+                'customer_relation',
+                Join::WITH,
+                "customer.customer_code = ( CASE
+                    WHEN( LEFT( customer_relation.represent_code, 1 ) = 't' ) THEN customer_relation.otodoke_code
+                    WHEN( LEFT( customer_relation.represent_code, 1 ) = 's' ) THEN customer_relation.shipping_code
+                    ELSE customer_relation.customer_code
+                END )"
+            );
+            $qb->innerJoin(
+                'Customize\Entity\DtOrderStatus',
+                'ordStatus',
+                Join::WITH,
+                "( LEFT( customer_relation.represent_code, 1 ) = 't' AND customer_relation.otodoke_code = ordStatus.otodoke_code )
+                OR ( LEFT( customer_relation.represent_code, 1 ) = 's' AND customer_relation.shipping_code = ordStatus.shipping_code )
+                OR customer_relation.customer_code = ordStatus.customer_code"
+            );
+            $qb->innerJoin(
                 'Customize\Entity\MstProduct',
                 'mstp',
                 Join::WITH,
-                'ordStatus.product_code = mstp.product_code'
-            )
-            ->leftJoin(
+                "mstp.product_code = ordStatus.product_code"
+            );
+            $qb->leftJoin(
                 'Customize\Entity\MstShipping',
                 'mstShip',
                 Join::WITH,
-                'mstShip.cus_order_no = ordStatus.cus_order_no
-                and mstShip.cus_order_lineno = ordStatus.cus_order_lineno'
-            )
-            ->where($where)
-            ->setParameter(':customerCode', $customerCode)
-            ->setParameter(':orderDate', Date("Y-m-d", strtotime("- 14 months")));
+                "mstShip.cus_order_no = ordStatus.cus_order_no AND mstShip.cus_order_lineno = ordStatus.cus_order_lineno"
+            );
+            $qb
+                ->where($where)
+                ->setParameter(':customerCode', $customerCode)
+                ->setParameter(':orderDate', Date("Y-m-d", strtotime("- 14 months")));
 
         /*Set param search */
         if ( $paramSearch['search_order_status'] != '' ) {
@@ -150,9 +168,9 @@ class OrderItemRepository extends AbstractRepository
         $qb->addOrderBy('ordStatus.cus_order_no', 'DESC');
         $qb->addOrderBy('ordStatus.cus_order_lineno', 'asc');
 
-        //dd( $qb->getQuery()->getSQL(), $customerCode);
-        //$this->queries->customize("", $qb, []);
-
+        // echo($qb->getQuery()->getSQL());
+        // var_dump($qb->getParameters());
+        // die();
         return $qb;
     }
 

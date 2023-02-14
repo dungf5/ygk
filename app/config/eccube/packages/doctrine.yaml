@@ -29,6 +29,7 @@ doctrine:
         dql:
             string_functions:
                 NORMALIZE: Eccube\Doctrine\ORM\Query\Normalize
+                LEFT: Eccube\Doctrine\ORM\Query\Left
             numeric_functions:
                 EXTRACT: Eccube\Doctrine\ORM\Query\Extract
         filters:

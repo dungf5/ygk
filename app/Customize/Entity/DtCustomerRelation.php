@@ -13,13 +13,19 @@ if (!class_exists('\Customize\Entity\DtCustomerRelation', false)) {
      */
     class DtCustomerRelation extends AbstractEntity
     {
- /**
+         /**
          * @var integer
          *
          * @ORM\Column(name="customer_code", type="integer", options={"unsigned":true})
          * @ORM\Id
          */
         private $customer_code;
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="represent_code", type="string", nullable=false)
+         */
+        private $represent_code;
         /**
          * @var string
          *
