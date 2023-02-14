@@ -28,7 +28,7 @@ class MstShippingRepository extends AbstractRepository
     public function getQueryBuilderByCustomer($search_parameter=[], $customer_code='', $login_type='')
     {
         $qb = $this->createQueryBuilder('shipping');
-        $qb->select('shipping.shipping_no', 'shipping.customer_code', 'shipping.shipping_status', 'shipping.shipping_plan_date', 'shipping.shipping_date', 'shipping.shipping_num', 'shipping.order_lineno', 'shipping.cus_order_no', 'shipping.cus_order_lineno');
+        $qb->select('shipping.shipping_no', 'shipping.customer_code', 'shipping.shipping_status', 'shipping.shipping_plan_date', 'shipping.shipping_date', 'shipping.shipping_num', 'shipping.order_no', 'shipping.order_lineno', 'shipping.cus_order_no', 'shipping.cus_order_lineno', 'shipping.ec_order_no', 'shipping.ec_order_lineno');
 
         $qb->innerJoin(
                 '\Customize\Entity\DtOrderStatus',
