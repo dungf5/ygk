@@ -70,7 +70,7 @@ class GlobalService
     {
         if ($this->getUser()) {
             $Customer           = $this->getUser();
-            $cutomerName        = $this->myCommon->getMstCustomer($Customer->getId())["name01"];
+            $cutomerName        = $this->myCommon->getMstCustomer2($Customer->getCustomerCode())["name01"];
 
             return $cutomerName ?? '';
         }
@@ -150,7 +150,7 @@ class GlobalService
     {
         if ($this->getUser()) {
             $Customer           = $this->getUser();
-            $priceViewFlg       = $this->myCommon->getMstCustomer($Customer->getId())["price_view_flg"];
+            $priceViewFlg       = $this->myCommon->getMstCustomer2($Customer->getCustomerCode())["price_view_flg"];
 
             return $priceViewFlg == 1 ? true : false;
         }
@@ -162,7 +162,7 @@ class GlobalService
     {
         if ($this->getUser()) {
             $Customer           = $this->getUser();
-            $plType             = $this->myCommon->getMstCustomer($Customer->getId())["pl_type"];
+            $plType             = $this->myCommon->getMstCustomer2($Customer->getCustomerCode())["pl_type"];
 
             return $plType ?? 0;
         }
@@ -174,7 +174,7 @@ class GlobalService
     {
         if ($this->getUser()) {
             $Customer           = $this->getUser();
-            $SpecialOrderFlg    = $this->myCommon->getMstCustomer($Customer->getId())["special_order_flg"];
+            $SpecialOrderFlg    = $this->myCommon->getMstCustomer2($Customer->getCustomerCode())["special_order_flg"];
 
             return $SpecialOrderFlg ?? 0;
         }

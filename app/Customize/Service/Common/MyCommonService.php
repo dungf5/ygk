@@ -112,13 +112,12 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
-    
+
     public function getMstCustomer2($customer_code)
     {
         $sql        = "
         SELECT
             dtcus.represent_code,
-            dtcus.customer_code,
             mstcus.customer_code as shipping_no,
             mstcus.customer_code,
             mstcus.ec_customer_id,
@@ -135,7 +134,8 @@ class MyCommonService extends AbstractRepository
             mstcus.update_date,
             mstcus.email as customer_email,
             mstcus.special_order_flg,
-            mstcus.price_view_flg
+            mstcus.price_view_flg,
+            mstcus.pl_type
         FROM
             dt_customer_relation AS dtcus
         JOIN
@@ -183,16 +183,16 @@ class MyCommonService extends AbstractRepository
                 // $where = "(
                 //     CASE
                 //          WHEN c.represent_code = '' OR c.represent_code IS NULL THEN c.customer_code
-                //         ELSE c.represent_code 
+                //         ELSE c.represent_code
                 //     END ) = :customer_code";
                 break;
         }
         $sql = <<<SQL
         SELECT
             CASE
-                WHEN LEFT( a.represent_code, 1 ) = 't' THEN a.otodoke_code 
+                WHEN LEFT( a.represent_code, 1 ) = 't' THEN a.otodoke_code
                 WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code
-                ELSE a.customer_code 
+                ELSE a.customer_code
             END AS shipping_no,
             b.company_name,
             b.customer_code,
@@ -216,34 +216,34 @@ class MyCommonService extends AbstractRepository
                 dt_customer_relation AS a
                 JOIN mst_customer b ON
                 b.customer_code = ( CASE
-                    WHEN LEFT( a.represent_code, 1 ) = 't' THEN a.otodoke_code 
+                    WHEN LEFT( a.represent_code, 1 ) = 't' THEN a.otodoke_code
                     WHEN LEFT( a.represent_code, 1 ) = 's' THEN a.shipping_code
-                    ELSE a.customer_code 
+                    ELSE a.customer_code
                 END )
                 JOIN dtb_customer AS c ON c.id = b.ec_customer_id
         WHERE
                 ( CASE
-                    WHEN LEFT ( a.represent_code, 1 ) = 't' THEN a.otodoke_code 
-                    WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code 
-                    ELSE a.customer_code 
+                    WHEN LEFT ( a.represent_code, 1 ) = 't' THEN a.otodoke_code
+                    WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code
+                    ELSE a.customer_code
                 END ) = ( SELECT
-                    CASE    
-                        WHEN LEFT( c.represent_code, 1 ) = 't' THEN c.otodoke_code 
+                    CASE
+                        WHEN LEFT( c.represent_code, 1 ) = 't' THEN c.otodoke_code
                         WHEN LEFT( c.represent_code, 1 ) = 's' THEN c.shipping_code
-                        ELSE c.customer_code 
-                    END 
+                        ELSE c.customer_code
+                    END
                 FROM
-                    dt_customer_relation AS c 
+                    dt_customer_relation AS c
                 WHERE
                     {$where}
             LIMIT 1 );
         LIMIT 1;
 SQL;
-        
+
         $param                  = [];
         $param['customer_code'] = $customer->getCustomerCode();
         $statement              = $this->entityManager->getConnection()->prepare($sql);
-        
+
         try {
             $result = $statement->executeQuery($param);
             $rows   = $result->fetchAllAssociative();
@@ -550,7 +550,7 @@ SQL;
 
         elseif ( $loginType == "change_type"
             && $shipping_code != '' ) {
-            
+
             $param          = [];
 
             $sql        = " SELECT
