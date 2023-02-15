@@ -201,7 +201,8 @@ class MyShoppingController extends AbstractShoppingController
         $Order                      = $this->orderHelper->initializeOrder($Cart, $Customer);
         $mstShip                    = $commonService->getMstShippingCustomer($this->globalService->getLoginType(), $Customer->getId());
         $Order->arCusLogin          = $arCusLogin;
-        $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId());
+        $login_type                 = $this->globalService->getLoginType();
+        $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $login_type);
         $Order->mstShips            = $mstShip;
         $Order->dtBillSeikyuCode    = $dtBillSeikyuCode;
 
@@ -439,12 +440,12 @@ class MyShoppingController extends AbstractShoppingController
                 $this->entityManager->persist($moreOrder);
                 $this->entityManager->flush();
             }
-
-            $mstShip                    = $commonService->getMstShippingCustomer($this->globalService->getLoginType(), $Customer->getId(), $moreOrder);
-            $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $moreOrder);
+            $login_type                 = $this->globalService->getLoginType();
+            $mstShip                    = $commonService->getMstShippingCustomer($login_type, $Customer->getId(), $moreOrder);
+            $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $login_type, $moreOrder);
             $arCusLogin                 = $commonService->getMstCustomer($Customer->getId());
             $Order->arCusLogin          = $arCusLogin;
-            $arrOtoProductOrder         = $commonService->getCustomerOtodoke($this->globalService->getLoginType(), $Customer->getId(), $moreOrder->getShippingCode(), $moreOrder);
+            $arrOtoProductOrder         = $commonService->getCustomerOtodoke($login_type, $Customer->getId(), $moreOrder->getShippingCode(), $moreOrder);
             $Order->MoreOrder           = $moreOrder;
             $Order->mstShips            = $mstShip;
             $Order->dtBillSeikyuCode    = $dtBillSeikyuCode;
