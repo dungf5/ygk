@@ -82,7 +82,6 @@ class GlobalService
     {
         if ($this->getUser()) {
             $Customer           = $this->getUser();
-            // $companyName        = $this->myCommon->getMstCustomer($Customer->getId())["company_name"];
             $companyName        = $this->myCommon->getMstCustomer2($Customer->getCustomerCode())["company_name"];
 
             return $companyName ?? '';

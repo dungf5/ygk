@@ -112,23 +112,40 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
+
     public function getMstCustomer2($customer_code)
     {
         $sql        = "
         SELECT
-            a.customer_code,
-            dtcus.company_name
+            dtcus.represent_code,
+            dtcus.customer_code,
+            mstcus.customer_code as shipping_no,
+            mstcus.customer_code,
+            mstcus.ec_customer_id,
+            mstcus.customer_name as name01,
+            mstcus.company_name,
+            mstcus.company_name_abb,
+            mstcus.department,
+            mstcus.postal_code,
+            mstcus.addr01,
+            mstcus.addr02,
+            mstcus.addr03,
+            mstcus.phone_number,
+            mstcus.create_date,
+            mstcus.update_date,
+            mstcus.email as customer_email,
+            mstcus.special_order_flg,
+            mstcus.price_view_flg
         FROM
-            dt_customer_relation AS a
-            JOIN mst_customer dtcus ON
-            CASE
-                WHEN LEFT ( a.represent_code, 1 ) = 't' THEN a.otodoke_code
-                WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code ELSE a.customer_code
-            END = dtcus.customer_code
+            dt_customer_relation AS dtcus
+        JOIN
+            mst_customer mstcus
+        ON
+            dtcus.customer_code = mstcus.customer_code
         WHERE
             CASE
-                WHEN LEFT ( a.represent_code, 1 ) = 't' THEN a.otodoke_code
-                WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code ELSE a.customer_code
+                WHEN LEFT ( dtcus.represent_code, 1 ) = 't' THEN dtcus.otodoke_code
+                WHEN LEFT ( dtcus.represent_code, 1 ) = 's' THEN dtcus.shipping_code ELSE dtcus.customer_code
             END = ?
         LIMIT 1;
         ";

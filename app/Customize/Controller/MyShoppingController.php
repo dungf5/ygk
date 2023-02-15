@@ -158,7 +158,7 @@ class MyShoppingController extends AbstractShoppingController
         // 受注の初期化.
         log_info('[注文手続] 受注の初期化処理を開始します.');
         $Customer       = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
-        $arCusLogin     = $commonService->getMstCustomer($Customer->getId());
+        $arCusLogin     = $commonService->getMstCustomer2($Customer->getCustomerCode());
         $is_update_cart = $this->session->get('is_update_cart', '');
 
         //************** update cart when login
