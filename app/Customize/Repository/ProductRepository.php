@@ -159,22 +159,14 @@ class ProductRepository extends AbstractRepository
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 
-    public function getQueryBuilderBySearchDataNewCustom($searchData, $user = false, $customer_code = '', $arProductCodeInDtPrice=[],$arTanakaNumber=[], $login_type = null)
+    public function getQueryBuilderBySearchDataNewCustom($searchData, $user = false, $customer_code = '')
     {
-        $defaultSortLoginorderPrice     = "
-            (CASE
-                WHEN price.price_s01  is null THEN mstProduct.unit_price
-                ELSE price.price_s01
-            END)
-                AS hidden orderPrice
-        ";
-
         $sqlColmnsP             = "p.id, p.description_list, p.free_area";
         $qb                     = $this->getEntityManager()->createQueryBuilder();
         $qb                     = $qb->andWhere('p.Status = 1');
 
         $qb ->select($sqlColmnsP)->from('Customize\Entity\Product', 'p');
-        $qb->addSelect($defaultSortLoginorderPrice);
+        $qb->addSelect("mstProduct.unit_price AS orderPrice");
 
         // category
         $categoryJoin           = false;
@@ -203,32 +195,32 @@ class ProductRepository extends AbstractRepository
 
         if (isset($searchData['mode']) && $searchData['mode'] == "searchLeft") {
             if (StringUtil::isNotBlank($searchData['s_product_name_kana'])) {
-                $key        = $searchData['s_product_name_kana'];
+                $key            = $searchData['s_product_name_kana'];
 
-                $arCode     = $newComs->getSearchProductNameKana($key);
-                $whereMore2 = 'mstProduct.jan_code in(:jan_code_name_kana)';
+                $arCode         = $newComs->getSearchProductNameKana($key);
+                $whereMore2     = 'mstProduct.jan_code in(:jan_code_name_kana)';
                 $qb->setParameter(":jan_code_name_kana", $arCode);
                 $qb->andWhere($whereMore2);
             }
 
             if (StringUtil::isNotBlank($searchData['s_product_name'])) {
-                $key        = $searchData['s_product_name'];
+                $key            = $searchData['s_product_name'];
 
-                $arCode     = $newComs->getSearchProductName($key);
-                $whereMore2 = 'mstProduct.jan_code in(:jan_code_name)';
+                $arCode         = $newComs->getSearchProductName($key);
+                $whereMore2     = 'mstProduct.jan_code in(:jan_code_name)';
                 $qb->setParameter(":jan_code_name", $arCode);
                 $qb->andWhere($whereMore2);
             }
 
             if (StringUtil::isNotBlank($searchData['s_jan'])) {
-                $whereMulti = "";
-                $key        = $searchData['s_jan'];
-                $arrK       = explode(' ',$key);
-                $countKey   = count($arrK);
+                $whereMulti     = "";
+                $key            = $searchData['s_jan'];
+                $arrK           = explode(' ',$key);
+                $countKey       = count($arrK);
 
                 foreach ($arrK as $item) {
                     $countKey--;
-                    $item   = trim($item);
+                    $item       = trim($item);
 
                     if ($item == "") {
                         continue;
@@ -249,9 +241,9 @@ class ProductRepository extends AbstractRepository
             }
 
             if (StringUtil::isNotBlank($searchData['s_catalog_code'])) {
-                $key        = $searchData['s_catalog_code'];
-                $arCode     = $newComs->getSearchCatalogCode($key);
-                $whereMore2 ='mstProduct.jan_code in(:jan_code_s_catalog_code)';
+                $key            = $searchData['s_catalog_code'];
+                $arCode         = $newComs->getSearchCatalogCode($key);
+                $whereMore2     ='mstProduct.jan_code in(:jan_code_s_catalog_code)';
                 $qb->setParameter(":jan_code_s_catalog_code",$arCode);
                 $qb->andWhere($whereMore2);
             }
@@ -339,35 +331,10 @@ class ProductRepository extends AbstractRepository
             $qb->andWhere("(mstProduct.special_order_flg <> 'Y' OR mstProduct.special_order_flg is null)");
         }
 
-        $curentDate         = date('Y-m-d');
-        $relationCus        = $newComs->getRelationCustomerCode($customer_code, $login_type);
-        $stringCon          = ' price.product_code = mstProduct.product_code AND price.customer_code = :customer_code ';
-        $stringCon          .= " and '$curentDate' >= price.valid_date AND '$curentDate' <= price.expire_date ";
-
-        if (count($arProductCodeInDtPrice) > 0) {
-            $stringCon      .= " and price.product_code in (:product_code) ";
-        }
-
-        if (count($arTanakaNumber) > 0) {
-            $stringCon      .= " and price.tanka_number in (:tanka_number) ";
-        }
-
-        $qb->leftJoin('Customize\Entity\Price', 'price',Join::WITH, $stringCon)
-            ->setParameter(':customer_code', $relationCus);
-
-        if (count($arProductCodeInDtPrice) > 0) {
-            $qb->setParameter(':product_code', $arProductCodeInDtPrice);
-        }
-
-        if (count($arTanakaNumber) > 0) {
-            $qb->setParameter(':tanka_number', $arTanakaNumber);
-        }
-
         $listSelectMstProduct   = "mstProduct.product_code,mstProduct.unit_price as mst_unit_price ,mstProduct.product_name,mstProduct.size,mstProduct.color";
         $listSelectMstProduct   .=",mstProduct.quantity as mst_quantity,mstProduct.jan_code,mstProduct.material,mstProduct.model, mstProduct.quantity, mstProduct.quantity_box ";
 
         $qb->addSelect($listSelectMstProduct);
-        $qb->addSelect('price.price_s01 as price_s01');
 
         $location   = $newComs->getCustomerLocation($customer_code);
 
