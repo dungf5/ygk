@@ -384,7 +384,7 @@ function updateOne(objThis){
                                     <li class="ec-cartRow__subtotalColumn">
                                         {# Check mst_customer.price_view_flg #}
                                         {% if global_service.getPriceViewFlg %}
-                                            <div class="ec-cartRow__sutbtotal">{{ roundPriceZeroTotal(CartItem.total_price) | raw }}</div>
+                                            <div class="ec-cartRow__sutbtotal">{{ roundPrice(CartItem.total_price) | raw }}</div>
                                         {% endif %}
                                     </li>
                                 </ul>
