@@ -147,6 +147,7 @@ class CustomerRepository extends AbstractRepository
 
             $_SESSION["usc_{$id}"]  = [
                 "login_type"        => $loginType,
+                "login_code"        => $login_code,
             ];
         }
 

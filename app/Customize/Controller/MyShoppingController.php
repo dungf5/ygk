@@ -311,7 +311,7 @@ class MyShoppingController extends AbstractShoppingController
         $Order->seikyu_code_checked                 = isset($moreOrder['seikyu_code']) ?? '';
         $Order->rate                                = $commonService->getTaxInfo()['tax_rate'];
         $Order->setTax((float) $Order->getTotal() / (float) $Order->rate);
-        $Order->setPaymentTotal((float) $Order->getTotal() + ((float) $Order->getTotal() / (float) $Order->rate));
+        $Order->setPaymentTotal((int) $Order->getTotal() + (int) ((float) $Order->getTotal() / (float) $Order->rate));
 
         $this->entityManager->persist($Order);
         $this->entityManager->flush();
@@ -424,7 +424,7 @@ class MyShoppingController extends AbstractShoppingController
             $commonService      = new MyCommonService($this->entityManager);
             $rate               = $commonService->getTaxInfo()['tax_rate'];
             $tax                = (float) $Order->getTotal() / (float) $rate;
-            $paymentTotal       = (float) $Order->getTotal() + ((float) $Order->getTotal() / (float) $rate);
+            $paymentTotal       = (int) $Order->getTotal() + (int) ((float) $Order->getTotal() / (float) $rate);
             $moreOrder          = $commonService->getMoreOrder($Order->getPreOrderId());
 
             //add default day delivery

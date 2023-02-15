@@ -990,7 +990,7 @@ function updateDeliverydAdress(delivery_code) {
                                                 {% endif %}
 
                                                 {{ orderItem.quantity|number_format }}
-                                                {% if MstProduct.quantity>1 %}
+                                                {% if MstProduct.quantity > 1 %}
                                                     箱({{ orderItem.quantity*MstProduct.quantity }}個)
                                                 {% else %}
                                                     個

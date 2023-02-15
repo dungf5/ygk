@@ -232,20 +232,15 @@ class MyProductController extends AbstractController
 
         $cmS                = new MyCommonService($this->entityManager);
         $login_type         = $this->globalService->getLoginType();
+        $login_code         = $this->globalService->getLoginCode();
 
         if ($this->isGranted('ROLE_USER')) {
             $Customer       = $this->getUser();
             $customer_code  = $cmS->getMstCustomer($Customer->getId())['customer_code'];
             $is_favorite    = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
-            $priceTxt       = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProduct->getProductCode(), $login_type);
-            $myPriceRe      = (object) ['price_s01' => $priceTxt];
-
-            if ($priceTxt == '') {
-                $myPriceRe  = null;
-            }
-
+            $priceTxt       = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProduct->getProductCode(), $login_type, $login_code);
             $location       = $cmS->getCustomerLocation($customer_code);
-            $price          = $myPriceRe;
+            $price          = $priceTxt;
             $stock          = $this->stockListRepository->getData($mstProduct->getProductCode(), $location);
 
             if ( $stock ) {
