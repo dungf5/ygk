@@ -540,7 +540,8 @@ class MyProductController extends AbstractController
         $commonService      = new MyCommonService($this->entityManager);
         $user               = false;
         $customer_code      = '';
-        $login_type = '';
+        $login_type         = '';
+        $login_code         = '';
 
         if ($this->isGranted('ROLE_USER')) {
             $user           = true;
@@ -548,16 +549,14 @@ class MyProductController extends AbstractController
             $Customer       = $this->getUser();
             $customer_code  = $myC->getMstCustomer($Customer->getId())['customer_code'];
             $login_type     = $this->globalService->getLoginType();
+            $login_code     = $this->globalService->getLoginCode();
         }
 
         // paginator
         $searchData             = $searchForm->getData();
         $arProductCodeInDtPrice = [];
         $arTanakaNumber         = [];
-        //$arPriceAndTanaka       = $commonService->getPriceFromDtPriceOfCusV2($customer_code);
-        //$arProductCodeInDtPrice = $arPriceAndTanaka[0];
-        //$arTanakaNumber         = $arPriceAndTanaka[1];
-        $qb                     = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customer_code, $arProductCodeInDtPrice, $arTanakaNumber, $login_type);
+        $qb                     = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customer_code);
 
         $event = new EventArgs(
             [
@@ -580,8 +579,18 @@ class MyProductController extends AbstractController
 
         $ids                    = [];
 
-        foreach ($pagination as $Product) {
-            $ids[]              = $Product['id'];
+        foreach ($pagination as $key => $Product) {
+            $ids[]                      = $Product['id'];
+
+            //Get dt_price.price_s01
+            $temp                       = $pagination[$key];
+            $temp['price_s01']          = '';
+            $priceTxt                   = $commonService->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $Product['product_code'], $login_type, $login_code);
+            if ($priceTxt) {
+                $temp['price_s01']      = $priceTxt['price_s01'];
+            }
+
+            $pagination[$key]           = $temp;
         }
 
         $ProductsAndClassCategories = $this->productRepository->findProductsWithSortedClassCategories($ids, 'p.id');
@@ -606,8 +615,8 @@ class MyProductController extends AbstractController
                 AddCartType::class,
                 null,
                 [
-                    'product' => $ProductsAndClassCategories[$Product['id']],
-                    'allow_extra_fields' => true,
+                    'product'               => $ProductsAndClassCategories[$Product['id']],
+                    'allow_extra_fields'    => true,
                 ]
             );
 
@@ -669,7 +678,7 @@ class MyProductController extends AbstractController
         $orderByForm    = $builder->getForm();
         $orderByForm->handleRequest($request);
         $Category       = $searchForm->get('category_id')->getData();
-        // var_dump($pagination);die;
+
         return [
             'subtitle'          => $this->getPageTitle($searchData),
             'pagination'        => $pagination,
