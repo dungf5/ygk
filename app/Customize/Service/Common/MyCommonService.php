@@ -117,22 +117,22 @@ class MyCommonService extends AbstractRepository
         $sql        = "
         SELECT
             a.customer_code,
-            dtcus.company_name 
+            dtcus.company_name
         FROM
             dt_customer_relation AS a
             JOIN mst_customer dtcus ON
             CASE
-                WHEN LEFT ( a.represent_code, 1 ) = 't' THEN a.otodoke_code 
-                WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code ELSE a.customer_code 
-            END = dtcus.customer_code 
+                WHEN LEFT ( a.represent_code, 1 ) = 't' THEN a.otodoke_code
+                WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code ELSE a.customer_code
+            END = dtcus.customer_code
         WHERE
             CASE
-                WHEN LEFT ( a.represent_code, 1 ) = 't' THEN a.otodoke_code 
-                WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code ELSE a.customer_code 
-            END = ? 
+                WHEN LEFT ( a.represent_code, 1 ) = 't' THEN a.otodoke_code
+                WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code ELSE a.customer_code
+            END = ?
         LIMIT 1;
         ";
-        
+
         $param      = [];
         $param[]    = $customer_code;
         $statement  = $this->entityManager->getConnection()->prepare($sql);
@@ -755,32 +755,26 @@ class MyCommonService extends AbstractRepository
 
     public function updateCartItem($hsPrice,$arCarItemId,$Cart)
     {
+        $objList            = $this->entityManager->getRepository(CartItem::class)->findBy(['Cart' => $Cart]);
+        $totalPrice         = 0;
 
-        $objList = $this->entityManager->getRepository(CartItem::class)->findBy(['Cart' => $Cart]);
-        $myDb = $this->entityManager->createQueryBuilder();
-        //$resSult = $myDb->select([])->from('CartItem','cartItem')->where('cartItem.id in(:ids)')->setParameter('ids',$arCarItemId)->getQuery()->getArrayResult();
-        //var_dump($resSult);die();
-        $totalPrice = 0;
-        foreach ($objList as $carItem ){
-
+        foreach ($objList as $carItem ) {
             if(isset($hsPrice[$carItem->getId()])){
                 $carItem->setPrice($hsPrice[$carItem->getId()]);
-
                 $this->entityManager->persist($carItem);
                 $this->entityManager->flush();
             }
-            $totalPrice += $carItem->getPrice()*$carItem->getQuantity();
 
+            $totalPrice     += $carItem->getPrice() * $carItem->getQuantity();
         }
-        $obC= $this->entityManager->getRepository(Cart::class)->findOneBy(['id' => $Cart->getId()]);
-        if($obC!=null){
-            $obC->setTotalPrice( $totalPrice);
 
+        $obC                = $this->entityManager->getRepository(Cart::class)->findOneBy(['id' => $Cart->getId()]);
+
+        if ($obC != null) {
+            $obC->setTotalPrice( $totalPrice);
             $this->entityManager->persist($obC);
             $this->entityManager->flush();
         }
-
-
     }
 
     /**
@@ -860,34 +854,71 @@ class MyCommonService extends AbstractRepository
      */
     public function getCustomerBillSeikyuCode($customer_id, $moreOrder = null)
     {
-        $column = "a.customer_code as seikyu_code, ec_customer_id, company_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number";
+        $column = "
+                    a.customer_code as seikyu_code,
+                    ec_customer_id,
+                    company_name as name01,
+                    company_name,
+                    company_name_abb,
+                    department,
+                    postal_code,
+                    addr01,
+                    addr02,
+                    addr03,
+                    email,
+                    phone_number
+                ";
 
         //seikyu_code  noi nhan hoa don
-        $sql = " SELECT {$column}   FROM mst_customer a  join
-                (
-                SELECT b.seikyu_code from dt_customer_relation b
-
-					 WHERE  b.customer_code= ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id=?  LIMIT 1 )
-                GROUP BY  b.seikyu_code
-                ) AS b ON  b.seikyu_code =a.customer_code
+        $sql = "SELECT
+                    {$column}
+                FROM
+                    mst_customer a
+                JOIN
+                    (
+                    SELECT
+                        b.seikyu_code
+                    FROM
+                        dt_customer_relation b
+                    WHERE
+                        b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 )
+                    GROUP BY
+                        b.seikyu_code
+                    ) AS b
+                ON
+                    b.seikyu_code = a.customer_code
                 ";
 
-        $myPara = [$customer_id];
+        $myPara     = [$customer_id];
+
         if ($moreOrder != null) {
-            $seikyu_code = $moreOrder->getSeikyuCode();
-            $sql = " SELECT {$column}   FROM mst_customer a  join
-                (
-                SELECT b.seikyu_code from dt_customer_relation b
+            $seikyu_code    = $moreOrder->getSeikyuCode();
+            $sql            = " SELECT
+                                    {$column}
+                                FROM
+                                    mst_customer a
+                                JOIN
+                                    (
+                                        SELECT
+                                            b.seikyu_code
+                                        FROM
+                                            dt_customer_relation b
+                                        WHERE
+                                            b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ?  LIMIT 1 )
+                                        GROUP BY  b.seikyu_code
+                                    ) AS b
+                                ON
+                                    b.seikyu_code = a.customer_code
+                                AND
+                                    b.seikyu_code = ?
+                            ";
 
-					 WHERE  b.customer_code= ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id=?  LIMIT 1 )
-                GROUP BY  b.seikyu_code
-                ) AS b ON  b.seikyu_code =a.customer_code and b.seikyu_code=?
-                ";
-            $myPara[] = $seikyu_code;
+            $myPara[]       = $seikyu_code;
         }
-        $statement = $this->entityManager->getConnection()->prepare($sql);
-        $result = $statement->executeQuery($myPara);
-        $rows = $result->fetchAllAssociative();
+
+        $statement          = $this->entityManager->getConnection()->prepare($sql);
+        $result             = $statement->executeQuery($myPara);
+        $rows               = $result->fetchAllAssociative();
 
         return $rows;
     }
@@ -1481,51 +1512,59 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
-    public function getPriceFromDtPriceOfCusProductcodeV2($customer_code="", $productCode, $login_type = null)
+    public function getPriceFromDtPriceOfCusProductcodeV2($customer_code = "", $productCode, $login_type = null, $login_code = null)
     {
         if ($customer_code == "") {
-            return "";
+            return null;
         }
 
         $newComs        = new MyCommonService($this->entityManager);
-        $relationCus    = $newComs->getRelationCustomerCode($customer_code, $login_type);
+        $relationCus    = $newComs->getCustomerRelationFromUser ($customer_code, $login_type, $login_code);
+        $addWhere       = "";
 
-        $sql = "SELECT
-                    a.price_s01
-                FROM
-                    dt_price a
-                JOIN
-                    (SELECT pri.product_code, MIN(pri.tanka_number) AS min_tanka_number
-                    FROM dt_price pri
-                    WHERE pri.customer_code = ?
-                    AND DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date
-                    AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
-                    AND pri.product_code = ?
-                GROUP BY product_code ) AS b
-                ON
-                    b.min_tanka_number = a.tanka_number
-                AND
-                    a.product_code=b.product_code
+        if ($relationCus) {
+            $customerCode       = $relationCus['customer_code'];
+            $shippingCode       = $relationCus['shipping_code'];
+            $params             = [$customerCode];
+
+            if (!empty($shippingCode))  {
+                $addWhere       = " AND pri.shipping_no = ? ";
+                $params[]       = $shippingCode;
+            }
+
+            $params[]           = $productCode;
+
+            $sql = "SELECT
+                        pri.price_s01
+                    FROM
+                        dt_price pri
+                    WHERE
+                        pri.customer_code = ?
+                        {$addWhere}
+                    AND
+                        DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date
+                    AND
+                        DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
+                    AND
+                        pri.product_code = ?
+                    GROUP BY pri.product_code
+                    HAVING MIN(pri.tanka_number)
                 ";
 
-        $param      = [$relationCus, $productCode];
-        $statement  = $this->entityManager->getConnection()->prepare($sql);
-        $price_s01  = "";
+            try {
+                $statement      = $this->entityManager->getConnection()->prepare($sql);
+                $result         = $statement->executeQuery($params);
+                $rows           = $result->fetchAllAssociative();
 
-        try {
-            $result = $statement->executeQuery($param);
-            $rows   = $result->fetchAllAssociative();
+                return $rows[0] ?? null;
 
-           if (count($rows) > 0) {
-                $price_s01 = $rows[0]["price_s01"];
-           }
-
-            return $price_s01;
-
-        } catch (\Exception $e) {
-            log_info($e->getMessage());
-            return "";
+            } catch (\Exception $e) {
+                log_info($e->getMessage());
+                return null;
+            }
         }
+
+        return null;
     }
 
     public function getPriceFromDtPriceOfCusProductcode($customer_code="",$productCode)
@@ -2031,59 +2070,59 @@ class MyCommonService extends AbstractRepository
         }
     }
 
-    public function getCustomerRelationFromUser($customer_code='', $login_type='') {
-        switch( $login_type ) {
+    public function getCustomerRelationFromUser($customer_code = '', $login_type = '', $login_code = '') {
+        switch ($login_type) {
             case 'shipping_code':
-                $where = ' shipping_code  = :customerCode ';
+                $where = " represent_code = :loginCode and shipping_code  = :customerCode ";
+                $param              = [
+                    'customerCode'  => $customer_code,
+                    'loginCode'     => $login_code,
+                ];
                 break;
+
             case 'otodoke_code':
-                $where = ' otodoke_code  = :customerCode ';
+                $where = " represent_code = :loginCode and otodoke_code  = :customerCode ";
+                $param              = [
+                    'customerCode'  => $customer_code,
+                    'loginCode'     => $login_code,
+                ];
                 break;
-            case 'represent_code':
-            case 'customer_code':
+
             case 'change_type':
+            case 'represent_code':
+                $where = " represent_code = :loginCode and customer_code  = :customerCode ";
+                $param              = [
+                    'customerCode'  => $customer_code,
+                    'loginCode'     => $login_code,
+                ];
+                break;
+
+            case 'customer_code':
             default:
-                $where = ' customer_code  = :customerCode ';
+                $where = " customer_code  = :customerCode ";
+                $param              = [
+                    'customerCode'  => $customer_code,
+                ];
                 break;
         }
 
         $sql = "SELECT
-                `represent_code`, `customer_code`, `seikyu_code`, `shipping_code`, `otodoke_code`
-            FROM `dt_customer_relation`
-            WHERE
-                {$where}";
-
-        try {
-            $statement = $this->entityManager->getConnection()->prepare($sql);
-            $result    = $statement->executeQuery([ 'customerCode'=>$customer_code ]);
-            $rows      = $result->fetchAllAssociative();
-            return $rows[0] ?? null;
-        } catch (Exception $e) {
-            return null;
-        }
-    }
-
-    /**
-     * @param
-     */
-    public function getProductLocation($product_code)
-    {
-        $sql = "
-                SELECT
-                    *
-                FROM
-				    stock_list
+                    represent_code,
+                    customer_code,
+                    seikyu_code,
+                    shipping_code,
+                    otodoke_code
+                FROM dt_customer_relation
                 WHERE
-                    product_code = ?
-			    ";
-
-        $param      = [$product_code];
-        $statement  = $this->entityManager->getConnection()->prepare($sql);
+                    {$where}
+            ";
 
         try {
-            $result = $statement->executeQuery($param);
-            $rows   = $result->fetchAllAssociative();
-            return $rows[0]['stock_location'];
+            $statement          = $this->entityManager->getConnection()->prepare($sql);
+            $result             = $statement->executeQuery($param);
+            $rows               = $result->fetchAllAssociative();
+
+            return $rows[0] ?? null;
 
         } catch (Exception $e) {
             return null;

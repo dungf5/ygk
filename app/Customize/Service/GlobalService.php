@@ -196,4 +196,18 @@ class GlobalService
             return '';
         }
     }
+
+    public function getLoginCode()
+    {
+        try {
+            if (!empty($_SESSION["usc_" . $this->customerId()])) {
+                return $_SESSION["usc_" . $this->customerId()]['login_code'];
+            }
+
+            return '';
+
+        } catch (\Exception $e) {
+            return '';
+        }
+    }
 }

@@ -56,7 +56,7 @@ class MyEccubeExtension extends AbstractExtension
 
     }
 
-    public function roundPrice($price){
+    public function roundPrice($price) {
         //$price = str_replace(",","", $price);
 
 //      if(is_float($price)){
@@ -69,6 +69,7 @@ class MyEccubeExtension extends AbstractExtension
 
         return "￥".$numAf;
     }
+
     public function roundPriceZero($price,$classShow="standar_price"){
 
         $numAf = number_format($price,2);
@@ -85,7 +86,7 @@ class MyEccubeExtension extends AbstractExtension
 
     public function roundPriceZeroTotal($price)
     {
-        $numAf      = number_format(round($price));
+        $numAf      = number_format((int)$price);
 
         if (MyCommon::checkExistText($numAf,".00")) {
             $numAf  = str_replace(".00","", $numAf);
