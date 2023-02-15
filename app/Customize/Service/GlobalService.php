@@ -81,9 +81,9 @@ class GlobalService
     public function companyName()
     {
         if ($this->getUser()) {
-            $Customer           = $this->getUser();
+            // $Customer           = $this->getUser();
             // $companyName        = $this->myCommon->getMstCustomer($Customer->getId())["company_name"];
-            $companyName        = $this->myCommon->getMstCustomer2($Customer->getCustomerCode())["company_name"];
+            $companyName        = $this->myCommon->getFullCustomer($this->getUser(), $this->getLoginType())["company_name"];
 
             return $companyName ?? '';
         }
