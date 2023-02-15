@@ -863,11 +863,11 @@ class MyCommonService extends AbstractRepository
         }
 
         elseif ($loginType == "otodoke_code") {
-            $condition      = ' b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 ) ';
+            $condition      = ' b.otodoke_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 ) ';
         }
 
         else {
-            $condition      = ' b.otodoke_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 ) ';
+            $condition      = ' b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 ) ';
         }
 
         $column = "
