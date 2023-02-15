@@ -443,7 +443,7 @@ class MyShoppingController extends AbstractShoppingController
             $login_type                 = $this->globalService->getLoginType();
             $mstShip                    = $commonService->getMstShippingCustomer($login_type, $Customer->getId(), $moreOrder);
             $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $login_type, $moreOrder);
-            $arCusLogin                 = $commonService->getMstCustomer($Customer->getId());
+            $arCusLogin                 = $commonService->getMstCustomer2($Customer->getCustomerCode());
             $Order->arCusLogin          = $arCusLogin;
             $arrOtoProductOrder         = $commonService->getCustomerOtodoke($login_type, $Customer->getId(), $moreOrder->getShippingCode(), $moreOrder);
             $Order->MoreOrder           = $moreOrder;
