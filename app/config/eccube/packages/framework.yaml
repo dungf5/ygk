@@ -1,4 +1,6 @@
 framework:
+    router:
+      generator_class: 'app.https_url_generator'
     secret: '%env(ECCUBE_AUTH_MAGIC)%'
     default_locale: '%locale%'
     translator:

@@ -13,6 +13,15 @@ parameters:
     currency: '%env(ECCUBE_CURRENCY)%'
 
 services:
+    app.https_url_generator:
+        class: Symfony\Component\Routing\Generator\UrlGenerator
+        arguments:
+            - '@router.request_context'
+            - null
+            - null
+            - null
+            - null
+            - 'https'
     # default configuration for services in *this* file
     _defaults:
         # automatically injects dependencies in your services
