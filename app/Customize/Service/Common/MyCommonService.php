@@ -852,8 +852,24 @@ class MyCommonService extends AbstractRepository
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCustomerBillSeikyuCode($customer_id, $moreOrder = null)
+    public function getCustomerBillSeikyuCode($customer_id, $loginType = null, $moreOrder = null)
     {
+        if ($loginType == "represent_code" || $loginType == "customer_code" || $loginType == "change_type") {
+            $condition      = ' b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 ) ';
+        }
+
+        elseif ($loginType == "shipping_code") {
+            $condition      = ' b.shipping_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 ) ';
+        }
+
+        elseif ($loginType == "otodoke_code") {
+            $condition      = ' b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 ) ';
+        }
+
+        else {
+            $condition      = ' b.otodoke_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 ) ';
+        }
+
         $column = "
                     a.customer_code as seikyu_code,
                     ec_customer_id,
@@ -881,7 +897,7 @@ class MyCommonService extends AbstractRepository
                     FROM
                         dt_customer_relation b
                     WHERE
-                        b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 )
+                        {$condition}
                     GROUP BY
                         b.seikyu_code
                     ) AS b
@@ -904,7 +920,7 @@ class MyCommonService extends AbstractRepository
                                         FROM
                                             dt_customer_relation b
                                         WHERE
-                                            b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ?  LIMIT 1 )
+                                            {$condition}
                                         GROUP BY  b.seikyu_code
                                     ) AS b
                                 ON
