@@ -112,31 +112,86 @@ class MyCommonService extends AbstractRepository
             return null;
         }
     }
-    public function getMstCustomer2($customer_code)
+    public function getFullCustomer($customer, $login_type)
     {
-        $sql        = "
-        SELECT
-            a.customer_code,
-            dtcus.company_name 
-        FROM
-            dt_customer_relation AS a
-            JOIN mst_customer dtcus ON
-            CASE
-                WHEN LEFT ( a.represent_code, 1 ) = 't' THEN a.otodoke_code 
-                WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code ELSE a.customer_code 
-            END = dtcus.customer_code 
-        WHERE
-            CASE
-                WHEN LEFT ( a.represent_code, 1 ) = 't' THEN a.otodoke_code 
-                WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code ELSE a.customer_code 
-            END = ? 
-        LIMIT 1;
-        ";
-        
-        $param      = [];
-        $param[]    = $customer_code;
-        $statement  = $this->entityManager->getConnection()->prepare($sql);
+        $where = '';
+        switch( $login_type ) {
+            case 'shipping_code':
+                $where = ' c.shipping_code  = :customer_code ';
+                break;
+            case 'otodoke_code':
+                $where = ' c.otodoke_code  = :customer_code ';
+                break;
+            case 'represent_code':
+            case 'customer_code':
+            case 'change_type':
+            default:
+                $where = ' c.customer_code  = :customer_code ';
+                // $where = "(
+                //     CASE
+                //          WHEN c.represent_code = '' OR c.represent_code IS NULL THEN c.customer_code
+                //         ELSE c.represent_code 
+                //     END ) = :customer_code";
+                break;
+        }
 
+        $sql = <<<SQL
+        SELECT
+            CASE
+                WHEN LEFT( a.represent_code, 1 ) = 't' THEN a.otodoke_code 
+                WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code
+                ELSE a.customer_code 
+            END AS shipping_no,
+            b.company_name,
+            b.customer_code,
+            b.ec_customer_id,
+            b.customer_name as name01,
+            b.company_name,
+            b.company_name_abb,
+            b.department,
+            b.postal_code,
+            b.addr01,
+            b.addr02,
+            b.addr03,
+            c.email,
+            b.phone_number,
+            b.create_date,
+            b.update_date,
+            b.email as customer_email,
+            b.special_order_flg,
+            b.price_view_flg
+        FROM
+                dt_customer_relation AS a
+                JOIN mst_customer b ON
+                b.customer_code = ( CASE
+                    WHEN LEFT( a.represent_code, 1 ) = 't' THEN a.otodoke_code 
+                    WHEN LEFT( a.represent_code, 1 ) = 's' THEN a.shipping_code
+                    ELSE a.customer_code 
+                END )
+                JOIN dtb_customer AS c ON c.id = b.ec_customer_id
+        WHERE
+                ( CASE
+                    WHEN LEFT ( a.represent_code, 1 ) = 't' THEN a.otodoke_code 
+                    WHEN LEFT ( a.represent_code, 1 ) = 's' THEN a.shipping_code 
+                    ELSE a.customer_code 
+                END ) = ( SELECT
+                    CASE    
+                        WHEN LEFT( c.represent_code, 1 ) = 't' THEN c.otodoke_code 
+                        WHEN LEFT( c.represent_code, 1 ) = 's' THEN c.shipping_code
+                        ELSE c.customer_code 
+                    END 
+                FROM
+                    dt_customer_relation AS c 
+                WHERE
+                    {$where}
+            LIMIT 1 );
+        LIMIT 1;
+SQL;
+        
+        $param                  = [];
+        $param['customer_code'] = $customer->getCustomerCode();
+        $statement              = $this->entityManager->getConnection()->prepare($sql);
+        
         try {
             $result = $statement->executeQuery($param);
             $rows   = $result->fetchAllAssociative();
@@ -367,7 +422,7 @@ class MyCommonService extends AbstractRepository
                             mc.create_date,
                             mc.update_date
                         ";
-
+        $shipping_code  = $_SESSION['s_shipping_code'] ?? '';
         $param          = [];
         $param[]        = $customerId;
 
@@ -443,8 +498,9 @@ class MyCommonService extends AbstractRepository
                         ";
         }
 
-        elseif ($loginType == "change_type") {
-            $shipping_code  = $_SESSION['s_shipping_code'] ?? '';
+        elseif ( $loginType == "change_type"
+            && $shipping_code != '' ) {
+            
             $param          = [];
 
             $sql        = " SELECT
@@ -461,7 +517,7 @@ class MyCommonService extends AbstractRepository
                                 from
                                     dt_customer_relation dcr
                                 WHERE
-                                    dcr.shipping_code = {$shipping_code}
+                                    dcr.shipping_code = '{$shipping_code}'
                                 GROUP BY
                                     dcr.shipping_code
                                 ) AS dcur
