@@ -1,3 +1,14 @@
+############## quyen vao
+AuthUserFile "/var/www/html/3pl_dev/basicauth/.htpasswd"
+AuthName "Member Site"
+AuthType BASIC
+require valid-user
+
+RewriteEngine On
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule ^(.*) - [E=HTTP_AUTHORIZATION:%1]
+##############
+
 DirectoryIndex index.php index.html .ht
 
 <Files ~ "/index.php">
