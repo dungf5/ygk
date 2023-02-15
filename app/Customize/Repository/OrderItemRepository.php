@@ -227,21 +227,46 @@ class OrderItemRepository extends AbstractRepository
         }
         // End - Add condition
 
-        $qb = $qb->select($col)
-            ->from('Customize\Entity\DtOrderStatus', 'dos')
-            ->innerJoin(
-                'Customize\Entity\MstShipping',
-                'ms',
-                Join::WITH,
-                'ms.cus_order_no = dos.cus_order_no and
-		        ms.cus_order_lineno = dos.cus_order_lineno'
-            )
-            ->leftJoin(
-                'Customize\Entity\MstDelivery',
-                'md',
-                Join::WITH,
-                "md.shipping_no = ms.shipping_no"
-            )
+        $qb = $qb->select($col);
+        $qb->from('Customize\Entity\MstCustomer', 'customer');
+        $qb->innerJoin(
+            'Customize\Entity\DtCustomerRelation',
+            'customer_relation',
+            Join::WITH,
+            "customer.customer_code = ( CASE
+                WHEN( LEFT( customer_relation.represent_code, 1 ) = 't' ) THEN customer_relation.otodoke_code
+                WHEN( LEFT( customer_relation.represent_code, 1 ) = 's' ) THEN customer_relation.shipping_code
+                ELSE customer_relation.customer_code 
+            END )"
+        );
+        $qb->innerJoin(
+            'Customize\Entity\DtOrderStatus',
+            'dos',
+            Join::WITH,
+            "( LEFT( customer_relation.represent_code, 1 ) = 't' AND customer_relation.otodoke_code = dos.otodoke_code )
+            OR ( LEFT( customer_relation.represent_code, 1 ) = 's' AND customer_relation.shipping_code = dos.shipping_code )
+            OR ( customer_relation.customer_code = dos.customer_code )"
+        );
+        $qb->innerJoin(
+            'Customize\Entity\MstProduct',
+            'product',
+            Join::WITH,
+            "product.product_code = dos.product_code"
+        );
+        $qb->leftJoin(
+            'Customize\Entity\MstShipping',
+            'ms',
+            Join::WITH,
+            "ms.cus_order_no = dos.cus_order_no AND ms.cus_order_lineno = dos.cus_order_lineno"
+        );
+        $qb->leftJoin(
+            'Customize\Entity\MstDelivery',
+            'md',
+            Join::WITH,
+            'md.shipping_no = ms.shipping_no'
+        );
+
+        $qb
             ->where($where)
             ->setParameter(':customerCode', $customerCode)
             ->setParameter(':shippingDate', Date("Y-m-d", strtotime("- 14 months")));
@@ -271,9 +296,9 @@ class OrderItemRepository extends AbstractRepository
         // Order By
         $qb->addOrderBy('ms.shipping_date', 'DESC');
 
-        //dd( $qb->getQuery()->getSQL(), $paramSearch, $customerCode);
-        //$this->queries->customize("", $qb, []);
-
+        // echo($qb->getQuery()->getSQL());
+        // var_dump($qb->getParameters());
+        // die();
         return $qb;
     }
 }
