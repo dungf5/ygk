@@ -27,46 +27,50 @@ class MstShippingRepository extends AbstractRepository
      */
     public function getQueryBuilderByCustomer($search_parameter=[], $customer_code='', $login_type='')
     {
-        $qb = $this->createQueryBuilder('shipping');
-        $qb->select('shipping.shipping_no', 'shipping.customer_code', 'shipping.shipping_status', 'shipping.shipping_plan_date', 'shipping.shipping_date', 'shipping.shipping_num', 'shipping.order_no', 'shipping.order_lineno', 'shipping.cus_order_no', 'shipping.cus_order_lineno', 'shipping.ec_order_no', 'shipping.ec_order_lineno');
-
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('customer.customer_code');
+        $qb->from('Customize\Entity\MstCustomer', 'customer');
         $qb->innerJoin(
-                '\Customize\Entity\DtOrderStatus',
-                'order_status',
-                Join::WITH,
-                'order_status.cus_order_no = shipping.cus_order_no');
+            'Customize\Entity\DtCustomerRelation',
+            'customer_relation',
+            Join::WITH,
+            "customer.customer_code = ( CASE
+                WHEN( LEFT( customer_relation.represent_code, 1 ) = 't' ) THEN customer_relation.otodoke_code
+                WHEN( LEFT( customer_relation.represent_code, 1 ) = 's' ) THEN customer_relation.shipping_code
+                ELSE customer_relation.customer_code 
+            END )"
+        );
         $qb->innerJoin(
-                '\Customize\Entity\MstProduct',
-                'product',
-                Join::WITH,
-                'product.product_code = shipping.product_code');
+            'Customize\Entity\DtOrderStatus',
+            'order_status',
+            Join::WITH,
+            "( LEFT( customer_relation.represent_code, 1 ) = 't' AND customer_relation.otodoke_code = order_status.otodoke_code )
+            OR ( LEFT( customer_relation.represent_code, 1 ) = 's' AND customer_relation.shipping_code = order_status.shipping_code )
+            OR ( customer_relation.customer_code = order_status.customer_code )"
+        );
+        $qb->innerJoin(
+            'Customize\Entity\MstProduct',
+            'product',
+            Join::WITH,
+            "product.product_code = order_status.product_code"
+        );
         $qb->leftJoin(
-                '\Customize\Entity\MstDelivery',
-                'delivery',
-                Join::WITH,
-                'delivery.shipping_no = shipping.shipping_no');
+            'Customize\Entity\MstShipping',
+            'shipping',
+            Join::WITH,
+            "shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno"
+        );
+        $qb->leftJoin(
+            'Customize\Entity\MstDelivery',
+            'delivery',
+            Join::WITH,
+            'delivery.shipping_no = shipping.shipping_no'
+        );
 
+        $qb->addSelect('shipping.shipping_no', 'shipping.customer_code', 'shipping.shipping_status', 'shipping.shipping_plan_date', 'shipping.shipping_date', 'shipping.shipping_num', 'shipping.order_no', 'shipping.order_lineno', 'shipping.cus_order_no', 'shipping.cus_order_lineno', 'shipping.ec_order_no', 'shipping.ec_order_lineno');
         $qb->where('shipping.delete_flg <> 0')
             ->andWhere('shipping.shipping_date >= :shipping_date')
             ->setParameter('shipping_date', date("Y-m-d", strtotime("-14 MONTH")));
-
-        switch( $login_type ) {
-            case 'shipping_code':
-                $qb->andWhere('order_status.shipping_code = :customer_code')
-                    ->setParameter('customer_code', $customer_code);
-                break;
-            case 'otodoke_code':
-                $qb->andWhere('order_status.otodoke_code = :customer_code')
-                    ->setParameter('customer_code', $customer_code);
-                break;
-            case 'represent_code':
-            case 'customer_code':
-            case 'change_type':
-            default:
-                $qb->andWhere('order_status.customer_code = :customer_code')
-                    ->setParameter('customer_code', $customer_code);
-                break;
-        }
 
         switch( $search_parameter['shipping_status'] ) {
             case 1:

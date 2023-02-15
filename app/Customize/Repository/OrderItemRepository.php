@@ -122,7 +122,7 @@ class OrderItemRepository extends AbstractRepository
                 Join::WITH,
                 "( LEFT( customer_relation.represent_code, 1 ) = 't' AND customer_relation.otodoke_code = ordStatus.otodoke_code )
                 OR ( LEFT( customer_relation.represent_code, 1 ) = 's' AND customer_relation.shipping_code = ordStatus.shipping_code )
-                OR customer_relation.customer_code = ordStatus.customer_code"
+                OR ( customer_relation.customer_code = ordStatus.customer_code )"
             );
             $qb->innerJoin(
                 'Customize\Entity\MstProduct',
