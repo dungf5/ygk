@@ -113,6 +113,58 @@ class MyCommonService extends AbstractRepository
         }
     }
     
+    public function getMstCustomer2($customer_code)
+    {
+        $sql        = "
+        SELECT
+            dtcus.represent_code,
+            dtcus.customer_code,
+            mstcus.customer_code as shipping_no,
+            mstcus.customer_code,
+            mstcus.ec_customer_id,
+            mstcus.customer_name as name01,
+            mstcus.company_name,
+            mstcus.company_name_abb,
+            mstcus.department,
+            mstcus.postal_code,
+            mstcus.addr01,
+            mstcus.addr02,
+            mstcus.addr03,
+            mstcus.phone_number,
+            mstcus.create_date,
+            mstcus.update_date,
+            mstcus.email as customer_email,
+            mstcus.special_order_flg,
+            mstcus.price_view_flg
+        FROM
+            dt_customer_relation AS dtcus
+        JOIN
+            mst_customer mstcus
+        ON
+            dtcus.customer_code = mstcus.customer_code
+        WHERE
+            CASE
+                WHEN LEFT ( dtcus.represent_code, 1 ) = 't' THEN dtcus.otodoke_code
+                WHEN LEFT ( dtcus.represent_code, 1 ) = 's' THEN dtcus.shipping_code ELSE dtcus.customer_code
+            END = ?
+        LIMIT 1;
+        ";
+
+        $param      = [];
+        $param[]    = $customer_code;
+        $statement  = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result = $statement->executeQuery($param);
+            $rows   = $result->fetchAllAssociative();
+
+            return $rows[0];
+
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
     public function getFullCustomer($customer, $login_type)
     {
         $where = '';
