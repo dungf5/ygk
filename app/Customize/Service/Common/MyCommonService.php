@@ -1605,20 +1605,34 @@ SQL;
             $params[]           = $productCode;
 
             $sql = "SELECT
-                        pri.price_s01
+                        price1.price_s01
                     FROM
-                        dt_price pri
-                    WHERE
-                        pri.customer_code = ?
-                        {$addWhere}
+                        dt_price price1
+                    JOIN
+                        (
+                            SELECT
+                                MIN(pri.tanka_number) as min_tanka_number, pri.product_code, pri.customer_code, pri.shipping_no
+                            FROM
+                                dt_price pri
+                            WHERE
+                                pri.customer_code = ?
+                                {$addWhere}
+                            AND
+                                DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date
+                            AND
+                                DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
+                            AND
+                                pri.product_code = ?
+                            GROUP BY pri.product_code
+                        ) as price2
+                    ON
+                        price1.tanka_number = price2.min_tanka_number
                     AND
-                        DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date
+                        price1.product_code = price2.product_code
                     AND
-                        DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
+                        price1.customer_code = price2.customer_code
                     AND
-                        pri.product_code = ?
-                    GROUP BY pri.product_code
-                    HAVING MIN(pri.tanka_number)
+                        price1.shipping_no = price2.shipping_no
                 ";
 
             try {
