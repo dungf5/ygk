@@ -263,12 +263,14 @@ class MypageController extends AbstractController
             'search_order_otodoke'  => $request->get('order_otodoke', 0),
         ];
 
-        // Query data
-        $customer_code  = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
-        $customer_id    = $this->twig->getGlobals()["app"]->MyDataMstCustomer["ec_customer_id"];
-        $login_type     = $this->globalService->getLoginType();
-
-        $qb             = $this->orderItemRepository->getQueryBuilderByCustomer($param, $customer_code, $login_type);
+        // paginator
+        $customer_id       = $this->globalService->customerId();
+        // $login_code        = $this->globalService->getLoginCode();
+        // $login_type        = $this->globalService->getLoginType();
+        
+        $my_common    = new MyCommonService($this->entityManager);
+        $order_status = $my_common->getOrderStatus($customer_id);
+        $qb           = $this->orderItemRepository->getQueryBuilderByCustomer($param, $order_status);
         // Paginator
         $pagination     = $paginator->paginate(
             $qb,
@@ -585,23 +587,21 @@ class MypageController extends AbstractController
      */
     public function shipping(Request $request, PaginatorInterface $paginator)
     {
-
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-        $Customer       = $this->getUser();
 
         // paginator
-        $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
-        $customer_id   = $this->twig->getGlobals()["app"]->MyDataMstCustomer["ec_customer_id"];
-        $login_type    = $this->globalService->getLoginType();
-        // $customer_relation = $common_service->getCustomerRelationFromUser($customer_code, $login_type);
-
+        $customer_id       = $this->globalService->customerId();
+        // $login_code        = $this->globalService->getLoginCode();
+        // $login_type        = $this->globalService->getLoginType();
+        
         $search_parameter = [
             'shipping_status' => $request->get('shipping_status', 0),
             'order_shipping' => $request->get('order_shipping', 0),
             'order_otodoke' => $request->get('order_otodoke', 0),
         ];
-        $qb = $this->mstShippingRepository->getQueryBuilderByCustomer($search_parameter, $customer_code, $login_type);
-
+        $my_common    = new MyCommonService($this->entityManager);
+        $order_status = $my_common->getOrderStatus($customer_id);
+        $qb           = $this->mstShippingRepository->getQueryBuilderByCustomer($search_parameter, $order_status);
         $pagination = $paginator->paginate(
             $qb,
             $request->get('pageno', 1),
@@ -663,13 +663,15 @@ class MypageController extends AbstractController
             'search_order_otodoke'  => $request->get('order_otodoke', 0),
         ];
 
-        // Query data
-        $customer_code  = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
-        $customer_id    = $this->twig->getGlobals()["app"]->MyDataMstCustomer["ec_customer_id"];
-        $login_type     = $this->globalService->getLoginType();
-
-        $qb             = $this->orderItemRepository->getDeliveryByCustomer($param, $customer_code, $login_type);
-
+        // paginator
+        $customer_id       = $this->globalService->customerId();
+        // $login_code        = $this->globalService->getLoginCode();
+        // $login_type        = $this->globalService->getLoginType();
+        
+        $my_common    = new MyCommonService($this->entityManager);
+        $order_status = $my_common->getOrderStatus($customer_id);
+        $qb           = $this->orderItemRepository->getDeliveryByCustomer($param, $order_status);
+        
         // Paginator
         $pagination     = $paginator->paginate(
             $qb,
