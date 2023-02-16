@@ -153,11 +153,11 @@ class OrderItemRepository extends AbstractRepository
             Join::WITH,
             "shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno"
         );
-        $qb->leftJoin(
+        $qb->innerJoin(
             'Customize\Entity\MstDelivery',
             'delivery',
             Join::WITH,
-            'delivery.shipping_no = shipping.shipping_no'
+            "delivery.shipping_no = shipping.shipping_no AND delivery.order_no = CONCAT(shipping.ec_order_no,'-',shipping.ec_order_lineno)"
         );
 
         $qb->addSelect(
