@@ -150,7 +150,7 @@ class GlobalService
     {
         if ($this->getUser()) {
             $Customer           = $this->getUser();
-            $priceViewFlg       = $this->myCommon->getMstCustomer2($Customer->getCustomerCode())["price_view_flg"];
+            $priceViewFlg       = $this->myCommon->getMstCustomer($Customer->getId())["price_view_flg"];
 
             return $priceViewFlg == 1 ? true : false;
         }
