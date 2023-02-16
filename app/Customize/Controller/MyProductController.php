@@ -238,14 +238,18 @@ class MyProductController extends AbstractController
             $Customer       = $this->getUser();
             $customer_code  = $cmS->getMstCustomer($Customer->getId())['customer_code'];
             $is_favorite    = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
-            $priceTxt       = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProduct->getProductCode(), $login_type, $login_code);
+            $dtPrice        = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProduct->getProductCode(), $login_type, $login_code);
             $location       = $cmS->getCustomerLocation($customer_code);
-            $price          = $priceTxt;
             $stock          = $this->stockListRepository->getData($mstProduct->getProductCode(), $location);
 
             if ( $stock ) {
                 $mstDeliveryPlan = $this->mstDeliveryPlanRepository->getData($mstProduct->getProductCode(), $stock);
             }
+        }
+
+        //Nếu dt_price no data
+        if (empty($dtPrice)) {
+            return $this->redirect($referer);
         }
 
         //check in cart
@@ -255,12 +259,11 @@ class MyProductController extends AbstractController
         $oneCartId          = '';
 
         if ($product_in_cart == 1) {
-            //productClassId,b.cart_id,a.product_id
             $cartInfoData   = $cmS->getCartInfo(MyCommon::getCarSession(), $ecProductId);
             $productClassId = $cartInfoData[0]['productClassId'];
             $oneCartId      = $cartInfoData[0]['cart_id'];
         }
-        // var_dump($mstDeliveryPlan);die;
+
         return [
             'title'           => $this->title,
             'subtitle'        => $Product->getName(),
@@ -270,7 +273,7 @@ class MyProductController extends AbstractController
             'is_favorite'     => $is_favorite,
             'productClassId'  => $productClassId,
             'oneCartId'       => $oneCartId,
-            'Price'           => $price,
+            'Price'           => $dtPrice,
             'Stock'           => $stock,
             'MstProduct'      => $mstProduct,
             'MstDeliveryPlan' => $mstDeliveryPlan,
@@ -553,15 +556,27 @@ class MyProductController extends AbstractController
         }
 
         // paginator
-        $searchData             = $searchForm->getData();
-        $arProductCodeInDtPrice = [];
-        $arTanakaNumber         = [];
-        $qb                     = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customer_code);
+        $searchData                 = $searchForm->getData();
+        $relationCus                = $commonService->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
+
+        if ($relationCus) {
+            $customerCode           = $relationCus['customer_code'];
+            $shippingCode           = $relationCus['shipping_code'];
+            $arPriceAndTanaka       = $commonService->getPriceFromDtPriceOfCusV2($customerCode);
+            $arProductCodeInDtPrice = $arPriceAndTanaka[0];
+            $arTanakaNumber         = $arPriceAndTanaka[1];
+
+            if (empty($shippingCode)) {
+                $shippingCode       = $this->globalService->getShippingCode();
+            }
+        }
+
+        $qb                         = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customerCode, $shippingCode, $arProductCodeInDtPrice, $arTanakaNumber);
 
         $event = new EventArgs(
             [
-                'searchData'    => $searchData,
-                'qb'            => $qb,
+                'searchData'        => $searchData,
+                'qb'                => $qb,
             ],
             $request
         );
@@ -583,14 +598,14 @@ class MyProductController extends AbstractController
             $ids[]                      = $Product['id'];
 
             //Get dt_price.price_s01
-            $temp                       = $pagination[$key];
-            $temp['price_s01']          = '';
-            $priceTxt                   = $commonService->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $Product['product_code'], $login_type, $login_code);
-            if ($priceTxt) {
-                $temp['price_s01']      = $priceTxt['price_s01'];
-            }
-
-            $pagination[$key]           = $temp;
+//            $temp                       = $pagination[$key];
+//            $temp['price_s01']          = '';
+//            $priceTxt                   = $commonService->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $Product['product_code'], $login_type, $login_code);
+//            if ($priceTxt) {
+//                $temp['price_s01']      = $priceTxt['price_s01'];
+//            }
+//
+//            $pagination[$key]           = $temp;
         }
 
         $ProductsAndClassCategories = $this->productRepository->findProductsWithSortedClassCategories($ids, 'p.id');

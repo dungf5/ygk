@@ -749,52 +749,66 @@ SQL;
     }
     public function getPriceFromDtPriceOfCusV2($customer_code="",$arProductCode=[])
     {
-        $arR = [];
-        $arRTana = [];
-        if($customer_code=="") {
+        $arR            = [];
+        $arRTana        = [];
+
+        if  ($customer_code == "") {
             return [[],[]];
         }
-        $param = [$customer_code];
 
-        $subWhere = "";
-        $c = count($arProductCode);
-        for ($i = 0;$i<$c;$i++) {
-            if($i ==$c-1){
-                $subWhere .="?";
-            }else{
-                $subWhere .="?,";
+        $param          = [$customer_code];
+
+        $subWhere       = "";
+        $c              = count($arProductCode);
+
+        for ($i = 0; $i < $c; $i++) {
+            if ($i == $c - 1) {
+                $subWhere   .= "?";
             }
-            $param[] = $arProductCode[$i];
+
+            else {
+                $subWhere   .= "?,";
+            }
+
+            $param[]        = $arProductCode[$i];
         }
-        $subQuereAdd="";
-        if($c>0){
-            $subQuereAdd = "and pri.product_code in({$subWhere})";
+
+        $subQuereAdd        = "";
+        if ($c > 0) {
+            $subQuereAdd    = "and pri.product_code in({$subWhere})";
         }
 
         //pri.customer_code = pri.shipping_no cho giao hang phai giong de co gia tot
-        $sql = "select DISTINCT pri.product_code,MIN(pri.tanka_number) AS min_tanka_number from dt_price pri
-                WHERE pri.customer_code=?
-                and DATE_FORMAT(NOW(),'%Y-%m-%d')>= pri.valid_date   AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
-                 {$subQuereAdd}
-                GROUP BY product_code
+        $sql = "select
+                    DISTINCT pri.product_code,
+                    MIN(pri.tanka_number) AS min_tanka_number
+                FROM
+                    dt_price pri
+                WHERE
+                    pri.customer_code=?
+                AND
+                    DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date
+                AND
+                    DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(pri.expire_date, INTERVAL 1 DAY)
+                {$subQuereAdd}
+                GROUP BY
+                    product_code
+                ORDER BY
+                    pri.tanka_number ASC
+            ";
 
-                ORDER BY pri.tanka_number asc
-                ; ";
-
-
-
-        $statement = $this->entityManager->getConnection()->prepare($sql);
         try {
-            $result = $statement->executeQuery($param);
-            $rows = $result->fetchAllAssociative();
+            $statement      = $this->entityManager->getConnection()->prepare($sql);
+            $result         = $statement->executeQuery($param);
+            $rows           = $result->fetchAllAssociative();
 
-            foreach ($rows as $item){
-                $arR[] = $item["product_code"];
-                $arRTana[] = $item["min_tanka_number"];
-
+            foreach ($rows as $item) {
+                $arR[]      = $item["product_code"];
+                $arRTana[]  = $item["min_tanka_number"];
             }
 
-            return [$arR,$arRTana];
+            return [$arR, $arRTana];
+
         } catch (\Exception $e) {
             log_info($e->getMessage());
             return [[],[]];
@@ -1634,6 +1648,7 @@ SQL;
             return null;
         }
     }
+
     public function getPriceFromDtPriceOfCusProductcodeV2($customer_code = "", $productCode, $login_type = null, $login_code = null)
     {
         if ($customer_code == "") {
@@ -1642,7 +1657,6 @@ SQL;
 
         $newComs        = new MyCommonService($this->entityManager);
         $relationCus    = $newComs->getCustomerRelationFromUser ($customer_code, $login_type, $login_code);
-        $addWhere       = "";
 
         if ($relationCus) {
             $customerCode       = $relationCus['customer_code'];
@@ -1652,6 +1666,16 @@ SQL;
             if (!empty($shippingCode))  {
                 $addWhere       = " AND pri.shipping_no = ? ";
                 $params[]       = $shippingCode;
+            }
+
+            elseif (!empty($_SESSION['s_shipping_code'])) {
+                $addWhere       = " AND pri.shipping_no = ? ";
+                $params[]       = $_SESSION['s_shipping_code'];
+            }
+
+            else {
+                $addWhere       = " AND pri.shipping_no = ? ";
+                $params[]       = '';
             }
 
             $params[]           = $productCode;
