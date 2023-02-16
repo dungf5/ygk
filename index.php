@@ -18,6 +18,8 @@ if (!file_exists($autoload) && !is_readable($autoload)) {
 }
 require $autoload;
 
+require "C:\wamp64\www\debug\debug.php";
+
 // The check is to ensure we don't use .env in production
 if (!isset($_SERVER['APP_ENV'])) {
     if (!class_exists(Dotenv::class)) {

@@ -38,138 +38,94 @@ class OrderItemRepository extends AbstractRepository
      *
      * @return QueryBuilder
      */
-    public function getQueryBuilderByCustomer($paramSearch = [], $customerCode, $loginType = null)
+    public function getQueryBuilderByCustomer($paramSearch = [], $order_status=[])
     {
-        if ($loginType == "represent_code" || $loginType == "customer_code" || $loginType == "change_type") {
-            $condition      = ' and ordStatus.customer_code  = :customerCode ';
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('shipping.shipping_no');
+        $qb->from('Customize\Entity\DtOrderStatus', 'order_status');
+        $qb->innerJoin(
+            'Customize\Entity\MstShipping',
+            'shipping',
+            Join::WITH,
+            "shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno"
+        );
+        $qb->innerJoin(
+            'Customize\Entity\MstProduct',
+            'product',
+            Join::WITH,
+            "product.product_code = order_status.product_code"
+        );
+
+        $qb->addSelect(
+            'order_status.ec_type',
+            'order_status.order_line_no',
+            'order_status.cus_order_no',
+            'order_status.cus_order_lineno',
+            'order_status.ec_order_no', 
+            'order_status.ec_order_lineno', 
+            'order_status.order_date', 
+            'order_status.order_status', 
+            'order_status.remarks1', 
+            'order_status.remarks2', 
+            'order_status.update_date', 
+            'order_status.order_remain_num', 
+            'order_status.reserve_stock_num', 
+            'product.jan_code', 
+            'product.ec_product_id as product_id', 
+            'product.product_name', 
+            'product.product_code', 
+            'product.quantity', 
+            'shipping.shipping_status', 
+            'shipping.inquiry_no', 
+            'shipping.shipping_date', 
+            'shipping.shipping_no'
+        );
+        $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = order_status.shipping_code) shipping_name');
+        $qb->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = order_status.otodoke_code) otodoke_name');
+        $qb->where('shipping.delete_flg <> 0')
+            ->andWhere('shipping.shipping_date >= :shipping_date')
+            ->setParameter('shipping_date', date("Y-m-d", strtotime("-14 MONTH")));
+        if( count($order_status) > 0 ) {
+            $where = ' 1 = 1 ';
+            foreach($order_status as $k=>$os ) {
+                $where .= " OR ( shipping.cus_order_no = :shipping_cus_order_no_{$k} AND shipping.cus_order_lineno = :shipping_cus_order_lineno_{$k} ) ";
+                $qb->setParameter("shipping_cus_order_no_{$k}", $os['cus_order_no']);
+                $qb->setParameter("shipping_cus_order_lineno_{$k}", $os['cus_order_lineno']);
+            }
+            $qb->andWhere( $where );
         }
 
-        elseif ($loginType == "shipping_code") {
-            $condition      = ' and ordStatus.shipping_code  = :customerCode ';
-        }
-
-        elseif ($loginType == "otodoke_code") {
-            $condition      = ' and ordStatus.otodoke_code  = :customerCode ';
-        }
-
-        else {
-            $condition      = ' and ordStatus.customer_code  = :customerCode ';
-        }
-
-        $col        = "
-            ordStatus.ec_type,
-            ordStatus.order_line_no,
-            ordStatus.cus_order_no,
-            ordStatus.cus_order_lineno,
-            ordStatus.ec_order_no,
-            ordStatus.ec_order_lineno,
-            ordStatus.order_date,
-            ordStatus.order_status,
-            ordStatus.remarks1,
-            ordStatus.remarks2,
-            ordStatus.update_date,
-            ordStatus.order_remain_num,
-            ordStatus.reserve_stock_num,
-            mstp.jan_code,
-            mstp.ec_product_id as product_id ,
-            mstp.product_name,
-            mstp.product_code,
-            mstp.quantity,
-            mstShip.shipping_status,
-            mstShip.inquiry_no,
-            mstShip.shipping_date,
-            mstShip.shipping_no
-        ";
-
-        $qb         = $this->getEntityManager()->createQueryBuilder();
-        $where      = " ordStatus.order_date >= :orderDate {$condition} AND mstShip.delete_flg <> 0";
-
-        // Add condition
-        if ( $paramSearch['search_order_status'] != '') {
-            $where .= ' AND ordStatus.order_status  = :orderStatus ';
-        }
-
-        if ( $paramSearch['search_order_date'] != 0 ) {
-            $where .= ' AND ordStatus.order_date like :search_order_date ';
-        }
-
-        if ( $paramSearch['search_order_shipping'] != 0 ) {
-            $where .= ' AND ordStatus.shipping_code  = :orderShipping ';
-        }
-
-        if ( $paramSearch['search_order_otodoke'] != 0 ) {
-            $where .= ' AND ordStatus.otodoke_code  = :orderOtodoke ';
-        }
-        // End - Add condition
-
-        $qb = $qb->select($col)
-            ->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = ordStatus.shipping_code) shipping_name')
-            ->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = ordStatus.otodoke_code) otodoke_name')
-            ->from('Customize\Entity\MstCustomer', 'customer');
-            $qb->innerJoin(
-                'Customize\Entity\DtCustomerRelation',
-                'customer_relation',
-                Join::WITH,
-                "customer.customer_code = ( CASE
-                    WHEN( LEFT( customer_relation.represent_code, 1 ) = 't' ) THEN customer_relation.otodoke_code
-                    WHEN( LEFT( customer_relation.represent_code, 1 ) = 's' ) THEN customer_relation.shipping_code
-                    ELSE customer_relation.customer_code
-                END )"
-            );
-            $qb->innerJoin(
-                'Customize\Entity\DtOrderStatus',
-                'ordStatus',
-                Join::WITH,
-                "( LEFT( customer_relation.represent_code, 1 ) = 't' AND customer_relation.otodoke_code = ordStatus.otodoke_code )
-                OR ( LEFT( customer_relation.represent_code, 1 ) = 's' AND customer_relation.shipping_code = ordStatus.shipping_code )
-                OR ( customer_relation.customer_code = ordStatus.customer_code )"
-            );
-            $qb->innerJoin(
-                'Customize\Entity\MstProduct',
-                'mstp',
-                Join::WITH,
-                "mstp.product_code = ordStatus.product_code"
-            );
-            $qb->leftJoin(
-                'Customize\Entity\MstShipping',
-                'mstShip',
-                Join::WITH,
-                "mstShip.cus_order_no = ordStatus.cus_order_no AND mstShip.cus_order_lineno = ordStatus.cus_order_lineno"
-            );
-            $qb
-                ->where($where)
-                ->setParameter(':customerCode', $customerCode)
-                ->setParameter(':orderDate', Date("Y-m-d", strtotime("- 14 months")));
-
-        /*Set param search */
         if ( $paramSearch['search_order_status'] != '' ) {
-            $qb = $qb->setParameter(':orderStatus', $paramSearch['search_order_status']);
+            $qb->andWhere( 'order_status.order_status  = :search_order_status' )
+                ->setParameter(':search_order_status', $paramSearch['search_order_status']);
         }
 
         if ( $paramSearch['search_order_date'] != 0 ) {
-            $qb = $qb->setParameter(':search_order_date', $paramSearch['search_order_date']."-%");
+            $qb->andWhere( 'order_status.order_date like :search_order_date' )
+                ->setParameter(':search_order_date', $paramSearch['search_order_date']."-%");
         }
 
         if ( $paramSearch['search_order_shipping'] != 0 ) {
-            $qb = $qb->setParameter(':orderShipping', $paramSearch['search_order_shipping']);
+            $qb->andWhere( 'order_status.shipping_code  = :search_order_shipping' )
+                ->setParameter(':search_order_shipping', $paramSearch['search_order_shipping']);
         }
 
         if ( $paramSearch['search_order_otodoke'] != 0 ) {
-            $qb = $qb->setParameter(':orderOtodoke', $paramSearch['search_order_otodoke']);
+            $qb->andWhere( 'order_status.otodoke_code  = :search_order_otodoke ' )
+                ->setParameter(':search_order_otodoke', $paramSearch['search_order_otodoke']);
         }
-        /*End - Set param search */
 
         //group
-        $qb->addGroupBy('ordStatus.order_no');
-        $qb->addGroupBy('ordStatus.order_line_no');
+        $qb->addGroupBy('order_status.order_no');
+        $qb->addGroupBy('order_status.order_line_no');
 
         // Order By
-        $qb->addOrderBy('ordStatus.order_date', 'DESC');
-        $qb->addOrderBy('ordStatus.cus_order_no', 'DESC');
-        $qb->addOrderBy('ordStatus.cus_order_lineno', 'asc');
+        $qb->addOrderBy('order_status.order_date', 'DESC');
+        $qb->addOrderBy('order_status.cus_order_no', 'DESC');
+        $qb->addOrderBy('order_status.cus_order_lineno', 'asc');
 
-        // echo($qb->getQuery()->getSQL());
-        // var_dump($qb->getParameters());
+        // dump($qb->getQuery()->getSQL());
+        // dump($qb->getParameters());
         // die();
         return $qb;
     }
@@ -179,125 +135,77 @@ class OrderItemRepository extends AbstractRepository
      *
      * @return QueryBuilder
      */
-    public function getDeliveryByCustomer($paramSearch = [], $customerCode, $loginType = null)
+    public function getDeliveryByCustomer($paramSearch = [], $order_status=[])
     {
-        if ($loginType == "represent_code" || $loginType == "customer_code" || $loginType == "change_type") {
-            $condition      = ' and dos.customer_code  = :customerCode ';
-        }
-
-        elseif ($loginType == "shipping_code") {
-            $condition      = ' and dos.shipping_code  = :customerCode ';
-        }
-
-        elseif ($loginType == "otodoke_code") {
-            $condition      = ' and dos.otodoke_code  = :customerCode ';
-        }
-
-        else {
-            $condition      = ' and dos.customer_code  = :customerCode ';
-        }
-
-        $col        = "
-                        md.delivery_no,
-                        md.delivery_lineno,
-                        ms.shipping_date,
-                        md.shiping_name,
-                        md.otodoke_name,
-                        ms.shipping_no
-                    ";
-
-        $qb         = $this->getEntityManager()->createQueryBuilder();
-        $where      = " ms.delete_flg <> 0 AND ms.shipping_date >= :shippingDate {$condition}";
-
-        // Add condition
-        if (!empty($paramSearch['delivery_no'])) {
-            $where .= ' AND md.delivery_no = :deliveryNo ';
-        }
-
-        if ( $paramSearch['search_shipping_date'] != 0 ) {
-            $where .= ' AND  ms.shipping_date  like :shippingDate ';
-        }
-
-        if ( $paramSearch['search_order_shipping'] != 0 ) {
-            $where .= ' AND md.shiping_name = (select mc3.company_name from Customize\Entity\MstCustomer mc3 where mc3.customer_code = :orderShipping) ';
-        }
-
-        if ( $paramSearch['search_order_otodoke'] != 0 ) {
-            $where .= ' AND md.otodoke_name in (select mc4.company_name from Customize\Entity\MstCustomer mc4 where mc4.customer_code = :orderOtodoke) ';
-        }
-        // End - Add condition
-
-        $qb = $qb->select($col);
-        $qb->from('Customize\Entity\MstCustomer', 'customer');
-        $qb->innerJoin(
-            'Customize\Entity\DtCustomerRelation',
-            'customer_relation',
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('delivery.delivery_no');
+        $qb->from('Customize\Entity\MstDelivery', 'delivery');
+        $qb->leftJoin(
+            'Customize\Entity\MstShipping',
+            'shipping',
             Join::WITH,
-            "customer.customer_code = ( CASE
-                WHEN( LEFT( customer_relation.represent_code, 1 ) = 't' ) THEN customer_relation.otodoke_code
-                WHEN( LEFT( customer_relation.represent_code, 1 ) = 's' ) THEN customer_relation.shipping_code
-                ELSE customer_relation.customer_code 
-            END )"
+            'shipping.shipping_no = delivery.shipping_no'
         );
         $qb->innerJoin(
             'Customize\Entity\DtOrderStatus',
-            'dos',
+            'order_status',
             Join::WITH,
-            "( LEFT( customer_relation.represent_code, 1 ) = 't' AND customer_relation.otodoke_code = dos.otodoke_code )
-            OR ( LEFT( customer_relation.represent_code, 1 ) = 's' AND customer_relation.shipping_code = dos.shipping_code )
-            OR ( customer_relation.customer_code = dos.customer_code )"
+            "shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno"
         );
         $qb->innerJoin(
             'Customize\Entity\MstProduct',
             'product',
             Join::WITH,
-            "product.product_code = dos.product_code"
-        );
-        $qb->leftJoin(
-            'Customize\Entity\MstShipping',
-            'ms',
-            Join::WITH,
-            "ms.cus_order_no = dos.cus_order_no AND ms.cus_order_lineno = dos.cus_order_lineno"
-        );
-        $qb->leftJoin(
-            'Customize\Entity\MstDelivery',
-            'md',
-            Join::WITH,
-            'md.shipping_no = ms.shipping_no'
+            "product.product_code = order_status.product_code"
         );
 
-        $qb
-            ->where($where)
-            ->setParameter(':customerCode', $customerCode)
-            ->setParameter(':shippingDate', Date("Y-m-d", strtotime("- 14 months")));
+        $qb->addSelect(
+            'delivery.delivery_no',
+            'delivery.delivery_lineno',
+            'delivery.shiping_name',
+            'delivery.otodoke_name',
+            'shipping.shipping_date',
+            'shipping.shipping_no'
+        );
 
-        /*Set param search */
+        $qb->where('shipping.delete_flg <> 0')
+            ->andWhere('shipping.shipping_date >= :shipping_date')
+            ->setParameter('shipping_date', date("Y-m-d", strtotime("-14 MONTH")));
+        if( count($order_status) > 0 ) {
+            $where = ' 1 = 1 ';
+            foreach($order_status as $k=>$os ) {
+                $where .= " OR ( shipping.cus_order_no = :shipping_cus_order_no_{$k} AND shipping.cus_order_lineno = :shipping_cus_order_lineno_{$k} ) ";
+                $qb->setParameter("shipping_cus_order_no_{$k}", $os['cus_order_no']);
+                $qb->setParameter("shipping_cus_order_lineno_{$k}", $os['cus_order_lineno']);
+            }
+            $qb->andWhere( $where );
+        }
         if (!empty($paramSearch['delivery_no'])) {
-            $qb = $qb->setParameter(':deliveryNo', $paramSearch['delivery_no']);
+            $qb->andWhere( 'delivery.delivery_no = :delivery_no' )
+                ->setParameter(':delivery_no', $paramSearch['delivery_no']);
         }
 
         if ( $paramSearch['search_shipping_date'] != 0 ) {
-            $qb = $qb->setParameter(':shippingDate', $paramSearch['search_shipping_date']."-%");
+            $qb->andWhere( 'shipping.shipping_date like :search_shipping_date' )
+                ->setParameter(':search_shipping_date', $paramSearch['search_shipping_date']."-%");
         }
 
         if ( $paramSearch['search_order_shipping'] != 0 ) {
-            $qb = $qb->setParameter(':orderShipping', $paramSearch['search_order_shipping']);
+            $qb->andWhere( 'delivery.shiping_name = (select mc3.company_name from Customize\Entity\MstCustomer mc3 where mc3.customer_code = :search_order_shipping)' )
+                ->setParameter(':search_order_shipping', $paramSearch['search_order_shipping']);
         }
 
         if ( $paramSearch['search_order_otodoke'] != 0 ) {
-            $qb = $qb->setParameter(':orderOtodoke', $paramSearch['search_order_otodoke']);
+            $qb->andWhere( 'delivery.otodoke_name in (select mc4.company_name from Customize\Entity\MstCustomer mc4 where mc4.customer_code = :search_order_otodoke)' )
+                ->setParameter(':search_order_otodoke', $paramSearch['search_order_otodoke']);
         }
-        /*End - Set param search */
 
-        //group
-        $qb->addGroupBy('dos.order_no');
-        $qb->addGroupBy('dos.order_line_no');
+        $qb->addGroupBy('delivery.delivery_no');
 
-        // Order By
-        $qb->addOrderBy('ms.shipping_date', 'DESC');
-
-        // echo($qb->getQuery()->getSQL());
-        // var_dump($qb->getParameters());
+        $qb->addOrderBy('shipping.shipping_date', 'DESC');
+        
+        // dump($qb->getQuery()->getSQL());
+        // dump($qb->getParameters());
         // die();
         return $qb;
     }
