@@ -44,16 +44,16 @@ class OrderItemRepository extends AbstractRepository
         $qb->select('shipping.shipping_no');
         $qb->from('Customize\Entity\DtOrderStatus', 'order_status');
         $qb->innerJoin(
-            'Customize\Entity\MstShipping',
-            'shipping',
-            Join::WITH,
-            "shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno"
-        );
-        $qb->innerJoin(
             'Customize\Entity\MstProduct',
             'product',
             Join::WITH,
             "product.product_code = order_status.product_code"
+        );
+        $qb->leftJoin(
+            'Customize\Entity\MstShipping',
+            'shipping',
+            Join::WITH,
+            "shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno"
         );
 
         $qb->addSelect(
@@ -82,15 +82,16 @@ class OrderItemRepository extends AbstractRepository
         );
         $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = order_status.shipping_code) shipping_name');
         $qb->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = order_status.otodoke_code) otodoke_name');
-        $qb->where('shipping.delete_flg <> 0')
-            ->andWhere('shipping.shipping_date >= :shipping_date')
+        $qb->where('shipping.delete_flg IS NULL OR shipping.delete_flg <> 0')
+            ->andWhere('order_status.order_date >= :shipping_date')
             ->setParameter('shipping_date', date("Y-m-d", strtotime("-14 MONTH")));
         if( count($order_status) > 0 ) {
-            $where = ' 1 = 1 ';
+            $where = '';
             foreach($order_status as $k=>$os ) {
-                $where .= " OR ( shipping.cus_order_no = :shipping_cus_order_no_{$k} AND shipping.cus_order_lineno = :shipping_cus_order_lineno_{$k} ) ";
-                $qb->setParameter("shipping_cus_order_no_{$k}", $os['cus_order_no']);
-                $qb->setParameter("shipping_cus_order_lineno_{$k}", $os['cus_order_lineno']);
+                if( ! empty($where) ) $where .= ' OR ';
+                $where .= " ( order_status.cus_order_no = :order_status_cus_order_no_{$k} AND order_status.cus_order_lineno = :order_status_cus_order_lineno_{$k} ) ";
+                $qb->setParameter("order_status_cus_order_no_{$k}", $os['cus_order_no']);
+                $qb->setParameter("order_status_cus_order_lineno_{$k}", $os['cus_order_lineno']);
             }
             $qb->andWhere( $where );
         }
@@ -138,25 +139,25 @@ class OrderItemRepository extends AbstractRepository
     public function getDeliveryByCustomer($paramSearch = [], $order_status=[])
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->select('delivery.delivery_no');
-        $qb->from('Customize\Entity\MstDelivery', 'delivery');
-        $qb->leftJoin(
-            'Customize\Entity\MstShipping',
-            'shipping',
-            Join::WITH,
-            'shipping.shipping_no = delivery.shipping_no'
-        );
-        $qb->innerJoin(
-            'Customize\Entity\DtOrderStatus',
-            'order_status',
-            Join::WITH,
-            "shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno"
-        );
+        $qb->select('shipping.shipping_no');
+        $qb->from('Customize\Entity\DtOrderStatus', 'order_status');
         $qb->innerJoin(
             'Customize\Entity\MstProduct',
             'product',
             Join::WITH,
             "product.product_code = order_status.product_code"
+        );
+        $qb->innerJoin(
+            'Customize\Entity\MstShipping',
+            'shipping',
+            Join::WITH,
+            "shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno"
+        );
+        $qb->leftJoin(
+            'Customize\Entity\MstDelivery',
+            'delivery',
+            Join::WITH,
+            'delivery.shipping_no = shipping.shipping_no'
         );
 
         $qb->addSelect(
@@ -168,13 +169,14 @@ class OrderItemRepository extends AbstractRepository
             'shipping.shipping_no'
         );
 
-        $qb->where('shipping.delete_flg <> 0')
+        $qb->where('( shipping.delete_flg IS NOT NULL AND shipping.delete_flg <> 0 )')
             ->andWhere('shipping.shipping_date >= :shipping_date')
             ->setParameter('shipping_date', date("Y-m-d", strtotime("-14 MONTH")));
         if( count($order_status) > 0 ) {
-            $where = ' 1 = 1 ';
+            $where = '';
             foreach($order_status as $k=>$os ) {
-                $where .= " OR ( shipping.cus_order_no = :shipping_cus_order_no_{$k} AND shipping.cus_order_lineno = :shipping_cus_order_lineno_{$k} ) ";
+                if( ! empty($where) ) $where .= ' OR ';
+                $where .= " ( shipping.cus_order_no = :shipping_cus_order_no_{$k} AND shipping.cus_order_lineno = :shipping_cus_order_lineno_{$k} ) ";
                 $qb->setParameter("shipping_cus_order_no_{$k}", $os['cus_order_no']);
                 $qb->setParameter("shipping_cus_order_lineno_{$k}", $os['cus_order_lineno']);
             }

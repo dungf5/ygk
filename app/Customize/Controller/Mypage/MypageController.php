@@ -253,12 +253,11 @@ class MypageController extends AbstractController
         ];
 
         // paginator
-        $customer_id       = $this->globalService->customerId();
-        // $login_code        = $this->globalService->getLoginCode();
-        // $login_type        = $this->globalService->getLoginType();
+        $user_login  = $this->twig->getGlobals()["app"]->getUser();
+        $customer_id = $this->globalService->customerId();
         
         $my_common    = new MyCommonService($this->entityManager);
-        $order_status = $my_common->getOrderStatus($customer_id);
+        $order_status = $my_common->getOrderStatus($user_login->getCustomerCode());
         $qb           = $this->orderItemRepository->getQueryBuilderByCustomer($param, $order_status);
         // Paginator
         $pagination     = $paginator->paginate(
@@ -579,17 +578,16 @@ class MypageController extends AbstractController
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // paginator
-        $customer_id       = $this->globalService->customerId();
-        // $login_code        = $this->globalService->getLoginCode();
-        // $login_type        = $this->globalService->getLoginType();
-        
+        $customer_id = $this->globalService->customerId();
+        $user_login  = $this->twig->getGlobals()["app"]->getUser();
         $search_parameter = [
             'shipping_status' => $request->get('shipping_status', 0),
             'order_shipping' => $request->get('order_shipping', 0),
             'order_otodoke' => $request->get('order_otodoke', 0),
         ];
         $my_common    = new MyCommonService($this->entityManager);
-        $order_status = $my_common->getOrderStatus($customer_id);
+        $order_status = $my_common->getOrderStatus($user_login->getCustomerCode());
+
         $qb           = $this->mstShippingRepository->getQueryBuilderByCustomer($search_parameter, $order_status);
         $pagination = $paginator->paginate(
             $qb,
@@ -653,12 +651,12 @@ class MypageController extends AbstractController
         ];
 
         // paginator
-        $customer_id       = $this->globalService->customerId();
-        // $login_code        = $this->globalService->getLoginCode();
-        // $login_type        = $this->globalService->getLoginType();
+        $user_login  = $this->twig->getGlobals()["app"]->getUser();
+        $customer_id = $this->globalService->customerId();
         
         $my_common    = new MyCommonService($this->entityManager);
-        $order_status = $my_common->getOrderStatus($customer_id);
+        $order_status = $my_common->getOrderStatus($user_login->getCustomerCode());
+        
         $qb           = $this->orderItemRepository->getDeliveryByCustomer($param, $order_status);
         
         // Paginator

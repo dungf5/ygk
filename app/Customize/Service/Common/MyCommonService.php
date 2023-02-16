@@ -2314,10 +2314,8 @@ SQL;
             return $customerCode;
         }
     }
-
-    public function getCustomerRelation($customer_id = '') {
-        if( empty($customer_id) ) return null;
-
+    public function getCustomerRelation($login_code = '') {
+        if( empty($login_code) ) return null;
         $sql = <<<SQL
         SELECT DISTINCT
             cr.represent_code, cr.customer_code, cr.seikyu_code, cr.shipping_code, cr.otodoke_code
@@ -2326,20 +2324,18 @@ SQL;
             JOIN mst_customer AS c
                 ON c.customer_code = (
                     CASE
-                        WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code
+                        WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code 
                         WHEN ( LEFT ( cr.represent_code, 1 ) = 's' ) THEN cr.shipping_code
-                        ELSE cr.customer_code
-                    END
+                        ELSE cr.customer_code 
+                    END 
             )
         WHERE
-            c.ec_customer_id = :customer_id
+            c.customer_code = :login_code
         ORDER BY cr.update_date DESC
         SQL;
-
-        $param                = [];
-        $param['customer_id'] = $customer_id;
-        $statement            = $this->entityManager->getConnection()->prepare($sql);
-
+        $param               = [];
+        $param['login_code'] = $login_code;
+        $statement           = $this->entityManager->getConnection()->prepare($sql);
         try {
             $result         = $statement->executeQuery($param);
             return $result->fetchAllAssociative();
@@ -2347,10 +2343,8 @@ SQL;
             return null;
         }
     }
-
-    public function getOrderStatus($customer_id = '') {
-        if( empty($customer_id) ) return null;
-
+    public function getOrderStatus($login_code = '') {
+        if( empty($login_code) ) return null;
         $sql = <<<SQL
         SELECT DISTINCT
             os.order_no, os.order_line_no, os.cus_order_no, os.cus_order_lineno
@@ -2364,22 +2358,21 @@ SQL;
         JOIN mst_customer  c
             ON c.customer_code = (
                 CASE
-                    WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code
+                    WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code 
                     WHEN ( LEFT ( cr.represent_code, 1 ) = 's' ) THEN cr.shipping_code
-                    ELSE cr.customer_code
-                END
+                    ELSE cr.customer_code 
+                END 
             )
         WHERE
-                c.ec_customer_id = :customer_id
+                c.customer_code = :login_code
         ORDER BY
             os.cus_order_no ASC,
             os.order_line_no ASC;
         SQL;
-
-        $param                = [];
-        $param['customer_id'] = $customer_id;
-        $statement            = $this->entityManager->getConnection()->prepare($sql);
-
+        $param               = [];
+        $param['login_code'] = $login_code;
+        $statement           = $this->entityManager->getConnection()->prepare($sql);
+        
         try {
             $result         = $statement->executeQuery($param);
             return $result->fetchAllAssociative();
