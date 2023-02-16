@@ -1948,20 +1948,12 @@ SQL;
      * @var MyCommonService $commonS
      * @var string $customer_code
      */
-    public function setCartIndtPrice($arProductCode,$hsMstProductCodeCheckShow,$commonS,$customer_code)
+    public function setCartIndtPrice($hsMstProductCodeCheckShow, $commonS, $customer_code, $login_type = '', $login_code = '')
     {
-        $arPriceAndTanaka = $commonS->getPriceFromDtPriceOfCusV2($customer_code,$arProductCode);
+        foreach ($hsMstProductCodeCheckShow as $keyCheck => $valueCheck) {
+            $dtPrice    = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $keyCheck, $login_type, $login_code);
 
-        $arProductCodeInDtPrice = $arPriceAndTanaka[0];
-        $arTanakaNumber = $arPriceAndTanaka[1];
-
-        if(count($arProductCodeInDtPrice)>0 && count($arTanakaNumber)>0){
-            $hsDtPriceProductCode =    $commonS->getPriceFromDtPriceTankaProductCode($arTanakaNumber,$arProductCodeInDtPrice,$customer_code);
-
-        }
-
-        foreach ($hsMstProductCodeCheckShow as $keyCheck=>$valueCheck){
-            if(isset($hsDtPriceProductCode[$keyCheck])){
+            if ($dtPrice && $dtPrice['price_s01'] && $dtPrice['price_s01'] > 0) {
                 $hsMstProductCodeCheckShow[$keyCheck]="good_price";
             }
         }

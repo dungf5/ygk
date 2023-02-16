@@ -202,6 +202,7 @@ class MyShoppingController extends AbstractShoppingController
         $mstShip                    = $commonService->getMstShippingCustomer($this->globalService->getLoginType(), $Customer->getId());
         $Order->arCusLogin          = $arCusLogin;
         $login_type                 = $this->globalService->getLoginType();
+        $login_code                 = $this->globalService->getLoginCode();
         $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $login_type);
         $Order->mstShips            = $mstShip;
         $Order->dtBillSeikyuCode    = $dtBillSeikyuCode;
@@ -340,7 +341,7 @@ class MyShoppingController extends AbstractShoppingController
             $hsMstProductCodeCheckShow[$itemP['product_code']] = "standar_price";
         }
 
-        $hsMstProductCodeCheckShow                  = $comSer->setCartIndtPrice($arProductCode,$hsMstProductCodeCheckShow,$comSer,$customer_code);
+        $hsMstProductCodeCheckShow                  = $comSer->setCartIndtPrice($hsMstProductCodeCheckShow, $comSer, $customer_code, $login_type, $login_code);
 
         return [
             'form'                                  => $form->createView(),
@@ -441,6 +442,7 @@ class MyShoppingController extends AbstractShoppingController
                 $this->entityManager->flush();
             }
             $login_type                 = $this->globalService->getLoginType();
+            $login_code                 = $this->globalService->getLoginCode();
             $mstShip                    = $commonService->getMstShippingCustomer($login_type, $Customer->getId(), $moreOrder);
             $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $login_type, $moreOrder);
             $arCusLogin                 = $commonService->getMstCustomer2($Customer->getCustomerCode());
@@ -482,7 +484,7 @@ class MyShoppingController extends AbstractShoppingController
             }
 
             $customer_code                  = $comSer->getMstCustomer($Customer->getId())["customer_code"];
-            $hsMstProductCodeCheckShow      = $comSer->setCartIndtPrice($arProductCode,$hsMstProductCodeCheckShow,$comSer,$customer_code);
+            $hsMstProductCodeCheckShow      = $comSer->setCartIndtPrice($hsMstProductCodeCheckShow, $comSer, $customer_code, $login_type, $login_code);
 
             return [
                 'form'          => $form->createView(),

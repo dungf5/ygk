@@ -303,110 +303,113 @@ class MyCartController extends AbstractController
      */
     public function showCart(Request $request)
     {
-
-
-
         // カートを取得して明細の正規化を実行
-        $Carts = $this->cartService->getCarts();
+        $Carts      = $this->cartService->getCarts();
 
         //$this->execPurchaseFlow($Carts);
-
         // TODO itemHolderから取得できるように
-        $least = [];
-        $quantity = [];
-        $isDeliveryFree = [];
-        $totalPrice = 0;
-        $totalQuantity = 0;
-        $carSession = MyCommon::getCarSession();
+        $least              = [];
+        $quantity           = [];
+        $isDeliveryFree     = [];
+        $totalPrice         = 0;
+        $totalQuantity      = 0;
+        $carSession         = MyCommon::getCarSession();
 
         foreach ($Carts as $Cart) {
-            if($Cart["key_eccube"]!== $carSession){
+            if ($Cart["key_eccube"] !== $carSession) {
                 continue;
             }
-            $quantity[$Cart->getCartKey()] = 0;
-            $isDeliveryFree[$Cart->getCartKey()] = false;
+
+            $quantity[$Cart->getCartKey()]          = 0;
+            $isDeliveryFree[$Cart->getCartKey()]    = false;
 
             if ($this->baseInfo->getDeliveryFreeQuantity()) {
                 if ($this->baseInfo->getDeliveryFreeQuantity() > $Cart->getQuantity()) {
-                    $quantity[$Cart->getCartKey()] = $this->baseInfo->getDeliveryFreeQuantity() - $Cart->getQuantity();
-                } else {
-                    $isDeliveryFree[$Cart->getCartKey()] = true;
+                    $quantity[$Cart->getCartKey()]  = $this->baseInfo->getDeliveryFreeQuantity() - $Cart->getQuantity();
+                }
+
+                else {
+                    $isDeliveryFree[$Cart->getCartKey()]    = true;
                 }
             }
 
             if ($this->baseInfo->getDeliveryFreeAmount()) {
                 if (!$isDeliveryFree[$Cart->getCartKey()] && $this->baseInfo->getDeliveryFreeAmount() <= $Cart->getTotalPrice()) {
-                    $isDeliveryFree[$Cart->getCartKey()] = true;
-                } else {
-                    $least[$Cart->getCartKey()] = $this->baseInfo->getDeliveryFreeAmount() - $Cart->getTotalPrice();
+                    $isDeliveryFree[$Cart->getCartKey()]    = true;
+                }
+
+                else {
+                    $least[$Cart->getCartKey()]             = $this->baseInfo->getDeliveryFreeAmount() - $Cart->getTotalPrice();
                 }
             }
 
-            $totalPrice += $Cart->getTotalPrice();
-            $totalQuantity += $Cart->getQuantity();
+            $totalPrice             += $Cart->getTotalPrice();
+            $totalQuantity          += $Cart->getQuantity();
         }
 
         // カートが分割された時のセッション情報を削除
         $request->getSession()->remove(OrderHelper::SESSION_CART_DIVIDE_FLAG);
-        $myCart = $this->cartService->getCarts(true);
-        //Mapping cart product with mst product
-        $comSer = new MyCommonService($this->entityManager);
-        $cartList = [];
-        $oneCartId =0;
-        $onecart_key='';
-        foreach ($myCart as $cartT) {
-            $cartList[] = $cartT['id'];
-            $oneCartId=$cartT['id'];
-            $onecart_key=$cartT['cart_key'];
+        $myCart         = $this->cartService->getCarts(true);
 
+        //Mapping cart product with mst product
+        $comSer         = new MyCommonService($this->entityManager);
+        $cartList       = [];
+        $oneCartId      = 0;
+        $onecart_key    = '';
+
+        foreach ($myCart as $cartT) {
+            $cartList[]     = $cartT['id'];
+            $oneCartId      = $cartT['id'];
+            $onecart_key    = $cartT['cart_key'];
         }
 
+        $mstProduct                 = $comSer->getMstProductsFromCart($cartList);
+        $hsMstProductPrice          = [];
+        $hsProductId                = [];
+        $arProductCode              = [];
+        $hsMstProductCodeCheckShow  = [];
 
-        $mstProduct = $comSer->getMstProductsFromCart($cartList);
-        $hsMstProductPrice = [];
-        $hsProductId = [];
-        $arProductCode = [];
-        $hsMstProductCodeCheckShow =[];
         foreach ($mstProduct as $itemP) {
             //car_quantity,a.product_id as my_product_id
-            $hsProductId[$itemP['ec_product_id']] = $itemP;
-            $arProductCode[] = $itemP['product_code'];
-            $hsMstProductCodeCheckShow[$itemP['product_code']] = "standar_price";
-
+            $hsProductId[$itemP['ec_product_id']]               = $itemP;
+            $arProductCode[]                                    = $itemP['product_code'];
+            $hsMstProductCodeCheckShow[$itemP['product_code']]  = "standar_price";
         }
         //end mapping
 
-
-
-        $isHideNext =false;
+        $isHideNext             = false;
         if ($this->getUser()) {
-            $Customer = $this->getUser();
-            $commonS = new MyCommonService($this->entityManager);
-            $customer_code = $commonS->getMstCustomer($Customer->getId())["customer_code"];
-            if($customer_code=="6000"){
-                $isHideNext = true;
-            }
-            if(count($arProductCode)>0){
-                $hsMstProductCodeCheckShow = $commonS->setCartIndtPrice($arProductCode,$hsMstProductCodeCheckShow,$commonS,$customer_code);
+            $Customer           = $this->getUser();
+            $commonS            = new MyCommonService($this->entityManager);
+            $customer_code      = $commonS->getMstCustomer($Customer->getId())["customer_code"];
+            $login_type         = $this->globalService->getLoginType();
+            $login_code         = $this->globalService->getLoginCode();
+
+            if ($customer_code == "6000") {
+                $isHideNext     = true;
             }
 
+            if (count($arProductCode) > 0) {
+                $hsMstProductCodeCheckShow  = $commonS->setCartIndtPrice($hsMstProductCodeCheckShow, $commonS, $customer_code, $login_type, $login_code);
+            }
         }
 
         return [
-            'totalPrice' => $totalPrice,
-            'isHideNext'=>$isHideNext,
-            'totalQuantity' => $totalQuantity,
+            'totalPrice'                => $totalPrice,
+            'isHideNext'                => $isHideNext,
+            'totalQuantity'             => $totalQuantity,
             // 空のカートを削除し取得し直す
-            'Carts' => $myCart,
-            'least' => $least,
-            'onecart_key' => $onecart_key,
-            'oneCartId' =>$oneCartId,
-            'quantity' => $quantity,
-            'hsProductId' => $hsProductId,
+            'Carts'                     => $myCart,
+            'least'                     => $least,
+            'onecart_key'               => $onecart_key,
+            'oneCartId'                 => $oneCartId,
+            'quantity'                  => $quantity,
+            'hsProductId'               => $hsProductId,
             'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
-            'is_delivery_free' => $isDeliveryFree,
+            'is_delivery_free'          => $isDeliveryFree,
         ];
     }
+
     /**
      * カートに追加.
      *
