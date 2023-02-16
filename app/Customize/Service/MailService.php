@@ -329,6 +329,13 @@ class MailService
     {
         log_info('受注メール送信開始');
 
+        if (empty($Order['email'])) {
+            $company    = $Order['company_name'] ?? '';
+            log_info("Company name: {$company} no email");
+
+            return ;
+        }
+
         $MailTemplate = $this->mailTemplateRepository->find($this->eccubeConfig['eccube_order_mail_template_id']);
 
         $body = $this->twig->render($MailTemplate->getFileName(), [

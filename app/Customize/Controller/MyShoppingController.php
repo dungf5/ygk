@@ -158,7 +158,7 @@ class MyShoppingController extends AbstractShoppingController
         // 受注の初期化.
         log_info('[注文手続] 受注の初期化処理を開始します.');
         $Customer       = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
-        $arCusLogin     = $commonService->getMstCustomer2($Customer->getCustomerCode());
+        $arCusLogin     = $commonService->getMstCustomer($Customer->getId());
         $is_update_cart = $this->session->get('is_update_cart', '');
 
         //************** update cart when login
@@ -445,7 +445,7 @@ class MyShoppingController extends AbstractShoppingController
             $login_code                 = $this->globalService->getLoginCode();
             $mstShip                    = $commonService->getMstShippingCustomer($login_type, $Customer->getId(), $moreOrder);
             $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $login_type, $moreOrder);
-            $arCusLogin                 = $commonService->getMstCustomer2($Customer->getCustomerCode());
+            $arCusLogin                 = $commonService->getMstCustomer($Customer->getId());
             $Order->arCusLogin          = $arCusLogin;
             $arrOtoProductOrder         = $commonService->getCustomerOtodoke($login_type, $Customer->getId(), $moreOrder->getShippingCode(), $moreOrder);
             $Order->MoreOrder           = $moreOrder;
