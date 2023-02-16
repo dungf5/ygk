@@ -371,9 +371,9 @@ $(function () {
         updateShipingAddress(shipping_code);
     });
 
-{#    {% if Order.dtBillSeikyuCode|length == 1 %}#}
-{#        updateBillAddress('{{ Order.dtBillSeikyuCode[0]["seikyu_code"] }}');#}
-{#    {% endif %}#}
+    {% if Order.dtBillSeikyuCode|length == 1 %}
+        updateBillAddress('{{ Order.dtBillSeikyuCode[0]["seikyu_code"] }}');
+    {% endif %}
 
     {% if Order.mstShips|length == 1 %}
         updateShipingAddress('{{ Order.mstShips[0]["shipping_code"] }}');
@@ -1146,7 +1146,7 @@ function updateDeliverydAdress(delivery_code) {
 
                                         {% endif %}
                                     </span>
-                                    <label for="shipping_radio">{{ Order.mstShips[0]["name01"] }}</label>
+                                    {{ Order.mstShips[0]["name01"] }}
                                 </div>
                                 <div class="shipping_col2">
                                     〒 {{ Order.mstShips[0]["postal_code"] }} {{ Order.mstShips[0]["addr01"] }} {{ Order.mstShips[0]["addr02"] }} {{ Order.mstShips[0]["addr03"] }}

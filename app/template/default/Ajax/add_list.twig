@@ -15,8 +15,7 @@
                                         {% endif %}
 
                                     </span>
-                    <label
-                        for="shipping_radio">{{ data.shipping[0]["name01"] }} </label>
+                    {{ data.shipping[0]["name01"] }}
                 </div>
                 <div class="shipping_col2">
                     〒 {{ data.shipping[0]["postal_code"] }} {{ data.shipping[0]["addr01"] }} {{ data.shipping[0]["addr02"] }}

@@ -276,7 +276,7 @@ console.log(Math.random());
                                         {% endif %}
 
                                     </span>
-                                <label for="bill_{{ arShipping["seikyu_code"] }}" >{{ arShipping["name01"] }} </label>
+                                {{ arShipping["name01"] }}
                             </div>
                             <div class="shipping_col2">
                                 〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}
@@ -319,7 +319,7 @@ console.log(Math.random());
                                          {% endif %}
 
                                     </span>
-                                <label for="{{ arShipping["shipping_no"] }}" >{{ arShipping["name01"] }} </label>
+                                {{ arShipping["name01"] }}
                             </div>
                             <div class="shipping_col2">
                                 〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}
