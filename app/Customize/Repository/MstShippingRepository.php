@@ -36,7 +36,7 @@ class MstShippingRepository extends AbstractRepository
             Join::WITH,
             "product.product_code = order_status.product_code"
         );
-        $qb->leftJoin(
+        $qb->innerJoin(
             'Customize\Entity\MstShipping',
             'shipping',
             Join::WITH,
@@ -46,7 +46,7 @@ class MstShippingRepository extends AbstractRepository
             'Customize\Entity\MstDelivery',
             'delivery',
             Join::WITH,
-            'delivery.shipping_no = shipping.shipping_no'
+            "delivery.shipping_no = shipping.shipping_no AND delivery.order_no = CONCAT(shipping.ec_order_no,'-',shipping.ec_order_lineno)"
         );
 
         $qb->addSelect(
