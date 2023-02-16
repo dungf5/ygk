@@ -203,9 +203,7 @@ class MyShoppingController extends AbstractShoppingController
         $Order->arCusLogin          = $arCusLogin;
         $login_type                 = $this->globalService->getLoginType();
         $login_code                 = $this->globalService->getLoginCode();
-        $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $login_type);
         $Order->mstShips            = $mstShip;
-        $Order->dtBillSeikyuCode    = $dtBillSeikyuCode;
 
         // 集計処理.
         log_info('[注文手続] 集計処理を開始します.', [$Order->getId()]);
@@ -444,7 +442,7 @@ class MyShoppingController extends AbstractShoppingController
             $login_type                 = $this->globalService->getLoginType();
             $login_code                 = $this->globalService->getLoginCode();
             $mstShip                    = $commonService->getMstShippingCustomer($login_type, $Customer->getId(), $moreOrder);
-            $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getId(), $login_type, $moreOrder);
+            $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getCustomerCode(), $login_type, $login_code);
             $arCusLogin                 = $commonService->getMstCustomer($Customer->getId());
             $Order->arCusLogin          = $arCusLogin;
             $arrOtoProductOrder         = $commonService->getCustomerOtodoke($login_type, $Customer->getId(), $moreOrder->getShippingCode(), $moreOrder);

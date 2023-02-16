@@ -972,22 +972,17 @@ SQL;
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCustomerBillSeikyuCode($customer_id, $loginType = null, $moreOrder = null)
+    public function getCustomerBillSeikyuCode($customer_code, $login_type = '', $login_code = '')
     {
-        if ($loginType == "represent_code" || $loginType == "customer_code" || $loginType == "change_type") {
-            $condition      = ' b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 ) ';
+        $newComs            = new MyCommonService($this->entityManager);
+        $relationCus        = $newComs->getCustomerRelationFromUser ($customer_code, $login_type, $login_code);
+
+        if ($relationCus) {
+            $seikyu_code    = $relationCus['seikyu_code'];
         }
 
-        elseif ($loginType == "shipping_code") {
-            $condition      = ' b.shipping_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 ) ';
-        }
-
-        elseif ($loginType == "otodoke_code") {
-            $condition      = ' b.otodoke_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 ) ';
-        }
-
-        else {
-            $condition      = ' b.customer_code = ( SELECT customer_code  FROM  mst_customer WHERE ec_customer_id = ? LIMIT 1 ) ';
+        if (empty($seikyu_code)) {
+            return [];
         }
 
         $column = "
@@ -1010,53 +1005,22 @@ SQL;
                     {$column}
                 FROM
                     mst_customer a
-                JOIN
-                    (
-                    SELECT
-                        b.seikyu_code
-                    FROM
-                        dt_customer_relation b
-                    WHERE
-                        {$condition}
-                    GROUP BY
-                        b.seikyu_code
-                    ) AS b
-                ON
-                    b.seikyu_code = a.customer_code
+                WHERE
+                    a.customer_code = ?
+                LIMIT 1
                 ";
 
-        $myPara     = [$customer_id];
+        try {
+            $myPara             = [$seikyu_code];
+            $statement          = $this->entityManager->getConnection()->prepare($sql);
+            $result             = $statement->executeQuery($myPara);
+            $rows               = $result->fetchAllAssociative();
 
-        if ($moreOrder != null) {
-            $seikyu_code    = $moreOrder->getSeikyuCode();
-            $sql            = " SELECT
-                                    {$column}
-                                FROM
-                                    mst_customer a
-                                JOIN
-                                    (
-                                        SELECT
-                                            b.seikyu_code
-                                        FROM
-                                            dt_customer_relation b
-                                        WHERE
-                                            {$condition}
-                                        GROUP BY  b.seikyu_code
-                                    ) AS b
-                                ON
-                                    b.seikyu_code = a.customer_code
-                                AND
-                                    b.seikyu_code = ?
-                            ";
+            return $rows ?? [];
 
-            $myPara[]       = $seikyu_code;
+        } catch (\Exception $e) {
+            return [];
         }
-
-        $statement          = $this->entityManager->getConnection()->prepare($sql);
-        $result             = $statement->executeQuery($myPara);
-        $rows               = $result->fetchAllAssociative();
-
-        return $rows;
     }
 
     /***
@@ -2362,16 +2326,16 @@ SQL;
             JOIN mst_customer AS c
                 ON c.customer_code = (
                     CASE
-                        WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code 
+                        WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code
                         WHEN ( LEFT ( cr.represent_code, 1 ) = 's' ) THEN cr.shipping_code
-                        ELSE cr.customer_code 
-                    END 
+                        ELSE cr.customer_code
+                    END
             )
         WHERE
             c.ec_customer_id = :customer_id
         ORDER BY cr.update_date DESC
         SQL;
-        
+
         $param                = [];
         $param['customer_id'] = $customer_id;
         $statement            = $this->entityManager->getConnection()->prepare($sql);
@@ -2400,10 +2364,10 @@ SQL;
         JOIN mst_customer  c
             ON c.customer_code = (
                 CASE
-                    WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code 
+                    WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code
                     WHEN ( LEFT ( cr.represent_code, 1 ) = 's' ) THEN cr.shipping_code
-                    ELSE cr.customer_code 
-                END 
+                    ELSE cr.customer_code
+                END
             )
         WHERE
                 c.ec_customer_id = :customer_id
@@ -2411,7 +2375,7 @@ SQL;
             os.cus_order_no ASC,
             os.order_line_no ASC;
         SQL;
-        
+
         $param                = [];
         $param['customer_id'] = $customer_id;
         $statement            = $this->entityManager->getConnection()->prepare($sql);

@@ -371,9 +371,9 @@ $(function () {
         updateShipingAddress(shipping_code);
     });
 
-    {% if Order.dtBillSeikyuCode|length == 1 %}
-        updateBillAddress('{{ Order.dtBillSeikyuCode[0]["seikyu_code"] }}');
-    {% endif %}
+{#    {% if Order.dtBillSeikyuCode|length == 1 %}#}
+{#        updateBillAddress('{{ Order.dtBillSeikyuCode[0]["seikyu_code"] }}');#}
+{#    {% endif %}#}
 
     {% if Order.mstShips|length == 1 %}
         updateShipingAddress('{{ Order.mstShips[0]["shipping_code"] }}');
