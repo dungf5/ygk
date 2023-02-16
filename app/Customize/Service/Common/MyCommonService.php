@@ -2351,8 +2351,8 @@ SQL;
         }
     }
 
-    public function getCustomerRelation($customer_id = '') {
-        if( empty($customer_id) ) return null;
+    public function getCustomerRelation($login_code = '') {
+        if( empty($login_code) ) return null;
 
         $sql = <<<SQL
         SELECT DISTINCT
@@ -2368,13 +2368,12 @@ SQL;
                     END 
             )
         WHERE
-            c.ec_customer_id = :customer_id
+            c.customer_code = :login_code
         ORDER BY cr.update_date DESC
         SQL;
-        
-        $param                = [];
-        $param['customer_id'] = $customer_id;
-        $statement            = $this->entityManager->getConnection()->prepare($sql);
+        $param               = [];
+        $param['login_code'] = $login_code;
+        $statement           = $this->entityManager->getConnection()->prepare($sql);
 
         try {
             $result         = $statement->executeQuery($param);
@@ -2384,8 +2383,8 @@ SQL;
         }
     }
 
-    public function getOrderStatus($customer_id = '') {
-        if( empty($customer_id) ) return null;
+    public function getOrderStatus($login_code = '') {
+        if( empty($login_code) ) return null;
 
         $sql = <<<SQL
         SELECT DISTINCT
@@ -2406,16 +2405,15 @@ SQL;
                 END 
             )
         WHERE
-                c.ec_customer_id = :customer_id
+                c.customer_code = :login_code
         ORDER BY
             os.cus_order_no ASC,
             os.order_line_no ASC;
         SQL;
+        $param               = [];
+        $param['login_code'] = $login_code;
+        $statement           = $this->entityManager->getConnection()->prepare($sql);
         
-        $param                = [];
-        $param['customer_id'] = $customer_id;
-        $statement            = $this->entityManager->getConnection()->prepare($sql);
-
         try {
             $result         = $statement->executeQuery($param);
             return $result->fetchAllAssociative();

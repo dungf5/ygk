@@ -29,18 +29,18 @@ class MstShippingRepository extends AbstractRepository
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('shipping.shipping_no');
-        $qb->from('Customize\Entity\MstShipping', 'shipping');
-        $qb->innerJoin(
-            'Customize\Entity\DtOrderStatus',
-            'order_status',
-            Join::WITH,
-            "shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno"
-        );
+        $qb->from('Customize\Entity\DtOrderStatus', 'order_status');
         $qb->innerJoin(
             'Customize\Entity\MstProduct',
             'product',
             Join::WITH,
             "product.product_code = order_status.product_code"
+        );
+        $qb->leftJoin(
+            'Customize\Entity\MstShipping',
+            'shipping',
+            Join::WITH,
+            "shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno"
         );
         $qb->leftJoin(
             'Customize\Entity\MstDelivery',
@@ -66,13 +66,14 @@ class MstShippingRepository extends AbstractRepository
         $qb->addSelect('product.jan_code', 'product.product_name', 'delivery.delivery_no');
         $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = order_status.shipping_code) shipping_name');
         $qb->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = order_status.otodoke_code) otodoke_name');
-        $qb->where('shipping.delete_flg <> 0')
+        $qb->where('shipping.delete_flg IS NOT NULL AND shipping.delete_flg <> 0')
             ->andWhere('shipping.shipping_date >= :shipping_date')
             ->setParameter('shipping_date', date("Y-m-d", strtotime("-14 MONTH")));
         if( count($order_status) > 0 ) {
-            $where = ' 1 = 1 ';
+            $where = '';
             foreach($order_status as $k=>$os ) {
-                $where .= " OR ( shipping.cus_order_no = :shipping_cus_order_no_{$k} AND shipping.cus_order_lineno = :shipping_cus_order_lineno_{$k} ) ";
+                if( ! empty($where) ) $where .= ' OR ';
+                $where .= " ( shipping.cus_order_no = :shipping_cus_order_no_{$k} AND shipping.cus_order_lineno = :shipping_cus_order_lineno_{$k} ) ";
                 $qb->setParameter("shipping_cus_order_no_{$k}", $os['cus_order_no']);
                 $qb->setParameter("shipping_cus_order_lineno_{$k}", $os['cus_order_lineno']);
             }
@@ -99,10 +100,14 @@ class MstShippingRepository extends AbstractRepository
                 ->setParameter('order_otodoke', $search_parameter['order_otodoke']);
         }
 
-        $qb->addGroupBy('shipping.order_no');
-        $qb->addGroupBy('shipping.order_lineno');
-        
-        $qb->addOrderBy('shipping.shipping_date', 'DESC');
+        //group
+        $qb->addGroupBy('order_status.order_no');
+        $qb->addGroupBy('order_status.order_line_no');
+
+        // Order By
+        $qb->addOrderBy('order_status.order_date', 'DESC');
+        $qb->addOrderBy('order_status.cus_order_no', 'DESC');
+        $qb->addOrderBy('order_status.cus_order_lineno', 'asc');
         
         // dump($qb->getQuery()->getSQL());
         // dump($qb->getParameters());

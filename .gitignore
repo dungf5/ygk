@@ -56,3 +56,4 @@ node_modules
 ###< symfony/web-server-bundle ###
 
 index.php
+.htaccess
