@@ -192,7 +192,31 @@ file that was distributed with this source code.
                                     </a>
                                 {% endif %}
                             </td>
-                            <td>{{ Shipping.order_lineno }}</td>
+                            <td>
+                                {% if Shipping.shipping_company_code == '8005' %}
+                                    <a target="_blank" href="https://www.tollexpressjapan.com/fwexphp/inquiry/chase/init">
+                                        {{ Shipping.order_lineno }}
+                                    </a>
+                                {% elseif Shipping.shipping_company_code == '8004' %}
+                                    <a target="_blank" href="https://trackings.post.japanpost.jp/services/srv/search/input">
+                                        {{ Shipping.order_lineno }}
+                                    </a>
+                                {% elseif Shipping.shipping_company_code == '8003' %}
+                                    <a target="_blank" href="https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp">
+                                        {{ Shipping.order_lineno }}
+                                    </a>
+                                {% elseif Shipping.shipping_company_code == '8002' %}
+                                    <a target="_blank" href="https://toi.kuronekoyamato.co.jp/cgi-bin/tneko">
+                                        {{ Shipping.order_lineno }}
+                                    </a>
+                                {% elseif Shipping.shipping_company_code == '8001' %}
+                                    <a target="_blank" href="https://track.seino.co.jp/cgi-bin/gnpquery.pgm">
+                                        {{ Shipping.order_lineno }}
+                                    </a>
+                                {% else %}
+                                    {{ Shipping.order_lineno }}
+                                {% endif %}
+                            </td>
                             <td>{{ Shipping.cus_order_no }}</td>
                             <td>{{ Shipping.cus_order_lineno }}</td>
                         </tr>
