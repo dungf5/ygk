@@ -284,13 +284,11 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                      return false;
              }
                 $.cookie( myid,valInput, { path: '/' });
-                 console.log('keyde#'+idQuantity);
              return true;
         }
  $(function() {
 
             let myValue = $.cookie( $('#quantity').attr('myid'));
-            console.log('key#'+$('#quantity').attr('myid'));
             if(myValue !=undefined){
               $('#quantity').val(myValue);
             }

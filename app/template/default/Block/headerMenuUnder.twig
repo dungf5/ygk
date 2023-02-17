@@ -122,18 +122,10 @@
     {% endif %}
 </style>
 
-<script src="https://cdn.jsdelivr.net/gh/yeikos/jquery.history/jquery.history.js"></script>
+<script src="{{ asset('assets/js/jquery/1.1.0/jquery.history.js', 'user_data') }}"></script>
 
 <script>
     $(function () {
-
-        console.log('headerheader'+Math.random());
-
-
-
-
-
-
         $.ajax({
             url: '{{ url('get_total_cart') }}?r'+Math.random(),
             type: 'GET',
@@ -141,8 +133,8 @@
 
                 '_token':'{{ csrf_token('_token') }}'
             }
-        }).done(function(data, statusText, jqXHR) {
-
+        })
+        .done(function(data, statusText, jqXHR) {
             if(data.totalNew>0){
                 let cartHtml ="<span class='fnDIN'>"+data.totalNew+"</span>";
                 $('#emptyCart').html(cartHtml);
@@ -151,19 +143,12 @@
             }else{
                 $('a>.fnDIN').remove();
             }
-
-
-
-        }).fail(function(jqXHR, statusText, errorThrown) {
+        })
+        .fail(function(jqXHR, statusText, errorThrown) {
 
         });
 
-
     });
-
-
-
-
 </script>
 
 <script>

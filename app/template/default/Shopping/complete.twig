@@ -14,20 +14,13 @@ file that was distributed with this source code.
 
 
 {% block javascript %}
-
-
 <script>
-console.log(Math.random());
-console.log(window.performance.navigation.type);
-
-if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_BACK_FORWARD) {
-    window.location.href='/';
-}
-
-
+    if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_BACK_FORWARD) {
+        window.location.href='/';
+    }
 </script>
-
 {% endblock javascript %}
+
 {% block main %}
 <div class="ec-role">
     <div class="ec-pageHeader">

@@ -1,5 +1,12 @@
+
+<div class="main_visual">
+    <div class="item slick-slide"><a href="/products/list?category_id=67" {% if not is_granted('ROLE_USER') %} class="disabled" {% endif %}><img src="{{ asset('/html/user_data/assets/img/top/topSlider01.jpg') }}"></a></div>
+    <div class="item slick-slide"><a href="/products/list?category_id=94" {% if not is_granted('ROLE_USER') %} class="disabled" {% endif %}><img src="{{ asset('/html/user_data/assets/img/top/topSlider02.jpg') }}"></a></div>
+    <div class="item slick-slide"><a href="/products/list?category_id=31" {% if not is_granted('ROLE_USER') %} class="disabled" {% endif %}><img src="{{ asset('/html/user_data/assets/img/top/topSlider03.jpg') }}"></a></div>
+</div>
+
 <script>
-    $(function() {
+    $(document).ready(function () {
         $('.main_visual').slick({
             dots: true,
             arrows: true,
@@ -8,14 +15,7 @@
             speed: 500,
             centerMode: true,
             centerPadding: '20%',
-            dots: true,
-            focusOnSelect: true,
+            focusOnSelect: true
         });
-    });
+    })
 </script>
-
-<div class="main_visual">
-    <div class="item slick-slide"><a href="/products/list?category_id=67" {% if not is_granted('ROLE_USER') %} class="disabled" {% endif %}><img src="{{ asset('/html/user_data/assets/img/top/topSlider01.jpg') }}"></a></div>
-    <div class="item slick-slide"><a href="/products/list?category_id=94" {% if not is_granted('ROLE_USER') %} class="disabled" {% endif %}><img src="{{ asset('/html/user_data/assets/img/top/topSlider02.jpg') }}"></a></div>
-    <div class="item slick-slide"><a href="/products/list?category_id=31" {% if not is_granted('ROLE_USER') %} class="disabled" {% endif %}><img src="{{ asset('/html/user_data/assets/img/top/topSlider03.jpg') }}"></a></div>
-</div>

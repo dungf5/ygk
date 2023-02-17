@@ -36,12 +36,12 @@ file that was distributed with this source code.
         {{ include(template_from_string(Page.meta_tags)) }}
     {% endif %}
     <link rel="icon" href="{{ asset('assets/img/common/favicon.ico', 'user_data') }}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/jquery.slick/1.6.0/slick.css">
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/3.4.1/bootstrap.min.css', 'user_data') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/5.3.1/fontawesome.css', 'user_data') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/slick/1.6.0/slick.css', 'user_data') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     {% block stylesheet %}{% endblock %}
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="{{ asset('assets/js/jquery/3.6.0/jquery.min.js', 'user_data') }}"></script>
     <script>
         $(function() {
             $.ajaxSetup({
@@ -58,7 +58,7 @@ file that was distributed with this source code.
     {# プラグイン用styleseetやmetatagなど #}
     {% if plugin_assets is defined %}{{ include('@admin/snippet.twig', { snippets: plugin_assets }) }}{% endif %}
     <link rel="stylesheet" href="{{ asset('assets/css/customize.css', 'user_data') }}">
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="{{ asset('assets/js/sweetalert/2.1.2/sweetalert.min.js', 'user_data') }}"></script>
 </head>
 <body id="page_{{ app.request.get('_route') }}" class="{{ body_class|default('other_page') }}">
 {# Layout: BODY_AFTER #}
@@ -158,8 +158,8 @@ file that was distributed with this source code.
     {% endif %}
 </div>
 <div class="ec-blockTopBtn pagetop">{{'common.pagetop'|trans}}</div>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/jquery.slick/1.6.0/slick.min.js"></script>
+<script src="{{ asset('assets/js/bootstrap/3.4.1/bootstrap.min.js', 'user_data') }}"></script>
+<script src="{{ asset('assets/js/slick/1.6.0/slick.min.js', 'user_data') }}"></script>
 {% include('@common/lang.twig') %}
 <script src="{{ asset('assets/js/function.js') }}"></script>
 <script src="{{ asset('assets/js/eccube.js') }}"></script>
