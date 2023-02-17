@@ -62,7 +62,8 @@ class MstShippingRepository extends AbstractRepository
             'shipping.cus_order_lineno', 
             'shipping.ec_order_no', 
             'shipping.ec_order_lineno',
-            'shipping.shipping_company_code'
+            'shipping.shipping_company_code',
+            'shipping.inquiry_no'
         );
         $qb->addSelect('product.jan_code', 'product.product_name', 'delivery.delivery_no');
         $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = order_status.shipping_code) shipping_name');
