@@ -1062,8 +1062,13 @@ function updateDeliverydAdress(delivery_code) {
                         margin-right: 20px;
                     }
 
-                    .shipping_destination_right {
+                    .shipping_destination_right,
+                    .shipping_destination_right > .custom-combobox {
+                        width: 100%;
+                    }
 
+                    .shipping_destination_right > .custom-combobox > .custom-combobox-input {
+                        width: calc(100% - 30px);
                     }
 
                     .shipping_row {
@@ -1088,13 +1093,13 @@ function updateDeliverydAdress(delivery_code) {
                     .ui-autocomplete-input.select {
                         position: relative;
                         align-items: center;
-                        max-width: 26vw;
                         height: 30px;
                         border-radius: 5px;
                         border: 1px solid #ccc;
                         transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
                         margin: 0;
                         padding: 0;
+                        color: #525263;
                     }
                     .shipping_radio_is_shipping_code {
                         position: relative;
