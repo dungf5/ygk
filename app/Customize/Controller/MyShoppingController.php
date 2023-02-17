@@ -563,6 +563,8 @@ class MyShoppingController extends AbstractShoppingController
         // 受注の存在チェック
         $preOrderId     = $this->cartService->getPreOrderId();
         $Order          = $this->orderHelper->getPurchaseProcessingOrder($preOrderId);
+        $login_type     = $this->globalService->getLoginType();
+        $login_code     = $this->globalService->getLoginCode();
 
         if (!$Order) {
             log_info('[注文処理] 購入処理中の受注が存在しません.', [$preOrderId]);
@@ -650,24 +652,22 @@ class MyShoppingController extends AbstractShoppingController
                 $remarks1           = $moreOrder->getRemarks1();
                 $remarks2           = $moreOrder->getRemarks2();
                 $location           = $comS->getCustomerLocation($customerCode);
+                $reCustomer         = $comS->getCustomerRelationFromUser($customerCode, $login_type, $login_code);
 
                 foreach ($itemList as $itemOr) {
                     if ($itemOr->isProduct()) {
-                        $arEcLData[] = [
+                        $arEcLData[]                = [
                             'ec_order_no'           => $orderNo,
                             'ec_order_lineno'       => $itemOr->getId(),
                             'product_code'          => $hsArrEcProductCusProduct[$itemOr->getId()],
-                            'customer_code'         => $customerCode,
+                            'customer_code'         => $reCustomer['customer_code'] ?? '',
                             'shipping_code'         => $ship_code,
                             'order_remain_num'      => $hsArrRemmain[$itemOr->getId()],
                             'shipping_plan_date'    => $shipping_plan_date,
                             'seikyu_code'           => $seikyu_code,
-                            //dtorder
                             'order_price'           => $itemOr->getPrice(),
                             'demand_quantity'       => $itemOr->getQuantity(),
                             'otodoke_code'          => $otodoke_code,
-                            // No41 注文情報送信I/F start
-                            //'order_date'=>'',   // ・受注日←受注日(購入日)
                             'deli_plan_date'        => $shipping_plan_date,                          // ・希望納期（納入予定日）←配送日指定
                             'item_no'               => $hsArrJanCode[$itemOr->getId()],                     // ・客先品目No←JANコード
                             'demand_unit'           => $hsArrProductQuantity[$itemOr->getId()] > 1 ? 'CS' : 'PC',        // ・需要単位←商品情報の入り数が‘1’の場合、‘PC’、入り数が‘1’以外の場合、‘CS’
@@ -678,7 +678,6 @@ class MyShoppingController extends AbstractShoppingController
                             'remarks1'              => $remarks1,
                             'remarks2'              => $remarks2,
                             'location'              => !empty($location) ? $location : "XB0101001",
-                            // No41 注文情報送信I/F end
                             ];
                     }
                 }
