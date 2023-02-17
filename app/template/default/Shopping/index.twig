@@ -649,9 +649,13 @@ function updateDeliverydAdress(delivery_code) {
         loadingOverlay();
         let remarks1    = $("input[name=remarks1]").val();
         let remarks2    = $("input[name=remarks2]").val();
+        let remarks3    = $("input[name=remarks3]").val();
+        let remarks4    = $("input[name=remarks4]").val();
 
         if (name == 'remarks1') remarks1    = value;
         if (name == 'remarks2') remarks2    = value;
+        if (name == 'remarks3') remarks3    = value;
+        if (name == 'remarks4') remarks4    = value;
 
         $.ajax({
             url: '{{ url('cart_save_temp_order') }}',
@@ -660,6 +664,8 @@ function updateDeliverydAdress(delivery_code) {
             data: {
                 'remarks1': remarks1,
                 'remarks2': remarks2,
+                'remarks3': remarks3,
+                'remarks4': remarks4,
                 'pre_order_id':'{{ Order.pre_order_id }}',
                 'customer_id':'{{ Order.Customer.id }}'
             }
@@ -1267,6 +1273,22 @@ function updateDeliverydAdress(delivery_code) {
                     </div>
                     <div class="col-md-12" style="padding: 0">
                         <input type="text" class="form-control" name="remarks2" id="remarks2" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks2 }} {% endif %}" onkeyup="updateRemarks(this)">
+                    </div>
+                </div>
+                <div class="col-md-12" style="display: inline-flex; padding: 0; margin-top: 10px">
+                    <div class="shipping_destination_left">
+                        <div>発注書宛先</div>
+                    </div>
+                    <div class="col-md-12" style="padding: 0">
+                        <input type="text" class="form-control" name="remarks3" id="remarks3" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks3 }} {% endif %}" onkeyup="updateRemarks(this)">
+                    </div>
+                </div>
+                <div class="col-md-12" style="display: inline-flex; padding: 0; margin-top: 10px">
+                    <div class="shipping_destination_left">
+                        <div>発注書備考</div>
+                    </div>
+                    <div class="col-md-12" style="padding: 0">
+                        <input type="text" class="form-control" name="remarks4" id="remarks4" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks4 }} {% endif %}" onkeyup="updateRemarks(this)">
                     </div>
                 </div>
                 {# End - Remarks#}

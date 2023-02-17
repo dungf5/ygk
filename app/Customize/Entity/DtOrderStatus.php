@@ -149,6 +149,20 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         private $remarks2;
 
         /**
+         * @var string|null
+         *
+         * @ORM\Column(name="remarks3", type="text",options={"comment":"発注書"}, nullable=true)
+         */
+        private $remarks3;
+
+        /**
+         * @var string|null
+         *
+         * @ORM\Column(name="remarks4", type="text",options={"comment":"発注書備考"}, nullable=true)
+         */
+        private $remarks4;
+
+        /**
          * @return string
          */
         public function getProductCode(): string
@@ -478,6 +492,46 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         public function getRemarks2()
         {
             return $this->remarks2;
+        }
+
+        /**
+         * Set remarks3.
+         *
+         * @param string|null $remarks3
+         */
+        public function setRemarks3($remarks3 = null)
+        {
+            $this->remarks3 = $remarks3;
+        }
+
+        /**
+         * Get remarks3.
+         *
+         * @return string|null
+         */
+        public function getRemarks3()
+        {
+            return $this->remarks3;
+        }
+
+        /**
+         * Set remarks4
+         *
+         * @param string|null $remarks4
+         */
+        public function setRemarks4($remarks4 = null)
+        {
+            $this->remarks4 = $remarks4;
+        }
+
+        /**
+         * Get remarks4.
+         *
+         * @return string|null
+         */
+        public function getRemarks4()
+        {
+            return $this->remarks4;
         }
     }
 }

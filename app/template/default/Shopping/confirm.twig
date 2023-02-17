@@ -423,6 +423,36 @@ console.log(Math.random());
                     </div>
                 </div>
             </div>
+
+            <div class="shipping_destination">
+                <div class="shipping_destination_left">
+                    <div>発注書宛先</div>
+                </div>
+                <div class="shipping_destination_right">
+                    <div>
+                        <div>
+                            {% if Order.MoreOrder is defined %}
+                                {{ Order.MoreOrder.remarks3 }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shipping_destination">
+                <div class="shipping_destination_left">
+                    <div>発注書備考</div>
+                </div>
+                <div class="shipping_destination_right">
+                    <div>
+                        <div>
+                            {% if Order.MoreOrder is defined %}
+                                {{ Order.MoreOrder.remarks4 }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
             {# End - Remarks#}
         </div>
         <div class="ec-orderRole__summary">

@@ -180,6 +180,8 @@ class MyCartController extends AbstractController
             $date_want_delivery     = $request->get('date_want_delivery');
             $remarks1               = $request->get('remarks1');
             $remarks2               = $request->get('remarks2');
+            $remarks3               = $request->get('remarks3');
+            $remarks4               = $request->get('remarks4');
 
             $result                 = [
                 'is_ok'             => '1',
@@ -267,6 +269,30 @@ class MyCartController extends AbstractController
                     'is_ok'         => '1',
                     'msg'           => 'OK',
                     'remarks2'      => $remarks2,
+                    'pre_order_id'  => $pre_order_id
+                ];
+            }
+
+            if (isset($remarks3)) {
+                $name               = "remarks3";
+                $commonService->saveTempCartRemarks($pre_order_id, $name, trim($remarks3));
+
+                $result             = [
+                    'is_ok'         => '1',
+                    'msg'           => 'OK',
+                    'remarks3'      => $remarks3,
+                    'pre_order_id'  => $pre_order_id
+                ];
+            }
+
+            if (isset($remarks4)) {
+                $name               = "remarks4";
+                $commonService->saveTempCartRemarks($pre_order_id, $name, trim($remarks4));
+
+                $result             = [
+                    'is_ok'         => '1',
+                    'msg'           => 'OK',
+                    'remarks4'      => $remarks4,
                     'pre_order_id'  => $pre_order_id
                 ];
             }

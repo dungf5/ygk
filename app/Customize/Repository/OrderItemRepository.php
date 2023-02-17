@@ -67,6 +67,8 @@ class OrderItemRepository extends AbstractRepository
             'order_status.order_status', 
             'order_status.remarks1', 
             'order_status.remarks2', 
+            'order_status.remarks3', 
+            'order_status.remarks4', 
             'order_status.update_date', 
             'order_status.order_remain_num', 
             'order_status.reserve_stock_num', 

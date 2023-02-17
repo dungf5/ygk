@@ -264,6 +264,14 @@ class MyShoppingController extends AbstractShoppingController
                 $moreOrder['remarks2']              = null;
             }
 
+            if (MyCommon::isEmptyOrNull($moreOrder['remarks3'])) {
+                $moreOrder['remarks3']              = null;
+            }
+
+            if (MyCommon::isEmptyOrNull($moreOrder['remarks4'])) {
+                $moreOrder['remarks4']              = null;
+            }
+
             $moreOrder->setShippingCode($this->globalService->getShippingCode() ?? '');
             $moreOrder->setOtodokeCode($this->globalService->getOtodokeCode() ?? '');
             $this->entityManager->persist($moreOrder);
@@ -651,6 +659,8 @@ class MyShoppingController extends AbstractShoppingController
                 $otodoke_code       = $moreOrder->getOtodokeCode();
                 $remarks1           = $moreOrder->getRemarks1();
                 $remarks2           = $moreOrder->getRemarks2();
+                $remarks3           = $moreOrder->getRemarks3();
+                $remarks4           = $moreOrder->getRemarks4();
                 $location           = $comS->getCustomerLocation($customerCode);
                 $reCustomer         = $comS->getCustomerRelationFromUser($customerCode, $login_type, $login_code);
 
@@ -677,6 +687,8 @@ class MyShoppingController extends AbstractShoppingController
                             'dyna_model_seg5'       => count($itemList),                            // ・ダイナ規格セグメント05←EC注文明細番号
                             'remarks1'              => $remarks1,
                             'remarks2'              => $remarks2,
+                            'remarks3'              => $remarks3,
+                            'remarks4'              => $remarks4,
                             'location'              => !empty($location) ? $location : "XB0101001",
                             ];
                     }

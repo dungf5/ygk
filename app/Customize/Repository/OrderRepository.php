@@ -73,7 +73,7 @@ class OrderRepository extends AbstractRepository
 
         // Order By
         $qb->addOrderBy('o.id', 'DESC');
-        //var_dump( $qb->getQuery()->getSQL());
+        // dump( $qb->getQuery()->getSQL() ); die;
 
         return $this->queries->customize(QueryKey::ORDER_SEARCH_BY_CUSTOMER, $qb, ['customer' => $Customer]);
     }

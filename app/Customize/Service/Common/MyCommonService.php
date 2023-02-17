@@ -1297,6 +1297,8 @@ SQL;
             $orderItem->setDynaModelSeg5($ec_order_lineno);                                                 // ・ダイナ規格セグメント05←EC注文明細番号
             $orderItem->setDynaModelSeg6($itemSave['remarks1']);                                     // ・ダイナ規格セグメント04←EC注文番号
             $orderItem->setDynaModelSeg7($itemSave['remarks2']);                                     // ・ダイナ規格セグメント04←EC注文番号
+            $orderItem->setDynaModelSeg8($itemSave['remarks3']);                                     
+            $orderItem->setDynaModelSeg9($itemSave['remarks4']);                                     
             $orderItem->setUnitPriceStatus('FOR');
             $orderItem->setDeploy('XB');
             $orderItem->setCompanyId('XB');
@@ -1344,6 +1346,8 @@ SQL;
             $orderItem->setProductCode($itemSave['product_code']);
             $orderItem->setRemarks1($itemSave['remarks1']);
             $orderItem->setRemarks2($itemSave['remarks2']);
+            $orderItem->setRemarks3($itemSave['remarks3']);
+            $orderItem->setRemarks4($itemSave['remarks4']);
 
 
             $this->entityManager->persist($orderItem);
@@ -1972,6 +1976,16 @@ SQL;
         if ($name == "remarks2") {
             $orderItem->setPreOrderId($pre_order_id);
             $orderItem->setRemarks2($value);
+        }
+
+        if ($name == "remarks3") {
+            $orderItem->setPreOrderId($pre_order_id);
+            $orderItem->setRemarks3($value);
+        }
+
+        if ($name == "remarks4") {
+            $orderItem->setPreOrderId($pre_order_id);
+            $orderItem->setRemarks4($value);
         }
 
         $this->entityManager->persist($orderItem);
