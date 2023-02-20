@@ -18,7 +18,23 @@
         <div class="logo">
             <div class="ttl">ショップキャッチショップキャッチショップキチ</div>
             <ul class="menu">
+                {% if is_granted('ROLE_USER') %}
+                    <li class="itemNav">{{ include('Block/nav_sp.twig') }}</li>
+                    <li class="mypage"><a href="{{ url('mypage') }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>
+                {% else %}
+                    <li class="mypage"><a href="{{ url('mypage_login') }}"><img src="/html/user_data/assets/img/common/headerLogin3.png" alt="ログインはこちら"></a></li>
+                {% endif %}
+
                 <li class="logo"><a href="{{ url('homepage') }}"><img src="/html/user_data/assets/img/common/logo_R+W.svg" alt="{{ BaseInfo.shop_name }}"></a></li>
+
+                {% if is_granted('ROLE_USER') %}
+                    {% if totalQuantity > 0 %}
+                        <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div><span class="fnDIN">{{ totalQuantity|number_format }}</span></a></li>
+                    {% else %}
+                        <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div></a></li>
+                    {% endif %}
+                    <li class="mypage"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i><div>ログアウト</div></a></li>
+                {% endif %}
             </ul>
         </div>
 
