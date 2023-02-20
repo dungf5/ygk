@@ -117,9 +117,9 @@ file that was distributed with this source code.
                         </a>
                         <br/>
                         <select id="search_order_otodoke" name="search_order_otodoke" onchange="handleSearch(this)">
-                            <option value="0" {% if 0 == search_parameter.order_otodoke %}selected{%  endif %}>すべて</option>
+                            <option value="0" {% if search_parameter.order_otodoke == '0' %} selected {% endif %}>すべて</option>
                             {% for orderOtodoke in orderOtodokeOpt %}
-                                <option value="{{orderOtodoke.key}}" {% if orderOtodoke.key == search_parameter.order_otodoke %}selected{%  endif %}>{{orderOtodoke.value}}</option>
+                                <option value="{{orderOtodoke.key}}" {% if orderOtodoke.key == search_parameter.order_otodoke %} selected {% endif %}>{{orderOtodoke.value}}</option>
                             {% endfor %}
                         </select>
                     </th>

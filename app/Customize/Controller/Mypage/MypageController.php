@@ -251,8 +251,8 @@ class MypageController extends AbstractController
             'pageno'                => $request->get('pageno', 1),
             'search_order_date'     => $request->get('order_date', 0),
             'search_order_status'   => $request->get('order_status', ''),
-            'search_order_shipping' => $request->get('order_shipping', 0),
-            'search_order_otodoke'  => $request->get('order_otodoke', 0),
+            'search_order_shipping' => $request->get('order_shipping', '0'),
+            'search_order_otodoke'  => $request->get('order_otodoke', '0'),
         ];
 
         // paginator
@@ -405,7 +405,7 @@ class MypageController extends AbstractController
         }
 
         /*create list otodoke code*/
-        $s_order_shipping       = (isset($param['search_order_shipping']) && $param['search_order_shipping'] != 0) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
+        $s_order_shipping       = (isset($param['search_order_shipping']) && $param['search_order_shipping'] != '0') ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
@@ -599,8 +599,8 @@ class MypageController extends AbstractController
         $login_type  = $this->globalService->getLoginType();
         $search_parameter = [
             'shipping_status' => $request->get('shipping_status', 0),
-            'order_shipping'  => $request->get('order_shipping', 0),
-            'order_otodoke'   => $request->get('order_otodoke', 0),
+            'order_shipping'  => $request->get('order_shipping', '0'),
+            'order_otodoke'   => $request->get('order_otodoke', '0'),
         ];
         $my_common              = new MyCommonService($this->entityManager);
         $order_status           = $my_common->getOrderStatus($user_login->getCustomerCode());
@@ -631,7 +631,7 @@ class MypageController extends AbstractController
             }
         }
 
-        $s_order_shipping       = (isset($search_parameter['order_shipping']) && $search_parameter['order_shipping']) ? $search_parameter['order_shipping'] : ($this->globalService->getShippingCode());
+        $s_order_shipping       = (isset($search_parameter['order_shipping']) && $search_parameter['order_shipping'] != '0') ? $search_parameter['order_shipping'] : ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
@@ -671,8 +671,8 @@ class MypageController extends AbstractController
             'pageno'                => $request->get('pageno', 1),
             'delivery_no'           => $request->get('delivery_no'),
             'search_shipping_date'  => $request->get('shipping_date', 0),
-            'search_order_shipping' => $request->get('order_shipping', 0),
-            'search_order_otodoke'  => $request->get('order_otodoke', 0),
+            'search_order_shipping' => $request->get('order_shipping', '0'),
+            'search_order_otodoke'  => $request->get('order_otodoke', '0'),
         ];
 
         // paginator
@@ -736,7 +736,7 @@ class MypageController extends AbstractController
         }
 
         /*create list otodoke code*/
-        $s_order_shipping       = (isset($param['search_order_shipping']) && $param['search_order_shipping'] != 0) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
+        $s_order_shipping       = (isset($param['search_order_shipping']) && $param['search_order_shipping'] != '0') ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
