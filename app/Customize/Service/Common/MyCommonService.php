@@ -1133,7 +1133,6 @@ SQL;
                             'PC' as unit,
                             m0_.amount,
                             m0_.tax,
-                            m0_.lot_no,
                             m0_.order_no,
                             m0_.item_remark,
                             m0_.total_amount,
