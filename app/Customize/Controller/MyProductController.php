@@ -559,6 +559,8 @@ class MyProductController extends AbstractController
         $searchData                 = $searchForm->getData();
         $customerCode               = '';
         $shippingCode               = '';
+        $arProductCodeInDtPrice     = [];
+        $arTanakaNumber             = [];
         $relationCus                = $commonService->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
 
         if ($relationCus) {
