@@ -255,7 +255,7 @@ class MypageController extends AbstractController
         // paginator
         $user_login  = $this->twig->getGlobals()["app"]->getUser();
         $customer_id = $this->globalService->customerId();
-        
+
         $my_common    = new MyCommonService($this->entityManager);
         $order_status = $my_common->getOrderStatus($user_login->getCustomerCode());
         $qb           = $this->orderItemRepository->getQueryBuilderByCustomer($param, $order_status);
@@ -295,8 +295,9 @@ class MypageController extends AbstractController
                 $myItem['shipping_status']  = MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']];
             }
 
-            $myItem['order_remain_num']     = $myItem['order_remain_num']*$myItem['quantity'];
-            $myItem['reserve_stock_num']    = $myItem['reserve_stock_num']*$myItem['quantity'];
+            $myItem['order_remain_num']     = $myItem['order_remain_num'] * $myItem['quantity'];
+            $myItem['reserve_stock_num']    = $myItem['reserve_stock_num'] * $myItem['quantity'];
+            $myItem['shipping_num']         = $myItem['shipping_num'] * $myItem['quantity'];
 
             $myItem['order_type']           = '';
              if (!empty($myItem['ec_type'])) {
@@ -653,12 +654,12 @@ class MypageController extends AbstractController
         // paginator
         $user_login  = $this->twig->getGlobals()["app"]->getUser();
         $customer_id = $this->globalService->customerId();
-        
+
         $my_common    = new MyCommonService($this->entityManager);
         $order_status = $my_common->getOrderStatus($user_login->getCustomerCode());
-        
+
         $qb           = $this->orderItemRepository->getDeliveryByCustomer($param, $order_status);
-        
+
         // Paginator
         $pagination     = $paginator->paginate(
             $qb,
