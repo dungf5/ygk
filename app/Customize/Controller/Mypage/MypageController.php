@@ -389,7 +389,7 @@ class MypageController extends AbstractController
         }
 
         /*create list otodoke code*/
-        $s_order_shipping       = !empty($param['search_order_shipping']) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
+        $s_order_shipping       = isset($param['search_order_shipping']) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
@@ -607,7 +607,7 @@ class MypageController extends AbstractController
             }
         }
 
-        $s_order_shipping       = !empty($search_parameter['order_shipping']) ? $search_parameter['order_shipping'] : ($this->globalService->getShippingCode());
+        $s_order_shipping       = isset($search_parameter['order_shipping']) ? $search_parameter['order_shipping'] : ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
@@ -704,7 +704,7 @@ class MypageController extends AbstractController
         }
 
         /*create list otodoke code*/
-        $s_order_shipping       = !empty($param['search_order_shipping']) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
+        $s_order_shipping       = isset($param['search_order_shipping']) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
