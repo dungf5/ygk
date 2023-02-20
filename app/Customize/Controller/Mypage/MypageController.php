@@ -255,7 +255,7 @@ class MypageController extends AbstractController
         // paginator
         $user_login  = $this->twig->getGlobals()["app"]->getUser();
         $customer_id = $this->globalService->customerId();
-        
+
         $my_common    = new MyCommonService($this->entityManager);
         $order_status = $my_common->getOrderStatus($user_login->getCustomerCode());
         $qb           = $this->orderItemRepository->getQueryBuilderByCustomer($param, $order_status);
@@ -389,7 +389,7 @@ class MypageController extends AbstractController
         }
 
         /*create list otodoke code*/
-        $s_order_shipping       = isset($param['search_order_shipping']) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
+        $s_order_shipping       = (isset($param['search_order_shipping']) && $param['search_order_shipping'] != 0) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
@@ -607,7 +607,7 @@ class MypageController extends AbstractController
             }
         }
 
-        $s_order_shipping       = isset($search_parameter['order_shipping']) ? $search_parameter['order_shipping'] : ($this->globalService->getShippingCode());
+        $s_order_shipping       = (isset($search_parameter['order_shipping']) && $search_parameter['order_shipping']) ? $search_parameter['order_shipping'] : ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
@@ -653,18 +653,18 @@ class MypageController extends AbstractController
         // paginator
         $user_login  = $this->twig->getGlobals()["app"]->getUser();
         $customer_id = $this->globalService->customerId();
-        
+
         $my_common    = new MyCommonService($this->entityManager);
         $order_status = $my_common->getOrderStatus($user_login->getCustomerCode());
-        
+
         $qb           = $this->orderItemRepository->getDeliveryByCustomer($param, $order_status);
-        
+
         // Paginator
         $pagination     = $paginator->paginate(
             $qb,
             $request->get('pageno', 1),
             $this->eccubeConfig['eccube_search_pmax'],
-            ['distinct' => false]
+            ['distinct' => true]
         );
 
         /*create list order date*/
@@ -704,7 +704,7 @@ class MypageController extends AbstractController
         }
 
         /*create list otodoke code*/
-        $s_order_shipping       = isset($param['search_order_shipping']) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
+        $s_order_shipping       = (isset($param['search_order_shipping']) && $param['search_order_shipping'] != 0) ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {

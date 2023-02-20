@@ -50,17 +50,17 @@ class MstShippingRepository extends AbstractRepository
         );
 
         $qb->addSelect(
-            'shipping.shipping_no', 
-            'shipping.customer_code', 
-            'shipping.shipping_status', 
-            'shipping.shipping_plan_date', 
-            'shipping.shipping_date', 
-            'shipping.shipping_num', 
-            'shipping.order_no', 
-            'shipping.order_lineno', 
-            'shipping.cus_order_no', 
-            'shipping.cus_order_lineno', 
-            'shipping.ec_order_no', 
+            'shipping.shipping_no',
+            'shipping.customer_code',
+            'shipping.shipping_status',
+            'shipping.shipping_plan_date',
+            'shipping.shipping_date',
+            'shipping.shipping_num',
+            'shipping.order_no',
+            'shipping.order_lineno',
+            'shipping.cus_order_no',
+            'shipping.cus_order_lineno',
+            'shipping.ec_order_no',
             'shipping.ec_order_lineno',
             'shipping.shipping_company_code',
             'shipping.inquiry_no'
@@ -92,12 +92,12 @@ class MstShippingRepository extends AbstractRepository
                     ->setParameter('shipping_status', 2);
                 break;
         }
-        if( $search_parameter['order_shipping'] > 0 ) {
+        if( $search_parameter['order_shipping'] != '0' ) {
             $qb->andWhere('order_status.shipping_code = :shipping_code')
                 ->setParameter('shipping_code', $search_parameter['order_shipping']);
         }
 
-        if( $search_parameter['order_otodoke'] > 0 ) {
+        if( $search_parameter['order_otodoke'] != '0' ) {
             $qb->andWhere('order_status.otodoke_code = :order_otodoke')
                 ->setParameter('order_otodoke', $search_parameter['order_otodoke']);
         }
@@ -110,7 +110,7 @@ class MstShippingRepository extends AbstractRepository
         $qb->addOrderBy('order_status.order_date', 'DESC');
         $qb->addOrderBy('order_status.cus_order_no', 'DESC');
         $qb->addOrderBy('order_status.cus_order_lineno', 'asc');
-        
+
         // dump($qb->getQuery()->getSQL());
         // dump($qb->getParameters());
         // die();
@@ -148,7 +148,7 @@ class MstShippingRepository extends AbstractRepository
             ->setParameter('customer_code', $customer_code);
 
         $qb->addGroupBy('customer.customer_code');
-        
+
         $qb->addOrderBy('shipping.shipping_date', 'DESC');
 
         // echo($qb->getQuery()->getSQL());

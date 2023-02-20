@@ -109,12 +109,12 @@ class OrderItemRepository extends AbstractRepository
                 ->setParameter(':search_order_date', $paramSearch['search_order_date']."-%");
         }
 
-        if ( $paramSearch['search_order_shipping'] != 0 ) {
+        if ( $paramSearch['search_order_shipping'] != '0' ) {
             $qb->andWhere( 'order_status.shipping_code  = :search_order_shipping' )
                 ->setParameter(':search_order_shipping', $paramSearch['search_order_shipping']);
         }
 
-        if ( $paramSearch['search_order_otodoke'] != 0 ) {
+        if ( $paramSearch['search_order_otodoke'] != '0' ) {
             $qb->andWhere( 'order_status.otodoke_code  = :search_order_otodoke ' )
                 ->setParameter(':search_order_otodoke', $paramSearch['search_order_otodoke']);
         }
@@ -139,7 +139,7 @@ class OrderItemRepository extends AbstractRepository
      *
      * @return QueryBuilder
      */
-    public function getDeliveryByCustomer($paramSearch = [], $order_status=[])
+    public function getDeliveryByCustomer($paramSearch = [], $order_status = [])
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('shipping.shipping_no');
@@ -173,11 +173,12 @@ class OrderItemRepository extends AbstractRepository
         );
 
         $qb->where('( shipping.delete_flg IS NOT NULL AND shipping.delete_flg <> 0 )')
-            ->andWhere('shipping.shipping_date >= :shipping_date')
-            ->setParameter('shipping_date', date("Y-m-d", strtotime("-14 MONTH")));
+            ->andWhere('order_status.order_date >= :order_date')
+            ->setParameter('order_date', date("Y-m-d", strtotime("-14 MONTH")));
+
         if( count($order_status) > 0 ) {
             $where = '';
-            foreach($order_status as $k=>$os ) {
+            foreach($order_status as $k => $os) {
                 if( ! empty($where) ) $where .= ' OR ';
                 $where .= " ( shipping.cus_order_no = :shipping_cus_order_no_{$k} AND shipping.cus_order_lineno = :shipping_cus_order_lineno_{$k} ) ";
                 $qb->setParameter("shipping_cus_order_no_{$k}", $os['cus_order_no']);
@@ -185,6 +186,7 @@ class OrderItemRepository extends AbstractRepository
             }
             $qb->andWhere( $where );
         }
+
         if (!empty($paramSearch['delivery_no'])) {
             $qb->andWhere( 'delivery.delivery_no = :delivery_no' )
                 ->setParameter(':delivery_no', $paramSearch['delivery_no']);
@@ -195,12 +197,12 @@ class OrderItemRepository extends AbstractRepository
                 ->setParameter(':search_shipping_date', $paramSearch['search_shipping_date']."-%");
         }
 
-        if ( $paramSearch['search_order_shipping'] != 0 ) {
+        if ( $paramSearch['search_order_shipping'] != '0' ) {
             $qb->andWhere( 'delivery.shiping_name = (select mc3.company_name from Customize\Entity\MstCustomer mc3 where mc3.customer_code = :search_order_shipping)' )
                 ->setParameter(':search_order_shipping', $paramSearch['search_order_shipping']);
         }
 
-        if ( $paramSearch['search_order_otodoke'] != 0 ) {
+        if ( $paramSearch['search_order_otodoke'] != '0' ) {
             $qb->andWhere( 'delivery.otodoke_name in (select mc4.company_name from Customize\Entity\MstCustomer mc4 where mc4.customer_code = :search_order_otodoke)' )
                 ->setParameter(':search_order_otodoke', $paramSearch['search_order_otodoke']);
         }
@@ -209,9 +211,9 @@ class OrderItemRepository extends AbstractRepository
 
         $qb->addOrderBy('shipping.shipping_date', 'DESC');
 
-        // dump($qb->getQuery()->getSQL());
-        // dump($qb->getParameters());
-        // die();
+         //dump($qb->getQuery()->getSQL());
+         //dump($qb->getParameters());
+         //die();
         return $qb;
     }
 }
