@@ -61,26 +61,27 @@ class OrderItemRepository extends AbstractRepository
             'order_status.order_line_no',
             'order_status.cus_order_no',
             'order_status.cus_order_lineno',
-            'order_status.ec_order_no', 
-            'order_status.ec_order_lineno', 
-            'order_status.order_date', 
-            'order_status.order_status', 
-            'order_status.remarks1', 
-            'order_status.remarks2', 
-            'order_status.remarks3', 
-            'order_status.remarks4', 
-            'order_status.update_date', 
-            'order_status.order_remain_num', 
-            'order_status.reserve_stock_num', 
-            'product.jan_code', 
-            'product.ec_product_id as product_id', 
-            'product.product_name', 
-            'product.product_code', 
-            'product.quantity', 
-            'shipping.shipping_status', 
-            'shipping.inquiry_no', 
-            'shipping.shipping_date', 
-            'shipping.shipping_no'
+            'order_status.ec_order_no',
+            'order_status.ec_order_lineno',
+            'order_status.order_date',
+            'order_status.order_status',
+            'order_status.remarks1',
+            'order_status.remarks2',
+            'order_status.remarks3',
+            'order_status.remarks4',
+            'order_status.update_date',
+            'order_status.order_remain_num',
+            'order_status.reserve_stock_num',
+            'product.jan_code',
+            'product.ec_product_id as product_id',
+            'product.product_name',
+            'product.product_code',
+            'product.quantity',
+            'shipping.shipping_status',
+            'shipping.inquiry_no',
+            'shipping.shipping_date',
+            'shipping.shipping_no',
+            'shipping.shipping_num'
         );
         $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = order_status.shipping_code) shipping_name');
         $qb->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = order_status.otodoke_code) otodoke_name');
@@ -207,7 +208,7 @@ class OrderItemRepository extends AbstractRepository
         $qb->addGroupBy('delivery.delivery_no');
 
         $qb->addOrderBy('shipping.shipping_date', 'DESC');
-        
+
         // dump($qb->getQuery()->getSQL());
         // dump($qb->getParameters());
         // die();

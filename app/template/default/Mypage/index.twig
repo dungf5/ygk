@@ -95,6 +95,10 @@ file that was distributed with this source code.
             <table class="table myTable">
                 <thead>
                     <tr>
+                        <th class="hide" title="shipping_status" style="text-align: center;" >{{ 'front.order.shipping_status'|trans| raw }}</th>
+                        <th class="hide" title="update_date">{{ 'front.order.update_date'|trans| raw }}</th>
+                        <th class="hide" title="shipping_date">{{ 'front.order.shipping_date'|trans| raw }}</th>
+
                         <th title="order_no_type">{{ 'front.order.order_no_type'|trans| raw }}</th>
                         <th title="order_no">{{ 'front.order.order_no'|trans| raw }}</th>
                         <th title="order_lineno">{{ 'front.order.order_lineno'|trans| raw }}</th>
@@ -159,12 +163,9 @@ file that was distributed with this source code.
                                 {% endfor %}
                             </select>
                         </th>
-                        <th title="shipping_status"  class="hide" style="text-align: center;" >{{ 'front.order.shipping_status'|trans| raw }}</th>
                         <th title="order_plus" style="text-align: right">{{ 'front.order.order_plus'|trans| raw }}</th>
                         <th title="reserve_stock_num" style="text-align: right">{{ 'front.order.reserve_stock_num'|trans| raw }}</th>
                         <th title="order_remain_num" style="text-align: right">{{ 'front.order.order_remain_num'|trans| raw }}</th>
-                        <th title="update_date" class="hide">{{ 'front.order.update_date'|trans| raw }}</th>
-                        <th class="hide" title="shipping_date">{{ 'front.order.shipping_date'|trans| raw }}</th>
                         <th title="shipping_no">{{ 'front.mypage.shipping_no_no'|trans| raw }}</th>
                     </tr>
                 </thead>
@@ -172,6 +173,10 @@ file that was distributed with this source code.
                     <tbody>
                         {% for Order in pagination %}
                             <tr>
+                                <td class="hide">{{Order.shipping_status}}</td>
+                                <td class="hide">{{Order.update_date}}</td>
+                                <td class="hide">{{Order.shipping_date}}</td>
+
                                 <td>{{Order.order_type}}</td>
                                 <td>{{Order.cus_order_no}}</td>
                                 <td>{{Order.cus_order_lineno}}</td>
@@ -195,13 +200,17 @@ file that was distributed with this source code.
                                     {{Order.remarks3}}<br/>
                                     {{Order.remarks4}}
                                 </td>
-                                <td>{{Order.order_status}}</td>
-                                <td class="hide">{{Order.shipping_status}}</td>
+                                <td>{{Order.order_status_name}}</td>
                                 <td style="text-align: right">{{Order.order_remain_num}}</td>
-                                <td style="text-align: right">{{Order.reserve_stock_num}}</td>
-                                <td style="text-align: right">{{Order.order_remain_num - Order.reserve_stock_num}}</td>
-                                <td class="hide">{{Order.update_date}}</td>
-                                <td class="hide">{{Order.shipping_date}}</td>
+
+                                {% if Order.order_status == 9%}
+                                    <td style="text-align: right">{{Order.shipping_num}}</td>
+                                    <td style="text-align: right">{{Order.order_remain_num - Order.shipping_num}}</td>
+                                {% else %}
+                                    <td style="text-align: right">{{Order.reserve_stock_num}}</td>
+                                    <td style="text-align: right">{{Order.order_remain_num - Order.reserve_stock_num}}</td>
+                                {% endif %}
+
                                 <td>
                                     {% if Order.shipping_no %}
                                         <a class=" btn btn-primary actBg " onclick="loadDataFor('all', '{{Order.ec_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest">

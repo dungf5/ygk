@@ -288,7 +288,7 @@ class MypageController extends AbstractController
             }
 
             if (isset(MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']])) {
-                $myItem['order_status']     = MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']];
+                $myItem['order_status_name']= MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']];
             }
 
             if (isset(MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']])) {
