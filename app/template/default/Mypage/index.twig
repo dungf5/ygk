@@ -549,13 +549,8 @@ file that was distributed with this source code.
             }
 
             if (name == 'search_order_otodoke') {
-                clearTimeout(typingTimer);
-                loadingOverlay('hide');
-
-                typingTimer         = setTimeout(function () {
-                    loadingOverlay();
-                    handelChangeOtodoke(origin, pathname, search);
-                }, doneTypingInterval);
+                loadingOverlay();
+                handelChangeOtodoke(origin, pathname, search);
             }
         }
 

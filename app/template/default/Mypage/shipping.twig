@@ -458,15 +458,12 @@ file that was distributed with this source code.
                     handelChangeShipping(origin, pathname, search);
                 }, 1000);
             }
-            if (name == 'search_order_otodoke') {
-                clearTimeout(typingTimer);
-                loadingOverlay('hide');
 
-                typingTimer = setTimeout(function () {
-                    loadingOverlay();
-                    handelChangeOtodoke(origin, pathname, search);
-                }, 1000);
+            if (name == 'search_order_otodoke') {
+                loadingOverlay();
+                handelChangeOtodoke(origin, pathname, search);
             }
+
             if (name == 'search_shipping_status') {
                 clearTimeout(typingTimer);
                 loadingOverlay('hide');
