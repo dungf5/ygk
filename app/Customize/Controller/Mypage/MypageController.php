@@ -598,6 +598,7 @@ class MypageController extends AbstractController
         $user_login  = $this->twig->getGlobals()["app"]->getUser();
         $login_type  = $this->globalService->getLoginType();
         $search_parameter = [
+            'shipping_no'     => $request->get('shipping_no', ''),
             'shipping_status' => $request->get('shipping_status', 0),
             'order_shipping'  => $request->get('order_shipping', '0'),
             'order_otodoke'   => $request->get('order_otodoke', '0'),

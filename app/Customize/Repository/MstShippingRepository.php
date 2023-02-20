@@ -83,6 +83,10 @@ class MstShippingRepository extends AbstractRepository
             $qb->andWhere( $where );
         }
 
+        if( $search_parameter['shipping_no'] != '' ) {
+            $qb->andWhere('shipping.shipping_no = :shipping_no')
+                ->setParameter('shipping_no', $search_parameter['shipping_no']);
+        }
         switch( $search_parameter['shipping_status'] ) {
             case 1:
                 $qb->andWhere('shipping.shipping_status = :shipping_status')
