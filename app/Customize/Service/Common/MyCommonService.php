@@ -1336,7 +1336,6 @@ SQL;
             $orderItem->setEcOrderNo($ec_order);
             $orderItem->setOrderNo($ec_order);
             $orderItem->setOrderLineNo($ec_order_lineno);
-            //"cus_order_no"=>$ec_order,"cus_order_lineno"=>$ec_order_lineno
             $orderItem->setCusOrderNo($ec_order);
             $orderItem->setCusOrderLineno($cusOrderLineno);
             $orderItem->setCustomerCode($itemSave['customer_code']);
@@ -1348,7 +1347,7 @@ SQL;
             $orderItem->setRemarks2($itemSave['remarks2']);
             $orderItem->setRemarks3($itemSave['remarks3']);
             $orderItem->setRemarks4($itemSave['remarks4']);
-
+            $orderItem->setEcType('1');
 
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
