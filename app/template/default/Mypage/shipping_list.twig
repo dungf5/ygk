@@ -25,7 +25,7 @@
 <table class="table myTable">
     <thead>
         <tr>
-            <th title="delivery_no ">{{ 'front.mypage.shipping.note_no'|trans| raw }}</th>
+            <th title="shipping_no ">{{ 'front.mypage.shipping_no'|trans| raw }}</th>
             <th title="product_code ">{{ 'front.order.jan_code'|trans| raw }}</th>
             <th title="product_name"> 商品名</th>
             <th title="shipping_status">出荷ステータス</th>
@@ -33,15 +33,14 @@
             <th title="shipping_plan_date">出荷指示日</th>
             <th title="shipping_date">出荷日</th>
             <th title="shipping_company_code">運送会社</th>
-            <th title="shipping_no ">{{ 'front.mypage.shipping_no'|trans| raw }}</th>
         </tr>
     </thead>
     <tbody>
     {% for item in myData %}
         <tr {% if item.highlight %} style="border: solid red;"  {% endif %}>
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>
-                <a href="/mypage/delivery/history?delivery_no={{item.delivery_no}}" target="_blank">
-                    {{item.delivery_no}}
+                <a href="/mypage/shipping/history?shipping_no={{item.shipping_no}}" target="_blank">
+                    {{item.shipping_no}}
                 </a>
             </td>
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{ item.jan_code }}</td>
@@ -51,11 +50,6 @@
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{ item.shipping_plan_date }}</td>
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{ item.shipping_date }}</td>
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{ item.shipping_company_name }}</td>
-            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>
-                <a href="/mypage/shipping/history?shipping_no={{item.shipping_no}}" target="_blank">
-                    {{item.shipping_no}}
-                </a>
-            </td>
         </tr>
     {% endfor %}
     </tbody>
