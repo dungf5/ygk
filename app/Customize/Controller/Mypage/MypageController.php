@@ -160,7 +160,7 @@ class MypageController extends AbstractController
         }
 
         $arMore             = $comS->getShipListExtend($otodoke_code, $shipping_code);
-        $arReturn           = ["myData" => $arRe, "arMore" => $arMore];
+        $arReturn           = [ "myData"=>$arRe, "arMore"=>$arMore, "login_type"=>$login_type ];
 
         return $arReturn;
     }
@@ -173,6 +173,9 @@ class MypageController extends AbstractController
      */
     public function exportOrderPdf(Request $request)
     {
+        $login_type         = $this->globalService->getLoginType();
+        if( in_array($login_type, ['shipping_code', 'otodoke_code']) ) return;
+
         $htmlFileName               = "Mypage/exportOrderPdf.twig";
         $delivery_no                = MyCommon::getPara("delivery_no");
         $order_no_line_no           = MyCommon::getPara("order_no_line_no");
@@ -591,12 +594,13 @@ class MypageController extends AbstractController
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // paginator
-        $customer_id            = $this->globalService->customerId();
-        $user_login             = $this->twig->getGlobals()["app"]->getUser();
-        $search_parameter       = [
-            'shipping_status'   => $request->get('shipping_status', 0),
-            'order_shipping'    => $request->get('order_shipping', 0),
-            'order_otodoke'     => $request->get('order_otodoke', 0),
+        $customer_id = $this->globalService->customerId();
+        $user_login  = $this->twig->getGlobals()["app"]->getUser();
+        $login_type  = $this->globalService->getLoginType();
+        $search_parameter = [
+            'shipping_status' => $request->get('shipping_status', 0),
+            'order_shipping'  => $request->get('order_shipping', 0),
+            'order_otodoke'   => $request->get('order_otodoke', 0),
         ];
         $my_common              = new MyCommonService($this->entityManager);
         $order_status           = $my_common->getOrderStatus($user_login->getCustomerCode());
@@ -645,6 +649,7 @@ class MypageController extends AbstractController
             'search_parameter' => $search_parameter,
             'orderShippingOpt' => $orderShippingList,
             'orderOtodokeOpt'  => $orderOtodeokeList,
+            'login_type'       => $login_type,
         ];
     }
 
