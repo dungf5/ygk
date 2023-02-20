@@ -557,6 +557,8 @@ class MyProductController extends AbstractController
 
         // paginator
         $searchData                 = $searchForm->getData();
+        $customerCode               = '';
+        $shippingCode               = '';
         $relationCus                = $commonService->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
 
         if ($relationCus) {
