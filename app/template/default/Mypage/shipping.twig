@@ -189,9 +189,13 @@ file that was distributed with this source code.
                                 {% if Shipping.delivery_no is null %}
                                     空白
                                 {% else %}
-                                    <a target="_blank" href="/mypage/exportOrderPdf?order_no_line_no={{Shipping.ec_order_no}}-{{Shipping.ec_order_lineno}}&delivery_no={{Shipping.delivery_no}}">
+                                    {% if login_type not in ['shipping_code', 'otodoke_code'] %}
+                                        <a target="_blank" href="/mypage/exportOrderPdf?order_no_line_no={{Shipping.ec_order_no}}-{{Shipping.ec_order_lineno}}&delivery_no={{Shipping.delivery_no}}">
+                                            {{ Shipping.delivery_no }}
+                                        </a>
+                                    {% else %}
                                         {{ Shipping.delivery_no }}
-                                    </a>
+                                    {% endif %}
                                 {% endif %}
                             </td>
                             <td>
