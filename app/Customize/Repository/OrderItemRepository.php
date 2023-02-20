@@ -38,7 +38,7 @@ class OrderItemRepository extends AbstractRepository
      *
      * @return QueryBuilder
      */
-    public function getQueryBuilderByCustomer($paramSearch = [], $order_status=[])
+    public function getQueryBuilderByCustomer($paramSearch = [], $order_status = [])
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('shipping.shipping_no');

@@ -2366,6 +2366,7 @@ SQL;
     }
     public function getOrderStatus($login_code = '') {
         if( empty($login_code) ) return null;
+
         $sql = <<<SQL
         SELECT DISTINCT
             os.order_no, os.order_line_no, os.cus_order_no, os.cus_order_lineno
@@ -2390,6 +2391,7 @@ SQL;
             os.cus_order_no ASC,
             os.order_line_no ASC;
         SQL;
+
         $param               = [];
         $param['login_code'] = $login_code;
         $statement           = $this->entityManager->getConnection()->prepare($sql);

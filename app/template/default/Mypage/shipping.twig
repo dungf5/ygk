@@ -91,7 +91,7 @@ file that was distributed with this source code.
     </style>
 
     <div class="ec-mypageRole">
-        {% if pagination.totalItemCount > 0 %}
+        {% if pagination and pagination.totalItemCount > 0 %}
             <p class="ec-para-normal">{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}</p>
         {% endif %}
         <table class="table myTable">
@@ -164,7 +164,7 @@ file that was distributed with this source code.
                 </tr>
             </thead>
             <tbody>
-                {% if pagination.totalItemCount > 0 %}
+                {% if pagination and pagination.totalItemCount > 0 %}
                     {% for Shipping in pagination %}
                         <tr>
                             <td>{{ Shipping.shipping_no }}</td>
@@ -235,7 +235,9 @@ file that was distributed with this source code.
             </tbody>
         </table>
         <div class="ec-pagerRole">
-            {% include "pager.twig" with {'pages': pagination.paginationData} %}
+            {% if pagination %}
+                {% include "pager.twig" with {'pages': pagination.paginationData} %}
+            {% endif %}
         </div>
     </div>
     {% include "Mypage/modal_list.twig" with {'shipping_no':'Test' } %}

@@ -253,21 +253,31 @@ class MypageController extends AbstractController
         ];
 
         // paginator
-        $user_login  = $this->twig->getGlobals()["app"]->getUser();
-        $customer_id = $this->globalService->customerId();
+        $user_login         = $this->twig->getGlobals()["app"]->getUser();
+        $customer_id        = $this->globalService->customerId();
 
-        $my_common    = new MyCommonService($this->entityManager);
-        $order_status = $my_common->getOrderStatus($user_login->getCustomerCode());
-        $qb           = $this->orderItemRepository->getQueryBuilderByCustomer($param, $order_status);
+        $my_common          = new MyCommonService($this->entityManager);
+        $order_status       = $my_common->getOrderStatus($user_login->getCustomerCode());
+
+        if (empty($order_status)) {
+            $pagination     = [];
+            goto No_Data_Case;
+        }
+
+        $qb                 = $this->orderItemRepository->getQueryBuilderByCustomer($param, $order_status);
+
         // Paginator
-        $pagination     = $paginator->paginate(
+        $pagination         = $paginator->paginate(
             $qb,
             $request->get('pageno', 1),
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
 
-        $listItem       = $pagination->getItems();
+
+        No_Data_Case:
+
+        $listItem       = !is_array($pagination) ? $pagination->getItems() : [];
         $arProductId    = [];
         $arOrderNo      = [];
 
@@ -324,12 +334,12 @@ class MypageController extends AbstractController
         }
 
         //get one image of product
-        $hsProductImgMain = $this->productImageRepository->getImageMain($arProductId);
-        $commonService = new MyCommonService($this->entityManager);
-        $listImgs = $commonService->getImageFromEcProductId($arProductId);
-        $hsKeyImg = [];
-        //a.file_name,a.product_id,b.product_code
-        foreach ($listImgs as $itemImg){
+        $hsProductImgMain   = $this->productImageRepository->getImageMain($arProductId);
+        $commonService      = new MyCommonService($this->entityManager);
+        $listImgs           = $commonService->getImageFromEcProductId($arProductId);
+        $hsKeyImg           = [];
+
+        foreach ($listImgs as $itemImg) {
             $hsKeyImg[$itemImg["product_id"]] = $itemImg["file_name"];
         }
 
@@ -351,7 +361,9 @@ class MypageController extends AbstractController
             }
         }
 
-        $pagination->setItems($listItem);
+        if (!is_array($pagination) && count($pagination)) {
+            $pagination->setItems($listItem);
+        }
 
         /*create list order date*/
         $orderDateList          = [];
@@ -579,23 +591,30 @@ class MypageController extends AbstractController
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // paginator
-        $customer_id = $this->globalService->customerId();
-        $user_login  = $this->twig->getGlobals()["app"]->getUser();
-        $search_parameter = [
-            'shipping_status' => $request->get('shipping_status', 0),
-            'order_shipping' => $request->get('order_shipping', 0),
-            'order_otodoke' => $request->get('order_otodoke', 0),
+        $customer_id            = $this->globalService->customerId();
+        $user_login             = $this->twig->getGlobals()["app"]->getUser();
+        $search_parameter       = [
+            'shipping_status'   => $request->get('shipping_status', 0),
+            'order_shipping'    => $request->get('order_shipping', 0),
+            'order_otodoke'     => $request->get('order_otodoke', 0),
         ];
-        $my_common    = new MyCommonService($this->entityManager);
-        $order_status = $my_common->getOrderStatus($user_login->getCustomerCode());
+        $my_common              = new MyCommonService($this->entityManager);
+        $order_status           = $my_common->getOrderStatus($user_login->getCustomerCode());
 
-        $qb           = $this->mstShippingRepository->getQueryBuilderByCustomer($search_parameter, $order_status);
-        $pagination = $paginator->paginate(
+        if (empty($order_status)) {
+            $pagination         = [];
+            goto No_Data_Case;
+        }
+
+        $qb                     = $this->mstShippingRepository->getQueryBuilderByCustomer($search_parameter, $order_status);
+        $pagination             = $paginator->paginate(
             $qb,
             $request->get('pageno', 1),
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
+
+        No_Data_Case:
 
         $orderShippingList      = [];
         $shippingList           = $this->globalService->shippingOption();
@@ -652,21 +671,28 @@ class MypageController extends AbstractController
         ];
 
         // paginator
-        $user_login  = $this->twig->getGlobals()["app"]->getUser();
-        $customer_id = $this->globalService->customerId();
+        $user_login             = $this->twig->getGlobals()["app"]->getUser();
+        $customer_id            = $this->globalService->customerId();
 
-        $my_common    = new MyCommonService($this->entityManager);
-        $order_status = $my_common->getOrderStatus($user_login->getCustomerCode());
+        $my_common              = new MyCommonService($this->entityManager);
+        $order_status           = $my_common->getOrderStatus($user_login->getCustomerCode());
 
-        $qb           = $this->orderItemRepository->getDeliveryByCustomer($param, $order_status);
+        if (empty($order_status)) {
+            $pagination         = [];
+            goto No_Data_Case;
+        }
+
+        $qb                     = $this->orderItemRepository->getDeliveryByCustomer($param, $order_status);
 
         // Paginator
-        $pagination     = $paginator->paginate(
+        $pagination             = $paginator->paginate(
             $qb,
             $request->get('pageno', 1),
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => true]
         );
+
+        No_Data_Case:
 
         /*create list order date*/
         $shippingDateList       = [];

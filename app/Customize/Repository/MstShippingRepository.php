@@ -25,7 +25,7 @@ class MstShippingRepository extends AbstractRepository
     /**
      * @return QueryBuilder
      */
-    public function getQueryBuilderByCustomer($search_parameter=[], $order_status=[])
+    public function getQueryBuilderByCustomer($search_parameter = [], $order_status = [])
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('shipping.shipping_no');
