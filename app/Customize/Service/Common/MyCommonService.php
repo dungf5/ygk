@@ -368,7 +368,7 @@ SQL;
                         WHEN c.shipping_company_code = '8004' THEN '日本郵便'
                         WHEN c.shipping_company_code = '8005' THEN 'ＴＯＬＬ'
                         ELSE ''
-                    END as c
+                    END as shipping_company_name
                 from dt_order_status as a
                 join mst_product as b
                 on a.product_code = b.product_code
