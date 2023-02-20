@@ -328,13 +328,13 @@
                                 <tr class="tr-content">
                                     <td style="width: 32.0866%;"></td>
                                     <td style="width: 29.3307%;"> 消費税金額：</td>
-                                    <td style="width: 21.6535%;text-align: right" >{{ roundPrice(totalTaxRe) }}円</td>
+                                    <td style="width: 21.6535%;text-align: right" >{{ roundPriceZeroTax(totalTaxRe) }}円</td>
                                 </tr>
 
                                 <tr class="tr-content">
                                     <td style="width: 32.0866%;"></td>
                                     <td style="width: 29.3307%;">合計金額:</td>
-                                    <td style="width: 21.6535%;text-align: right" >{{ roundPrice(totalaAmountTax) }}円</td>
+                                    <td style="width: 21.6535%;text-align: right" >{{ roundPriceZeroTotalAll(totalaAmountTax) }}円</td>
                                 </tr>
                                 <tr>
                                     <td style="width: 32.0866%;" colspan="3">備考: {{ myData[0].footer_remark1}} </td>
