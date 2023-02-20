@@ -362,11 +362,11 @@ SQL;
                     c.shipping_company_code,
                     c.shipping_date,
                     CASE
-                        WHEN c.shipping_company_code = '8001' THEN '西濃運輸'
-                        WHEN c.shipping_company_code = '8002' THEN 'ヤマト運輸'
-                        WHEN c.shipping_company_code = '8003' THEN '佐川急便'
-                        WHEN c.shipping_company_code = '8004' THEN '日本郵便'
-                        WHEN c.shipping_company_code = '8005' THEN 'ＴＯＬＬ'
+                        WHEN TRIM(c.shipping_company_code) = '8001' THEN '西濃運輸'
+                        WHEN TRIM(c.shipping_company_code) = '8002' THEN 'ヤマト運輸'
+                        WHEN TRIM(c.shipping_company_code) = '8003' THEN '佐川急便'
+                        WHEN TRIM(c.shipping_company_code) = '8004' THEN '日本郵便'
+                        WHEN TRIM(c.shipping_company_code) = '8005' THEN 'ＴＯＬＬ'
                         ELSE ''
                     END as shipping_company_name
                 from dt_order_status as a
