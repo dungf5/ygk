@@ -62,21 +62,21 @@
                 {{ render(path('block_search_product')) }}
             </div>
             <ul class="menu">
-                <li class="siteTop action"><a href="{{ url('homepage') }}"><i class="fas fa-home"></i><div>トップページ</div></a></li>
+                <a href="{{ url('homepage') }}"><li class="siteTop action"><i class="fas fa-home"></i><div>トップページ</div></li></a>
 
                 {% if is_granted('ROLE_USER') %}
-                <li class="mypage action"><a href="{{ url('mypage') }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>
-                <li class="mypage action"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i><div>  ログアウト</div></a></li>
+                    <a href="{{ url('mypage') }}"><li class="mypage action"><i class="fas fa-user"></i><div>マイページ</div></li></a>
+                    <a href="{{ url('logout') }}"><li class="mypage action"><i class="fas fa-lock-open"></i><div>  ログアウト</div></li></a>
 
                 {% else %}
-                <li class="mypage action"><a href="{{ url('mypage_login') }}"><i class="fas fa-lock"></i><div>ログイン</div></a></li>
+                    <a href="{{ url('mypage_login') }}"><li class="mypage action"><i class="fas fa-lock"></i><div>ログイン</div></li></a>
                 {% endif %}
 
                 {% if totalQuantity > 0 %}
-                <li class="cart action"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div><span class="fnDIN">{{ totalQuantity|number_format }}</span></a></li>
+                    <a href="{{ urlCart }}"><li class="cart action"><i class="fas fa-shopping-cart"></i><div>カート</div><span class="fnDIN">{{ totalQuantity|number_format }}</span></li></a>
 
                 {% else %}
-                <li class="cart action"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div></a></li>
+                    <a href="{{ urlCart }}"><li class="cart action"><i class="fas fa-shopping-cart"></i><div>カート</div></li></a>
                 {% endif %}
             </ul>
         </div>
