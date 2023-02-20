@@ -586,7 +586,8 @@ file that was distributed with this source code.
         }
 
         function handelChangeOtodoke(origin, pathname, search) {
-            pathname += "&order_otodoke=" +  $("#search_order_otodoke").val();
+            pathname += "&order_shipping=" + $("#search_order_shipping").val();
+            pathname += "&order_otodoke=" + $("#search_order_otodoke").val();
             window.location.href = origin + pathname;
         }
 
