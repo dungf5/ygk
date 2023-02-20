@@ -69,8 +69,9 @@ class MstShippingRepository extends AbstractRepository
         $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = order_status.shipping_code) shipping_name');
         $qb->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = order_status.otodoke_code) otodoke_name');
         $qb->where('shipping.delete_flg IS NOT NULL AND shipping.delete_flg <> 0')
-            ->andWhere('shipping.shipping_date >= :shipping_date')
-            ->setParameter('shipping_date', date("Y-m-d", strtotime("-14 MONTH")));
+            ->andWhere('order_status.order_date >= :order_date')
+            ->setParameter('order_date', date("Y-m-d", strtotime("-14 MONTH")));
+
         if( count($order_status) > 0 ) {
             $where = '';
             foreach($order_status as $k=>$os ) {
