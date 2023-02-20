@@ -183,12 +183,6 @@ if (!class_exists('\Customize\Entity\MstDelivery', false)) {
         /**
          * @var string
          *
-         * @ORM\Column(name="lot_no",nullable=true, type="string", length=8, options={"comment":"ロット№"})
-         */
-        private $lot_no;
-        /**
-         * @var string
-         *
          * @ORM\Column(name="order_no",nullable=true, type="string", length=8, options={"comment":"御社注文№"})
          */
         private $order_no;
@@ -605,22 +599,6 @@ if (!class_exists('\Customize\Entity\MstDelivery', false)) {
         public function setTax($tax): void
         {
             $this->tax = $tax;
-        }
-
-        /**
-         * @return string
-         */
-        public function getLotNo(): string
-        {
-            return $this->lot_no;
-        }
-
-        /**
-         * @param string $lot_no
-         */
-        public function setLotNo(string $lot_no): void
-        {
-            $this->lot_no = $lot_no;
         }
 
         /**
