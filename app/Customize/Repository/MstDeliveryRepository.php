@@ -48,7 +48,6 @@ class MstDeliveryRepository extends AbstractRepository
                     ,mstDeli.unit_price
                     ,mstDeli.amount
                     ,mstDeli.tax
-                    ,mstDeli.lot_no
                     ,mstDeli.order_no
                     ,mstDeli.item_remark
                     ,mstDeli.total_amount
