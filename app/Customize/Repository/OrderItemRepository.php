@@ -170,7 +170,9 @@ class OrderItemRepository extends AbstractRepository
             'delivery.shiping_name',
             'delivery.otodoke_name',
             'shipping.shipping_date',
-            'shipping.shipping_no'
+            'shipping.shipping_no',
+            'shipping.ec_order_no',
+            'shipping.ec_order_lineno'
         );
 
         $qb->where('( shipping.delete_flg IS NOT NULL AND shipping.delete_flg <> 0 )')

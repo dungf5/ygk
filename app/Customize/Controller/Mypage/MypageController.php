@@ -598,6 +598,7 @@ class MypageController extends AbstractController
         $user_login  = $this->twig->getGlobals()["app"]->getUser();
         $login_type  = $this->globalService->getLoginType();
         $search_parameter = [
+            'shipping_no'     => $request->get('shipping_no', ''),
             'shipping_status' => $request->get('shipping_status', 0),
             'order_shipping'  => $request->get('order_shipping', '0'),
             'order_otodoke'   => $request->get('order_otodoke', '0'),
@@ -676,8 +677,9 @@ class MypageController extends AbstractController
         ];
 
         // paginator
-        $user_login             = $this->twig->getGlobals()["app"]->getUser();
-        $customer_id            = $this->globalService->customerId();
+        $user_login  = $this->twig->getGlobals()["app"]->getUser();
+        $customer_id = $this->globalService->customerId();
+        $login_type  = $this->globalService->getLoginType();
 
         $my_common              = new MyCommonService($this->entityManager);
         $order_status           = $my_common->getOrderStatus($user_login->getCustomerCode());
@@ -747,15 +749,16 @@ class MypageController extends AbstractController
                 ];
             }
         }
-
+        
         return [
-            'pagination'                => $pagination,
-            'shippingDateOpt'           => $shippingDateList,
-            'orderShippingOpt'          => $orderShippingList,
-            'orderOtodokeOpt'           => $orderOtodeokeList,
-            'search_shipping_date'      => $param['search_shipping_date'],
-            'search_order_shipping'     => $param['search_order_shipping'],
-            'search_order_otodoke'      => $param['search_order_otodoke'],
+            'pagination'            => $pagination,
+            'shippingDateOpt'       => $shippingDateList,
+            'orderShippingOpt'      => $orderShippingList,
+            'orderOtodokeOpt'       => $orderOtodeokeList,
+            'login_type'            => $login_type,
+            'search_shipping_date'  => $param['search_shipping_date'],
+            'search_order_shipping' => $param['search_order_shipping'],
+            'search_order_otodoke'  => $param['search_order_otodoke'],
         ];
     }
 }
