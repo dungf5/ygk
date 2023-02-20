@@ -360,7 +360,15 @@ SQL;
                     c.shipping_plan_date,
                     c.inquiry_no,
                     c.shipping_company_code,
-                    c.shipping_date
+                    c.shipping_date,
+                    CASE
+                        WHEN c.shipping_company_code = '8001' THEN '西濃運輸'
+                        WHEN c.shipping_company_code = '8002' THEN 'ヤマト運輸'
+                        WHEN c.shipping_company_code = '8003' THEN '佐川急便'
+                        WHEN c.shipping_company_code = '8004' THEN '日本郵便'
+                        WHEN c.shipping_company_code = '8005' THEN 'ＴＯＬＬ'
+                        ELSE ''
+                    END as c
                 from dt_order_status as a
                 join mst_product as b
                 on a.product_code = b.product_code
@@ -1297,8 +1305,8 @@ SQL;
             $orderItem->setDynaModelSeg5($ec_order_lineno);                                                 // ・ダイナ規格セグメント05←EC注文明細番号
             $orderItem->setDynaModelSeg6($itemSave['remarks1']);                                     // ・ダイナ規格セグメント04←EC注文番号
             $orderItem->setDynaModelSeg7($itemSave['remarks2']);                                     // ・ダイナ規格セグメント04←EC注文番号
-            $orderItem->setDynaModelSeg8($itemSave['remarks3']);                                     
-            $orderItem->setDynaModelSeg9($itemSave['remarks4']);                                     
+            $orderItem->setDynaModelSeg8($itemSave['remarks3']);
+            $orderItem->setDynaModelSeg9($itemSave['remarks4']);
             $orderItem->setUnitPriceStatus('FOR');
             $orderItem->setDeploy('XB');
             $orderItem->setCompanyId('XB');
@@ -2337,10 +2345,10 @@ SQL;
             JOIN mst_customer AS c
                 ON c.customer_code = (
                     CASE
-                        WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code 
+                        WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code
                         WHEN ( LEFT ( cr.represent_code, 1 ) = 's' ) THEN cr.shipping_code
-                        ELSE cr.customer_code 
-                    END 
+                        ELSE cr.customer_code
+                    END
             )
         WHERE
             c.customer_code = :login_code
@@ -2371,10 +2379,10 @@ SQL;
         JOIN mst_customer  c
             ON c.customer_code = (
                 CASE
-                    WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code 
+                    WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code
                     WHEN ( LEFT ( cr.represent_code, 1 ) = 's' ) THEN cr.shipping_code
-                    ELSE cr.customer_code 
-                END 
+                    ELSE cr.customer_code
+                END
             )
         WHERE
                 c.customer_code = :login_code
@@ -2385,7 +2393,7 @@ SQL;
         $param               = [];
         $param['login_code'] = $login_code;
         $statement           = $this->entityManager->getConnection()->prepare($sql);
-        
+
         try {
             $result         = $statement->executeQuery($param);
             return $result->fetchAllAssociative();

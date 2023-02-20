@@ -44,13 +44,13 @@
                     {{item.delivery_no}}
                 </a>
             </td>
-            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.jan_code }}</td>
-            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.product_name }}</td>
-            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.shipping_status }}</td>
-            <td {% if item.highlight %} class="shipping-highlight" {% endif %} style="text-align: right" >{{item.shipping_num }}</td>
-            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.shipping_plan_date }}</td>
-            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.shipping_date }}</td>
-            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{item.shipping_company_code }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{ item.jan_code }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{ item.product_name }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{ item.shipping_status }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %} style="text-align: right" >{{ item.shipping_num }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{ item.shipping_plan_date }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{ item.shipping_date }}</td>
+            <td {% if item.highlight %} class="shipping-highlight" {% endif %}>{{ item.shipping_company_name }}</td>
             <td {% if item.highlight %} class="shipping-highlight" {% endif %}>
                 <a href="/mypage/shipping/history?shipping_no={{item.shipping_no}}" target="_blank">
                     {{item.shipping_no}}

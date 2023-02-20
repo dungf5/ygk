@@ -88,7 +88,7 @@ class OrderItemRepository extends AbstractRepository
         $qb->where('shipping.delete_flg IS NULL OR shipping.delete_flg <> 0')
             ->andWhere('order_status.order_date >= :order_date')
             ->setParameter('order_date', date("Y-m-d", strtotime("-14 MONTH")));
-        
+
         if( count($order_status) > 0 ) {
             $where = '';
             foreach($order_status as $k=>$os ) {
