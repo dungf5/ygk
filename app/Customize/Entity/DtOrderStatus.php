@@ -163,6 +163,11 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         private $remarks4;
 
         /**
+         * @ORM\Column(name="shipping_num",type="integer",nullable=true, options={"comment":"出荷済数" ,"default": null })
+         */
+        private $shipping_num;
+
+        /**
          * @return string
          */
         public function getProductCode(): string
@@ -532,6 +537,22 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         public function getRemarks4()
         {
             return $this->remarks4;
+        }
+
+        /**
+         * @return int
+         */
+        public function getShippingNum(): int
+        {
+            return (int)$this->shipping_num;
+        }
+
+        /**
+         * @param int|null
+         */
+        public function setShippingNum($shipping_num = null): void
+        {
+            $this->shipping_num = $shipping_num;
         }
     }
 }

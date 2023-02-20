@@ -295,8 +295,9 @@ class MypageController extends AbstractController
                 $myItem['shipping_status']  = MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']];
             }
 
-            $myItem['order_remain_num']     = $myItem['order_remain_num']*$myItem['quantity'];
-            $myItem['reserve_stock_num']    = $myItem['reserve_stock_num']*$myItem['quantity'];
+            $myItem['order_remain_num']     = $myItem['order_remain_num'] * $myItem['quantity'];
+            $myItem['reserve_stock_num']    = $myItem['reserve_stock_num'] * $myItem['quantity'];
+            $myItem['shipping_num']         = $myItem['shipping_num'] * $myItem['quantity'];
 
             $myItem['order_type']           = '';
              if (!empty($myItem['ec_type'])) {
