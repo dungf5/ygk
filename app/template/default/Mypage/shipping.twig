@@ -205,19 +205,19 @@ file that was distributed with this source code.
                                             {{ Shipping.inquiry_no }}
                                         </a>
                                     {% elseif Shipping.shipping_company_code == '8004' %}
-                                        <a target="_blank" href="https://trackings.post.japanpost.jp/services/srv/search/?requestNo1={{ Shipping.inquiry_no }}&search=追跡スタート">
+                                        <a target="_blank" href="https://trackings.post.japanpost.jp/services/srv/search/direct?searchKind=S003&locale=ja&SVID=023&reqCodeNo1={{ Shipping.inquiry_no }}">
                                             {{ Shipping.inquiry_no }}
                                         </a>
                                     {% elseif Shipping.shipping_company_code == '8003' %}
-                                        <a target="_blank" href="http://k2k.sagawa-exp.co.jp/p/web/okurijosearch.do?okurijoNo={{ Shipping.inquiry_no }}">
+                                        <a target="_blank" href="https://k2k.sagawa-exp.co.jp/p/web/okurijosearch.do?okurijoNo={{ Shipping.inquiry_no }}">
                                             {{ Shipping.inquiry_no }}
                                         </a>
                                     {% elseif Shipping.shipping_company_code == '8002' %}
-                                        <a target="_blank" href="http://jizen.kuronekoyamato.co.jp/jizen/servlet/crjz.b.NQ0010?id={{ Shipping.inquiry_no }}">
+                                        <a target="_blank" href="https://jizen.kuronekoyamato.co.jp/jizen/servlet/crjz.b.NQ0010?id={{ Shipping.inquiry_no }}">
                                             {{ Shipping.inquiry_no }}
                                         </a>
                                     {% elseif Shipping.shipping_company_code == '8001' %}
-                                        <a target="_blank" href="https://track.seino.co.jp/cgi-bin/gnpquery.pgm">
+                                        <a target="_blank" href="https://track.seino.co.jp/cgi-bin/gnpquery.pgm?GNPNO1={{ Shipping.inquiry_no }}">
                                             {{ Shipping.inquiry_no }}
                                         </a>
                                     {% else %}
