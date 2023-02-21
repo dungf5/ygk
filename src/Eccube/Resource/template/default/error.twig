@@ -28,7 +28,12 @@ file that was distributed with this source code.
                     </div>
                 </div>
                 <p class="ec-404Role__title ec-reportHeading">{{ error_title }}</p>
-                <p class="ec-404Role__description ec-reportDescription">{{ error_message }}</p>
+                <ul class="ec-404Role__description ec-reportDescription" style="list-style: none; text-align: left;">
+                    <li>{{ error_message }}</li>
+                    <li>・発生日時：{{ error_date }}</li>
+                    <li>・発生時の動作 :</li>
+                    <li>※連絡先メールアドレス：<a href="mailto:r.tanaka@hiroka.biz">r.tanaka@hiroka.biz</a></li>
+                </ul>
                 <a class="ec-blockBtn--cancel" href="{{ url('homepage') }}">{{ 'common.go_to_top'|trans }}</a>
             </div>
         </div>

@@ -1773,8 +1773,8 @@ install.go_to_admin_page: 管理画面を表示
 # エラー画面
 #------------------------------------------------------------------------------------
 
-exception.error_title: システムエラーが発生しました。
-exception.error_message: 大変お手数ですが、サイト管理者までご連絡ください。
+exception.error_title: エラーが発生しました。
+exception.error_message: 大変お手数ですが、下記の内容を記載のうえ、メールにてご連絡をお願い致します。
 exception.error_title_can_not_access: アクセスできません。
 exception.error_message_can_not_access: お探しのページはアクセスができない状況にあるか、移動もしくは削除された可能性があります。
 exception.error_title_not_found: ページがみつかりません。
