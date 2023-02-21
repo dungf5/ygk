@@ -629,11 +629,16 @@ class MypageController extends AbstractController
             if ($myItem['shipping_company_code'] == '8004') {
                 $inquiryNo                  = $myItem['inquiry_no'];
                 $arrInquiry                 = explode("-", $inquiryNo);
-                $requestNo                  = "";
+                $count                      = (int) ($arrInquiry['1'] ?? null);
+                $requestNo                  = "requestNo1=" . ($arrInquiry[0] ?? "") . "&";
 
-                for ($i = 0; $i < 10; $i++) {
-                    $tempRequestNo          = $arrInquiry[0] ?? "";
-                    $tempRequestNo          = !empty($tempRequestNo) ? (int)$tempRequestNo + $i : "";
+                for ($i = 1; $i < 10; $i++) {
+                    $tempRequestNo          = "";
+
+                    if ($i < $count) {
+                        $tempRequestNo      = $arrInquiry[0] ?? "";
+                        $tempRequestNo      = !empty($tempRequestNo) ? (int)$tempRequestNo + $i : "";
+                    }
 
                     $requestNo              .= "requestNo" . ($i + 1) . "=" . $tempRequestNo . "&";
                 }
