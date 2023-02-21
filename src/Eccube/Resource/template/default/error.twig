@@ -27,10 +27,10 @@ file that was distributed with this source code.
                         <img src="{{ asset('assets/icon/exclamation-pale.svg') }}" alt="">
                     </div>
                 </div>
-                <p class="ec-404Role__title ec-reportHeading">{{ error_title }}</p>
+                <p class="ec-404Role__title ec-reportHeading">エラーが発生しました。</p>
                 <ul class="ec-404Role__description ec-reportDescription" style="list-style: none; text-align: left;">
-                    <li>{{ error_message }}</li>
-                    <li>・発生日時：{{ error_date }}</li>
+                    <li>大変お手数ですが、下記の内容を記載のうえ、メールにてご連絡をお願い致します。</li>
+                    <li>・発生日時：{{ post.published_at|date("Y/m/d H:i:s") }}</li>
                     <li>・発生時の動作 :</li>
                     <li>※連絡先メールアドレス：<a href="mailto:r.tanaka@hiroka.biz">r.tanaka@hiroka.biz</a></li>
                 </ul>

@@ -95,7 +95,6 @@ class ExceptionListener implements EventSubscriberInterface
             $content = $this->twig->render($file, [
                 'error_title' => $title,
                 'error_message' => $message,
-                'error_date' => date("Y/m/d"),
             ]);
         } catch (\Exception $ignore) {
             $content = $title;
