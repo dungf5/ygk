@@ -633,7 +633,7 @@ class MypageController extends AbstractController
 
                 for ($i = 0; $i < 10; $i++) {
                     $tempRequestNo          = $arrInquiry[0] ?? "";
-                    $tempRequestNo          .= !empty($tempRequestNo) ? (int)$tempRequestNo + $i : "";
+                    $tempRequestNo          = !empty($tempRequestNo) ? (int)$tempRequestNo + $i : "";
 
                     $requestNo              .= "requestNo" . ($i + 1) . "=" . $tempRequestNo . "&";
                 }
