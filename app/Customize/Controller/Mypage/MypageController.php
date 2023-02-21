@@ -619,6 +619,31 @@ class MypageController extends AbstractController
             ['distinct' => false]
         );
 
+        $listItem       = !is_array($pagination) ? $pagination->getItems() : [];
+
+
+        //modify data
+        foreach ($listItem as &$myItem) {
+            $myItem['delivery_url']         = "";
+
+            if ($myItem['shipping_company_code'] == '8004') {
+                $inquiryNo                  = $myItem['inquiry_no'];
+                $arrInquiry                 = explode("-", $inquiryNo);
+                $requestNo                  = "";
+
+                for ($i = 0; $i < 10; $i++) {
+                    $tempRequestNo          = $arrInquiry[0] ?? "";
+                    $tempRequestNo          .= !empty($tempRequestNo) ? (int)$tempRequestNo + $i : "";
+
+                    $requestNo              .= "requestNo" . ($i + 1) . "=" . $tempRequestNo . "&";
+                }
+
+                $myItem['delivery_url']     = "https://trackings.post.japanpost.jp/services/srv/search/?{$requestNo}search.x=104&search.y=15&startingUrlPatten=&locale=ja";
+            }
+        }
+
+        $pagination->setItems($listItem);
+
         No_Data_Case:
 
         $orderShippingList      = [];
@@ -749,7 +774,7 @@ class MypageController extends AbstractController
                 ];
             }
         }
-        
+
         return [
             'pagination'            => $pagination,
             'shippingDateOpt'       => $shippingDateList,
