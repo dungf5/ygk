@@ -205,7 +205,7 @@ file that was distributed with this source code.
                                             {{ Shipping.inquiry_no }}
                                         </a>
                                     {% elseif Shipping.shipping_company_code == '8004' %}
-                                        <a target="_blank" href="https://trackings.post.japanpost.jp/services/srv/search/direct?searchKind=S003&locale=ja&SVID=023&reqCodeNo1={{ Shipping.inquiry_no }}">
+                                        <a target="_blank" href="https://trackings.post.japanpost.jp/services/srv/sequenceNoSearch/?requestNo={{ Shipping.inquiry_no|split('-')[0] ? '' }}&count={{ Shipping.inquiry_no|split('-')[1] ? '' }}&sequenceNoSearch.x=92&sequenceNoSearch.y=26&locale=ja">
                                             {{ Shipping.inquiry_no }}
                                         </a>
                                     {% elseif Shipping.shipping_company_code == '8003' %}
