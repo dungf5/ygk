@@ -209,7 +209,7 @@ file that was distributed with this source code.
                                             {{ Shipping.inquiry_no }}
                                         </a>
                                     {% elseif Shipping.shipping_company_code == '8003' %}
-                                        <a target="_blank" href="https://k2k.sagawa-exp.co.jp/p/web/okurijosearch.do?okurijoNo={{ Shipping.inquiry_no }}">
+                                        <a target="_blank" href="{{ Shipping.delivery_url }}">
                                             {{ Shipping.inquiry_no }}
                                         </a>
                                     {% elseif Shipping.shipping_company_code == '8002' %}

@@ -626,11 +626,33 @@ class MypageController extends AbstractController
         foreach ($listItem as &$myItem) {
             $myItem['delivery_url']         = "";
 
+            if ($myItem['shipping_company_code'] == '8003') {
+                $inquiryNo                  = $myItem['inquiry_no'];
+                $arrInquiry                 = explode("-", $inquiryNo);
+                $count                      = (int) ($arrInquiry['1'] ?? null);
+                $okurijoNo                  = "okurijoNo1=" . ($arrInquiry[0] ? trim($arrInquiry[0]) : "") . "&";
+
+                for ($i = 1; $i < 10; $i++) {
+                    $tempOkurijoNo          = "";
+
+                    if ($i < $count) {
+                        $tempOkurijoNo      = $arrInquiry[0] ?? "";
+                        $tempOkurijoNo      = !empty($tempOkurijoNo) ? (int)$tempOkurijoNo + $i : "";
+                    }
+
+                    $okurijoNo              .= "okurijoNo" . ($i + 1) . "=" . $tempOkurijoNo . "&";
+                }
+
+                $okurijoNo                  = trim($okurijoNo, "&");
+
+                $myItem['delivery_url']     = "https://k2k.sagawa-exp.co.jp/p/web/okurijosearch.do?{$okurijoNo}";
+            }
+
             if ($myItem['shipping_company_code'] == '8004') {
                 $inquiryNo                  = $myItem['inquiry_no'];
                 $arrInquiry                 = explode("-", $inquiryNo);
                 $count                      = (int) ($arrInquiry['1'] ?? null);
-                $requestNo                  = "requestNo1=" . ($arrInquiry[0] ?? "") . "&";
+                $requestNo                  = "requestNo1=" . ($arrInquiry[0] ? trim($arrInquiry[0]) : "") . "&";
 
                 for ($i = 1; $i < 10; $i++) {
                     $tempRequestNo          = "";
