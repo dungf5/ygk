@@ -244,7 +244,7 @@ class MypageController extends AbstractController
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // 購入処理中/決済処理中ステータスの受注を非表示にする.
-        $this->entityManager->aaa()->enable('incomplete_order_status_hidden');
+        $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
 
         //Params
         $param                      = [
