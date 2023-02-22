@@ -20,12 +20,12 @@
             <ul class="menu">
                 {% if is_granted('ROLE_USER') %}
                     <li class="itemNav">{{ include('Block/nav_sp.twig') }}</li>
-                    <li class="mypage"><a href="{{ url('mypage') }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>
+                    <li class="mypage"><a href="{{ url('mypage', [], true) }}"><i class="fas fa-user"></i><div>マイページ</div></a></li>
                 {% else %}
-                    <li class="mypage"><a href="{{ url('mypage_login') }}"><img src="/html/user_data/assets/img/common/headerLogin3.png" alt="ログインはこちら"></a></li>
+                    <li class="mypage"><a href="{{ url('mypage_login', [], true) }}"><img src="/html/user_data/assets/img/common/headerLogin3.png" alt="ログインはこちら"></a></li>
                 {% endif %}
 
-                <li class="logo"><a href="{{ url('homepage') }}"><img src="/html/user_data/assets/img/common/logo_R+W.svg" alt="{{ BaseInfo.shop_name }}"></a></li>
+                <li class="logo"><a href="{{ url('homepage', [], true) }}"><img src="/html/user_data/assets/img/common/logo_R+W.svg" alt="{{ BaseInfo.shop_name }}"></a></li>
 
                 {% if is_granted('ROLE_USER') %}
                     {% if totalQuantity > 0 %}
@@ -33,7 +33,7 @@
                     {% else %}
                         <li class="cart"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div></a></li>
                     {% endif %}
-                    <li class="mypage"><a href="{{ url('logout') }}"><i class="fas fa-lock-open"></i><div>ログアウト</div></a></li>
+                    <li class="mypage"><a href="{{ url('logout', [], true) }}"><i class="fas fa-lock-open"></i><div>ログアウト</div></a></li>
                 {% endif %}
             </ul>
         </div>
@@ -47,7 +47,7 @@
                 </div>
             {% else %}
                 <div class="login">
-                    <a href="{{ url('mypage_login') }}"><img src="/html/user_data/assets/img/common/headerLogin3.png" alt="ログインはこちら"></a>
+                    <a href="{{ url('mypage_login', [], true) }}"><img src="/html/user_data/assets/img/common/headerLogin3.png" alt="ログインはこちら"></a>
                 </div>
             {% endif %}
         </div>
@@ -59,14 +59,14 @@
                 {{ render(path('block_search_product')) }}
             </div>
             <ul class="menu">
-                <a href="{{ url('homepage') }}"><li class="siteTop action"><i class="fas fa-home"></i><div>トップページ</div></li></a>
+                <a href="{{ url('homepage', [], true) }}"><li class="siteTop action"><i class="fas fa-home"></i><div>トップページ</div></li></a>
 
                 {% if is_granted('ROLE_USER') %}
-                    <a href="{{ url('mypage') }}"><li class="mypage action"><i class="fas fa-user"></i><div>マイページ</div></li></a>
-                    <a href="{{ url('logout') }}"><li class="mypage action"><i class="fas fa-lock-open"></i><div>  ログアウト</div></li></a>
+                    <a href="{{ url('mypage', [], true) }}"><li class="mypage action"><i class="fas fa-user"></i><div>マイページ</div></li></a>
+                    <a href="{{ url('logout', [], true) }}"><li class="mypage action"><i class="fas fa-lock-open"></i><div>  ログアウト</div></li></a>
 
                 {% else %}
-                    <a href="{{ url('mypage_login') }}"><li class="mypage action"><i class="fas fa-lock"></i><div>ログイン</div></li></a>
+                    <a href="{{ url('mypage_login', [], true) }}"><li class="mypage action"><i class="fas fa-lock"></i><div>ログイン</div></li></a>
                 {% endif %}
 
                 {% if totalQuantity > 0 %}
