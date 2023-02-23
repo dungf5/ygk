@@ -439,6 +439,41 @@ class MypageController extends AbstractController
      */
     public function login(Request $request, AuthenticationUtils $utils)
     {
+        // Check case must to choose represent
+        if(!empty($_SESSION["choose_represent"])) {
+            $my_common              = new MyCommonService($this->entityManager);
+            $representList          = $my_common->getListRepresent();
+
+            if (count($representList) > 1) {
+                return [
+                    'represent'     => TRUE,
+                    'representOpt'  => $representList,
+                ];
+            }
+
+            if (count($representList) == 1) {
+                $represent_code                 = $representList[0]['represent_code'];
+                $customerId                     = $_SESSION["customer_id"] ?? '';
+
+                if (!empty($customerId)) {
+                    try {
+                        $loginType              = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
+
+                        if (!empty($loginType) && $loginType == "represent_code") {
+                            $_SESSION["choose_shipping"]                    = FALSE;
+                            $_SESSION['s_shipping_code']                    = $shipping_code;
+                            $_SESSION["usc_{$customerId}"]['login_type']    = "change_type";
+                        }
+
+                    } catch (\Exception $e) {
+                        $_SESSION["choose_shipping"]                    = TRUE;
+                        $_SESSION['s_shipping_code']                    = '';
+                        $_SESSION["usc_{$customerId}"]['login_type']    = "represent_code";
+                    }
+                }
+            }
+        }
+
         // Check case must to choose shipping
         if(!empty($_SESSION["choose_shipping"])) {
             $shippingList           = $this->globalService->shippingOption();
@@ -504,6 +539,7 @@ class MypageController extends AbstractController
 
         return [
             'shipping'  => FALSE,
+            'represent' => FALSE,
             'error'     => $utils->getLastAuthenticationError(),
             'form'      => $form->createView(),
         ];
@@ -812,5 +848,46 @@ class MypageController extends AbstractController
             'search_order_shipping' => $param['search_order_shipping'],
             'search_order_otodoke'  => $param['search_order_otodoke'],
         ];
+    }
+
+    /**
+     * Change Shipping Code.
+     *
+     * @Route("/mypage/represent/change", name="mypage_represent", methods={"POST"})
+     * @Template("Mypage/login.twig")
+     */
+    public function changeRepresentCode (Request $request)
+    {
+        try {
+            if ('POST' === $request->getMethod()) {
+                $represent_code                 = $request->get('represent_code', '');
+                $represent_code                 = explode("-", $represent_code);
+                $customerId                     = $_SESSION["customer_id"] ?? '';
+                $myCommon                       = new MyCommonService($this->getEntityManager());
+
+                if (!empty($customerId)) {
+                    try {
+                        $loginType  = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
+
+                        if (!empty($loginType) && $loginType == "supper_user") {
+                            $_SESSION["choose_represent"]                           = FALSE;
+                            $_SESSION["customer_id"]                                = $represent_code[0];
+                            $_SESSION["usc_{$represent_code[0]}"]['login_type']     = $myCommon->checkLoginType($represent_code[1]);
+                            $_SESSION["usc_{$represent_code[0]}"]['login_code']     = $represent_code[1];
+                        }
+
+                    } catch (\Exception $e) {
+                        return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
+                    }
+                }
+
+                return $this->json(['status' => 1], 200);
+            }
+
+            return $this->json(['status' => 0], 400);
+
+        } catch (\Exception $e) {
+            return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
+        }
     }
 }

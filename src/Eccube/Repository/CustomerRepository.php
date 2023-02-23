@@ -119,7 +119,7 @@ class CustomerRepository extends AbstractRepository
             if (!empty($Customer)) return $Customer;
         }
 
-        if ($loginType == "represent_code") {
+        if ($loginType == "supper_user" || $loginType == "represent_code") {
             $dataGet    = $myCommon->getCustomerByRepresentType($login_code);
         }
 

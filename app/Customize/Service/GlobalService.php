@@ -56,11 +56,15 @@ class GlobalService
 
     public function customerId()
     {
-        if ($this->getUser()) {
-            $Customer           = $this->getUser();
-            $cutomerId          = $Customer->getId();
+        return $_SESSION['customer_id'] ?? '';
+    }
 
-            return $cutomerId ?? '';
+    public function customerCode()
+    {
+        if ($this->customerId() != '') {
+            $customerCode        = $this->myCommon->getMstCustomer($this->customerId())["customer_code"];
+
+            return $customerCode ?? '';
         }
 
         return  '';
@@ -68,9 +72,8 @@ class GlobalService
 
     public function customerName()
     {
-        if ($this->getUser()) {
-            $Customer           = $this->getUser();
-            $cutomerName        = $this->myCommon->getMstCustomer($Customer->getId())["name01"];
+        if ($this->customerId() != '') {
+            $cutomerName        = $this->myCommon->getMstCustomer($this->customerId())["name01"];
 
             return $cutomerName ?? '';
         }
@@ -80,9 +83,8 @@ class GlobalService
 
     public function companyName()
     {
-        if ($this->getUser()) {
-            $Customer           = $this->getUser();
-            $companyName        = $this->myCommon->getMstCustomer($Customer->getId())["company_name"];
+        if ($this->customerId() != '') {
+            $companyName        = $this->myCommon->getMstCustomer($this->customerId())["company_name"];
 
             return $companyName ?? '';
         }
@@ -148,9 +150,8 @@ class GlobalService
 
     public function getPriceViewFlg()
     {
-        if ($this->getUser()) {
-            $Customer           = $this->getUser();
-            $priceViewFlg       = $this->myCommon->getMstCustomer($Customer->getId())["price_view_flg"];
+        if ($this->customerId() != '') {
+            $priceViewFlg       = $this->myCommon->getMstCustomer($this->customerId())["price_view_flg"];
 
             return $priceViewFlg == 1 ? true : false;
         }
@@ -160,9 +161,8 @@ class GlobalService
 
     public function getPLType()
     {
-        if ($this->getUser()) {
-            $Customer           = $this->getUser();
-            $plType             = $this->myCommon->getMstCustomer($Customer->getId())["pl_type"];
+        if ($this->customerId() != '') {
+            $plType             = $this->myCommon->getMstCustomer($this->customerId())["pl_type"];
 
             return $plType ?? 0;
         }
@@ -172,9 +172,8 @@ class GlobalService
 
     public function getSpecialOrderFlg()
     {
-        if ($this->getUser()) {
-            $Customer           = $this->getUser();
-            $SpecialOrderFlg    = $this->myCommon->getMstCustomer($Customer->getId())["special_order_flg"];
+        if ($this->customerId() != '') {
+            $SpecialOrderFlg    = $this->myCommon->getMstCustomer($this->customerId())["special_order_flg"];
 
             return $SpecialOrderFlg ?? 0;
         }

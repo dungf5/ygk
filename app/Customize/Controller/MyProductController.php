@@ -236,7 +236,7 @@ class MyProductController extends AbstractController
 
         if ($this->isGranted('ROLE_USER')) {
             $Customer       = $this->getUser();
-            $customer_code  = $cmS->getMstCustomer($Customer->getId())['customer_code'];
+            $customer_code  = $this->globalService->customerCode();
             $is_favorite    = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
             $dtPrice        = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProduct->getProductCode(), $login_type, $login_code);
             $location       = $cmS->getCustomerLocation($customer_code);

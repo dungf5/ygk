@@ -13,7 +13,86 @@ file that was distributed with this source code.
 {% set body_class = 'mypage' %}
 
 {% block main %}
-    {% if not shipping %}
+    {% if shipping is defined and shipping %}
+        <div class="ec-role">
+            <div class="modal fade" id="modal-shipping" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                <div class="modal-dialog"  style="width: 1000px; overflow: initial" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="modalLabel"><i class="fas fa-truck" style="color: #07c; margin: 0 0.5em 0 0;"></i></h4>
+                        </div>
+                        <div class="modal-body showbody">
+                            <div class="row col-md-8 col-xs-12">
+                                <div class="col-md-4 col-xs-12">
+                                    <label>出荷先</label>
+                                </div>
+                                <div class="col-md-8 col-xs-12">
+                                    <select class="form-control" id="shipping_code" name="shipping_code">
+                                        {% set shoppingOpt = global_service.shippingOption() %}
+                                        {% if shoppingOpt %}
+                                            {% for item in shoppingOpt %}
+                                                <option value="{{ item["shipping_no"] }}" {% if global_service.getShippingCode == item["shipping_no"] %} selected {% endif %}>
+                                                    {{ item["name01"] }} 〒 {{ item["postal_code"] }} {{ item["addr01"] }} {{ item["addr02"] }} {{ item["addr03"] }}
+                                                </option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info" onclick="handleChangeShippingCode()">次へ</button>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">キャンセル</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% elseif represent is defined and represent %}
+        <div class="ec-role">
+            <div class="modal fade" id="modal-represent" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                <div class="modal-dialog"  style="width: 1000px; overflow: initial" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="modalLabel"><i class="fas fa-truck" style="color: #07c; margin: 0 0.5em 0 0;"></i></h4>
+                        </div>
+                        <div class="modal-body showbody">
+                            <div class="row col-md-8 col-xs-12">
+                                <div class="col-md-4 col-xs-12">
+                                    <label>ログインコード</label>
+                                </div>
+                                <div class="col-md-8 col-xs-12">
+                                    <select class="form-control" id="represent_code" name="represent_code">
+                                        {% if representOpt %}
+                                            {% for item in representOpt %}
+                                                <option value="{{ item["id"] }}-{{ item["represent_code"] }}">
+                                                    {{ item["represent_code"] }} - {{ item["company_name"] }} 〒 {{ item["postal_code"] }} {{ item["addr01"] }} {{ item["addr02"] }} {{ item["addr03"] }}
+                                                </option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info" onclick="handleChangerepresentCode()">次へ</button>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">キャンセル</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
         <div class="ec-role">
             <div class="ec-pageHeader">
                 <h1>{{ 'common.login'|trans }}</h1>
@@ -76,51 +155,12 @@ file that was distributed with this source code.
                 </div>
             </div>
         </div>
-    {% else %}
-        <div class="ec-role">
-            <div class="modal fade" id="modal-shipping" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-                <div class="modal-dialog"  style="width: 1000px; overflow: initial" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                            <h4 class="modal-title" id="modalLabel"><i class="fas fa-truck" style="color: #07c; margin: 0 0.5em 0 0;"></i></h4>
-                        </div>
-                        <div class="modal-body showbody">
-                            <div class="row col-md-8 col-xs-12">
-                                <div class="col-md-4 col-xs-12">
-                                    <label>出荷先</label>
-                                </div>
-                                <div class="col-md-8 col-xs-12">
-                                    <select class="form-control" id="shipping_code" name="shipping_code">
-                                        {% set shoppingOpt = global_service.shippingOption() %}
-                                        {% if shoppingOpt %}
-                                            {% for item in shoppingOpt %}
-                                                <option value="{{ item["shipping_no"] }}" {% if global_service.getShippingCode == item["shipping_no"] %} selected {% endif %}>
-                                                    {{ item["name01"] }} 〒 {{ item["postal_code"] }} {{ item["addr01"] }} {{ item["addr02"] }} {{ item["addr03"] }}
-                                                </option>
-                                            {% endfor %}
-                                        {% endif %}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-info" onclick="handleChangeShippingCode()">次へ</button>
-                            <button type="button" class="btn btn-danger" data-dismiss="modal">キャンセル</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     {% endif %}
 {% endblock %}
 
 {% block javascript %}
 <script>
-    let shipping    = "{{ shipping }}";
+    let shipping    = "{{ shipping ?? null }}";
 
     if (shipping) {
         loadingOverlay();
@@ -131,6 +171,20 @@ file that was distributed with this source code.
     }
 
     $("#modal-shipping").on('hidden.bs.modal', function (e) {
+        window.location.href    = "{{ url('logout') }}";
+    })
+
+    let represent   = "{{ represent ?? null }}";
+
+    if (represent) {
+        loadingOverlay();
+        $(".ec-layoutRole .ec-layoutRole__header .headerMenu .search").hide();
+        $(".ec-layoutRole .ec-layoutRole__header .headerMenu .menu").hide();
+        $(".ec-layoutRole .ec-layoutRole__contents .ec-layoutRole__left").hide();
+        $("#modal-represent").modal();
+    }
+
+    $("#modal-represent").on('hidden.bs.modal', function (e) {
         window.location.href    = "{{ url('logout') }}";
     })
 </script>
@@ -154,6 +208,32 @@ file that was distributed with this source code.
 
                 if (data.status == 1) {
                     $("#modal-shipping").css('display', 'none');
+                    window.location.href    = "{{ url('homepage') }}";
+                }
+            })
+            .fail(function(data) {
+                loadingOverlay("hide");
+            });
+    }
+
+    function handleChangerepresentCode () {
+        $.ajax({
+            url: '{{ url('mypage_represent') }}',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'represent_code': $("#represent_code").val(),
+                    '_csrf_token': '{{ csrf_token('authenticate') }}'
+                },
+                beforeSend: function( xhr ) {
+                    loadingOverlay();
+                }
+            })
+            .done(function(data) {
+                loadingOverlay("hide");
+
+                if (data.status == 1) {
+                    $("#modal-represent").css('display', 'none');
                     window.location.href    = "{{ url('homepage') }}";
                 }
             })
