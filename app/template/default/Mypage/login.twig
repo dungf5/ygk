@@ -76,6 +76,7 @@ file that was distributed with this source code.
                 </div>
             </div>
         </div>
+
     {% else %}
         <div class="ec-role">
             <div class="modal fade" id="modal-shipping" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
@@ -154,6 +155,36 @@ file that was distributed with this source code.
 
                 if (data.status == 1) {
                     $("#modal-shipping").css('display', 'none');
+                    window.location.href    = "{{ url('homepage') }}";
+                }
+            })
+            .fail(function(data) {
+                loadingOverlay("hide");
+            });
+    }
+
+    var typingTimer;
+    var doneTypingInterval = 2000;
+
+    $("#login_email").on('keyup', function() {
+        clearTimeout(typingTimer);
+        typingTimer       = setTimeout(handleCheckUserLogin(), doneTypingInterval);
+    })
+
+    function handleCheckUserLogin() {
+        $.ajax({
+            url: '{{ url('mypage_check_user') }}',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'login_email': $("#login_email").val(),
+                    '_csrf_token': '{{ csrf_token('authenticate') }}'
+                },
+            })
+            .done(function(data) {
+                if (data.status == 1) {
+                    $("#login_email").css('display', 'none');
+                    $("#login_email_selection").css('display', 'Initial');
                     window.location.href    = "{{ url('homepage') }}";
                 }
             })
