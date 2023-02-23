@@ -2402,5 +2402,47 @@ SQL;
             return null;
         }
     }
+
+    public function getListRepresent($user_login)
+    {
+        $sql = "
+                SELECT
+                    a.represent_code,
+                    c.id,
+                    b.customer_code,
+                    b.company_name,
+                    b.postal_code,
+                    b.addr01,
+                    b.addr02,
+                    b.addr03
+                FROM
+                    dt_customer_relation AS a
+                    JOIN mst_customer b ON
+                    b.customer_code = ( CASE
+                        WHEN LEFT( a.represent_code, 1 ) = 't' THEN a.otodoke_code
+                        WHEN LEFT( a.represent_code, 1 ) = 's' THEN a.shipping_code
+                        ELSE a.customer_code
+                    END )
+                    JOIN dtb_customer AS c ON c.id = b.ec_customer_id
+                WHERE
+                    a.represent_code IS NOT NULL
+                AND
+                    a.represent_code <> ''
+                AND
+	                LEFT( a.represent_code, 2 ) <> ?
+            ";
+
+        $params         = [$user_login];
+        $statement      = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result     = $statement->executeQuery($params);
+            $rows       = $result->fetchAllAssociative();
+            return $rows;
+
+        } catch (Exception $e) {
+            return [];
+        }
+    }
 }
 

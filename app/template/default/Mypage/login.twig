@@ -33,6 +33,9 @@ file that was distributed with this source code.
                             <div class="ec-login__input">
                                 <div class="ec-input">
                                     {{ form_widget(form.login_email, {'attr': {'style' : 'ime-mode: disabled;', 'placeholder' : 'common.mail_address', 'autofocus': true}}) }}
+                                    <select class="form-control" id="represent_code" name="represent_code" style="display: none; margin-bottom: 10px;" onchange="handleChangeRepresentCode(this)">
+                                        <option value="">---ログインコード---</option>
+                                    </select>
                                     {{ form_widget(form.login_pass,  {'attr': {'placeholder' : 'common.password' }}) }}
                                 </div>
                                 {% if BaseInfo.option_remember_me %}
@@ -164,33 +167,51 @@ file that was distributed with this source code.
     }
 
     var typingTimer;
-    var doneTypingInterval = 2000;
+    var doneTypingInterval = 1000;
 
     $("#login_email").on('keyup', function() {
         clearTimeout(typingTimer);
-        typingTimer       = setTimeout(handleCheckUserLogin(), doneTypingInterval);
+
+        typingTimer     = setTimeout(function () {
+            handleCheckUserLogin();
+        }, doneTypingInterval);
     })
 
     function handleCheckUserLogin() {
         $.ajax({
-            url: '{{ url('mypage_check_user') }}',
+            url: '{{ url('check_user') }}',
                 type: 'POST',
                 dataType: 'json',
                 data: {
                     'login_email': $("#login_email").val(),
                     '_csrf_token': '{{ csrf_token('authenticate') }}'
                 },
+                beforeSend: function( xhr ) {
+                    $("#represent_code").css('display', 'none');
+                }
             })
             .done(function(data) {
                 if (data.status == 1) {
-                    $("#login_email").css('display', 'none');
-                    $("#login_email_selection").css('display', 'Initial');
-                    window.location.href    = "{{ url('homepage') }}";
+                    if (data.representOpt && data.representOpt.length > 0) {
+                        $.each(data.representOpt, function(index, value) {
+                            $('#represent_code')
+                            .find('option')
+                            .end()
+                            .append('<option value="' + (value.represent_code ? value.represent_code : '') +'">' + (value.represent_code ? value.represent_code + ' - '  : ' - ') + (value.company_name ? value.company_name : '') + " 〒 " + (value.postal_code ? value.postal_code : '') + " " + (value.addr01 ? value.addr01 : '') + " " + (value.addr02 ? value.addr02 : '') + " " + (value.addr03 ? value.addr03 : '') +'</option>');
+                        })
+
+                        $("#represent_code").css('display', 'Initial');
+                    }
                 }
-            })
-            .fail(function(data) {
-                loadingOverlay("hide");
             });
+    }
+
+    function handleChangeRepresentCode (target) {
+        let value = target.value;
+
+        if (value != '') {
+            $("#login_email").val(value);
+        }
     }
 </script>
 {% endblock %}

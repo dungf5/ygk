@@ -21,6 +21,7 @@ use Eccube\Controller\AbstractController;
 use Eccube\Service\CartService;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 
@@ -101,6 +102,48 @@ class TopController extends AbstractController
                 $this->session->set("is_update_cart", 0);
             }
             //*****************
+        }
+    }
+
+    /**
+     * Check user login.
+     *
+     * @Route("/check_user", name="check_user", methods={"POST"})
+     */
+    public function checkUserLogin (Request $request)
+    {
+        try {
+            if ('POST' === $request->getMethod()) {
+                $user_login                     = $request->get('login_email', '');
+                $my_common                      = new MyCommonService($this->entityManager);
+
+                if (!empty($user_login) && $user_login == 'su100') {
+                    try {
+                        $representList          = $my_common->getListRepresent($user_login);
+
+                        return $this->json([
+                            'status'            => 1,
+                            'representOpt'      => $representList,
+                        ], 200);
+
+                    } catch (\Exception $e) {
+                        return $this->json([
+                            'status'            => -1,
+                            'error'             => $e->getMessage(),
+                        ], 400);
+                    }
+                }
+
+                return $this->json([
+                    'status'                    => 1,
+                    'representOpt'              => [],
+                ], 200);
+            }
+
+            return $this->json(['status' => 0], 400);
+
+        } catch (\Exception $e) {
+            return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
         }
     }
 }
