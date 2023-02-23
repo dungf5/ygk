@@ -33,7 +33,7 @@ file that was distributed with this source code.
                             <div class="ec-login__input">
                                 <div class="ec-input">
                                     {{ form_widget(form.login_email, {'attr': {'style' : 'ime-mode: disabled;', 'placeholder' : 'common.mail_address', 'autofocus': true}}) }}
-                                    <select class="form-control" id="represent_code" name="represent_code" style="display: none; margin-bottom: 10px;" onchange="handleChangeRepresentCode(this)">
+                                    <select class="form-control" id="represent_code" name="represent_code" style="display: none; margin-bottom: 16px; height: 40px;" onchange="handleChangeRepresentCode(this)">
                                         <option value="">---ログインコード---</option>
                                     </select>
                                     {{ form_widget(form.login_pass,  {'attr': {'placeholder' : 'common.password' }}) }}
