@@ -407,7 +407,7 @@ class MyCartController extends AbstractController
         if ($this->getUser()) {
             $Customer           = $this->getUser();
             $commonS            = new MyCommonService($this->entityManager);
-            $customer_code      = $commonS->getMstCustomer($Customer->getId())["customer_code"];
+            $customer_code      = $commonS->getMstCustomer($this->globalService->customerId())["customer_code"];
             $login_type         = $this->globalService->getLoginType();
             $login_code         = $this->globalService->getLoginCode();
 
