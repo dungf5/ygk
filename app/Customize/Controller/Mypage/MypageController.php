@@ -455,20 +455,16 @@ class MypageController extends AbstractController
                 $represent_code                 = $representList[0]['represent_code'];
                 $customerId                     = $_SESSION["customer_id"] ?? '';
 
-                if (!empty($customerId)) {
+                if (!empty($represent_code) && !empty($customerId)) {
                     try {
-                        $loginType              = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
-
-                        if (!empty($loginType) && $loginType == "represent_code") {
-                            $_SESSION["choose_shipping"]                    = FALSE;
-                            $_SESSION['s_shipping_code']                    = $shipping_code;
-                            $_SESSION["usc_{$customerId}"]['login_type']    = "change_type";
-                        }
+                        $_SESSION["choose_represent"]                           = FALSE;
+                        $_SESSION["usc_{$customerId}"]['su_represent_code']     = $represent_code;
+                        $_SESSION["usc_{$customerId}"]['login_type']            = "change_type";
 
                     } catch (\Exception $e) {
-                        $_SESSION["choose_shipping"]                    = TRUE;
-                        $_SESSION['s_shipping_code']                    = '';
-                        $_SESSION["usc_{$customerId}"]['login_type']    = "represent_code";
+                        $_SESSION["choose_represent"]                           = TRUE;
+                        $_SESSION["usc_{$customerId}"]['su_represent_code']     = '';
+                        $_SESSION["usc_{$customerId}"]['login_type']            = "supper_user";
                     }
                 }
             }
@@ -860,21 +856,13 @@ class MypageController extends AbstractController
     {
         try {
             if ('POST' === $request->getMethod()) {
-                $represent_code                 = $request->get('represent_code', '');
-                $represent_code                 = explode("-", $represent_code);
-                $customerId                     = $_SESSION["customer_id"] ?? '';
-                $myCommon                       = new MyCommonService($this->getEntityManager());
+                $represent_code     = $request->get('represent_code', '');
+                $customerId         = $_SESSION["customer_id"] ?? '';
 
-                if (!empty($customerId)) {
+                if (!empty($represent_code) && !empty($customerId)) {
                     try {
-                        $loginType  = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
-
-                        if (!empty($loginType) && $loginType == "supper_user") {
-                            $_SESSION["choose_represent"]                           = FALSE;
-                            $_SESSION["customer_id"]                                = $represent_code[0];
-                            $_SESSION["usc_{$represent_code[0]}"]['login_type']     = $myCommon->checkLoginType($represent_code[1]);
-                            $_SESSION["usc_{$represent_code[0]}"]['login_code']     = $represent_code[1];
-                        }
+                        $_SESSION["choose_represent"]                           = FALSE;
+                        $_SESSION["usc_{$customerId}"]['su_represent_code']     = $represent_code;
 
                     } catch (\Exception $e) {
                         return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);

@@ -73,7 +73,7 @@ file that was distributed with this source code.
                                     <select class="form-control" id="represent_code" name="represent_code">
                                         {% if representOpt %}
                                             {% for item in representOpt %}
-                                                <option value="{{ item["id"] }}-{{ item["represent_code"] }}">
+                                                <option value="{{ item["represent_code"] }}">
                                                     {{ item["represent_code"] }} - {{ item["company_name"] }} 〒 {{ item["postal_code"] }} {{ item["addr01"] }} {{ item["addr02"] }} {{ item["addr03"] }}
                                                 </option>
                                             {% endfor %}
