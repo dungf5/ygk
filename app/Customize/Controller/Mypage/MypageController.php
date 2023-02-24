@@ -633,7 +633,7 @@ class MypageController extends AbstractController
                 $okurijoNo                  = "okurijoNo=" . ($arrInquiry[0] ? trim($arrInquiry[0]) : "") . ",";
 
                 for ($i = 1; $i < $count; $i++) {
-                    $okurijoNo              .= (int)$arrInquiry[0] + $i + ",";
+                    $okurijoNo              .= (int)$arrInquiry[0] + $i . ",";
                 }
 
                 $okurijoNo                  = trim($okurijoNo, ",");
