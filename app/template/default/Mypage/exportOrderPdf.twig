@@ -379,8 +379,10 @@
             </table>
         </div>
 
-        <br/>
-        <span style="float: right">page {{ myDatas|length }}</span>
+        {% if myDatas|length > 1 %}
+            <br/>
+            <span style="float: right">page {{ myDatas|length }}</span>
+        {% endif %}
     </div>
 </body>
 
