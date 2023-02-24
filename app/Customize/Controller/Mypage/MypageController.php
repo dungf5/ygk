@@ -630,20 +630,13 @@ class MypageController extends AbstractController
                 $inquiryNo                  = $myItem['inquiry_no'];
                 $arrInquiry                 = explode("-", $inquiryNo);
                 $count                      = (int) ($arrInquiry['1'] ?? null);
-                $okurijoNo                  = "okurijoNo1=" . ($arrInquiry[0] ? trim($arrInquiry[0]) : "") . "&";
+                $okurijoNo                  = "okurijoNo=" . ($arrInquiry[0] ? trim($arrInquiry[0]) : "") . ",";
 
-                for ($i = 1; $i < 10; $i++) {
-                    $tempOkurijoNo          = "";
-
-                    if ($i < $count) {
-                        $tempOkurijoNo      = $arrInquiry[0] ?? "";
-                        $tempOkurijoNo      = !empty($tempOkurijoNo) ? (int)$tempOkurijoNo + $i : "";
-                    }
-
-                    $okurijoNo              .= "okurijoNo" . ($i + 1) . "=" . $tempOkurijoNo . "&";
+                for ($i = 1; $i < $count; $i++) {
+                    $okurijoNo              .= (int)$arrInquiry[0] + $i + ",";
                 }
 
-                $okurijoNo                  = trim($okurijoNo, "&");
+                $okurijoNo                  = trim($okurijoNo, ",");
 
                 $myItem['delivery_url']     = "https://k2k.sagawa-exp.co.jp/p/web/okurijosearch.do?{$okurijoNo}";
             }
