@@ -271,8 +271,8 @@ class MypageController extends AbstractController
             }
         }
 
-        $order_status                   = $my_common->getOrderStatus($customer_code);
-
+        $order_status                   = $my_common->getOrderStatus($customer_code, $login_type);
+   
         if (empty($order_status)) {
             $pagination     = [];
             goto No_Data_Case;
@@ -663,7 +663,7 @@ class MypageController extends AbstractController
             }
         }
 
-        $order_status                   = $my_common->getOrderStatus($customer_code);
+        $order_status                   = $my_common->getOrderStatus($customer_code, $login_type);
 
         if (empty($order_status)) {
             $pagination         = [];
@@ -796,7 +796,7 @@ class MypageController extends AbstractController
             }
         }
 
-        $order_status           = $my_common->getOrderStatus($customer_code);
+        $order_status           = $my_common->getOrderStatus($customer_code, $login_type);
 
         if (empty($order_status)) {
             $pagination         = [];

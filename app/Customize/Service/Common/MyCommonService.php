@@ -2355,41 +2355,46 @@ SQL;
         }
     }
 
-    public function getOrderStatus ($login_code = '') {
-        if( empty($login_code) ) return null;
+    public function getOrderStatus ($login_code = '', $login_type = '') {
+        if (empty($login_code)) return null;
 
-        $sql = <<<SQL
-        SELECT DISTINCT
-            os.order_no, os.order_line_no, os.cus_order_no, os.cus_order_lineno
-        FROM dt_order_status os
-        JOIN dt_customer_relation cr ON
-            case
-                WHEN( LEFT( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code = os.otodoke_code
-                WHEN( LEFT( cr.represent_code, 1 ) = 's' ) THEN cr.shipping_code = os.shipping_code
-                ELSE cr.customer_code = os.customer_code
-            end
-        JOIN mst_customer  c
-            ON c.customer_code = (
-                CASE
-                    WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code
-                    WHEN ( LEFT ( cr.represent_code, 1 ) = 's' ) THEN cr.shipping_code
-                    ELSE cr.customer_code
-                END
-            )
-        WHERE
-                c.customer_code = :login_code
-        ORDER BY
-            os.cus_order_no ASC,
-            os.order_line_no ASC;
-        SQL;
+        switch ($login_type) {
+            case 'shipping_code':
+                $condition          = " os.shipping_code = ? ";
+                break;
 
-        $param               = [];
-        $param['login_code'] = $login_code;
-        $statement           = $this->entityManager->getConnection()->prepare($sql);
+            case 'otodoke_code':
+                $condition          = " os.otodoke_code = ? ";
+                break;
+
+            default:
+                $condition          = " os.customer_code = ? ";
+                break;
+        }
+
+        $sql    = "
+                    SELECT DISTINCT
+                        os.order_no,
+                        os.order_line_no,
+                        os.cus_order_no,
+                        os.cus_order_lineno
+                    FROM
+                        dt_order_status os
+                    WHERE
+                        {$condition}
+                    ORDER BY
+                        os.cus_order_no ASC,
+                        os.order_line_no ASC;
+                ";
 
         try {
-            $result         = $statement->executeQuery($param);
-            return $result->fetchAllAssociative();
+            $params         = [$login_code];
+            $statement      = $this->entityManager->getConnection()->prepare($sql);
+            $result         = $statement->executeQuery($params);
+            $row            = $result->fetchAllAssociative();
+
+            return $row ?? null;
+
         } catch (Exception $e) {
             return null;
         }
