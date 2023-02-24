@@ -223,14 +223,14 @@ file that was distributed with this source code.
                                         </a>
                                     {% elseif Shipping.shipping_company_code == '8002' %}
                                         <a
-                                            target="_blank" href="https://jizen.kuronekoyamato.co.jp/jizen/servlet/crjz.b.NQ0010?id={{ Shipping.inquiry_no }}"
+                                            target="_blank" href="https://jizen.kuronekoyamato.co.jp/jizen/servlet/crjz.b.NQ0010?id={{ Shipping.inquiry_no|split('-')[0] ?? '' }}"
                                             style="white-space: nowrap;"
                                         >
                                             {{ Shipping.inquiry_no }}
                                         </a>
                                     {% elseif Shipping.shipping_company_code == '8001' %}
                                         <a
-                                            target="_blank" href="https://track.seino.co.jp/cgi-bin/gnpquery.pgm?GNPNO1={{ Shipping.inquiry_no }}"
+                                            target="_blank" href="https://track.seino.co.jp/cgi-bin/gnpquery.pgm?GNPNO1={{ Shipping.inquiry_no|split('-')[0] ?? '' }}"
                                             style="white-space: nowrap;"
                                         >
                                             {{ Shipping.inquiry_no }}
