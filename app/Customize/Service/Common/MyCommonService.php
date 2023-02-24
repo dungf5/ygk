@@ -116,39 +116,14 @@ class MyCommonService extends AbstractRepository
     public function getMstCustomer2($customer_code)
     {
         $sql        = "
-        SELECT
-            dtcus.represent_code,
-            mstcus.customer_code as shipping_no,
-            mstcus.customer_code,
-            mstcus.ec_customer_id,
-            mstcus.customer_name as name01,
-            mstcus.company_name,
-            mstcus.company_name_abb,
-            mstcus.department,
-            mstcus.postal_code,
-            mstcus.addr01,
-            mstcus.addr02,
-            mstcus.addr03,
-            mstcus.phone_number,
-            mstcus.create_date,
-            mstcus.update_date,
-            mstcus.email as customer_email,
-            mstcus.special_order_flg,
-            mstcus.price_view_flg,
-            mstcus.pl_type
-        FROM
-            dt_customer_relation AS dtcus
-        JOIN
-            mst_customer mstcus
-        ON
-            dtcus.customer_code = mstcus.customer_code
-        WHERE
-            CASE
-                WHEN LEFT ( dtcus.represent_code, 1 ) = 't' THEN dtcus.otodoke_code
-                WHEN LEFT ( dtcus.represent_code, 1 ) = 's' THEN dtcus.shipping_code ELSE dtcus.customer_code
-            END = ?
-        LIMIT 1;
-        ";
+                        SELECT
+                            mstcus.*
+                        FROM
+                            mst_customer AS mstcus
+                        WHERE
+                            mstcus.customer_code = ?
+                        LIMIT 1;
+                    ";
 
         $param      = [];
         $param[]    = $customer_code;
@@ -158,7 +133,7 @@ class MyCommonService extends AbstractRepository
             $result = $statement->executeQuery($param);
             $rows   = $result->fetchAllAssociative();
 
-            return $rows[0];
+            return $rows[0] ?? null;
 
         } catch (Exception $e) {
             return null;
@@ -2338,36 +2313,49 @@ SQL;
             return $customerCode;
         }
     }
-    public function getCustomerRelation($login_code = '') {
-        if( empty($login_code) ) return null;
-        $sql = <<<SQL
-        SELECT DISTINCT
-            cr.represent_code, cr.customer_code, cr.seikyu_code, cr.shipping_code, cr.otodoke_code
-        FROM
-            dt_customer_relation AS cr
-            JOIN mst_customer AS c
-                ON c.customer_code = (
+
+    public function getCustomerRelation ($represent_code = '') {
+        if (empty($represent_code)) return null;
+
+        $sql = "
+                SELECT
+                    c.ec_customer_id AS customer_id,
                     CASE
                         WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code
                         WHEN ( LEFT ( cr.represent_code, 1 ) = 's' ) THEN cr.shipping_code
                         ELSE cr.customer_code
-                    END
-            )
-        WHERE
-            c.customer_code = :login_code
-        ORDER BY cr.update_date DESC
-        SQL;
-        $param               = [];
-        $param['login_code'] = $login_code;
-        $statement           = $this->entityManager->getConnection()->prepare($sql);
+                    END AS customer_code
+                FROM
+                    dt_customer_relation AS cr
+                JOIN
+                    mst_customer AS c
+                ON
+                    c.customer_code = (
+                        CASE
+                            WHEN ( LEFT ( cr.represent_code, 1 ) = 't' ) THEN cr.otodoke_code
+                            WHEN ( LEFT ( cr.represent_code, 1 ) = 's' ) THEN cr.shipping_code
+                            ELSE cr.customer_code
+                        END
+                    )
+                WHERE
+                    cr.represent_code = ?
+                LIMIT 1
+            ";
+
         try {
+            $param          = [$represent_code];
+            $statement      = $this->entityManager->getConnection()->prepare($sql);
             $result         = $statement->executeQuery($param);
-            return $result->fetchAllAssociative();
+            $row            = $result->fetchAllAssociative();
+
+            return $row[0] ?? null;
+
         } catch (Exception $e) {
             return null;
         }
     }
-    public function getOrderStatus($login_code = '') {
+
+    public function getOrderStatus ($login_code = '') {
         if( empty($login_code) ) return null;
 
         $sql = <<<SQL

@@ -256,11 +256,22 @@ class MypageController extends AbstractController
         ];
 
         // paginator
-        $user_login         = $this->twig->getGlobals()["app"]->getUser();
-        $customer_id        = $this->globalService->customerId();
+        $user_login                     = $this->twig->getGlobals()["app"]->getUser();
+        $customer_id                    = $this->globalService->customerId();
+        $login_type                     = $this->globalService->getLoginType();
+        $my_common                      = new MyCommonService($this->entityManager);
+        $customer_code                  = $user_login->getCustomerCode();
 
-        $my_common          = new MyCommonService($this->entityManager);
-        $order_status       = $my_common->getOrderStatus($user_login->getCustomerCode());
+        if (!empty($_SESSION["usc_" . $customer_id]) && !empty($_SESSION["usc_" . $customer_id]['login_code'])) {
+            $represent_code             = $_SESSION["usc_" . $customer_id]['login_code'];
+            $temp_customer_code         = $my_common->getCustomerRelation($represent_code);
+
+            if (!empty($temp_customer_code)) {
+                $customer_code          = $temp_customer_code['customer_code'];
+            }
+        }
+
+        $order_status                   = $my_common->getOrderStatus($customer_code);
 
         if (empty($order_status)) {
             $pagination     = [];
@@ -459,12 +470,16 @@ class MypageController extends AbstractController
                     try {
                         $_SESSION["choose_represent"]                           = FALSE;
                         $_SESSION["usc_{$customerId}"]['su_represent_code']     = $represent_code;
-                        $_SESSION["usc_{$customerId}"]['login_type']            = "change_type";
+
+                        $new_customer_id                                        = $representList[0]['id'];
+                        $_SESSION['customer_id']                                = $new_customer_id;
+                        $_SESSION["usc_{$new_customer_id}"]['login_type']       = $my_common->checkLoginType($represent_code);
+                        $_SESSION["usc_{$new_customer_id}"]['login_code']       = $represent_code;
 
                     } catch (\Exception $e) {
                         $_SESSION["choose_represent"]                           = TRUE;
+                        $_SESSION['customer_id']                                = $customerId;
                         $_SESSION["usc_{$customerId}"]['su_represent_code']     = '';
-                        $_SESSION["usc_{$customerId}"]['login_type']            = "supper_user";
                     }
                 }
             }
@@ -626,17 +641,29 @@ class MypageController extends AbstractController
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // paginator
-        $customer_id = $this->globalService->customerId();
-        $user_login  = $this->twig->getGlobals()["app"]->getUser();
-        $login_type  = $this->globalService->getLoginType();
-        $search_parameter = [
-            'shipping_no'     => $request->get('shipping_no', ''),
-            'shipping_status' => $request->get('shipping_status', 0),
-            'order_shipping'  => $request->get('order_shipping', '0'),
-            'order_otodoke'   => $request->get('order_otodoke', '0'),
+        $customer_id                    = $this->globalService->customerId();
+        $user_login                     = $this->twig->getGlobals()["app"]->getUser();
+        $login_type                     = $this->globalService->getLoginType();
+        $customer_code                  = $user_login->getCustomerCode();
+        $my_common                      = new MyCommonService($this->entityManager);
+
+        $search_parameter               = [
+            'shipping_no'               => $request->get('shipping_no', ''),
+            'shipping_status'           => $request->get('shipping_status', 0),
+            'order_shipping'            => $request->get('order_shipping', '0'),
+            'order_otodoke'             => $request->get('order_otodoke', '0'),
         ];
-        $my_common              = new MyCommonService($this->entityManager);
-        $order_status           = $my_common->getOrderStatus($user_login->getCustomerCode());
+
+        if (!empty($_SESSION["usc_" . $customer_id]) && !empty($_SESSION["usc_" . $customer_id]['login_code'])) {
+            $represent_code             = $_SESSION["usc_" . $customer_id]['login_code'];
+            $temp_customer_code         = $my_common->getCustomerRelation($represent_code);
+
+            if (!empty($temp_customer_code)) {
+                $customer_code          = $temp_customer_code['customer_code'];
+            }
+        }
+
+        $order_status                   = $my_common->getOrderStatus($customer_code);
 
         if (empty($order_status)) {
             $pagination         = [];
@@ -761,12 +788,22 @@ class MypageController extends AbstractController
         ];
 
         // paginator
-        $user_login  = $this->twig->getGlobals()["app"]->getUser();
-        $customer_id = $this->globalService->customerId();
-        $login_type  = $this->globalService->getLoginType();
+        $user_login                     = $this->twig->getGlobals()["app"]->getUser();
+        $customer_id                    = $this->globalService->customerId();
+        $login_type                     = $this->globalService->getLoginType();
+        $customer_code                  = $user_login->getCustomerCode();
+        $my_common                      = new MyCommonService($this->entityManager);
 
-        $my_common              = new MyCommonService($this->entityManager);
-        $order_status           = $my_common->getOrderStatus($user_login->getCustomerCode());
+        if (!empty($_SESSION["usc_" . $customer_id]) && !empty($_SESSION["usc_" . $customer_id]['login_code'])) {
+            $represent_code             = $_SESSION["usc_" . $customer_id]['login_code'];
+            $temp_customer_code         = $my_common->getCustomerRelation($represent_code);
+
+            if (!empty($temp_customer_code)) {
+                $customer_code          = $temp_customer_code['customer_code'];
+            }
+        }
+
+        $order_status           = $my_common->getOrderStatus($customer_code);
 
         if (empty($order_status)) {
             $pagination         = [];
@@ -857,12 +894,19 @@ class MypageController extends AbstractController
         try {
             if ('POST' === $request->getMethod()) {
                 $represent_code     = $request->get('represent_code', '');
+                $represent_code     = explode("-", $represent_code);
                 $customerId         = $_SESSION["customer_id"] ?? '';
+                $my_common          = new MyCommonService($this->entityManager);
 
                 if (!empty($represent_code) && !empty($customerId)) {
                     try {
                         $_SESSION["choose_represent"]                           = FALSE;
-                        $_SESSION["usc_{$customerId}"]['su_represent_code']     = $represent_code;
+                        $_SESSION["usc_{$customerId}"]['su_represent_code']     = $represent_code[1] ?? "";
+
+                        $new_customer_id                                        = $represent_code[0] ?? "";
+                        $_SESSION['customer_id']                                = $new_customer_id;
+                        $_SESSION["usc_{$new_customer_id}"]['login_type']       = $my_common->checkLoginType($represent_code[1] ?? "");
+                        $_SESSION["usc_{$new_customer_id}"]['login_code']       = $represent_code[1] ?? "";
 
                     } catch (\Exception $e) {
                         return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
