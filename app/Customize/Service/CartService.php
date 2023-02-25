@@ -409,9 +409,9 @@ class CartService extends Service
         }
 
         if ($this->getUser()) {
-            $Customer           = $this->getUser();
             $commonS            = new MyCommonService($this->entityManager);
-            $customer_code      = $commonS->getMstCustomer($Customer->getId())["customer_code"];
+            $customer_id        = $this->globalService->customerId();
+            $customer_code      = $commonS->getMstCustomer($customer_id)["customer_code"] ?? "";
             $login_type         = $this->globalService->getLoginType();
             $login_code         = $this->globalService->getLoginCode();
             $priceR             = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProductClass->getProductCode(), $login_type, $login_code);
@@ -466,12 +466,12 @@ class CartService extends Service
         }
 
         if ($this->getUser()) {
-            $Customer           = $this->getUser();
             $commonS            = new MyCommonService($this->entityManager);
-            $customer_code      = $commonS->getMstCustomer($Customer->getId())["customer_code"];
             $login_type         = $this->globalService->getLoginType();
             $login_code         = $this->globalService->getLoginCode();
-            $priceR             = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProductClass->getProductCode(), $login_type, $login_code);
+            $customer_id        = $this->globalService->customerId();
+            $customer_code      = $commonS->getMstCustomer($customer_id)["customer_code"] ?? "";
+            $priceR             = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProductClass->getProductCode(), $login_type, $login_code);
 
             if ($priceR) {
                 $price          = $priceR['price_s01'];
@@ -517,9 +517,9 @@ class CartService extends Service
         }
 
         if ($this->getUser()) {
-            $Customer           = $this->getUser();
             $commonS            = new MyCommonService($this->entityManager);
-            $customer_code      = $commonS->getMstCustomer($Customer->getId())["customer_code"];
+            $customer_id        = $this->globalService->customerId();
+            $customer_code      = $commonS->getMstCustomer($customer_id)["customer_code"] ?? "";
             $login_type         = $this->globalService->getLoginType();
             $login_code         = $this->globalService->getLoginCode();
             $priceR             = $commonS->getPriceFromDtPriceOfCusProductcodeV2($customer_code,$mstProductClass->getProductCode(), $login_type, $login_code);
@@ -602,6 +602,7 @@ class CartService extends Service
         foreach ($this->carts as $Cart) {
             $Cart->setCustomer($this->getUser());
             $this->entityManager->persist($Cart);
+
             foreach ($Cart->getCartItems() as $item) {
                 $this->entityManager->persist($item);
             }

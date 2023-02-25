@@ -116,15 +116,15 @@ class MypageController extends AbstractController
         $this->twig                   = $twig;
         $this->entityManager          = $entityManager;
         $myCm                         = new MyCommonService($this->entityManager);
+        $this->globalService          = $globalService;
 
         if ($this->twig->getGlobals()["app"]->getUser() != null) {
-            $MyDataMstCustomer                                  = $myCm->getMstCustomer($this->twig->getGlobals()["app"]->getUser()->getId());
+            $MyDataMstCustomer                                  = $myCm->getMstCustomer($this->globalService->customerId());
             $this->twig->getGlobals()["app"]->MyDataMstCustomer = $MyDataMstCustomer;
         }
 
         $this->BaseInfo                             = $baseInfoRepository->get();
         $this->customerFavoriteProductRepository    = $customerFavoriteProductRepository;
-        $this->globalService                        = $globalService;
     }
 
     /**

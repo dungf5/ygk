@@ -17,6 +17,7 @@ namespace Customize\Controller;
 use Customize\Service\Common\MyCommonService;
 
 
+use Customize\Service\GlobalService;
 use Eccube\Controller\AbstractController;
 use Eccube\Service\CartService;
 
@@ -30,16 +31,21 @@ class TopController extends AbstractController
     /**
      * @var CartService
      */
+
+    /**
+     * @var GlobalService
+     */
+    protected $globalService;
+
     public function __construct(
 
-        CartService $cartService
-
+        CartService $cartService,
+        GlobalService $globalService
     )
     {
 
-        $this->cartService = $cartService;
-
-
+        $this->cartService      = $cartService;
+        $this->globalService    = $globalService;
     }
 
     protected $cartService;
@@ -60,48 +66,54 @@ class TopController extends AbstractController
 
     private function updateCart()
     {
-        $is_update_cart = $this->session->get("is_update_cart");
+        $is_update_cart     = $this->session->get("is_update_cart");
+        $Cart               = $this->cartService->getCart();
 
-        $Cart = $this->cartService->getCart();
         if ($Cart == null) {
             return;
         }
-        $arCarItemId =[];
-        $commonService = new  MyCommonService($this->entityManager);
-        $Customer = $this->getUser() ? $this->getUser() : null;
+
+        $arCarItemId        = [];
+        $commonService      = new  MyCommonService($this->entityManager);
+        $Customer           = $this->getUser() ? $this->getUser() : null;
+        $customet_id        = $this->globalService->customerId();
+
         if ($Customer != null) {
-            $arCusLogin = $commonService->getMstCustomer($Customer->getId());
+            $arCusLogin                     = $commonService->getMstCustomer($customet_id);
             if ($is_update_cart == 1) {
-                $cartId = $Cart->getId();
-                $productCart = $commonService->getdtPriceFromCart([$cartId], $arCusLogin["customer_code"]);
-                $arPCodeTankaNumber = $commonService->getPriceFromDtPriceOfCusV2($arCusLogin["customer_code"]);
-                $arPCode = $arPCodeTankaNumber[0];
-                $arTanaka = $arPCodeTankaNumber[1];
-                $hsHsProductCodeIndtPrice = [];
-                $hsTanaka = [];
+                $cartId                     = $Cart->getId();
+                $productCart                = $commonService->getdtPriceFromCart([$cartId], $arCusLogin["customer_code"]);
+                $arPCodeTankaNumber         = $commonService->getPriceFromDtPriceOfCusV2($arCusLogin["customer_code"]);
+                $arPCode                    = $arPCodeTankaNumber[0];
+                $arTanaka                   = $arPCodeTankaNumber[1];
+                $hsHsProductCodeIndtPrice   = [];
+                $hsTanaka                   = [];
+
                 foreach ($arPCode as $hasKey) {
-                    $hsHsProductCodeIndtPrice[$hasKey] = 1;
-                }
-                foreach ($arTanaka as $hasKey) {
-                    $hsTanaka[$hasKey] = 1;
+                    $hsHsProductCodeIndtPrice[$hasKey]  = 1;
                 }
 
-                $hsPriceUp = [];
+                foreach ($arTanaka as $hasKey) {
+                    $hsTanaka[$hasKey]                  = 1;
+                }
+
+                $hsPriceUp                      = [];
+
                 foreach ($productCart as $itemCart) {
                     if ($itemCart["price_s01"] != null && ($itemCart["price_s01"] != "")) {
-                        $isPro = isset($hsHsProductCodeIndtPrice[$itemCart['product_code']]);
-                        $isTana = isset($hsTanaka[$itemCart['tanka_number']]);
+                        $isPro                  = isset($hsHsProductCodeIndtPrice[$itemCart['product_code']]);
+                        $isTana                 = isset($hsTanaka[$itemCart['tanka_number']]);
                         if ($isPro && $isTana) {
                             $hsPriceUp[$itemCart["id"]] = $itemCart["price_s01"];
-                            $arCarItemId[] = $itemCart["id"];
+                            $arCarItemId[]      = $itemCart["id"];
                         }
 
                     }
                 }
+
                 $commonService->updateCartItem($hsPriceUp, $arCarItemId, $Cart);
                 $this->session->set("is_update_cart", 0);
             }
-            //*****************
         }
     }
 

@@ -339,28 +339,29 @@ class MyProductController extends AbstractController
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // エラーメッセージの配列
-        $errorMessages = [];
+        $errorMessages      = [];
         if (!$this->checkVisibility($Product)) {
             throw new NotFoundHttpException();
         }
 
-        $builder = $this->formFactory->createNamedBuilder(
+        $builder            = $this->formFactory->createNamedBuilder(
             '',
             AddCartType::class,
             null,
             [
-                'product' => $Product,
+                'product'           => $Product,
                 'id_add_product_id' => false,
             ]
         );
 
-        $event = new EventArgs(
+        $event              = new EventArgs(
             [
-                'builder' => $builder,
-                'Product' => $Product,
+                'builder'           => $builder,
+                'Product'           => $Product,
             ],
             $request
         );
+
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_CART_ADD_INITIALIZE, $event);
 
         /* @var $form \Symfony\Component\Form\FormInterface */
@@ -376,58 +377,40 @@ class MyProductController extends AbstractController
         log_info(
             'カート追加処理開始',
             [
-                'product_id' => $Product->getId(),
-                'product_class_id' => $addCartData['product_class_id'],
-                'quantity' => $addCartData['quantity'],
+                'product_id'        => $Product->getId(),
+                'product_class_id'  => $addCartData['product_class_id'],
+                'quantity'          => $addCartData['quantity'],
             ]
         );
-        $carSession = MyCommon::getCarSession();
+        $carSession                 = MyCommon::getCarSession();
 
         //////////////////////////////check in cart
-        $cmS = new MyCommonService($this->entityManager);
-        $ecProductId = $Product->getId();
-        $product_in_cart = $cmS->isProductEcIncart(MyCommon::getCarSession(), $ecProductId);
-        $productClassId = '';
-        $oneCartId = '';
+        $cmS                        = new MyCommonService($this->entityManager);
+        $ecProductId                = $Product->getId();
+        $product_in_cart            = $cmS->isProductEcIncart(MyCommon::getCarSession(), $ecProductId);
+
         if ($product_in_cart == 1) {
             //productClassId,b.cart_id,a.product_id
-            $cartInfoData = $cmS->getCartInfo(MyCommon::getCarSession(), $ecProductId);
-            $productClassId = $cartInfoData[0]['productClassId'];
-            $oneCartId = $cartInfoData[0]['cart_id'];
-            $ProductClass = $this->productClassRepository->find($productClassId);
-            $msg = $this->cartService->updateProductCustomize($ProductClass, $addCartData['quantity'], $oneCartId, $productClassId);
+            $cartInfoData           = $cmS->getCartInfo(MyCommon::getCarSession(), $ecProductId);
+            $productClassId         = $cartInfoData[0]['productClassId'];
+            $oneCartId              = $cartInfoData[0]['cart_id'];
+            $ProductClass           = $this->productClassRepository->find($productClassId);
+            $msg                    = $this->cartService->updateProductCustomize($ProductClass, $addCartData['quantity'], $oneCartId, $productClassId);
         }
 
-        //////////////////////////////
-
         // カートへ追加
-        if ($product_in_cart ==0) {
+        if ($product_in_cart == 0) {
             $this->cartService->addProductCustomize2022($addCartData['product_class_id'], $addCartData['quantity'], $carSession);
         }
 
         // 明細の正規化
-        $Carts = $this->cartService->getCarts();
+        $Carts                      = $this->cartService->getCarts();
+        $mstProduct                 = $this->mstProductRepository->getData($Product->getId());
 
-//        foreach ($Carts as $Cart) {
-//            //$result = $this->purchaseFlow->validate($Cart, new PurchaseContext($Cart, $this->getUser()));
-//            // 復旧不可のエラーが発生した場合は追加した明細を削除.
-//            if ($result->hasError()) {
-//                $this->cartService->removeProductCustomize($addCartData['product_class_id']);
-//                foreach ($result->getErrors() as $error) {
-//                    $errorMessages[] = $error->getMessage();
-//                }
-//            }
-//            foreach ($result->getWarning() as $warning) {
-//                $errorMessages[] = $warning->getMessage();
-//            }
-//        }
-        $mstProduct = $this->mstProductRepository->getData($Product->getId());
-
-        $cartId = 0;
         // set total price
         foreach ($Carts as $Cart) {
             if ($Cart['key_eccube'] == $carSession) {
-                $totalPrice = 0;
+                $totalPrice         = 0;
                 foreach ($Cart['CartItems'] as $CartItem) {
                     $totalPrice += $CartItem['price'] * $CartItem['quantity'];
                 }
@@ -436,6 +419,7 @@ class MyProductController extends AbstractController
                 $Cart->setDeliveryFeeTotal(0);
             }
         }
+
         $this->cartService->saveCustomize();
         //update cookie
         foreach ($Carts as $Cart) {
@@ -451,19 +435,20 @@ class MyProductController extends AbstractController
         log_info(
             'カート追加処理完了',
             [
-                'product_id' => $Product->getId(),
-                'product_class_id' => $addCartData['product_class_id'],
-                'quantity' => $addCartData['quantity'],
+                'product_id'        => $Product->getId(),
+                'product_class_id'  => $addCartData['product_class_id'],
+                'quantity'          => $addCartData['quantity'],
             ]
         );
 
-        $event = new EventArgs(
+        $event                      = new EventArgs(
             [
-                'form' => $form,
-                'Product' => $Product,
+                'form'              => $form,
+                'Product'           => $Product,
             ],
             $request
         );
+
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_CART_ADD_COMPLETE, $event);
 
         if ($event->getResponse() !== null) {
@@ -472,25 +457,35 @@ class MyProductController extends AbstractController
 
         if ($request->isXmlHttpRequest()) {
             // ajaxでのリクエストの場合は結果をjson形式で返す。
-            $myComS = new MyCommonService($this->entityManager);
-            $cartId = $Carts[0]->getId();
-            $totalNew = $myComS->getTotalItemCart($cartId);
+            $myComS         = new MyCommonService($this->entityManager);
+            $cartId         = $Carts[0]->getId();
+            $totalNew       = $myComS->getTotalItemCart($cartId);
+
             // 初期化
-            $done = null;
-            $messages = [];
+            $done           = null;
+            $messages       = [];
 
             if (empty($errorMessages)) {
                 // エラーが発生していない場合
-                $done = true;
+                $done       = true;
                 array_push($messages, trans('front.product.add_cart_complete'));
-            } else {
-                // エラーが発生している場合
-                $done = false;
-                $messages = $errorMessages;
             }
 
-            return $this->json(['done' => $done, 'messages' => $messages, 'totalNew' => $totalNew]);
-        } else {
+            else {
+                // エラーが発生している場合
+                $done       = false;
+                $messages   = $errorMessages;
+            }
+
+            return $this->json([
+                'done'      => $done,
+                'messages'  => $messages,
+                'totalNew'  => $totalNew
+            ]);
+
+        }
+
+        else {
             // ajax以外でのリクエストの場合はカート画面へリダイレクト
             foreach ($errorMessages as $errorMessage) {
                 $this->addRequestError($errorMessage);
