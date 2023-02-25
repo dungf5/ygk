@@ -24,6 +24,7 @@ use Doctrine\DBAL\Driver\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Entity\Cart;
 use Eccube\Entity\CartItem;
+use Eccube\Entity\Customer;
 use Eccube\Repository\AbstractRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -1885,14 +1886,15 @@ SQL;
     }
 
     public function updateCartItemOne($oneCartId,$productClassId,$myQuantity){
-         $sql = "update  dtb_cart_item SET quantity=? where product_class_id =? and cart_id=?";
-         $param =[$myQuantity,$productClassId,$oneCartId];
-         $result = $this->entityManager->getConnection()->prepare($sql)->executeStatement($param);
+         $sql           = "update  dtb_cart_item SET quantity = ? where product_class_id = ? and cart_id = ?";
+         $param         = [$myQuantity, $productClassId, $oneCartId];
+         $result        = $this->entityManager->getConnection()->prepare($sql)->executeStatement($param);
         $this->entityManager->flush();
-        $sqlGetTotal ="select sum(quantity*price) as totalPrice from  dtb_cart_item where cart_id={$oneCartId}";
-        $totalPrice = $this->runQuery($sqlGetTotal,[])[0]["totalPrice"];
-        $sqlTotal = "update dtb_cart set total_price= '{$totalPrice}' ,pre_order_id=null,update_date=now() where id={$oneCartId}";
-        $result = $this->entityManager->getConnection()->prepare($sqlTotal)->executeStatement();
+
+        $sqlGetTotal    = "select sum(quantity * price) as totalPrice from  dtb_cart_item where cart_id = {$oneCartId}";
+        $totalPrice     = $this->runQuery($sqlGetTotal, [])[0]["totalPrice"];
+        $sqlTotal       = "update dtb_cart set total_price = '{$totalPrice}', pre_order_id = null, update_date = now() where id = {$oneCartId}";
+        $result         = $this->entityManager->getConnection()->prepare($sqlTotal)->executeStatement();
 
          return $result;
     }
@@ -2434,6 +2436,13 @@ SQL;
         } catch (Exception $e) {
             return [];
         }
+    }
+
+    public function getDtbCustomer($customer_id)
+    {
+        $objRep = $this->entityManager->getRepository(Customer::class)->findOneBy(['id' => $customer_id]);
+
+        return $objRep;
     }
 }
 

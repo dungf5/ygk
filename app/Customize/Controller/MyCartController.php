@@ -118,14 +118,14 @@ class MyCartController extends AbstractController
             $customer_id            = $request->get('customer_id');
             $date_want_delivery     = $request->get('date_want_delivery');
             $is_check_exist         = $request->get('is_check_exist');
-            if($is_check_exist==1){
 
+            if ($is_check_exist == 1) {
                 echo $commonService->checkExistPreOrder($pre_order_id);
                 die();
             }
 
             $commonService->saveTempCart($shipping_code, $pre_order_id);
-            $arrOtoProductOrder     = $commonService->getCustomerOtodoke($this->globalService->getLoginType(), $customer_id, $shipping_code, null);
+            $arrOtoProductOrder     = $commonService->getCustomerOtodoke($this->globalService->getLoginType(), $this->globalService->customerId(), $shipping_code, null);
             $moreOrder              = $commonService->getMoreOrder($pre_order_id);
             $data                   = (object) [];
             $otodoke_code_checked   = '';
@@ -405,11 +405,11 @@ class MyCartController extends AbstractController
 
         $isHideNext             = false;
         if ($this->getUser()) {
-            $Customer           = $this->getUser();
             $commonS            = new MyCommonService($this->entityManager);
-            $customer_code      = $commonS->getMstCustomer($this->globalService->customerId())["customer_code"];
             $login_type         = $this->globalService->getLoginType();
             $login_code         = $this->globalService->getLoginCode();
+            $customer_id        = $this->globalService->customerId();
+            $customer_code      = $commonS->getMstCustomer($customer_id)["customer_code"] ?? "";
 
             if ($customer_code == "6000") {
                 $isHideNext     = true;
@@ -443,17 +443,20 @@ class MyCartController extends AbstractController
      */
     public function upCart(Request $request)
     {
-        $productClassId = $request->get("productClassId");
-        $ProductClass = $this->productClassRepository->find($productClassId);
-        $myQuantity = $request->get("quantity");
-        $oneCartId = $request->get("oneCartId");
-        $product_id = $ProductClass->getProduct()->getId();
+        $productClassId     = $request->get("productClassId");
+        $ProductClass       = $this->productClassRepository->find($productClassId);
+        $myQuantity         = $request->get("quantity");
+        $oneCartId          = $request->get("oneCartId");
+        $product_id         = $ProductClass->getProduct()->getId();
         setcookie($ProductClass->getProduct()->getId(),$myQuantity,0,"/");
 
-        $msg = $this->cartService->updateProductCustomize($ProductClass, $myQuantity,$oneCartId,$productClassId);
-        return $this->json(["is_ok"=>1,"msg"=>$msg], 200);
-
+        $msg                = $this->cartService->updateProductCustomize($ProductClass, $myQuantity,$oneCartId,$productClassId);
+        return $this->json([
+            "is_ok"         => 1,
+            "msg"           => $msg
+        ], 200);
     }
+
     /**
      * カート明細の加算/減算/削除を行う.
      *

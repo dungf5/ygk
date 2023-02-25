@@ -157,9 +157,10 @@ class MyShoppingController extends AbstractShoppingController
 
         // 受注の初期化.
         log_info('[注文手続] 受注の初期化処理を開始します.');
-        $Customer       = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
-        $arCusLogin     = $commonService->getMstCustomer($Customer->getId());
-        $is_update_cart = $this->session->get('is_update_cart', '');
+        $Customer           = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
+        $customer_id        = $this->globalService->customerId();
+        $arCusLogin         = $commonService->getMstCustomer($customer_id);
+        $is_update_cart     = $this->session->get('is_update_cart', '');
 
         //************** update cart when login
         $arCarItemId    = [];
@@ -199,7 +200,7 @@ class MyShoppingController extends AbstractShoppingController
         //*****************
 
         $Order                      = $this->orderHelper->initializeOrder($Cart, $Customer);
-        $mstShip                    = $commonService->getMstShippingCustomer($this->globalService->getLoginType(), $Customer->getId());
+        $mstShip                    = $commonService->getMstShippingCustomer($this->globalService->getLoginType(), $this->globalService->customerId());
         $Order->arCusLogin          = $arCusLogin;
         $login_type                 = $this->globalService->getLoginType();
         $login_code                 = $this->globalService->getLoginCode();
@@ -337,7 +338,8 @@ class MyShoppingController extends AbstractShoppingController
             $cartList[]                             = $cartT['id'];
         }
 
-        $customer_code                              = $comSer->getMstCustomer($Customer->getId())["customer_code"];
+        $customer_id                                = $this->globalService->customerId();
+        $customer_code                              = $comSer->getMstCustomer($customer_id)["customer_code"] ?? "";
         $mstProduct                                 = $comSer->getMstProductsFromCart($cartList);
         $hsProductId                                = [];
         $hsMstProductCodeCheckShow                  = [];
@@ -430,7 +432,6 @@ class MyShoppingController extends AbstractShoppingController
 
             log_info('[注文確認] 注文確認画面を表示します.');
             //nvtrong start
-            $Customer           = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
             $commonService      = new MyCommonService($this->entityManager);
             $rate               = $commonService->getTaxInfo()['tax_rate'];
             $tax                = (float) $Order->getTotal() / (float) $rate;
@@ -451,11 +452,21 @@ class MyShoppingController extends AbstractShoppingController
             }
             $login_type                 = $this->globalService->getLoginType();
             $login_code                 = $this->globalService->getLoginCode();
-            $mstShip                    = $commonService->getMstShippingCustomer($login_type, $Customer->getId(), $moreOrder);
-            $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getCustomerCode(), $login_type, $login_code);
-            $arCusLogin                 = $commonService->getMstCustomer($Customer->getId());
+            $customer_id                = $this->globalService->customerId();
+            $mstShip                    = $commonService->getMstShippingCustomer($login_type, $customer_id, $moreOrder);
+            $Customer                   = $commonService->getMstCustomer($customer_id);
+            $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer['customer_code'] ?? "", $login_type, $login_code);
+
+            // Update more_order.seikyu_code
+            if (!empty($dtBillSeikyuCode)) {
+                $moreOrder->setSeikyuCode($dtBillSeikyuCode[0]['seikyu_code'] ?? "");
+                $this->entityManager->persist($moreOrder);
+                $this->entityManager->flush();
+            }
+
+            $arCusLogin                 = $commonService->getMstCustomer($customer_id);
             $Order->arCusLogin          = $arCusLogin;
-            $arrOtoProductOrder         = $commonService->getCustomerOtodoke($login_type, $Customer->getId(), $moreOrder->getShippingCode(), $moreOrder);
+            $arrOtoProductOrder         = $commonService->getCustomerOtodoke($login_type, $customer_id, $moreOrder->getShippingCode(), $moreOrder);
             $Order->MoreOrder           = $moreOrder;
             $Order->mstShips            = $mstShip;
             $Order->dtBillSeikyuCode    = $dtBillSeikyuCode;
@@ -491,7 +502,8 @@ class MyShoppingController extends AbstractShoppingController
                 $hsMstProductCodeCheckShow[$itemP['product_code']]  = "standar_price";
             }
 
-            $customer_code                  = $comSer->getMstCustomer($Customer->getId())["customer_code"];
+            $customer_id                    = $this->globalService->customerId();
+            $customer_code                  = $comSer->getMstCustomer($customer_id)["customer_code"] ?? "";
             $hsMstProductCodeCheckShow      = $comSer->setCartIndtPrice($hsMstProductCodeCheckShow, $comSer, $customer_code, $login_type, $login_code);
 
             return [
@@ -650,8 +662,9 @@ class MyShoppingController extends AbstractShoppingController
                 }
 
                 //customer_code
-                $oneCustomer        = $comS->getMstCustomer($Order->getCustomer()->getId());
-                $customerCode       = $oneCustomer['customer_code'];
+                $customer_id        = $this->globalService->customerId();
+                $oneCustomer        = $comS->getMstCustomer($customer_id);
+                $customerCode       = $oneCustomer['customer_code'] ?? "";
                 $moreOrder          = $comS->getMoreOrder($Order->getPreOrderId());
                 $ship_code          = $moreOrder->getShippingCode();
                 $seikyu_code        = $moreOrder->getSeikyuCode();
@@ -739,9 +752,9 @@ class MyShoppingController extends AbstractShoppingController
             $newOrder = null;
             // Get info customer
 
-            $user                           = $this->getUser();
-            $customer                       = $commonService->getMstCustomer($user->getId());
-            $newOrder['name']               = $customer['name01'];
+            $customer_id                    = $this->globalService->customerId();
+            $customer                       = $commonService->getMstCustomer($customer_id);
+            $newOrder['name']               = $customer['name01'] ?? "";
             // Get info order
             $newOrder['subtotal']           = $Order['subtotal'];
             $newOrder['charge']             = $Order['charge'];
@@ -753,13 +766,13 @@ class MyShoppingController extends AbstractShoppingController
             // Get info tax
             $newOrder['rate']               = $commonService->getTaxInfo()['tax_rate'];
             // Get Customer
-            $newOrder['company_name']       = $customer['company_name'];
-            $newOrder['postal_code']        = $customer['postal_code'];
-            $newOrder['addr01']             = $customer['addr01'];
-            $newOrder['addr02']             = $customer['addr02'];
-            $newOrder['addr03']             = $customer['addr03'];
-            $newOrder['phone_number']       = $customer['phone_number'];
-            $newOrder['email']              = $customer['customer_email'];
+            $newOrder['company_name']       = $customer['company_name'] ?? "";
+            $newOrder['postal_code']        = $customer['postal_code'] ?? "";
+            $newOrder['addr01']             = $customer['addr01'] ?? "";
+            $newOrder['addr02']             = $customer['addr02'] ?? "";
+            $newOrder['addr03']             = $customer['addr03'] ?? "";
+            $newOrder['phone_number']       = $customer['phone_number'] ?? "";
+            $newOrder['email']              = $customer['customer_email'] ?? "";
 
             // Get Product
             $goods                          = $commonService->getMstProductsOrderCustomer($Order->getId());
