@@ -331,9 +331,12 @@ class ProductRepository extends AbstractRepository
             $customer_code = '';
         }
 
+        $curentDateTime     = date('Y-m-d H:i:s');
+
         $qb->innerJoin('Customize\Entity\MstProduct', 'mstProduct',Join::WITH,'mstProduct.ec_product_id = p.id');
         $qb->andWhere("(mstProduct.jan_code is not null)");
         $qb->andWhere("(mstProduct.jan_code <> '')");
+        $qb->andWhere("( DATE_FORMAT(IFNULL(mstProduct.discontinued_date, '9999-12-31 00:00:00'), '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT('$curentDateTime', '%Y-%m-%d %H:%i:%s') )");
 
         if (!$this->globalService->getSpecialOrderFlg()) {
             $qb->andWhere("(mstProduct.special_order_flg <> 'Y' OR mstProduct.special_order_flg is null)");

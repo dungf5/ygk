@@ -30,8 +30,12 @@ doctrine:
             string_functions:
                 NORMALIZE: Eccube\Doctrine\ORM\Query\Normalize
                 LEFT: Eccube\Doctrine\ORM\Query\Left
+                IFNULL: Eccube\Doctrine\ORM\Query\IfNull
             numeric_functions:
                 EXTRACT: Eccube\Doctrine\ORM\Query\Extract
+            datetime_functions:
+                DATE_FORMAT: Eccube\Doctrine\ORM\Query\DateFormat
+                Now: Eccube\Doctrine\ORM\Query\Now
         filters:
             option_nostock_hidden:
                 class: Eccube\Doctrine\Filter\NoStockHiddenFilter

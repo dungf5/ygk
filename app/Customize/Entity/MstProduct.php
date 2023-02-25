@@ -256,6 +256,13 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         private $special_order_flg;
 
         /**
+         * @var \DateTime
+         *
+         * @ORM\Column(name="discontinued_date", type="datetimetz", nullable=true)
+         */
+        private $discontinued_date;
+
+        /**
          * @return int
          */
         public function getEcProductId(): int
@@ -749,6 +756,22 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         public function setSpecialOrderFlg(string $special_order_flg): void
         {
             $this->special_order_flg = $special_order_flg;
+        }
+
+        /**
+         * @return \DateTime
+         */
+        public function getDiscontinuedDate(): \DateTime
+        {
+            return $this->discontinued_date;
+        }
+
+        /**
+         * @param \DateTime $discontinued_date
+         */
+        public function setDiscontinuedDate(\DateTime $discontinued_date): void
+        {
+            $this->discontinued_date = $discontinued_date;
         }
     }
 }
