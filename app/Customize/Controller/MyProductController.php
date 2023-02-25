@@ -549,10 +549,10 @@ class MyProductController extends AbstractController
         if ($this->isGranted('ROLE_USER')) {
             $user           = true;
             $myC            = new MyCommonService($this->entityManager);
-            $Customer       = $this->getUser();
-            $customer_code  = $myC->getMstCustomer($Customer->getId())['customer_code'];
             $login_type     = $this->globalService->getLoginType();
             $login_code     = $this->globalService->getLoginCode();
+            $Customer_id    = $this->globalService->customerId();
+            $customer_code  = $myC->getMstCustomer($Customer_id)['customer_code'] ?? "";
         }
 
         // paginator
