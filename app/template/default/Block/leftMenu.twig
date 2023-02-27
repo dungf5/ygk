@@ -85,6 +85,10 @@
     </div>
 </form>
 
+<div class="leftMenuManual">
+    <a href="/html/user_data/manual.pdf" target="_blank"><img src="/html/user_data/assets/img/common/leftManual2.jpg" alt="操作マニュアル"></a>
+</div>
+
 {% set Categories = repository('Eccube\\Entity\\Category').getList() %}
 
 {% macro tree(Category) %}
@@ -276,4 +280,3 @@
     }
 </script>
 {% endblock javascript %}
-

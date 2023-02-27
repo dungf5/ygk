@@ -4232,7 +4232,7 @@ Styleguide 11.2
 .ec-layoutRole {
   width: 100%;
   transition: transform 0.3s;
-  background: #fff; }
+  background: #eee; }
 .ec-layoutRole .ec-layoutRole__contentTop {
     padding: 0; }
 .ec-layoutRole .ec-layoutRole__contents {
