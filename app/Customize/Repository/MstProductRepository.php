@@ -31,9 +31,9 @@ class MstProductRepository extends AbstractRepository
         $qb                 = $this->createQueryBuilder('p');
 
         $qb->where('p.ec_product_id = :ec_product_id')
-            ->andWhere("DATE_FORMAT(IFNULL(p.discontinued_date, '9999-12-31 00:00:00'), '%Y-%m-%d %H:%i:%s') >= :curent_date_time")
-            ->setParameter('ec_product_id', $ec_product_id)
-            ->setParameter('curent_date_time', "DATE_FORMAT('{$curentDateTime}', '%Y-%m-%d %H:%i:%s')");
+            ->andWhere("DATE_FORMAT(IFNULL(p.discontinued_date, '9999-12-31 00:00:00'), '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(:curent_date_time, '%Y-%m-%d %H:%i:%s')")
+            ->setParameter(':ec_product_id', $ec_product_id)
+            ->setParameter(':curent_date_time', $curentDateTime);
 
         return $qb->getQuery()->getOneOrNullResult();
     }
