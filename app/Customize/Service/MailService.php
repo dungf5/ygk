@@ -349,7 +349,12 @@ class MailService
             ->setBcc($this->BaseInfo->getEmail01())
             ->setReplyTo($this->BaseInfo->getEmail03())
             ->setReturnPath($this->BaseInfo->getEmail04());
-        // ->setBcc("nvtrong@monotos.biz")
+
+        // Set CC mail super user if any
+        if (!empty($Order['emailcc'])) {
+            $message->setCc($Order['emailcc']);
+        }
+
         // HTMLテンプレートが存在する場合
         $htmlFileName = $this->getHtmlTemplate($MailTemplate->getFileName());
         if (!is_null($htmlFileName)) {

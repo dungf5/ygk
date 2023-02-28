@@ -754,6 +754,21 @@ class MyShoppingController extends AbstractShoppingController
 
             $customer_id                    = $this->globalService->customerId();
             $customer                       = $commonService->getMstCustomer($customer_id);
+
+            /* Get infomation for case Supper user*/
+            $customer_id2                   = $Order->getCustomer()->getId();
+            $customer2                      = $commonService->getMstCustomer($customer_id2);
+            $emailcc                        = "";
+
+            if (
+                !empty($customer2['customer_email']) &&
+                !empty($customer['customer_email']) &&
+                $customer2['customer_email'] != $customer['customer_email']
+            ) {
+                $emailcc                    = $customer2['customer_email'];
+            }
+            /* End */
+
             $newOrder['name']               = $customer['name01'] ?? "";
             // Get info order
             $newOrder['subtotal']           = $Order['subtotal'];
@@ -773,6 +788,7 @@ class MyShoppingController extends AbstractShoppingController
             $newOrder['addr03']             = $customer['addr03'] ?? "";
             $newOrder['phone_number']       = $customer['phone_number'] ?? "";
             $newOrder['email']              = $customer['customer_email'] ?? "";
+            $newOrder['emailcc']            = $emailcc;
 
             // Get Product
             $goods                          = $commonService->getMstProductsOrderCustomer($Order->getId());
@@ -783,6 +799,7 @@ class MyShoppingController extends AbstractShoppingController
             //$shipping = $commonService->getMstShippingOrder($user->getId(),$Order->getId());
             $shipping                       = $commonService->getMoreOrderCustomer($Order->getPreOrderId());
             $newOrder['Shipping']           = $shipping;
+
             $Order->setName01($customer['name01']);
             $Order->setCompanyName( $customer['company_name']);
             $this->mailService->sendOrderMail($newOrder, $Order);
