@@ -226,8 +226,7 @@ class MyForgotController extends AbstractController
         } else {
             //Get User_code and email
             $master_email       = $Customer->getEmail();
-            $customer_id        = $this->globalService->customerId();
-            $mstCusData         = $this->myCommon->getMstCustomer($customer_id);
+            $mstCusData         = $this->myCommon->getMstCustomer($Customer->getId());
             $userCode           = $mstCusData ? $mstCusData['customer_code'] : '';
             $email              = $mstCusData ? $mstCusData['customer_email'] : '';
         }
