@@ -1070,7 +1070,7 @@ SQL;
         return $rows;
     }
 
-    public function getPdfDelivery($orderNo){
+    public function getPdfDelivery($delivery_no, $orderNo = "") {
         $subQuantity    = " CASE
                             WHEN m1_.quantity > 1 THEN m1_.quantity * m0_.quanlity
                             ELSE m0_.quanlity
@@ -1082,6 +1082,12 @@ SQL;
                             ELSE m0_.unit_price
                             END AS unit_price
                        ";
+
+        $addCondition   = "";
+
+        if (!empty($orderNo)) {
+            $addCondition = " and m0_.order_no LIKE ? ";
+        }
 
         $sql        = "
                         SELECT
@@ -1124,11 +1130,16 @@ SQL;
                          LEFT JOIN
                             mst_product m1_ ON (m1_.product_code = m0_.item_no)
                     WHERE
-                        m0_.order_no LIKE ?
+                        m0_.delivery_no = ? {$addCondition}
                     ORDER BY
                         CONVERT(orderByAs, SIGNED INTEGER) ASC";
 
-        $myPara     = [ $orderNo."-%"];
+        $myPara     = [$delivery_no];
+
+        if (!empty($orderNo)) {
+            $myPara[]     = $orderNo . "-%";
+        }
+
         $statement  = $this->entityManager->getConnection()->prepare($sql);
         $result     = $statement->executeQuery($myPara);
         $rows       = $result->fetchAllAssociative();

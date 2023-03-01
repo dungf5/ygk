@@ -182,7 +182,7 @@ class MypageController extends AbstractController
 
         $comS                       = new MyCommonService($this->entityManager);
         $orderNo                    = explode("-",$order_no_line_no)[0];
-        $arRe                       = $comS->getPdfDelivery($orderNo);
+        $arRe                       = $comS->getPdfDelivery($delivery_no, $orderNo);
 
         //add special line
         $totalTax                   = 0;

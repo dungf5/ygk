@@ -144,7 +144,7 @@ file that was distributed with this source code.
                         <tr>
                             <td>
                                 {% if login_type not in ['shipping_code', 'otodoke_code'] %}
-                                    <a target="_blank" href="/mypage/exportOrderPdf?order_no_line_no={{Order.ec_order_no}}-{{Order.ec_order_lineno}}&delivery_no={{Order.delivery_no}}">
+                                    <a target="_blank" href="/mypage/exportOrderPdf?delivery_no={{Order.delivery_no}}">
                                         {{ Order.delivery_no }}
                                     </a>
                                 {% else %}
