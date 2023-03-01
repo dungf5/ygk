@@ -683,6 +683,7 @@ class MypageController extends AbstractController
 
         //modify data
         foreach ($listItem as &$myItem) {
+            $myItem['shipping_company_code']= trim($myItem['shipping_company_code']);
             $myItem['delivery_url']         = "";
 
             if ($myItem['shipping_company_code'] == '8003') {
