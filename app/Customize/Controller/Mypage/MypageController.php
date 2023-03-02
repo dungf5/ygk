@@ -272,7 +272,7 @@ class MypageController extends AbstractController
         }
 
         $order_status                   = $my_common->getOrderStatus($customer_code, $login_type);
-   
+
         if (empty($order_status)) {
             $pagination     = [];
             goto No_Data_Case;
@@ -782,29 +782,11 @@ class MypageController extends AbstractController
         ];
 
         // paginator
-        $user_login                     = $this->twig->getGlobals()["app"]->getUser();
+        $my_common                      = new MyCommonService($this->entityManager);
         $customer_id                    = $this->globalService->customerId();
         $login_type                     = $this->globalService->getLoginType();
-        $customer_code                  = $user_login->getCustomerCode();
-        $my_common                      = new MyCommonService($this->entityManager);
-
-        if (!empty($_SESSION["usc_" . $customer_id]) && !empty($_SESSION["usc_" . $customer_id]['login_code'])) {
-            $represent_code             = $_SESSION["usc_" . $customer_id]['login_code'];
-            $temp_customer_code         = $my_common->getCustomerRelation($represent_code);
-
-            if (!empty($temp_customer_code)) {
-                $customer_code          = $temp_customer_code['customer_code'];
-            }
-        }
-
-        $order_status           = $my_common->getOrderStatus($customer_code, $login_type);
-
-        if (empty($order_status)) {
-            $pagination         = [];
-            goto No_Data_Case;
-        }
-
-        $qb                     = $this->orderItemRepository->getDeliveryByCustomer($param, $order_status);
+        $customer_code                  = $my_common->getMstCustomer($customer_id)['customer_code'] ?? '';
+        $qb                             = $this->orderItemRepository->getDeliveryByCustomer($param, $customer_code, $login_type);
 
         // Paginator
         $pagination             = $paginator->paginate(
@@ -813,8 +795,6 @@ class MypageController extends AbstractController
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => true]
         );
-
-        No_Data_Case:
 
         /*create list order date*/
         $shippingDateList       = [];

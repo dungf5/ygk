@@ -140,8 +140,22 @@ class OrderItemRepository extends AbstractRepository
      *
      * @return QueryBuilder
      */
-    public function getDeliveryByCustomer($paramSearch = [], $order_status = [])
+    public function getDeliveryByCustomer($paramSearch = [], $customer_code = '', $login_type = '')
     {
+        switch ($login_type) {
+            case 'shipping_code':
+                $condition          = "order_status.shipping_code = :customer_code";
+                break;
+
+            case 'otodoke_code':
+                $condition          = "order_status.otodoke_code = :customer_code";
+                break;
+
+            default:
+                $condition          = "order_status.customer_code = :customer_code";
+                break;
+        }
+
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('shipping.shipping_no');
         $qb->from('Customize\Entity\DtOrderStatus', 'order_status');
@@ -178,18 +192,9 @@ class OrderItemRepository extends AbstractRepository
         $qb->where('shipping.delete_flg IS NOT NULL AND shipping.delete_flg <> 0')
             ->andWhere('order_status.order_date >= :order_date')
             ->andWhere('delivery.delivery_lineno = 1')
-            ->setParameter('order_date', date("Y-m-d", strtotime("-14 MONTH")));
-
-        if( count($order_status) > 0 ) {
-            $where = '';
-            foreach($order_status as $k => $os) {
-                if( ! empty($where) ) $where .= ' OR ';
-                $where .= " ( shipping.cus_order_no = :shipping_cus_order_no_{$k} AND shipping.cus_order_lineno = :shipping_cus_order_lineno_{$k} ) ";
-                $qb->setParameter("shipping_cus_order_no_{$k}", $os['cus_order_no']);
-                $qb->setParameter("shipping_cus_order_lineno_{$k}", $os['cus_order_lineno']);
-            }
-            $qb->andWhere( $where );
-        }
+            ->andWhere($condition)
+            ->setParameter(':order_date', date("Y-m-d", strtotime("-14 MONTH")))
+            ->setParameter(':customer_code', $customer_code);
 
         if (!empty($paramSearch['delivery_no'])) {
             $qb->andWhere( 'delivery.delivery_no = :delivery_no' )
@@ -215,9 +220,10 @@ class OrderItemRepository extends AbstractRepository
 
         $qb->addOrderBy('shipping.shipping_date', 'DESC');
 
-         //dump($qb->getQuery()->getSQL());
-         //dump($qb->getParameters());
-         //die();
+        //dump($login_type);
+        //dump($qb->getQuery()->getSQL());
+        //dump($qb->getParameters());
+        //die();
         return $qb;
     }
 }
