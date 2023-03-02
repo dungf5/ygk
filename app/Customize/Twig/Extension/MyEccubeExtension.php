@@ -130,10 +130,10 @@ class MyEccubeExtension extends AbstractExtension
     }
 
     public function getMinDate(){
-        $newDate = date('Y-m-d', strtotime(date("Y-m-d"). ' + 1 days'));
+        $newDate = date('Y-m-d', strtotime(date("Y-m-d")));
         return $newDate;
-
     }
+
     public function getWebRootUrl(){
 
         return MyConstant::MY_WEB;

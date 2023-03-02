@@ -493,12 +493,12 @@ function updateDeliverydAdress(delivery_code) {
         let inputDate       = new Date(inputDateStr);
         inputDate.setHours(0, 0, 0, 0);
 
-        if (curDate.toString() == inputDate.toString()) {
-            $('#date_picker_delivery').focus();
-            $('.error_date').html(msErSame);
-
-            return false;
-        }
+        // if (curDate.toString() == inputDate.toString()) {
+        //     $('#date_picker_delivery').focus();
+        //     $('.error_date').html(msErSame);
+        //
+        //     return false;
+        // }
 
         if (inputDate < curDate) {
             $('.error_date').html(msErSmal);
