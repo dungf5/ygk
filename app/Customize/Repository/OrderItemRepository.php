@@ -175,8 +175,9 @@ class OrderItemRepository extends AbstractRepository
             'shipping.ec_order_lineno'
         );
 
-        $qb->where('( shipping.delete_flg IS NOT NULL AND shipping.delete_flg <> 0 )')
+        $qb->where('shipping.delete_flg IS NOT NULL AND shipping.delete_flg <> 0')
             ->andWhere('order_status.order_date >= :order_date')
+            ->andWhere('delivery.delivery_lineno = 1')
             ->setParameter('order_date', date("Y-m-d", strtotime("-14 MONTH")));
 
         if( count($order_status) > 0 ) {
