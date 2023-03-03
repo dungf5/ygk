@@ -187,11 +187,8 @@ class CartService extends Service
      */
     public function getPersistedCarts()
     {
-        $myS            = MyCommon::getCarSession();
-        $customer_id    = $this->globalService->customerId();
-        $commonService  = new MyCommonService($this->entityManager);
-        $customer       = $commonService->getDtbCustomer($customer_id);
-        return $this->cartRepository->findBy(['Customer' => $customer,'key_eccube'=>$myS]);
+        $myS = MyCommon::getCarSession();
+        return $this->cartRepository->findBy(['Customer' => $this->getUser(),'key_eccube'=>$myS]);
     }
 
     /**
@@ -247,9 +244,8 @@ class CartService extends Service
             return null;
         }
 
-        $cartKeys   = $this->session->get('cart_keys', []);
-        $Cart       = null;
-
+        $cartKeys = $this->session->get('cart_keys', []);
+        $Cart = null;
         if (count($cartKeys) > 0) {
             foreach ($Carts as $cart) {
                 if ($cart->getCartKey() === current($cartKeys)) {
@@ -334,14 +330,13 @@ class CartService extends Service
         $this->carts = [];
 
         /** @var Cart[] $Carts */
-        $Carts              = [];
-        $commonService      = new MyCommonService($this->entityManager);
-        $customer_id        = $this->globalService->customerId();
-        $customer           = $commonService->getDtbCustomer($customer_id);
-
+        $Carts = [];
         foreach ($cartItems as $item) {
+
+
+
             $allocatedId = $this->cartItemAllocator->allocate($item);
-            $cartKey = $this->createCartKey($allocatedId, $customer);
+            $cartKey = $this->createCartKey($allocatedId, $this->getUser());
 
             if (isset($Carts[$cartKey])) {
                 $Cart = $Carts[$cartKey];
@@ -370,6 +365,7 @@ class CartService extends Service
             }
         }
         $this->carts = array_values($Carts);
+
     }
 
     /**
@@ -600,13 +596,11 @@ class CartService extends Service
 
     public function saveCustomize()
     {
-        $cartKeys           = [];
-        $commonService      = new MyCommonService($this->entityManager);
-        $customer_id        = $this->globalService->customerId();
-        $Customer           = $commonService->getDtbCustomer($customer_id);
+        $cartKeys = [];
+
 
         foreach ($this->carts as $Cart) {
-            $Cart->setCustomer($Customer);
+            $Cart->setCustomer($this->getUser());
             $this->entityManager->persist($Cart);
 
             foreach ($Cart->getCartItems() as $item) {

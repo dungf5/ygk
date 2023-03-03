@@ -220,10 +220,9 @@ class OrderItemRepository extends AbstractRepository
 
         $qb->addOrderBy('shipping.shipping_date', 'DESC');
 
-        //dump($login_type);
-        //dump($qb->getQuery()->getSQL());
-        //dump($qb->getParameters());
-        //die();
+         //dump($qb->getQuery()->getSQL());
+         //dump($qb->getParameters());
+         //die();
         return $qb;
     }
 }

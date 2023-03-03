@@ -1,0 +1,234 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends 'default_frame.twig' %}
+
+{% block stylesheet %}
+    <style>
+        p {
+            margin-bottom: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="ec-role">
+        <div class="ec-pageHeader">
+            <h1>{{ 'front.privacy.title'|trans }}</h1>
+        </div>
+        <div class="ec-off1Grid">
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">1. はじめに</div>
+                <p>本サイトは、お客様が本サイトをご利用するにあたり、個人情報（個人情報の保護に関する法律（以下「個人情報保護法」といいます。）2条1項により定義されるものを指します。）その他お客様個人に関する情報（以下「お客様情報」といいます。）を取得することがあります。</p>
+                <p>本サイトは、お客様情報の取扱いにあたり個人情報保護法その他関連法令及びガイドライン並びに下記にて本サイトが定めるプライバシーポリシー（以下「本プライバシーポリシー」といいます。）を遵守するものとします。</p>
+            </div>
+        </div>
+        <div class="ec-off1Grid">
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">2. 適用対象</div>
+                <p>本プライバシーポリシーは、お客様が本サイトをご利用するにあたり本サイトが取得する全てのお客様情報を対象とします。</p>
+            </div>
+        </div>
+        <div class="ec-off1Grid" style="display: block;">
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">3. 本サイトが取得するお客様情報</div>
+                <p>本サイトは、以下のお客様情報を、a.本サイトに関するサービス上でお客様自身が直接入力する方法、b.お客様が本サイトに対し、電子メール、郵便、書面、電話等の手段により提供する方法、c.お客様の本サイトに関するサービスの利用又は閲覧の際に収集する方法等により取得します。</p>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">お客様による商品の購入等に際して取得する情報</div>
+                <ul>
+                    <li>お客様の氏名、住所、職業等の基本的情報</li>
+                    <li>お客様の電話番号、メールアドレス等連絡先に関する情報</li>
+                    <li>お客様の銀行口座情報等の情報</li>
+                    <li>その他お客様及びお客様による商品の購入等に関する情報</li>
+                </ul>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">お客様による本サイトの利用に際して取得するその他の情報</div>
+                <ul>
+                    <li>お客様が購入した商品等、本サイトの利用に関する情報</li>
+                    <li>お客様の本サイト上での決済状況に関する情報</li>
+                    <li>お客様が本サイトを利用する際のクッキー、IPアドレス、端末の種類、<br>
+                    携帯端末識別子、ブラウザの種類、ブラウザの言語、参照元URL、プラットフォームの種類、ページ閲覧数、ページ閲覧時間及び本サイトの<br>
+　                  アプリ又はウェブサイトにおけるアクティビティを行った日時</li>
+                    <li>その他お客様による本サイトの利用に関する情報</li>
+                </ul>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">本サイトがお客様に対して行うアンケートに際して取得する情報</div>
+                <ul>
+                    <li>お客様による本サイトの利用状況、本サイトに関する要望等その他お客様によるアンケートへの回答内容、<br>
+                    その他お客様へのアンケートに関する情報</li>
+                </ul>
+            </div>
+        </div>
+        <div class="ec-off1Grid" style="display: block;">
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">4. 利用目的</div>
+                <p>本サイトは、3.に記載したお客様情報を以下の目的に利用します。</p>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">お客様に対する本サイトに関するサービスの提供等</div>
+                <ul>
+                    <li>本サイトを利用した商品等の購入等を確認するため</li>
+                    <li>本サイトに関する請求、支払いとその確認のため</li>
+                    <li>その他お客様に本サイトに関するサービスを提供するため</li>
+                </ul>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">本サイトに関するサービスの改善及び新サービスの立案等</div>
+                <ul>
+                    <li>本サイトの利用状況・利用態様等に関する調査・分析のため</li>
+                    <li>お客様に対する本サイトに関するアンケートの実施のため</li>
+                    <li>調査等への協力に対して謝礼等を送るため</li>
+                    <li>本サイトに関するサービスの改善・改良及び新サービスの立案のため</li>
+                    <li>本サイトに関するサービスの内容を個々のお客様に合わせてカスタマイズするため</li>
+                    <li>新サービスの企画立案・研究開発のため</li>
+                    <li>その他本サイトのサービスの品質向上のため</li>
+                </ul>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">本サイトに関するサービスに関する案内、お客様からの問い合わせ等への対応等</div>
+                <ul>
+                    <li>本サイトに関するサービスに係る連絡や情報提供を行うため</li>
+                    <li>電子メール配信サービスの申し込みの確認やメールを配信するため</li>
+                    <li>キャンペーンの案内のため</li>
+                    <li>応募があった懸賞等に対して景品等を送るため</li>
+                    <li>新商品、新サービス等の案内に利用するため</li>
+                    <li>利用規約の変更等本サイトに関するサービスに係る重大な変更をお知らせするため</li>
+                    <li>お客様による問い合わせ、請求等への対応のため</li>
+                    <li>その他本サイトの利用に関してお客様と適切な連絡を行うため</li>
+                </ul>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">広告、マーケティング等</div>
+                <ul>
+                    <li>本サイトの広告の配信、表示又は効果測定のため</li>
+                    <li>その他広告及びマーケティングを目的とした施策を実施するため</li>
+                </ul>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">管理運営等</div>
+                <ul>
+                    <li>お客様の本サイトに関するサービスの利用状況や登録情報の確認のため</li>
+                    <li>お客様による規約の遵守状況の確認のため</li>
+                    <li>規約違反が疑われる又は規約違反が認められたお客様への対応その他本サイト運営上のトラブルの解決のため</li>
+                    <li>その他お客様による安全な利用の確保及び本サイトに関するサービスの品質の保持に必要な措置を実施するため</li>
+                </ul>
+            </div>
+        </div>
+        <div class="ec-off1Grid" style="display: block">
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">5. お客様情報の第三者への預託、提供について</div>
+                <p>本サイトは、以下のような場合において、お客様情報を第三者に提供、預託することがあります。なお、かかる場合において、本サイトは、必要に応じて、当該提供先について、本サイトが定める基準を満たす者であるか審査を行い、本サイトの適切な監督のもと、お客様情報を預託、提供し、契約に際してはお客様情報が適正に管理されるように契約内容に配慮します。</p>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">業務委託先への預託・提供</div>
+                <p>お客様情報の処理、お客様への情報提供、キャンペーン・アンケートの実施及び本サイトに関するサービスの利用状況等に関する調査又は分析等を行うために、業務の全部又は一部を他の企業に委託する場合</p>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">本サイトの協力事業者・提携先への預託・提供</div>
+                <p>本サイトに関するサービス提供のため、他の企業等と協力関係・提携関係を結ぶ場合（本サイトの広告の配信、表示又は効果測定を目的として、広告配信サービス提供会社、広告代理店その他の広告に関連する事業者等との間で、協力関係・提携関係を結ぶ場合を含みます。）</p>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">事業の承継等に伴う承継先等への提供</div>
+                <p>合併、会社分割、及び事業譲渡等により他の企業に本サイトに関するサービスを含む事業を承継させる場合。（本サイトが別途法人を設立して本サイトの事業を当該法人に承継する場合を含みます。）</p>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">法令等に基づく提供</div>
+                <p>法令等に基づき、裁判所、行政機関、監督官庁その他の公的機関からお客様情報を提供するよう求められた場合</p>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">第三者との紛争解決のため</div>
+                <p>第三者との紛争解決のため、又は本サイトに関するサービスのお客様や第三者の権利利益を確保するためにお客様情報の提供が必要と判断した場合</p>
+            </div>
+        </div>
+        <div class="ec-off1Grid">
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">6. 管理</div>
+                <p>本サイトでは、お客様情報の紛失、破壊、改ざん並びに不正アクセス及び漏えい等が起きないように、お客様情報について厳重に管理を行います。なお、5.のとおり、本サイトでは、個人情報の取扱いを他の企業等に委託する場合がありますが、この場合本サイトは当該企業に対して適切な監督を行うものとします。</p>
+            </div>
+        </div>
+        <div class="ec-off1Grid" style="display: block">
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">7.Google アナリティクス及びクッキーの利用について</div>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">Google アナリティクスの利用</div>
+                <p>本サイトに関するサービスではお客様による利用状況・利用態様を調査・分析するためにGoogle アナリティクスを利用しています。Google アナリティクスの利用により収集されたデータは、Google社のプライバシーポリシーに基づいて管理されています。Google アナリティクスの詳細及びオプトアウト手続については、「<a href="https://marketingplatform.google.com/about/analytics/terms/jp/" target="_blank">「Google アナリティクス利用規約」</a>」「<a href="https://policies.google.com/technologies/partner-sites?hl=ja" target="_blank">「Google のサービスを使用するサイトやアプリから収集した情報の Google による使用」</a>」をご確認ください。</p>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">クッキーの利用について</div>
+                <p>本サイトに関するサービスでは、利便性向上や統計データ分析並びに広告の配信、表示及び効果測定等の目的でクッキー（Cookie）及びこれに類似する技術を利用することがあります。</p>
+                <p>クッキーとは、お客様が本サイトに関するサービスにアクセスした際にご利用のデバイス上に保存されるテキストデータです。</p>
+                <p>お客様は、ブラウザの設定等により、お客様の判断でクッキーの受け入れの制限又は拒否を行うことができますが、このような選択をした場合、本サイトに関するサービスを正常にご利用いただけなくなる可能性があります。</p>
+            </div>
+        </div>
+        <div class="ec-off1Grid">
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">8. 本サイトによるお客様情報の訂正について</div>
+                <p>お客様情報のうち、市町村等の名称及び郵便番号並びに金融機関の名称等、請求や支払いを行う上で支障がある情報に変更があった場合には、本サイトが登録されているお客様情報を変更させていただく場合があります。</p>
+            </div>
+        </div>
+        <div class="ec-off1Grid" style="display: block">
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">9. お客様によるお客様情報の確認・訂正、保有個人データの開示等</div>
+                <p>お客様は、お客様情報の取扱いに関し、以下の対応を行うことができます。</p>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">お客様情報の確認・訂正</div>
+                <p>お客様はいつでもお客様がご登録したお客様情報の確認・訂正を行うことができます。</p>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">保有個人データの開示</div>
+                <p>本サイトは、お客様から保有個人データ又は第三者提供に係る記録の開示の請求があった場合には、次の場合を除き、遅滞なく開示します。</p>
+                <ul>
+                    <li>開示することで本人又は第三者の生命、身体、財産その他の権利利益を害するおそれがある場合</li>
+                    <li>お客様による規約の遵守状況の確認のため</li>
+                    <li>開示することで本サイトの業務の適正な実施に著しい支障を及ぼすおそれがある場合</li>
+                    <li>開示することが法令に違反することとなる場合</li>
+                </ul>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">保有個人データの訂正等</div>
+                <p>本サイトは、お客様から保有個人データの訂正、追加、削除、消去、利用停止、第三者提供の停止等に関する請求があった場合には、当該請求がお客様本人又は本人から適切な授権を受けた代理人によるものであること、及び、当該請求が関連する法令上の要件を充足することについて調査・確認の上、法令に従い対応します。なお、技術的な制限等により、お客様の要望に直接的にはお応えできない場合がありますので、あらかじめご了承ください。</p>
+            </div>
+        </div>
+        <div class="ec-off1Grid" style="display: block">
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">10.免責・注意事項について</div>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">他の事業者等のウェブサイトの利用について</div>
+                <p>本サイトは、他の事業者又は個人のウェブサイト（本サイトに関するサービスの提供に際して本サイトが用いるウェブサイトからのリンクにより遷移するウェブサイトを含みます。）におけるお客様の個人情報等の保護について、責任を負うものではありません。お客様ご自身にて当該ウェブサイトの内容をよくご確認の上ご利用ください。</p>
+            </div>
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">本人を確認するための情報について</div>
+                <p>お客様本人を確認するための情報につきましては、お客様にて、紛失、忘失及び第三者への漏洩がないよう厳重な管理をお願いします。</p>
+            </div>
+        </div>
+        <div class="ec-off1Grid">
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">11. プライバシーポリシーの変更及び最新のプライバシーポリシーの確認について</div>
+                <p>本サイトは本プライバシーポリシーについて、適宜その内容を変更します。</p>
+                <p>お客様におかれましては、本サイトに関するサービスのご利用に際して、必ず最新のプライバシーポリシーをご確認ください。</p>
+                <p>本サイトは、本プライバシーポリシーを変更する場合には、お客様に本プライバシーポリシーを変更する旨及び変更後の内容並びにその効力発生日を通知又は周知するものとします。なお、本プライバシーポリシーの変更に際して、法令上お客様の同意が必要となる場合において、本サイトは本プライバシーポリシーの変更についてお客様の同意（当該変更内容の通知又は周知後、お客様が本サイトを利用した場合又は本サイトの定める期間内に登録取消等の手続をとらなかったときには、お客様が変更後の本プライバシーポリシーが適用されることに同意したものとみなすことを含みます。）を取得します。</p>
+            </div>
+        </div>
+        <div class="ec-off1Grid">
+            <div class="ec-off1Grid__cell">
+                <div class="ec-heading-bold">12. 本サイトに係る情報及び各種問い合わせ先</div>
+                <p>本プライバシーポリシーに関する本サイトへのお問い合わせ並びに、本プライバシーポリシー及び個人情報保護法に基づく本サイトに対する各種請求については、本サイトの販売業者へご連絡ください。</p>
+                <br>
+                <p>最終更新日 : 2022年12月1日</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

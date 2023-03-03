@@ -1,0 +1,89 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends 'default_frame.twig' %}
+
+{% set mypageno = 'favorite' %}
+
+{% set body_class = 'mypage' %}
+
+{% block main %}
+    <div class="ec-layoutRole__main">
+        <div class="ec-mypageRole">
+            <div class="ec-pageHeader">
+                <h1>{{ 'front.mypage.title'|trans }}/{{ 'front.mypage.nav__favorite'|trans }}</h1>
+            </div>
+            {% include 'Mypage/navi.twig' %}
+        </div>
+
+        <div class="ec-mypageRole">
+            <div class="ec-favoriteRole">
+                {% if pagination.totalItemCount > 0 %}
+                    <div class="ec-favoriteRole__header">
+                        <p>{{ 'front.mypage.favorite_count'|trans({'%count%':pagination.totalItemCount}) }}</p>
+                    </div>
+                    <div class="mypageFavoriteItem">
+                        <ul class="mypageFavoriteItemList">
+                            {% for FavoriteProduct in pagination %}
+                                {% set Product = FavoriteProduct.Product %}
+                                <li>
+                                    <div class="itemImageTitle">
+                                        <div class="image">
+                                            <div class="inner">
+                                                <a href="{{ url('product_detail', {'id': Product.id}) }}">
+                                                    <img src="{{ asset(Product.main_list_image|no_image_product, 'save_image') }}" alt="{{ Product.name }}">
+                                                </a>
+                                            </div>
+                                            <div class="mypageFavoriteItemListDelete">
+                                                <a href="{{ url('mypage_favorite_delete', { id : Product.id }) }}" {{ csrf_token_for_anchor() }} data-method="delete">
+                                                    <i class="far fa-trash-alt"></i>
+                                                    <span>削除</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="titleSpec">
+                                            <a href="{{ url('product_detail', {'id': Product.id}) }}">
+                                                <h2>{{ Product.name }}</h2>
+                                                <div>★にほんごしょうひんめいいれる</div>
+                                            </a>
+                                            <div class="spec">
+                                                <dl>
+                                                    <dt>サイズ</dt>
+                                                    <dd>★000M-0.0号</dd>
+                                                </dl>
+                                                <dl>
+                                                    <dt>カラー</dt>
+                                                    <dd>★あああああああ</dd>
+                                                </dl>
+                                                <dl>
+                                                    <dt>素材</dt>
+                                                    <dd>★あああああああああ</dd>
+                                                </dl>
+                                                <dl>
+                                                    <dt>規格（m）</dt>
+                                                    <dd>★？？？</dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="ec-pagerRole">
+                        {% include "pager.twig" with {'pages': pagination.paginationData} %}
+                    </div>
+                {% else %}
+                    <div class="ec-favoriteRole__header">{{ 'front.mypage.favorite_not_found'|trans }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

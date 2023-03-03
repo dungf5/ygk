@@ -157,8 +157,8 @@ class MyShoppingController extends AbstractShoppingController
 
         // 受注の初期化.
         log_info('[注文手続] 受注の初期化処理を開始します.');
+        $Customer           = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
         $customer_id        = $this->globalService->customerId();
-        $customer           = $commonService->getDtbCustomer($customer_id);
         $arCusLogin         = $commonService->getMstCustomer($customer_id);
         $is_update_cart     = $this->session->get('is_update_cart', '');
 
@@ -199,12 +199,12 @@ class MyShoppingController extends AbstractShoppingController
         }
         //*****************
 
-        $Order                      = $this->orderHelper->initializeOrder($Cart, $customer);
+        $Order                      = $this->orderHelper->initializeOrder($Cart, $Customer);
         $mstShip                    = $commonService->getMstShippingCustomer($this->globalService->getLoginType(), $this->globalService->customerId());
         $Order->arCusLogin          = $arCusLogin;
         $login_type                 = $this->globalService->getLoginType();
         $login_code                 = $this->globalService->getLoginCode();
-        $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($customer->getCustomerCode(), $login_type, $login_code);
+        $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer->getCustomerCode(), $login_type, $login_code);
         $Order->mstShips            = $mstShip;
         $Order->dtBillSeikyuCode    = $dtBillSeikyuCode;
 
@@ -213,8 +213,8 @@ class MyShoppingController extends AbstractShoppingController
         $flowResult                 = $this->executePurchaseFlow($Order, false);
 
         // マイページで会員情報が更新されていれば, Orderの注文者情報も更新する.
-        if ($customer->getId()) {
-            $this->orderHelper->updateCustomerInfo($Order, $customer);
+        if ($Customer->getId()) {
+            $this->orderHelper->updateCustomerInfo($Order, $Customer);
             $this->entityManager->flush();
         }
 
@@ -338,6 +338,7 @@ class MyShoppingController extends AbstractShoppingController
             $cartList[]                             = $cartT['id'];
         }
 
+        $customer_id                                = $this->globalService->customerId();
         $customer_code                              = $comSer->getMstCustomer($customer_id)["customer_code"] ?? "";
         $mstProduct                                 = $comSer->getMstProductsFromCart($cartList);
         $hsProductId                                = [];
@@ -455,6 +456,14 @@ class MyShoppingController extends AbstractShoppingController
             $mstShip                    = $commonService->getMstShippingCustomer($login_type, $customer_id, $moreOrder);
             $Customer                   = $commonService->getMstCustomer($customer_id);
             $dtBillSeikyuCode           = $commonService->getCustomerBillSeikyuCode($Customer['customer_code'] ?? "", $login_type, $login_code);
+
+            // Update more_order.seikyu_code
+            if (!empty($dtBillSeikyuCode)) {
+                $moreOrder->setSeikyuCode($dtBillSeikyuCode[0]['seikyu_code'] ?? "");
+                $this->entityManager->persist($moreOrder);
+                $this->entityManager->flush();
+            }
+
             $arCusLogin                 = $commonService->getMstCustomer($customer_id);
             $Order->arCusLogin          = $arCusLogin;
             $arrOtoProductOrder         = $commonService->getCustomerOtodoke($login_type, $customer_id, $moreOrder->getShippingCode(), $moreOrder);
@@ -745,21 +754,6 @@ class MyShoppingController extends AbstractShoppingController
 
             $customer_id                    = $this->globalService->customerId();
             $customer                       = $commonService->getMstCustomer($customer_id);
-
-            /* Get infomation for case Supper user*/
-            $root_customer_id               = $this->getUser()->getId();
-            $customer2                      = $commonService->getMstCustomer($root_customer_id);
-            $emailcc                        = "";
-
-            if (
-                !empty($customer2['customer_email']) &&
-                !empty($customer['customer_email']) &&
-                $customer2['customer_email'] != $customer['customer_email']
-            ) {
-                $emailcc                    = $customer2['customer_email'];
-            }
-            /* End */
-
             $newOrder['name']               = $customer['name01'] ?? "";
             // Get info order
             $newOrder['subtotal']           = $Order['subtotal'];
@@ -779,7 +773,6 @@ class MyShoppingController extends AbstractShoppingController
             $newOrder['addr03']             = $customer['addr03'] ?? "";
             $newOrder['phone_number']       = $customer['phone_number'] ?? "";
             $newOrder['email']              = $customer['customer_email'] ?? "";
-            $newOrder['emailcc']            = $emailcc;
 
             // Get Product
             $goods                          = $commonService->getMstProductsOrderCustomer($Order->getId());
@@ -790,7 +783,6 @@ class MyShoppingController extends AbstractShoppingController
             //$shipping = $commonService->getMstShippingOrder($user->getId(),$Order->getId());
             $shipping                       = $commonService->getMoreOrderCustomer($Order->getPreOrderId());
             $newOrder['Shipping']           = $shipping;
-
             $Order->setName01($customer['name01']);
             $Order->setCompanyName( $customer['company_name']);
             $this->mailService->sendOrderMail($newOrder, $Order);

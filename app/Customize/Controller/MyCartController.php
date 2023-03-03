@@ -24,8 +24,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
 use Eccube\Entity\ProductClass;
-use Eccube\Event\EccubeEvents;
-use Eccube\Event\EventArgs;
 use Eccube\Repository\BaseInfoRepository;
 use Eccube\Repository\ProductClassRepository;
 use Eccube\Service\CartService;
@@ -547,43 +545,5 @@ class MyCartController extends AbstractController
 //            $cartId = $Carts[0]->getId();
 //            $totalNew = $myComS->getTotalItemCart($cartId);
 //        }
-    }
-
-    /**
-     * カートをロック状態に設定し、購入確認画面へ遷移する.
-     *
-     * @Route("/cart/buystep/{cart_key}", name="cart_buystep", requirements={"cart_key" = "[a-zA-Z0-9]+[_][\x20-\x7E]+"}, methods={"GET"})
-     */
-    public function buystep(Request $request, $cart_key)
-    {
-        $Carts = $this->cartService->getCart();
-
-        if (!is_object($Carts)) {
-            return $this->redirectToRoute('cart');
-        }
-
-        // FRONT_CART_BUYSTEP_INITIALIZE
-        $event = new EventArgs(
-            [],
-            $request
-        );
-
-        $this->eventDispatcher->dispatch(EccubeEvents::FRONT_CART_BUYSTEP_INITIALIZE, $event);
-
-        $this->cartService->setPrimary($cart_key);
-        $this->cartService->save();
-
-        // FRONT_CART_BUYSTEP_COMPLETE
-        $event = new EventArgs(
-            [],
-            $request
-        );
-        $this->eventDispatcher->dispatch(EccubeEvents::FRONT_CART_BUYSTEP_COMPLETE, $event);
-
-        if ($event->hasResponse()) {
-            return $event->getResponse();
-        }
-
-        return $this->redirectToRoute('shopping');
     }
 }
