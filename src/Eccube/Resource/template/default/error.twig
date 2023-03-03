@@ -34,7 +34,14 @@ file that was distributed with this source code.
                     <li>・発生時の動作 :</li>
                     <li>※連絡先メールアドレス：<a href="mailto:order_support@xbraid.net">order_support@xbraid.net</a></li>
                 </ul>
-                <a class="ec-blockBtn--cancel" href="{{ url('homepage') }}">{{ 'common.go_to_top'|trans }}</a>
+                <div style="display: inline-flex;">
+                    <div style="padding: 10px;">
+                        <a class="ec-blockBtn--submit" href="{{ url('homepage') }}">{{ 'common.go_to_top'|trans }}</a>
+                    </div>
+                    <div style="padding: 10px;">
+                        <a class="ec-blockBtn--action" href="javascript:void(0);" onclick="handleClearCookie()">{{ 'common.clear_cookie'|trans }}</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -45,14 +52,14 @@ file that was distributed with this source code.
 <script>
     var timeout = 2000;
 
-    $(document).ready(function () {
-        setTimeout(function () {
-            //Clear cookie
-            deleteAllCookies();
+    {#$(document).ready(function () {#}
+    {#    setTimeout(function () {#}
+    {#        //Clear cookie#}
+    {#        deleteAllCookies();#}
 
-            window.location.href = '{{ url('homepage') }}';
-        }, timeout);
-    })
+    {#        window.location.href = '{{ url('homepage') }}';#}
+    {#    }, timeout);#}
+    {#})#}
 
     function deleteAllCookies() {
         const cookies = document.cookie.split(";");
@@ -63,5 +70,13 @@ file that was distributed with this source code.
             const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
             document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
         }
+    }
+
+    function handleClearCookie() {
+        //Clear cookie
+        console.log("Clear All Cookie");
+        deleteAllCookies();
+
+        window.location.href = '{{ url('homepage') }}';
     }
 </script>

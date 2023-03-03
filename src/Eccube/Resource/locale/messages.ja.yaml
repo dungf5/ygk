@@ -16,6 +16,7 @@ common.delete: 削除
 common.ok: OK
 common.cancel: キャンセル
 common.go_to_top: トップページへ
+common.clear_cookie: クッキー のクリア はこちら
 common.go_to_cart: カートへ進む
 common.go_to_confirm: 確認ページへ
 common.go_to_next: 次のページへ
