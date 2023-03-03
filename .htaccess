@@ -1,6 +1,6 @@
 
 ############## quyen vao
-AuthUserFile "/var/www/real/basicauth/.htpasswd"
+AuthUserFile "/var/www/html/3pl_staging/basicauth/.htpasswd"
 AuthName "Member Site"
 AuthType BASIC
 require valid-user
