@@ -1,16 +1,16 @@
-deploy_staging:
+deploy_staging1:
   tags:
-    - staging
+    - staging1
   before_script:
-    - whoami > /var/tmp/ygk-staging.txt
+    - whoami > /var/tmp/ygk-staging1.txt
     - eval $(ssh-agent -s)
     - ssh-add /home/ec2-user/.ssh/id_rsa
-    - cd /var/www/html/staging
+    - cd /var/www/html/staging1
   environment:
-    name: staging
+    name: staging1
   when: manual
   script:
     - git checkout .
     - git pull origin
   only:
-    - staging
+    - staging1
