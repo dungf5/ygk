@@ -5,7 +5,7 @@ deploy_develop:
     - whoami > /var/tmp/ygk-dev.txt
     - eval $(ssh-agent -s)
     - ssh-add /home/ec2-user/.ssh/id_rsa
-    - cd /var/www/html/staging_dev
+    - cd /var/www/html/develop
   environment:
     name: develop
   when: manual
@@ -14,6 +14,22 @@ deploy_develop:
     - git pull origin
   only:
     - develop
+deploy_develop1:
+  tags:
+    - develop1
+  before_script:
+    - whoami > /var/tmp/ygk-dev1.txt
+    - eval $(ssh-agent -s)
+    - ssh-add /home/ec2-user/.ssh/id_rsa
+    - cd /var/www/html/develop1
+  environment:
+    name: develop1
+  when: manual
+  script:
+    - git checkout .
+    - git pull origin
+  only:
+    - develop1
 deploy_staging:
   tags:
     - staging
