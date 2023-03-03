@@ -1,64 +1,16 @@
-deploy_develop:
+deploy_develop2:
   tags:
-    - develop
-  before_script:
-    - whoami > /var/tmp/ygk-dev.txt
-    - eval $(ssh-agent -s)
-    - ssh-add /home/ec2-user/.ssh/id_rsa
-    - cd /var/www/html/develop
-  environment:
-    name: develop
-  when: manual
-  script:
-    - git checkout .
-    - git pull origin
-  only:
-    - develop
-deploy_develop1:
-  tags:
-    - develop1
+    - develop2
   before_script:
     - whoami > /var/tmp/ygk-dev1.txt
     - eval $(ssh-agent -s)
     - ssh-add /home/ec2-user/.ssh/id_rsa
-    - cd /var/www/html/develop1
+    - cd /var/www/html/develop2
   environment:
-    name: develop1
+    name: develop2
   when: manual
   script:
     - git checkout .
     - git pull origin
   only:
-    - develop1
-deploy_staging:
-  tags:
-    - staging
-  before_script:
-    - whoami > /var/tmp/ygk-staging.txt
-    - eval $(ssh-agent -s)
-    - ssh-add /home/ec2-user/.ssh/id_rsa
-    - cd /var/www/html/staging
-  environment:
-    name: staging
-  when: manual
-  script:
-    - git checkout .
-    - git pull origin
-  only:
-    - staging
-deploy_production:
-  tags:
-    - production
-  before_script:
-    - whoami > /var/tmp/ygk-production.txt
-    - eval $(ssh-agent -s)
-    - ssh-add /home/ec2-user/.ssh/id_rsa
-    - cd /var/www/html/production
-  environment:
-    name: production
-  when: manual
-  script:
-    - git checkout .
-    - git pull origin
-  only:
-    - production
+    - develop2
