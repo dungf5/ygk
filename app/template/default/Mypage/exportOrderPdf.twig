@@ -1,396 +1,392 @@
-
 <html >
+    <head>
+        <style>
+            @font-face {
+                font-family: msgothic;
+                font-weight: 400;
+                font-style: normal;
+                font-variant: normal;
+                src:url("{{getWebRootUrl()}}/html/template/default/fonts/assets/MS-Gothic.ttf") format("truetype");
+            }
 
-<head>
-    <style>
-        @font-face {
-            font-family: msgothic;
-            font-weight: 400;
-            font-style: normal;
-            font-variant: normal;
-            src:url("{{getWebRootUrl()}}/html/template/default/fonts/assets/MS-Gothic.ttf") format("truetype");
-        }
+            @font-face {
+                font-family: msgothic;
+                font-weight: 700;
+                font-style: bold;
+                font-variant: bold;
+                src:url("{{getWebRootUrl()}}/html/template/default/fonts/assets/MS-Gothic.ttf") format("truetype");
+            }
 
-        @font-face {
-            font-family: msgothic;
-            font-weight: 700;
-            font-style: bold;
-            font-variant: bold;
-            src:url("{{getWebRootUrl()}}/html/template/default/fonts/assets/MS-Gothic.ttf") format("truetype");
-        }
+            @font-face {
+                font-family: msgothic;
+                font-weight: italic;
+                font-style: italic;
+                font-variant: italic;
+                src:url("{{getWebRootUrl()}}/html/template/default/fonts/assets/MS-Gothic.ttf") format("truetype");
+            }
 
-        @font-face {
-            font-family: msgothic;
-            font-weight: italic;
-            font-style: italic;
-            font-variant: italic;
-            src:url("{{getWebRootUrl()}}/html/template/default/fonts/assets/MS-Gothic.ttf") format("truetype");
-        }
+            * {
+                font-family: msgothic;
+                margin: 0;
+                padding: 0
+            }
 
-        * {
-            font-family: msgothic;
-            margin: 0;
-            padding: 0
-        }
+            .header {
+                position: relative;
+                height: 50px;
+                display: block;
+                width: 100%;
+                padding-top: 20px
+            }
 
-        .header {
-            position: relative;
-            height: 50px;
-            display: block;
-            width: 100%;
-            padding-top: 20px
-        }
+            .title {
+                top: 20px;
+                left: 15px;
+                font-size: 25px;
+                padding-right: 30px;
+                text-align: center;
+                vertical-align: middle;
+                padding-bottom: 7px;
+            }
+            .date_time {
+                position: absolute;
+                right: 0;
+                top: 30px;
+            }
+            .delivery_no_right {
+                position: absolute;
+                right: 0;
+                top: 30px;
 
-        .title {
-            top: 20px;
-            left: 15px;
-            font-size: 25px;
-            padding-right: 30px;
-            text-align: center;
-            vertical-align: middle;
-            padding-bottom: 7px;
-        }
-        .date_time {
-            position: absolute;
-            right: 0;
-            top: 30px;
-        }
-        .delivery_no_right {
-            position: absolute;
-            right: 0;
-            top: 30px;
-
-            text-decoration: underline;
-        }
-        .header_left {
-            position: absolute;
-            left: 0;
-            top: 30px;
-
-
-        }
-
-        .clear-float {
-            clear: both
-        }
-        .shelf_title {
-            font-size: 20px;
-            height: 170px;
-            position: relative;
-        }
-
-        .shelf-person p {
-            margin: 0;
-            padding: 5px 0;
-            text-align: center;
-            border-bottom: 1px solid #000
-        }
-
-        .product-info table {
-            border-collapse: collapse
-        }
-
-        .product-info .tr-header > td {
-            font-size: 13px;
-            padding: 3px 0;
-            border: 1px solid black;
-            border-top: 2px solid #000;
-            border-bottom: 1px solid #000;
-            text-align: center;
-            height:35px;
-        }
-
-        .product-info .tr-content > td {
-            font-size: 14px;
-            border: 1px solid black;
-            border-top: 1px dotted #000;
-            border-bottom: 1px dotted #000;
-            padding: 4px 4px
-        }
+                text-decoration: underline;
+            }
+            .header_left {
+                position: absolute;
+                left: 0;
+                top: 30px;
 
 
-        .col-barcode {
-            /*padding: 5px !important;*/
-            padding-left: 3px !important;
-            padding-right: 3px !important;
-            position: relative;
-            height: 60px;
-            width: 160px
-        }
+            }
 
-        .col-barcode img {
-            width: 140px;
-            height: 20px
-        }
+            .clear-float {
+                clear: both
+            }
+            .shelf_title {
+                font-size: 20px;
+                height: 170px;
+                position: relative;
+            }
 
-        .jancode-before {
-            font-size: 15px !important;
-            vertical-align: top;
-            text-align: left;
-            padding: 0;
-            padding-top: 2px !important;
-            /*width: 50%;
-            padding-left: 0px !important;
-            font-weight: bold;*/
-        }
+            .shelf-person p {
+                margin: 0;
+                padding: 5px 0;
+                text-align: center;
+                border-bottom: 1px solid #000
+            }
 
-        .jancode-after {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 30px !important;
-            font-weight: 700;
-            line-height: 25px;
-            padding-top: 1px !important;
-            /* width: 50%;
-             text-align: right;
-             padding-right: 10px*/
-        }
+            .product-info table {
+                border-collapse: collapse
+            }
 
-        .col-barcode .jancode_inside {
-            display: block;
-        }
+            .product-info .tr-header > td {
+                font-size: 13px;
+                padding: 3px 0;
+                border: 1px solid black;
+                border-top: 2px solid #000;
+                border-bottom: 1px solid #000;
+                text-align: center;
+                height:35px;
+            }
 
-        .col-barcode .jancode_inside .jancode_num {
-            display: inline;
-        }
-
-        .col-barcode .jancode_inside .jancode_num .jancode_9_num {
-            margin-left: 0px;
-            font-size: 16px;
-            float: left;
-            margin-top: 2px;
-        }
-
-        .col-barcode .jancode_inside .jancode_num .jancode_4_num {
-            margin-right: 5px;
-            font-family: sans-serif;
-            float: right;
-            font-size: 27px;
-            font-weight: 600;
-        }
+            .product-info .tr-content > td {
+                font-size: 14px;
+                border: 1px solid black;
+                border-top: 1px dotted #000;
+                border-bottom: 1px dotted #000;
+                padding: 4px 4px
+            }
 
 
-        .plan_quantity {
-            font-family: Arial, Helvetica, sans-serif;
-            text-align: center;
-            min-width: 80px !important
-        }
+            .col-barcode {
+                /*padding: 5px !important;*/
+                padding-left: 3px !important;
+                padding-right: 3px !important;
+                position: relative;
+                height: 60px;
+                width: 160px
+            }
 
-        .plan_quantity img {
-            height: 25px;
-        }
+            .col-barcode img {
+                width: 140px;
+                height: 20px
+            }
 
-        .shelf_no {
-            font-size: 20px;
-            text-align: center;
-            width: 110px;
-            line-height: 10px;
-        }
+            .jancode-before {
+                font-size: 15px !important;
+                vertical-align: top;
+                text-align: left;
+                padding: 0;
+                padding-top: 2px !important;
+                /*width: 50%;
+                padding-left: 0px !important;
+                font-weight: bold;*/
+            }
 
-        .column-1 {
-            font-size: 26px;
-            font-weight: bold;
-            width: 110px;
-            text-align: center;
-            vertical-align: middle;
-        }
+            .jancode-after {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 30px !important;
+                font-weight: 700;
+                line-height: 25px;
+                padding-top: 1px !important;
+                /* width: 50%;
+                 text-align: right;
+                 padding-right: 10px*/
+            }
 
-        table tbody tr {
-            max-height: 60px !important;
-        }
-        .page_break {
-            page-break-before: always;
-        }
-        .header1_left{
-            position: absolute;
-            left: 0;
-        }
-        .header1_right{
-            position: absolute;
-            right: 0;
-        }
-        .text_right_header{
-            text-align: left;
-            width: 450px;
-            margin-top: 20px;
-            line-height: 1.5;
-        }
-        .top_table{
-            text-align: center;
-        }
-        .signbox .tr-content > td {
-            font-size: 14px;
-            border: 1px solid black;
-            border-top: 1px solid black;
-            border-bottom: 1px solid black;
-            padding: 4px 4px;
-        }
-        .signbox >table{
-            border-collapse: collapse;
-        }
-        .tblFooterLeft{ height: 159px;
-            width: 98.1591%;
-            border-color: black;
-            border-style: solid;
-            height: 159px;
-            border-width: 1px;
-        }
-        .footer1{
-            padding-top: 10px;
-        }
+            .col-barcode .jancode_inside {
+                display: block;
+            }
 
-        .pagebreak {
-            page-break-before: always;
-        }
-    </style>
-</head>
+            .col-barcode .jancode_inside .jancode_num {
+                display: inline;
+            }
 
-<body style="margin: -25px 25px -5px 25px; margin-top: 0; margin-bottom: 25px;">
-    <div style="height: 1051.48445px;">
-        {% set page = 0 %}
-        {% for myData in myDatas %}
-            {% set page = page + 1 %}
-            <div class="pagebreak">
-                <div style="padding-top: 5px"><img style="background: black;" src='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI2LjMuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IuODrOOCpOODpOODvF8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiCgkgeT0iMHB4IiB3aWR0aD0iMjcwcHgiIGhlaWdodD0iNDBweCIgdmlld0JveD0iMCAwIDI3MCA0MCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMjcwIDQwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+Cgkuc3Qwe2ZpbGw6I0ZGMDAwMDt9Cgkuc3Qxe2ZpbGw6I0ZGRkZGRjt9Cjwvc3R5bGU+Cjxwb2x5Z29uIGNsYXNzPSJzdDAiIHBvaW50cz0iMzAuOCwyIDUzLjQsMTcuNyAzMi40LDE3LjcgOS43LDIgIi8+Cjxwb2x5Z29uIGNsYXNzPSJzdDAiIHBvaW50cz0iNjkuNywyNC44IDk0LjMsMzkuOSA3MS41LDM5LjkgNDYuOSwyNC44ICIvPgo8cG9seWdvbiBjbGFzcz0ic3QwIiBwb2ludHM9IjU3LjgsMC4xIDAsMzkuOSAyNS4xLDM5LjkgNjgsMTAuNCA1Mi45LDEwLjQgNTQuOSw4LjkgNzAsOC45IDcxLjIsOC4xIDU2LjQsOC4xIDU4LjQsNi43IDczLjIsNi43IAoJNzQuNCw1LjkgNTkuNCw1LjkgNjEuNSw0LjUgNzYuNSw0LjUgNzcuNywzLjcgNjMsMy43IDY1LDIuMiA3OS43LDIuMiA4Mi44LDAuMSAiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTE5Ni4yLDE0LjlsNi44LDBsNy43LTkuNmwtNi44LDBsNC01bDIyLjcsMGwtNCw1bC02LjksMGwtNy43LDkuNmw2LjgsMGwtNCw1bC0yMi43LDBMMTk2LjIsMTQuOXoiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTI0NywyMGwtMzAuMSwwbDE1LjctMTkuNkwyNzAsMC40bC0xMi40LDE1LjVDMjUzLjIsMjAuMiwyNDcsMjAsMjQ3LDIweiBNMjUwLjYsMTMuMmw2LjItNy43bC0xOS4yLDBsLTcuNiw5LjUKCWwxNi42LDBDMjQ2LjcsMTUsMjQ5LjIsMTUsMjUwLjYsMTMuMnoiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTEyMC44LDExLjFjMi4zLTEwLjEtNy4xLTEwLjktNy4xLTEwLjlMOTAsMC4yTDYzLjksMjBsNDkuNSwwLjFjMC41LTAuNiwxLTEuNCwxLjMtMi4yCgljMC4zLTAuOCwwLjYtMS42LDAuNy0yLjRjMC4xLTAuOCwwLjItMS42LDAuMS0yLjNjMC0wLjgtMC4yLTEuNS0wLjQtMi4xTDEyMC44LDExLjEgTTg0LjQsMTQuOWwxMC45LTkuN2gxNC42YzAsMCwxLjIsMC4xLDEsMi43CgloLTE1bC00LjcsNC4yaDEzYzAsMCwxLjIsMC4xLDEsMi43TDg0LjQsMTQuOXoiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTE3NS43LDAuMWwzMC42LDBMMTkwLjUsMjBsLTkuMywwbDMuOS00LjhsLTE5LjQsMGwtMy45LDQuOGwtOS4zLDBsMTIuMy0xNS40QzE2NC44LDQuNSwxNjguMS0wLjIsMTc1LjcsMC4xegoJIE0xNjkuNywxMGwxOS40LDBsMy45LTQuOGwtMTYuMiwwQzE3Mi42LDUuMiwxNjkuNywxMCwxNjkuNywxMHoiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTE1Ny45LDEyLjVsLTMuOSwwYzAuMiwxLjIsMC4xLDIuNC0wLjIsMy44Yy0wLjMsMS40LTEsMi42LTEuOSwzLjhsLTEwLDBjMC44LTEuNiwxLjMtMi43LDEuNS0zLjUKCWMwLjMtMC44LDAuMy0xLjIsMC4zLTEuNWMtMC4yLTIuNS0yLjQtMi40LTIuNC0yLjRsLTExLjUsMGwzLjgtNC44aDE1LjNjMC4yLTIuNi0xLTIuNy0xLTIuN2gtMTQuM2wtMi4xLDIuN2wwLDBMMTIyLDIwbC05LjMsMAoJbDE1LjgtMTkuOGwyMy43LDBDMTUyLjIsMC4yLDE2MS43LDAuMywxNTcuOSwxMi41eiIvPgo8cGF0aCBjbGFzcz0ic3QxIiBkPSJNOTUuNiwzOS4xYzAuNiwwLDAuOS0wLjEsMS4xLTAuM2MwLjItMC4yLDAuMy0wLjUsMC4zLTEuMXYtNy4xYzAtMC42LTAuMS0xLTAuMy0xLjFjLTAuMi0wLjItMC41LTAuMy0xLjEtMC4zCgl2LTAuM2g0YzEuMSwwLDIuMSwwLjIsMi43LDAuNnMxLDEuMSwxLDIuMWMwLDAuOC0wLjIsMS4zLTAuNywxLjdjLTAuMywwLjItMC43LDAuNC0xLjIsMC42YzAuNywwLjIsMS4yLDAuNSwxLjcsMC45CgljMC41LDAuNCwwLjcsMSwwLjcsMS43YzAsMS4yLTAuNSwyLjEtMS42LDIuNmMtMC41LDAuMi0xLjIsMC40LTIsMC40aC00LjdWMzkuMXogTTEwMSwzMy4zYzAuNi0wLjMsMC45LTAuOSwwLjktMS43CgljMC0xLTAuMy0xLjYtMS0xLjljLTAuNC0wLjItMS0wLjMtMS44LTAuM2MtMC4zLDAtMC41LDAtMC42LDAuMWMtMC4xLDAuMS0wLjEsMC4yLTAuMSwwLjV2My42bDEuNCwwCglDMTAwLjMsMzMuNiwxMDAuNywzMy41LDEwMSwzMy4zeiBNMTAxLjUsMzguNGMwLjUtMC4zLDAuNy0wLjksMC43LTEuOGMwLTAuOS0wLjMtMS41LTAuOS0xLjhjLTAuNi0wLjMtMS4zLTAuNS0yLjItMC41CgljLTAuMiwwLTAuNCwwLTAuNCwwcy0wLjEsMC0wLjMsMHY0YzAsMC4zLDAuMSwwLjUsMC4yLDAuNWMwLjEsMC4xLDAuNSwwLjEsMSwwLjFDMTAwLjQsMzguOSwxMDEsMzguNywxMDEuNSwzOC40eiIvPgo8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMTA1LjEsMzkuMWMwLjUtMC4xLDAuOS0wLjIsMS0wLjRjMC4xLTAuMiwwLjItMC42LDAuMi0xLjN2LTYuOWMwLTAuNi0wLjEtMC45LTAuMi0xLjFjLTAuMS0wLjItMC41LTAuMy0xLTAuMwoJdi0wLjNoMy44YzAuOCwwLDEuNSwwLjEsMiwwLjRjMSwwLjQsMS41LDEuMywxLjUsMi40YzAsMC44LTAuMiwxLjQtMC43LDEuOGMtMC40LDAuNC0xLjEsMC43LTEuOCwwLjhsMi44LDQuMQoJYzAuMiwwLjIsMC4zLDAuNCwwLjUsMC41czAuNCwwLjIsMC43LDAuMnYwLjNoLTIuMmwtMy40LTQuOWwtMC42LDB2My4yYzAsMC42LDAuMSwxLDAuMiwxLjFjMC4yLDAuMiwwLjUsMC4zLDEsMC4zdjAuM2gtMy44VjM5LjF6CgkgTTEwOS44LDMzLjZjMC43LTAuMywxLjEtMSwxLjEtMmMwLTAuOS0wLjMtMS42LTEtMS45Yy0wLjMtMC4yLTAuOC0wLjMtMS40LTAuM2MtMC40LDAtMC42LDAtMC43LDAuMWMtMC4xLDAuMS0wLjEsMC4yLTAuMSwwLjVWMzQKCUMxMDguNywzMy45LDEwOS40LDMzLjgsMTA5LjgsMzMuNnoiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTExNC4zLDM5LjR2LTAuM2MwLjQsMCwwLjYtMC4yLDAuOC0wLjVjMC4yLTAuMywwLjUtMSwwLjktMi4ybDIuOS03LjloMC4zbDMuNCw5LjFjMC4yLDAuNiwwLjQsMSwwLjUsMS4xCgljMC4xLDAuMSwwLjQsMC4yLDAuNywwLjN2MC4zaC0zLjV2LTAuM2MwLjQsMCwwLjctMC4xLDAuOC0wLjJjMC4xLTAuMSwwLjItMC4yLDAuMi0wLjRjMC0wLjEsMC0wLjItMC4xLTAuNGMwLTAuMi0wLjEtMC40LTAuMi0wLjYKCWwtMC42LTEuNWgtMy42Yy0wLjQsMS0wLjYsMS43LTAuNiwxLjljLTAuMSwwLjItMC4xLDAuNC0wLjEsMC41YzAsMC4zLDAuMSwwLjUsMC4zLDAuNmMwLjEsMC4xLDAuMywwLjEsMC43LDAuMXYwLjNIMTE0LjN6CgkgTTEyMC4zLDM1LjNsLTEuNi00LjRsLTEuNiw0LjRIMTIwLjN6Ii8+CjxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xMjQuMywzOS4xYzAuNiwwLDAuOS0wLjEsMS4xLTAuM2MwLjItMC4xLDAuMi0wLjUsMC4yLTEuMXYtNy4xYzAtMC42LTAuMS0xLTAuMi0xLjFjLTAuMi0wLjItMC41LTAuMy0xLjEtMC4zCgl2LTAuM2g0LjF2MC4zYy0wLjYsMC0wLjksMC4xLTEuMSwwLjNjLTAuMiwwLjItMC4yLDAuNS0wLjIsMS4xdjcuMWMwLDAuNiwwLjEsMSwwLjIsMS4xYzAuMiwwLjEsMC41LDAuMiwxLjEsMC4zdjAuM2gtNC4xVjM5LjF6Ii8+CjxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xMjguOSwzOS4xYzAuNS0wLjEsMC44LTAuMiwxLTAuM2MwLjItMC4xLDAuMi0wLjUsMC4yLTEuMXYtNy4xYzAtMC42LTAuMS0xLTAuMi0xLjFjLTAuMS0wLjItMC41LTAuMy0xLTAuMwoJdi0wLjNoMy43YzEuMywwLDIuMywwLjIsMy4yLDAuN2MxLjYsMC45LDIuMywyLjQsMi4zLDQuNmMwLDAuOC0wLjEsMS42LTAuNCwyLjNjLTAuMywwLjctMC43LDEuMy0xLjMsMS44Yy0wLjQsMC4zLTAuNywwLjYtMS4xLDAuNwoJYy0wLjcsMC4zLTEuNiwwLjUtMi42LDAuNWgtMy44VjM5LjF6IE0xMzEuNiwzOC43YzAuMSwwLjEsMC4zLDAuMSwwLjcsMC4xYzEuMSwwLDItMC4yLDIuNy0wLjdjMS4xLTAuOCwxLjYtMi4xLDEuNi0zLjkKCWMwLTEuNi0wLjQtMi45LTEuMy0zLjdjLTAuOC0wLjctMS43LTEuMS0zLTEuMWMtMC4zLDAtMC41LDAtMC42LDAuMWMtMC4xLDAuMS0wLjIsMC4zLTAuMiwwLjV2OC4xCglDMTMxLjUsMzguNSwxMzEuNSwzOC42LDEzMS42LDM4Ljd6Ii8+CjxnPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTE0Mi4xLDI4LjhoNy41bDAuMSwyLjdoLTAuM2MtMC4yLTAuOS0wLjQtMS40LTAuNi0xLjdjLTAuMi0wLjMtMC43LTAuNC0xLjUtMC40aC0wLjd2OC4yCgkJYzAsMC42LDAuMSwxLDAuMiwxLjFzMC41LDAuMiwxLDAuM3YwLjNoLTMuOXYtMC4zYzAuNi0wLjEsMC45LTAuMiwxLTAuM2MwLjEtMC4yLDAuMi0wLjYsMC4yLTEuM3YtOGgtMC43Yy0wLjcsMC0xLjIsMC4xLTEuNSwwLjQKCQljLTAuMywwLjMtMC41LDAuOC0wLjYsMS43SDE0MkwxNDIuMSwyOC44eiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTE1MC4xLDM5LjFjMC41LTAuMSwwLjgtMC4yLDEtMC4zYzAuMS0wLjIsMC4yLTAuNiwwLjItMS4zdi02LjljMC0wLjYtMC4xLTAuOS0wLjItMS4xCgkJYy0wLjEtMC4yLTAuNS0wLjMtMC45LTAuM3YtMC4zaDMuN3YwLjNjLTAuNSwwLTAuOCwwLjEtMC45LDAuM2MtMC4xLDAuMi0wLjIsMC41LTAuMiwxLjF2My4xaDR2LTMuMWMwLTAuNi0wLjEtMC45LTAuMi0xLjEKCQljLTAuMS0wLjItMC41LTAuMy0xLTAuM3YtMC4zaDMuN3YwLjNjLTAuNSwwLTAuOCwwLjEtMC45LDAuM2MtMC4xLDAuMi0wLjIsMC41LTAuMiwxLjF2Ny4xYzAsMC42LDAuMSwxLDAuMiwxLjEKCQljMC4xLDAuMiwwLjUsMC4zLDAuOSwwLjN2MC4zaC0zLjd2LTAuM2MwLjUtMC4xLDAuOC0wLjIsMS0wLjNjMC4xLTAuMiwwLjItMC42LDAuMi0xLjN2LTMuMWgtNHYzLjNjMCwwLjYsMC4xLDEsMC4yLDEuMQoJCWMwLjEsMC4yLDAuNSwwLjMsMC45LDAuM3YwLjNoLTMuN1YzOS4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTE1OS42LDM5LjFjMC41LTAuMSwwLjgtMC4yLDAuOS0wLjNjMC4xLTAuMSwwLjItMC41LDAuMi0xLjF2LTcuMWMwLTAuNi0wLjEtMC45LTAuMi0xLjEKCQljLTAuMS0wLjItMC41LTAuMy0xLTAuM3YtMC4zaDdsMCwyLjNoLTAuM2MtMC4xLTAuNy0wLjMtMS4yLTAuNS0xLjRzLTAuNy0wLjMtMS41LTAuM2gtMS44Yy0wLjIsMC0wLjMsMC0wLjQsMC4xCgkJYzAsMC4xLTAuMSwwLjItMC4xLDAuNHYzLjZoMmMwLjYsMCwwLjktMC4xLDEuMS0wLjNzMC4zLTAuNiwwLjQtMS4yaDAuM3YzLjdoLTAuM2MtMC4xLTAuNi0wLjItMS0wLjQtMS4yCgkJYy0wLjItMC4yLTAuNS0wLjMtMS4xLTAuM2gtMnY0YzAsMC4zLDAuMSwwLjUsMC4yLDAuNmMwLjIsMC4xLDAuNywwLjEsMS41LDAuMWMwLjksMCwxLjYtMC4xLDItMC40YzAuNC0wLjIsMC44LTAuOCwxLjItMS43aDAuNAoJCWwtMC42LDIuN2gtNy4yVjM5LjF6Ii8+CjwvZz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTE3MS4xLDM5LjJjMC45LDAsMS42LTAuMiwyLjEtMC4zYzAuNS0wLjIsMS40LTAuNywyLjktMS41bDUuMy0zLjFsLTMuOC0yLjZjLTEuNi0xLjEtMi44LTEuOC0zLjUtMi4xCgljLTAuNy0wLjMtMS42LTAuNC0yLjctMC40di0wLjNoMTAuNHYwLjNjLTEsMC0xLjYsMC0xLjksMC4xYy0wLjUsMC4xLTAuNywwLjItMC43LDAuNWMwLDAuMSwwLjEsMC4zLDAuMywwLjUKCWMwLjEsMC4xLDAuMywwLjIsMC41LDAuNGwzLjYsMi40bDMuOS0yLjJjMC42LTAuMywxLTAuNiwxLjItMC44YzAuMS0wLjEsMC4yLTAuMiwwLjItMC4zYzAtMC4yLTAuMi0wLjQtMC43LTAuNQoJYy0wLjMsMC0wLjgtMC4xLTEuNi0wLjF2LTAuM2g4LjJ2MC4zYy0wLjksMC0xLjYsMC4xLTIuMSwwLjJjLTAuOCwwLjItMS44LDAuNy0zLDEuM2wtNSwyLjlMMTkxLDM4YzAuNywwLjUsMS4zLDAuOCwxLjcsMC45CgljMC41LDAuMSwxLjEsMC4yLDIsMC4zdjAuM2gtMTAuMXYtMC4zYzEsMCwxLjctMC4xLDItMC4xYzAuNC0wLjEsMC42LTAuMiwwLjYtMC40YzAtMC4yLTAuMy0wLjUtMC44LTAuOHMtMS45LTEuNC00LjItM2wtNCwyLjQKCWMtMC42LDAuNC0xLDAuNi0xLjIsMC44Yy0wLjQsMC4zLTAuNSwwLjQtMC41LDAuNmMwLDAuMiwwLjMsMC40LDAuOSwwLjVjMC4zLDAuMSwwLjksMC4xLDEuOCwwLjF2MC4zaC03LjlWMzkuMnoiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTE5Ni4zLDM5LjFjMC41LTAuMSwwLjktMC4yLDEtMC4zYzAuMS0wLjIsMC4yLTAuNiwwLjItMS4zdi02LjljMC0wLjYtMC4xLTAuOS0wLjItMS4xYy0wLjEtMC4yLTAuNS0wLjMtMS0wLjMKCXYtMC4zaDcuM2wwLDIuM2gtMC40Yy0wLjEtMC43LTAuMy0xLjItMC41LTEuNGMtMC4zLTAuMi0wLjgtMC4zLTEuNS0wLjNoLTEuOWMtMC4yLDAtMC4zLDAtMC40LDAuMWMtMC4xLDAuMS0wLjEsMC4yLTAuMSwwLjR2My42aDIKCWMwLjYsMCwxLTAuMSwxLjEtMC4zYzAuMi0wLjIsMC4zLTAuNiwwLjQtMS4yaDAuM3YzLjdoLTAuM2MtMC4xLTAuNi0wLjItMS0wLjQtMS4yYy0wLjItMC4yLTAuNS0wLjMtMS4xLTAuM2gtMnYzLjUKCWMwLDAuNiwwLjEsMSwwLjIsMS4xYzAuMiwwLjIsMC41LDAuMywxLDAuM3YwLjNoLTMuOVYzOS4xeiIvPgo8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMjA3LjksMjguOHYwLjNjLTAuNSwwLTAuOSwwLjEtMSwwLjNjLTAuMiwwLjItMC4yLDAuNS0wLjIsMS4xdjUuMWMwLDAuOCwwLjEsMS41LDAuMywyCgljMC40LDAuOSwxLjEsMS4zLDIuMSwxLjNjMS4xLDAsMS45LTAuNCwyLjMtMS4zYzAuMi0wLjUsMC4zLTEuMiwwLjMtMi4zdi00LjJjMC0wLjktMC4xLTEuNC0wLjMtMS42Yy0wLjItMC4yLTAuNS0wLjQtMS0wLjR2LTAuMwoJaDMuMnYwLjNjLTAuNSwwLjEtMC45LDAuMi0xLDAuNGMtMC4yLDAuMi0wLjIsMC44LTAuMiwxLjZ2NC4yYzAsMS4xLTAuMSwyLTAuNCwyLjZjLTAuNSwxLjEtMS42LDEuNy0zLjEsMS43Yy0xLjUsMC0yLjUtMC42LTMtMS43CgljLTAuMy0wLjYtMC40LTEuNC0wLjQtMi40di01YzAtMC42LTAuMS0xLTAuMi0xLjFjLTAuMi0wLjItMC41LTAuMy0xLTAuM3YtMC4zSDIwNy45eiIvPgo8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMjE0LDI4LjhoNy44bDAuMSwyLjdoLTAuM2MtMC4yLTAuOS0wLjQtMS40LTAuNi0xLjdjLTAuMi0wLjMtMC44LTAuNC0xLjYtMC40aC0wLjh2OC4yYzAsMC42LDAuMSwxLDAuMiwxLjEKCXMwLjUsMC4yLDEuMSwwLjN2MC4zaC00di0wLjNjMC42LTAuMSwwLjktMC4yLDEuMS0wLjNjMC4xLTAuMiwwLjItMC42LDAuMi0xLjN2LThoLTAuOGMtMC44LDAtMS4zLDAuMS0xLjYsMC40CgljLTAuMywwLjMtMC41LDAuOC0wLjYsMS43aC0wLjNMMjE0LDI4Ljh6Ii8+CjxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yMjYuMiwyOC44djAuM2MtMC41LDAtMC45LDAuMS0xLDAuM2MtMC4yLDAuMi0wLjIsMC41LTAuMiwxLjF2NS4xYzAsMC44LDAuMSwxLjUsMC4zLDIKCWMwLjQsMC45LDEuMSwxLjMsMi4xLDEuM2MxLjEsMCwxLjktMC40LDIuMy0xLjNjMC4yLTAuNSwwLjMtMS4yLDAuMy0yLjN2LTQuMmMwLTAuOS0wLjEtMS40LTAuMy0xLjZjLTAuMi0wLjItMC41LTAuNC0xLTAuNHYtMC4zCgloMy4ydjAuM2MtMC41LDAuMS0wLjksMC4yLTEsMC40Yy0wLjIsMC4yLTAuMiwwLjgtMC4yLDEuNnY0LjJjMCwxLjEtMC4xLDItMC40LDIuNmMtMC41LDEuMS0xLjYsMS43LTMuMSwxLjdjLTEuNSwwLTIuNS0wLjYtMy0xLjcKCWMtMC4zLTAuNi0wLjQtMS40LTAuNC0yLjR2LTVjMC0wLjYtMC4xLTEtMC4yLTEuMWMtMC4yLTAuMi0wLjUtMC4zLTEtMC4zdi0wLjNIMjI2LjJ6Ii8+CjxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yMzIuMiwzOS4xYzAuNS0wLjEsMC45LTAuMiwxLTAuNGMwLjEtMC4yLDAuMi0wLjYsMC4yLTEuM3YtNi45YzAtMC42LTAuMS0wLjktMC4yLTEuMWMtMC4xLTAuMi0wLjUtMC4zLTEtMC4zCgl2LTAuM2gzLjhjMC44LDAsMS41LDAuMSwyLDAuNGMxLDAuNCwxLjUsMS4zLDEuNSwyLjRjMCwwLjgtMC4yLDEuNC0wLjcsMS44Yy0wLjQsMC40LTEuMSwwLjctMS44LDAuOGwyLjgsNC4xCgljMC4yLDAuMiwwLjMsMC40LDAuNSwwLjVjMC4yLDAuMSwwLjQsMC4yLDAuNywwLjJ2MC4zaC0yLjJsLTMuNC00LjlsLTAuNiwwdjMuMmMwLDAuNiwwLjEsMSwwLjIsMS4xYzAuMiwwLjIsMC41LDAuMywxLDAuM3YwLjMKCWgtMy44VjM5LjF6IE0yMzYuOSwzMy42YzAuNy0wLjMsMS4xLTEsMS4xLTJjMC0wLjktMC4zLTEuNi0xLTEuOWMtMC4zLTAuMi0wLjgtMC4zLTEuNC0wLjNjLTAuNCwwLTAuNiwwLTAuNywwLjEKCWMtMC4xLDAuMS0wLjEsMC4yLTAuMSwwLjVWMzRDMjM1LjgsMzMuOSwyMzYuNSwzMy44LDIzNi45LDMzLjZ6Ii8+CjxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yNDEuNCwzOS4xYzAuNS0wLjEsMC44LTAuMiwxLTAuM2MwLjEtMC4xLDAuMi0wLjUsMC4yLTEuMXYtNy4xYzAtMC42LTAuMS0wLjktMC4yLTEuMWMtMC4xLTAuMi0wLjUtMC4zLTEtMC4zCgl2LTAuM2g3LjNsMCwyLjNoLTAuM2MtMC4xLTAuNy0wLjMtMS4yLTAuNS0xLjRjLTAuMi0wLjItMC44LTAuMy0xLjYtMC4zaC0xLjljLTAuMiwwLTAuMywwLTAuNCwwLjFjMCwwLjEtMC4xLDAuMi0wLjEsMC40djMuNmgyLjEKCWMwLjYsMCwxLTAuMSwxLjEtMC4zczAuMy0wLjYsMC40LTEuMmgwLjN2My43aC0wLjNjLTAuMS0wLjYtMC4yLTEtMC40LTEuMmMtMC4yLTAuMi0wLjUtMC4zLTEuMS0wLjNIMjQ0djRjMCwwLjMsMC4xLDAuNSwwLjMsMC42CgljMC4yLDAuMSwwLjcsMC4xLDEuNiwwLjFjMC45LDAsMS42LTAuMSwyLjEtMC40YzAuNC0wLjIsMC44LTAuOCwxLjItMS43aDAuNGwtMC42LDIuN2gtNy40VjM5LjF6Ii8+Cjwvc3ZnPgo='/></div>
-                <header class="header">
-                    <div class="header_left"><span>{{ myDatas[0][0].deli_post_code }}</span></div>
-                    <div class="title">納品書 <br/>{{ myDatas[0][0].delivery_date }} </div>
-                    <div class="delivery_no_right"><span>納品書№ </span> <span>{{ myDatas[0][0].delivery_no }}</span></div>
-                    <div class="clear-float"></div>
-                </header>
+            .col-barcode .jancode_inside .jancode_num .jancode_9_num {
+                margin-left: 0px;
+                font-size: 16px;
+                float: left;
+                margin-top: 2px;
+            }
 
-                <div class="shelf_title">
-                    <div class="header1_left">
-                    <div>{{ myDatas[0][0].deli_addr01 }}</div>
-                    <div>{{ myDatas[0][0].deli_addr02 }}</div>
-                    <div>{{ myDatas[0][0].deli_addr03 }}</div>
-                    <div>{{ myDatas[0][0].deli_company_name }}  御中</div>
-                    <div>{{ myDatas[0][0].deli_department_name }}</div>
-                </div>
-                    <div class="header1_right">
-                        <div class="text_right_header">
-                            <div style="font-size: 1.2em; font-weight: 700">株式会社XBRAID JAPAN</div>
-                            <div>〒550-0005</div>
-                            <div>大阪市西区西本町1-7-21 ニシモトビル303</div>
-                            <div>TEL:(050)-5526-8046&emsp;FAX:(050)-3385-5614</div>
-{#                        <div>{{ myDatas[0][0].postal_code }}</div>#}
-{#                        <div>{{ myDatas[0][0].addr01 }}</div>#}
-{#                        <div>{{ myDatas[0][0].addr02 }}</div>#}
-{#                        <div>{{ myDatas[0][0].addr03 }}</div>#}
-{#                        <div>{{ myDatas[0][0].company_name }}</div>#}
-{#                        <div>{{ myDatas[0][0].department }}</div>#}
+            .col-barcode .jancode_inside .jancode_num .jancode_4_num {
+                margin-right: 5px;
+                font-family: sans-serif;
+                float: right;
+                font-size: 27px;
+                font-weight: 600;
+            }
+
+
+            .plan_quantity {
+                font-family: Arial, Helvetica, sans-serif;
+                text-align: center;
+                min-width: 80px !important
+            }
+
+            .plan_quantity img {
+                height: 25px;
+            }
+
+            .shelf_no {
+                font-size: 20px;
+                text-align: center;
+                width: 110px;
+                line-height: 10px;
+            }
+
+            .column-1 {
+                font-size: 26px;
+                font-weight: bold;
+                width: 110px;
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            table tbody tr {
+                max-height: 60px !important;
+            }
+            .page_break {
+                page-break-before: always;
+            }
+            .header1_left{
+                position: absolute;
+                left: 0;
+            }
+            .header1_right{
+                position: absolute;
+                right: 0;
+            }
+            .text_right_header{
+                text-align: left;
+                width: 450px;
+                margin-top: 20px;
+                line-height: 1.5;
+            }
+            .top_table{
+                text-align: center;
+            }
+            .signbox .tr-content > td {
+                font-size: 14px;
+                border: 1px solid black;
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 4px 4px;
+            }
+            .signbox >table{
+                border-collapse: collapse;
+            }
+            .tblFooterLeft{ height: 159px;
+                width: 98.1591%;
+                border-color: black;
+                border-style: solid;
+                height: 159px;
+                border-width: 1px;
+            }
+            .footer1{
+                padding-top: 10px;
+            }
+
+            .pagebreak {
+                page-break-before: always;
+            }
+        </style>
+    </head>
+    <body style="margin: -25px 25px -5px 25px; margin-top: 0; margin-bottom: 25px;">
+        <div style="height: 1051.48445px;">
+            {% set page = 0 %}
+            {% for myData in myDatas %}
+                {% set page = page + 1 %}
+                <div class="pagebreak">
+                    <div style="padding-top: 5px"><img style="background: black;" src='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI2LjMuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IuODrOOCpOODpOODvF8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiCgkgeT0iMHB4IiB3aWR0aD0iMjcwcHgiIGhlaWdodD0iNDBweCIgdmlld0JveD0iMCAwIDI3MCA0MCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMjcwIDQwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+Cgkuc3Qwe2ZpbGw6I0ZGMDAwMDt9Cgkuc3Qxe2ZpbGw6I0ZGRkZGRjt9Cjwvc3R5bGU+Cjxwb2x5Z29uIGNsYXNzPSJzdDAiIHBvaW50cz0iMzAuOCwyIDUzLjQsMTcuNyAzMi40LDE3LjcgOS43LDIgIi8+Cjxwb2x5Z29uIGNsYXNzPSJzdDAiIHBvaW50cz0iNjkuNywyNC44IDk0LjMsMzkuOSA3MS41LDM5LjkgNDYuOSwyNC44ICIvPgo8cG9seWdvbiBjbGFzcz0ic3QwIiBwb2ludHM9IjU3LjgsMC4xIDAsMzkuOSAyNS4xLDM5LjkgNjgsMTAuNCA1Mi45LDEwLjQgNTQuOSw4LjkgNzAsOC45IDcxLjIsOC4xIDU2LjQsOC4xIDU4LjQsNi43IDczLjIsNi43IAoJNzQuNCw1LjkgNTkuNCw1LjkgNjEuNSw0LjUgNzYuNSw0LjUgNzcuNywzLjcgNjMsMy43IDY1LDIuMiA3OS43LDIuMiA4Mi44LDAuMSAiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTE5Ni4yLDE0LjlsNi44LDBsNy43LTkuNmwtNi44LDBsNC01bDIyLjcsMGwtNCw1bC02LjksMGwtNy43LDkuNmw2LjgsMGwtNCw1bC0yMi43LDBMMTk2LjIsMTQuOXoiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTI0NywyMGwtMzAuMSwwbDE1LjctMTkuNkwyNzAsMC40bC0xMi40LDE1LjVDMjUzLjIsMjAuMiwyNDcsMjAsMjQ3LDIweiBNMjUwLjYsMTMuMmw2LjItNy43bC0xOS4yLDBsLTcuNiw5LjUKCWwxNi42LDBDMjQ2LjcsMTUsMjQ5LjIsMTUsMjUwLjYsMTMuMnoiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTEyMC44LDExLjFjMi4zLTEwLjEtNy4xLTEwLjktNy4xLTEwLjlMOTAsMC4yTDYzLjksMjBsNDkuNSwwLjFjMC41LTAuNiwxLTEuNCwxLjMtMi4yCgljMC4zLTAuOCwwLjYtMS42LDAuNy0yLjRjMC4xLTAuOCwwLjItMS42LDAuMS0yLjNjMC0wLjgtMC4yLTEuNS0wLjQtMi4xTDEyMC44LDExLjEgTTg0LjQsMTQuOWwxMC45LTkuN2gxNC42YzAsMCwxLjIsMC4xLDEsMi43CgloLTE1bC00LjcsNC4yaDEzYzAsMCwxLjIsMC4xLDEsMi43TDg0LjQsMTQuOXoiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTE3NS43LDAuMWwzMC42LDBMMTkwLjUsMjBsLTkuMywwbDMuOS00LjhsLTE5LjQsMGwtMy45LDQuOGwtOS4zLDBsMTIuMy0xNS40QzE2NC44LDQuNSwxNjguMS0wLjIsMTc1LjcsMC4xegoJIE0xNjkuNywxMGwxOS40LDBsMy45LTQuOGwtMTYuMiwwQzE3Mi42LDUuMiwxNjkuNywxMCwxNjkuNywxMHoiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTE1Ny45LDEyLjVsLTMuOSwwYzAuMiwxLjIsMC4xLDIuNC0wLjIsMy44Yy0wLjMsMS40LTEsMi42LTEuOSwzLjhsLTEwLDBjMC44LTEuNiwxLjMtMi43LDEuNS0zLjUKCWMwLjMtMC44LDAuMy0xLjIsMC4zLTEuNWMtMC4yLTIuNS0yLjQtMi40LTIuNC0yLjRsLTExLjUsMGwzLjgtNC44aDE1LjNjMC4yLTIuNi0xLTIuNy0xLTIuN2gtMTQuM2wtMi4xLDIuN2wwLDBMMTIyLDIwbC05LjMsMAoJbDE1LjgtMTkuOGwyMy43LDBDMTUyLjIsMC4yLDE2MS43LDAuMywxNTcuOSwxMi41eiIvPgo8cGF0aCBjbGFzcz0ic3QxIiBkPSJNOTUuNiwzOS4xYzAuNiwwLDAuOS0wLjEsMS4xLTAuM2MwLjItMC4yLDAuMy0wLjUsMC4zLTEuMXYtNy4xYzAtMC42LTAuMS0xLTAuMy0xLjFjLTAuMi0wLjItMC41LTAuMy0xLjEtMC4zCgl2LTAuM2g0YzEuMSwwLDIuMSwwLjIsMi43LDAuNnMxLDEuMSwxLDIuMWMwLDAuOC0wLjIsMS4zLTAuNywxLjdjLTAuMywwLjItMC43LDAuNC0xLjIsMC42YzAuNywwLjIsMS4yLDAuNSwxLjcsMC45CgljMC41LDAuNCwwLjcsMSwwLjcsMS43YzAsMS4yLTAuNSwyLjEtMS42LDIuNmMtMC41LDAuMi0xLjIsMC40LTIsMC40aC00LjdWMzkuMXogTTEwMSwzMy4zYzAuNi0wLjMsMC45LTAuOSwwLjktMS43CgljMC0xLTAuMy0xLjYtMS0xLjljLTAuNC0wLjItMS0wLjMtMS44LTAuM2MtMC4zLDAtMC41LDAtMC42LDAuMWMtMC4xLDAuMS0wLjEsMC4yLTAuMSwwLjV2My42bDEuNCwwCglDMTAwLjMsMzMuNiwxMDAuNywzMy41LDEwMSwzMy4zeiBNMTAxLjUsMzguNGMwLjUtMC4zLDAuNy0wLjksMC43LTEuOGMwLTAuOS0wLjMtMS41LTAuOS0xLjhjLTAuNi0wLjMtMS4zLTAuNS0yLjItMC41CgljLTAuMiwwLTAuNCwwLTAuNCwwcy0wLjEsMC0wLjMsMHY0YzAsMC4zLDAuMSwwLjUsMC4yLDAuNWMwLjEsMC4xLDAuNSwwLjEsMSwwLjFDMTAwLjQsMzguOSwxMDEsMzguNywxMDEuNSwzOC40eiIvPgo8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMTA1LjEsMzkuMWMwLjUtMC4xLDAuOS0wLjIsMS0wLjRjMC4xLTAuMiwwLjItMC42LDAuMi0xLjN2LTYuOWMwLTAuNi0wLjEtMC45LTAuMi0xLjFjLTAuMS0wLjItMC41LTAuMy0xLTAuMwoJdi0wLjNoMy44YzAuOCwwLDEuNSwwLjEsMiwwLjRjMSwwLjQsMS41LDEuMywxLjUsMi40YzAsMC44LTAuMiwxLjQtMC43LDEuOGMtMC40LDAuNC0xLjEsMC43LTEuOCwwLjhsMi44LDQuMQoJYzAuMiwwLjIsMC4zLDAuNCwwLjUsMC41czAuNCwwLjIsMC43LDAuMnYwLjNoLTIuMmwtMy40LTQuOWwtMC42LDB2My4yYzAsMC42LDAuMSwxLDAuMiwxLjFjMC4yLDAuMiwwLjUsMC4zLDEsMC4zdjAuM2gtMy44VjM5LjF6CgkgTTEwOS44LDMzLjZjMC43LTAuMywxLjEtMSwxLjEtMmMwLTAuOS0wLjMtMS42LTEtMS45Yy0wLjMtMC4yLTAuOC0wLjMtMS40LTAuM2MtMC40LDAtMC42LDAtMC43LDAuMWMtMC4xLDAuMS0wLjEsMC4yLTAuMSwwLjVWMzQKCUMxMDguNywzMy45LDEwOS40LDMzLjgsMTA5LjgsMzMuNnoiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTExNC4zLDM5LjR2LTAuM2MwLjQsMCwwLjYtMC4yLDAuOC0wLjVjMC4yLTAuMywwLjUtMSwwLjktMi4ybDIuOS03LjloMC4zbDMuNCw5LjFjMC4yLDAuNiwwLjQsMSwwLjUsMS4xCgljMC4xLDAuMSwwLjQsMC4yLDAuNywwLjN2MC4zaC0zLjV2LTAuM2MwLjQsMCwwLjctMC4xLDAuOC0wLjJjMC4xLTAuMSwwLjItMC4yLDAuMi0wLjRjMC0wLjEsMC0wLjItMC4xLTAuNGMwLTAuMi0wLjEtMC40LTAuMi0wLjYKCWwtMC42LTEuNWgtMy42Yy0wLjQsMS0wLjYsMS43LTAuNiwxLjljLTAuMSwwLjItMC4xLDAuNC0wLjEsMC41YzAsMC4zLDAuMSwwLjUsMC4zLDAuNmMwLjEsMC4xLDAuMywwLjEsMC43LDAuMXYwLjNIMTE0LjN6CgkgTTEyMC4zLDM1LjNsLTEuNi00LjRsLTEuNiw0LjRIMTIwLjN6Ii8+CjxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xMjQuMywzOS4xYzAuNiwwLDAuOS0wLjEsMS4xLTAuM2MwLjItMC4xLDAuMi0wLjUsMC4yLTEuMXYtNy4xYzAtMC42LTAuMS0xLTAuMi0xLjFjLTAuMi0wLjItMC41LTAuMy0xLjEtMC4zCgl2LTAuM2g0LjF2MC4zYy0wLjYsMC0wLjksMC4xLTEuMSwwLjNjLTAuMiwwLjItMC4yLDAuNS0wLjIsMS4xdjcuMWMwLDAuNiwwLjEsMSwwLjIsMS4xYzAuMiwwLjEsMC41LDAuMiwxLjEsMC4zdjAuM2gtNC4xVjM5LjF6Ii8+CjxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xMjguOSwzOS4xYzAuNS0wLjEsMC44LTAuMiwxLTAuM2MwLjItMC4xLDAuMi0wLjUsMC4yLTEuMXYtNy4xYzAtMC42LTAuMS0xLTAuMi0xLjFjLTAuMS0wLjItMC41LTAuMy0xLTAuMwoJdi0wLjNoMy43YzEuMywwLDIuMywwLjIsMy4yLDAuN2MxLjYsMC45LDIuMywyLjQsMi4zLDQuNmMwLDAuOC0wLjEsMS42LTAuNCwyLjNjLTAuMywwLjctMC43LDEuMy0xLjMsMS44Yy0wLjQsMC4zLTAuNywwLjYtMS4xLDAuNwoJYy0wLjcsMC4zLTEuNiwwLjUtMi42LDAuNWgtMy44VjM5LjF6IE0xMzEuNiwzOC43YzAuMSwwLjEsMC4zLDAuMSwwLjcsMC4xYzEuMSwwLDItMC4yLDIuNy0wLjdjMS4xLTAuOCwxLjYtMi4xLDEuNi0zLjkKCWMwLTEuNi0wLjQtMi45LTEuMy0zLjdjLTAuOC0wLjctMS43LTEuMS0zLTEuMWMtMC4zLDAtMC41LDAtMC42LDAuMWMtMC4xLDAuMS0wLjIsMC4zLTAuMiwwLjV2OC4xCglDMTMxLjUsMzguNSwxMzEuNSwzOC42LDEzMS42LDM4Ljd6Ii8+CjxnPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTE0Mi4xLDI4LjhoNy41bDAuMSwyLjdoLTAuM2MtMC4yLTAuOS0wLjQtMS40LTAuNi0xLjdjLTAuMi0wLjMtMC43LTAuNC0xLjUtMC40aC0wLjd2OC4yCgkJYzAsMC42LDAuMSwxLDAuMiwxLjFzMC41LDAuMiwxLDAuM3YwLjNoLTMuOXYtMC4zYzAuNi0wLjEsMC45LTAuMiwxLTAuM2MwLjEtMC4yLDAuMi0wLjYsMC4yLTEuM3YtOGgtMC43Yy0wLjcsMC0xLjIsMC4xLTEuNSwwLjQKCQljLTAuMywwLjMtMC41LDAuOC0wLjYsMS43SDE0MkwxNDIuMSwyOC44eiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTE1MC4xLDM5LjFjMC41LTAuMSwwLjgtMC4yLDEtMC4zYzAuMS0wLjIsMC4yLTAuNiwwLjItMS4zdi02LjljMC0wLjYtMC4xLTAuOS0wLjItMS4xCgkJYy0wLjEtMC4yLTAuNS0wLjMtMC45LTAuM3YtMC4zaDMuN3YwLjNjLTAuNSwwLTAuOCwwLjEtMC45LDAuM2MtMC4xLDAuMi0wLjIsMC41LTAuMiwxLjF2My4xaDR2LTMuMWMwLTAuNi0wLjEtMC45LTAuMi0xLjEKCQljLTAuMS0wLjItMC41LTAuMy0xLTAuM3YtMC4zaDMuN3YwLjNjLTAuNSwwLTAuOCwwLjEtMC45LDAuM2MtMC4xLDAuMi0wLjIsMC41LTAuMiwxLjF2Ny4xYzAsMC42LDAuMSwxLDAuMiwxLjEKCQljMC4xLDAuMiwwLjUsMC4zLDAuOSwwLjN2MC4zaC0zLjd2LTAuM2MwLjUtMC4xLDAuOC0wLjIsMS0wLjNjMC4xLTAuMiwwLjItMC42LDAuMi0xLjN2LTMuMWgtNHYzLjNjMCwwLjYsMC4xLDEsMC4yLDEuMQoJCWMwLjEsMC4yLDAuNSwwLjMsMC45LDAuM3YwLjNoLTMuN1YzOS4xeiIvPgoJPHBhdGggY2xhc3M9InN0MSIgZD0iTTE1OS42LDM5LjFjMC41LTAuMSwwLjgtMC4yLDAuOS0wLjNjMC4xLTAuMSwwLjItMC41LDAuMi0xLjF2LTcuMWMwLTAuNi0wLjEtMC45LTAuMi0xLjEKCQljLTAuMS0wLjItMC41LTAuMy0xLTAuM3YtMC4zaDdsMCwyLjNoLTAuM2MtMC4xLTAuNy0wLjMtMS4yLTAuNS0xLjRzLTAuNy0wLjMtMS41LTAuM2gtMS44Yy0wLjIsMC0wLjMsMC0wLjQsMC4xCgkJYzAsMC4xLTAuMSwwLjItMC4xLDAuNHYzLjZoMmMwLjYsMCwwLjktMC4xLDEuMS0wLjNzMC4zLTAuNiwwLjQtMS4yaDAuM3YzLjdoLTAuM2MtMC4xLTAuNi0wLjItMS0wLjQtMS4yCgkJYy0wLjItMC4yLTAuNS0wLjMtMS4xLTAuM2gtMnY0YzAsMC4zLDAuMSwwLjUsMC4yLDAuNmMwLjIsMC4xLDAuNywwLjEsMS41LDAuMWMwLjksMCwxLjYtMC4xLDItMC40YzAuNC0wLjIsMC44LTAuOCwxLjItMS43aDAuNAoJCWwtMC42LDIuN2gtNy4yVjM5LjF6Ii8+CjwvZz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTE3MS4xLDM5LjJjMC45LDAsMS42LTAuMiwyLjEtMC4zYzAuNS0wLjIsMS40LTAuNywyLjktMS41bDUuMy0zLjFsLTMuOC0yLjZjLTEuNi0xLjEtMi44LTEuOC0zLjUtMi4xCgljLTAuNy0wLjMtMS42LTAuNC0yLjctMC40di0wLjNoMTAuNHYwLjNjLTEsMC0xLjYsMC0xLjksMC4xYy0wLjUsMC4xLTAuNywwLjItMC43LDAuNWMwLDAuMSwwLjEsMC4zLDAuMywwLjUKCWMwLjEsMC4xLDAuMywwLjIsMC41LDAuNGwzLjYsMi40bDMuOS0yLjJjMC42LTAuMywxLTAuNiwxLjItMC44YzAuMS0wLjEsMC4yLTAuMiwwLjItMC4zYzAtMC4yLTAuMi0wLjQtMC43LTAuNQoJYy0wLjMsMC0wLjgtMC4xLTEuNi0wLjF2LTAuM2g4LjJ2MC4zYy0wLjksMC0xLjYsMC4xLTIuMSwwLjJjLTAuOCwwLjItMS44LDAuNy0zLDEuM2wtNSwyLjlMMTkxLDM4YzAuNywwLjUsMS4zLDAuOCwxLjcsMC45CgljMC41LDAuMSwxLjEsMC4yLDIsMC4zdjAuM2gtMTAuMXYtMC4zYzEsMCwxLjctMC4xLDItMC4xYzAuNC0wLjEsMC42LTAuMiwwLjYtMC40YzAtMC4yLTAuMy0wLjUtMC44LTAuOHMtMS45LTEuNC00LjItM2wtNCwyLjQKCWMtMC42LDAuNC0xLDAuNi0xLjIsMC44Yy0wLjQsMC4zLTAuNSwwLjQtMC41LDAuNmMwLDAuMiwwLjMsMC40LDAuOSwwLjVjMC4zLDAuMSwwLjksMC4xLDEuOCwwLjF2MC4zaC03LjlWMzkuMnoiLz4KPHBhdGggY2xhc3M9InN0MSIgZD0iTTE5Ni4zLDM5LjFjMC41LTAuMSwwLjktMC4yLDEtMC4zYzAuMS0wLjIsMC4yLTAuNiwwLjItMS4zdi02LjljMC0wLjYtMC4xLTAuOS0wLjItMS4xYy0wLjEtMC4yLTAuNS0wLjMtMS0wLjMKCXYtMC4zaDcuM2wwLDIuM2gtMC40Yy0wLjEtMC43LTAuMy0xLjItMC41LTEuNGMtMC4zLTAuMi0wLjgtMC4zLTEuNS0wLjNoLTEuOWMtMC4yLDAtMC4zLDAtMC40LDAuMWMtMC4xLDAuMS0wLjEsMC4yLTAuMSwwLjR2My42aDIKCWMwLjYsMCwxLTAuMSwxLjEtMC4zYzAuMi0wLjIsMC4zLTAuNiwwLjQtMS4yaDAuM3YzLjdoLTAuM2MtMC4xLTAuNi0wLjItMS0wLjQtMS4yYy0wLjItMC4yLTAuNS0wLjMtMS4xLTAuM2gtMnYzLjUKCWMwLDAuNiwwLjEsMSwwLjIsMS4xYzAuMiwwLjIsMC41LDAuMywxLDAuM3YwLjNoLTMuOVYzOS4xeiIvPgo8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMjA3LjksMjguOHYwLjNjLTAuNSwwLTAuOSwwLjEtMSwwLjNjLTAuMiwwLjItMC4yLDAuNS0wLjIsMS4xdjUuMWMwLDAuOCwwLjEsMS41LDAuMywyCgljMC40LDAuOSwxLjEsMS4zLDIuMSwxLjNjMS4xLDAsMS45LTAuNCwyLjMtMS4zYzAuMi0wLjUsMC4zLTEuMiwwLjMtMi4zdi00LjJjMC0wLjktMC4xLTEuNC0wLjMtMS42Yy0wLjItMC4yLTAuNS0wLjQtMS0wLjR2LTAuMwoJaDMuMnYwLjNjLTAuNSwwLjEtMC45LDAuMi0xLDAuNGMtMC4yLDAuMi0wLjIsMC44LTAuMiwxLjZ2NC4yYzAsMS4xLTAuMSwyLTAuNCwyLjZjLTAuNSwxLjEtMS42LDEuNy0zLjEsMS43Yy0xLjUsMC0yLjUtMC42LTMtMS43CgljLTAuMy0wLjYtMC40LTEuNC0wLjQtMi40di01YzAtMC42LTAuMS0xLTAuMi0xLjFjLTAuMi0wLjItMC41LTAuMy0xLTAuM3YtMC4zSDIwNy45eiIvPgo8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMjE0LDI4LjhoNy44bDAuMSwyLjdoLTAuM2MtMC4yLTAuOS0wLjQtMS40LTAuNi0xLjdjLTAuMi0wLjMtMC44LTAuNC0xLjYtMC40aC0wLjh2OC4yYzAsMC42LDAuMSwxLDAuMiwxLjEKCXMwLjUsMC4yLDEuMSwwLjN2MC4zaC00di0wLjNjMC42LTAuMSwwLjktMC4yLDEuMS0wLjNjMC4xLTAuMiwwLjItMC42LDAuMi0xLjN2LThoLTAuOGMtMC44LDAtMS4zLDAuMS0xLjYsMC40CgljLTAuMywwLjMtMC41LDAuOC0wLjYsMS43aC0wLjNMMjE0LDI4Ljh6Ii8+CjxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yMjYuMiwyOC44djAuM2MtMC41LDAtMC45LDAuMS0xLDAuM2MtMC4yLDAuMi0wLjIsMC41LTAuMiwxLjF2NS4xYzAsMC44LDAuMSwxLjUsMC4zLDIKCWMwLjQsMC45LDEuMSwxLjMsMi4xLDEuM2MxLjEsMCwxLjktMC40LDIuMy0xLjNjMC4yLTAuNSwwLjMtMS4yLDAuMy0yLjN2LTQuMmMwLTAuOS0wLjEtMS40LTAuMy0xLjZjLTAuMi0wLjItMC41LTAuNC0xLTAuNHYtMC4zCgloMy4ydjAuM2MtMC41LDAuMS0wLjksMC4yLTEsMC40Yy0wLjIsMC4yLTAuMiwwLjgtMC4yLDEuNnY0LjJjMCwxLjEtMC4xLDItMC40LDIuNmMtMC41LDEuMS0xLjYsMS43LTMuMSwxLjdjLTEuNSwwLTIuNS0wLjYtMy0xLjcKCWMtMC4zLTAuNi0wLjQtMS40LTAuNC0yLjR2LTVjMC0wLjYtMC4xLTEtMC4yLTEuMWMtMC4yLTAuMi0wLjUtMC4zLTEtMC4zdi0wLjNIMjI2LjJ6Ii8+CjxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yMzIuMiwzOS4xYzAuNS0wLjEsMC45LTAuMiwxLTAuNGMwLjEtMC4yLDAuMi0wLjYsMC4yLTEuM3YtNi45YzAtMC42LTAuMS0wLjktMC4yLTEuMWMtMC4xLTAuMi0wLjUtMC4zLTEtMC4zCgl2LTAuM2gzLjhjMC44LDAsMS41LDAuMSwyLDAuNGMxLDAuNCwxLjUsMS4zLDEuNSwyLjRjMCwwLjgtMC4yLDEuNC0wLjcsMS44Yy0wLjQsMC40LTEuMSwwLjctMS44LDAuOGwyLjgsNC4xCgljMC4yLDAuMiwwLjMsMC40LDAuNSwwLjVjMC4yLDAuMSwwLjQsMC4yLDAuNywwLjJ2MC4zaC0yLjJsLTMuNC00LjlsLTAuNiwwdjMuMmMwLDAuNiwwLjEsMSwwLjIsMS4xYzAuMiwwLjIsMC41LDAuMywxLDAuM3YwLjMKCWgtMy44VjM5LjF6IE0yMzYuOSwzMy42YzAuNy0wLjMsMS4xLTEsMS4xLTJjMC0wLjktMC4zLTEuNi0xLTEuOWMtMC4zLTAuMi0wLjgtMC4zLTEuNC0wLjNjLTAuNCwwLTAuNiwwLTAuNywwLjEKCWMtMC4xLDAuMS0wLjEsMC4yLTAuMSwwLjVWMzRDMjM1LjgsMzMuOSwyMzYuNSwzMy44LDIzNi45LDMzLjZ6Ii8+CjxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yNDEuNCwzOS4xYzAuNS0wLjEsMC44LTAuMiwxLTAuM2MwLjEtMC4xLDAuMi0wLjUsMC4yLTEuMXYtNy4xYzAtMC42LTAuMS0wLjktMC4yLTEuMWMtMC4xLTAuMi0wLjUtMC4zLTEtMC4zCgl2LTAuM2g3LjNsMCwyLjNoLTAuM2MtMC4xLTAuNy0wLjMtMS4yLTAuNS0xLjRjLTAuMi0wLjItMC44LTAuMy0xLjYtMC4zaC0xLjljLTAuMiwwLTAuMywwLTAuNCwwLjFjMCwwLjEtMC4xLDAuMi0wLjEsMC40djMuNmgyLjEKCWMwLjYsMCwxLTAuMSwxLjEtMC4zczAuMy0wLjYsMC40LTEuMmgwLjN2My43aC0wLjNjLTAuMS0wLjYtMC4yLTEtMC40LTEuMmMtMC4yLTAuMi0wLjUtMC4zLTEuMS0wLjNIMjQ0djRjMCwwLjMsMC4xLDAuNSwwLjMsMC42CgljMC4yLDAuMSwwLjcsMC4xLDEuNiwwLjFjMC45LDAsMS42LTAuMSwyLjEtMC40YzAuNC0wLjIsMC44LTAuOCwxLjItMS43aDAuNGwtMC42LDIuN2gtNy40VjM5LjF6Ii8+Cjwvc3ZnPgo='/></div>
+                    <header class="header">
+                        <div class="header_left"><span>{{ myDatas[0][0].deli_post_code }}</span></div>
+                        <div class="title">納品書 <br/>{{ myDatas[0][0].delivery_date }} </div>
+                        <div class="delivery_no_right"><span>納品書№ </span> <span>{{ myDatas[0][0].delivery_no }}</span></div>
+                        <div class="clear-float"></div>
+                    </header>
+
+                    <div class="shelf_title">
+                        <div class="header1_left">
+                        <div>{{ myDatas[0][0].deli_addr01 }}</div>
+                        <div>{{ myDatas[0][0].deli_addr02 }}</div>
+                        <div>{{ myDatas[0][0].deli_addr03 }}</div>
+                        <div>{{ myDatas[0][0].deli_company_name }}  御中</div>
+                        <div>{{ myDatas[0][0].deli_department_name }}</div>
+                    </div>
+                        <div class="header1_right">
+                            <div class="text_right_header">
+                                <div style="font-size: 1.2em; font-weight: 700">株式会社XBRAID JAPAN</div>
+                                <div>〒550-0005</div>
+                                <div>大阪市西区西本町1-7-21 ニシモトビル303</div>
+                                <div>TEL:(050)-5526-8046&emsp;FAX:(050)-3385-5614</div>
+    {#                        <div>{{ myDatas[0][0].postal_code }}</div>#}
+    {#                        <div>{{ myDatas[0][0].addr01 }}</div>#}
+    {#                        <div>{{ myDatas[0][0].addr02 }}</div>#}
+    {#                        <div>{{ myDatas[0][0].addr03 }}</div>#}
+    {#                        <div>{{ myDatas[0][0].company_name }}</div>#}
+    {#                        <div>{{ myDatas[0][0].department }}</div>#}
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="top_table">以下の通りに納品申し上げます。</div>
-                <div class="product-info">
-                    <table style="width: 100%;">
-                        <tr class="tr-header" style="">
-                            <td style="text-align: right;">
-                                No.
-                            </td>
-                            <td class="" style="" >
-                               売上
-                            </td>
-                            <td class="" style="">JAN コード<br />商品名</td>
-                            <td class="" title="soluong" style="text-align: right;">数量</td>
-                            <td class="" style="">単位</td>
-                            <td class="" title="dongia" style="text-align: right;">単価</td>
-                            <td class="" title="thanhtien" style="text-align: right;">金額</td>
-                            <td class=""  title="order_orderlineo" style="">注文番号<br/>出荷指示№</td>
-                            <td style="" title="item_remark" >備考</td>
-                        </tr>
+                    <div class="top_table">以下の通りに納品申し上げます。</div>
+                    <div class="product-info">
+                        <table style="width: 100%;">
+                            <tr class="tr-header" style="">
+                                <td style="text-align: right;">
+                                    No.
+                                </td>
+                                <td class="" style="" >
+                                   売上
+                                </td>
+                                <td class="" style="">JAN コード<br />商品名</td>
+                                <td class="" title="soluong" style="text-align: right;">数量</td>
+                                <td class="" style="">単位</td>
+                                <td class="" title="dongia" style="text-align: right;">単価</td>
+                                <td class="" title="thanhtien" style="text-align: right;">金額</td>
+                                <td class=""  title="order_orderlineo" style="">注文番号<br/>出荷指示№</td>
+                                <td style="" title="item_remark" >備考</td>
+                            </tr>
 
-                        {% for deli in myData %}
-                            {% if deli.is_total == 0 %}
-                                <tr class="tr-content">
-                                    <td style="text-align: right;">
-                                        {{ deli.autoIncr }}
-                                    </td>
-                                    <td class="" style="" >
-                                        {{ deli.sale_type }}
-                                    </td>
-                                    <td class="" style="">{{ deli.item_no }}<br />{{ deli.item_name }}</td>
-                                    <td class="" title="quantity" style="text-align: right;">{{ deli.quanlity }}</td>
-                                    <td class="" style="">{{ deli.unit }}</td>
-                                    <td class="" title="price" style="text-align: right;">{{ roundPrice(deli.unit_price) }}</td>
-                                    <td class="" title="amount" style="text-align: right;">{{ roundPrice(deli.amount) }}</td>
-                                    <td class=""  title="order_orderlineo" style="">{{ deli.order_no }}<br/>{{ deli.shipping_no }}</td>
-                                    <td style="" title="item_remark" >{{ deli.item_remark }}</td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
-                    </table>
-                </div>
-
-                {% if page < myDatas|length %}
-                    <br/>
-                    <span style="float: right">page 1</span>
-                {% endif %}
-            </div>
-        {% endfor %}
-
-        <div class="footer1">
-            <table style=" height: 159px;">
-                <tbody>
-                    <tr class="tr-content">
-                        <td style="width: 1200px;">
-
-                            <table style=" " class="tblFooterLeft">
-                                <tbody>
-
-                                <tr class="tr-content">
-                                    <td style="width: 32.0866%;"></td>
-                                    <td style="width: 29.3307%;"> 小計：</td>
-                                    <td style="width: 21.6535%;text-align: right" >{{ roundPriceZeroTotal(OrderTotal) }}円</td>
-                                </tr>
-
-                                <tr class="tr-content">
-                                    <td style="width: 32.0866%;"></td>
-                                    <td style="width: 29.3307%;"> 消費税金額：</td>
-                                    <td style="width: 21.6535%;text-align: right" >{{ roundPriceZeroTax(totalTaxRe) }}円</td>
-                                </tr>
-
-                                <tr class="tr-content">
-                                    <td style="width: 32.0866%;"></td>
-                                    <td style="width: 29.3307%;">合計金額:</td>
-                                    <td style="width: 21.6535%;text-align: right" >{{ roundPriceZeroTotalAll(totalaAmountTax) }}円</td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 32.0866%;" colspan="3">備考: {{ myDatas[0][0].footer_remark1}} </td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 32.0866%;">出荷先: {{ myDatas[0][0].shiping_code }}</td>
-                                    <td style="width: 29.3307%;">届け先: {{ myDatas[0][0].otodoke_code }}</td>
-                                    <td style="width: 21.6535%;">&nbsp;</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                        <td style="width: 400px;    vertical-align: bottom;">
-                            <div class="signbox">
-                                <table style=" height: 80px;">
-                                    <tbody>
+                            {% for deli in myData %}
+                                {% if deli.is_total == 0 %}
                                     <tr class="tr-content">
-                                        <td style="width: 100px;"></td>
-                                        <td style="width: 100px;"></td>
-                                        <td style="width:100px;"></td>
-                                        <td style="width: 100px;"></td>
+                                        <td style="text-align: right;">
+                                            {{ deli.autoIncr }}
+                                        </td>
+                                        <td class="" style="" >
+                                            {{ deli.sale_type }}
+                                        </td>
+                                        <td class="" style="">{{ deli.item_no }}<br />{{ deli.item_name }}</td>
+                                        <td class="" title="quantity" style="text-align: right;">{{ deli.quanlity }}</td>
+                                        <td class="" style="">{{ deli.unit }}</td>
+                                        <td class="" title="price" style="text-align: right;">{{ roundPrice(deli.unit_price) }}</td>
+                                        <td class="" title="amount" style="text-align: right;">{{ roundPrice(deli.amount) }}</td>
+                                        <td class=""  title="order_orderlineo" style="">{{ deli.order_no }}<br/>{{ deli.shipping_no }}</td>
+                                        <td style="" title="item_remark" >{{ deli.item_remark }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </table>
+                    </div>
+
+                    {% if page < myDatas|length %}
+                        <br/>
+                        <span style="float: right">page 1</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="footer1">
+                <table style=" height: 159px;">
+                    <tbody>
+                        <tr class="tr-content">
+                            <td style="width: 1200px;">
+
+                                <table style=" " class="tblFooterLeft">
+                                    <tbody>
+
+                                    <tr class="tr-content">
+                                        <td style="width: 32.0866%;"></td>
+                                        <td style="width: 29.3307%;"> 小計：</td>
+                                        <td style="width: 21.6535%;text-align: right" >{{ roundPriceZeroTotal(OrderTotal) }}</td>
+                                    </tr>
+
+                                    <tr class="tr-content">
+                                        <td style="width: 32.0866%;"></td>
+                                        <td style="width: 29.3307%;"> 消費税金額：</td>
+                                        <td style="width: 21.6535%;text-align: right" >{{ roundPriceZeroTax(totalTaxRe) }}</td>
+                                    </tr>
+
+                                    <tr class="tr-content">
+                                        <td style="width: 32.0866%;"></td>
+                                        <td style="width: 29.3307%;">合計金額:</td>
+                                        <td style="width: 21.6535%;text-align: right" >{{ roundPriceZeroTotalAll(totalaAmountTax) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 32.0866%;" colspan="3">備考: {{ myDatas[0][0].footer_remark1}} </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 32.0866%;">出荷先: {{ myDatas[0][0].shiping_code }}</td>
+                                        <td style="width: 29.3307%;">届け先: {{ myDatas[0][0].otodoke_code }}</td>
+                                        <td style="width: 21.6535%;">&nbsp;</td>
                                     </tr>
                                     </tbody>
                                 </table>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                            </td>
+                            <td style="width: 400px;    vertical-align: bottom;">
+                                <div class="signbox">
+                                    <table style=" height: 80px;">
+                                        <tbody>
+                                        <tr class="tr-content">
+                                            <td style="width: 100px;"></td>
+                                            <td style="width: 100px;"></td>
+                                            <td style="width:100px;"></td>
+                                            <td style="width: 100px;"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {% if myDatas|length > 1 %}
+                <br/>
+                <span style="float: right">page {{ myDatas|length }}</span>
+            {% endif %}
         </div>
-
-        {% if myDatas|length > 1 %}
-            <br/>
-            <span style="float: right">page {{ myDatas|length }}</span>
-        {% endif %}
-    </div>
-</body>
-
+    </body>
 </html>
 
