@@ -30,3 +30,19 @@ deploy_staging:
     - git pull origin
   only:
     - staging
+deploy_production:
+  tags:
+    - production
+  before_script:
+    - whoami > /var/tmp/ygk-production.txt
+    - eval $(ssh-agent -s)
+    - ssh-add /home/ec2-user/.ssh/id_rsa
+    - cd /var/www/html/production
+  environment:
+    name: production
+  when: manual
+  script:
+    - git checkout .
+    - git pull origin
+  only:
+    - production
