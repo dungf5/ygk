@@ -217,6 +217,7 @@ class OrderItemRepository extends AbstractRepository
         }
 
         $qb->addGroupBy('delivery.delivery_no');
+        $qb->addGroupBy('shipping.order_no');
 
         $qb->addOrderBy('shipping.shipping_date', 'DESC');
 
