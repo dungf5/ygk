@@ -951,6 +951,21 @@ class MyShoppingController extends AbstractShoppingController
                     $newOrder                           = null;
                     $customer_id                        = $this->globalService->customerId();
                     $customer                           = $commonService->getMstCustomer($customer_id);
+
+                    /* Get infomation for case Supper user*/
+                    $root_customer_id                   = $this->getUser()->getId();
+                    $customer2                          = $commonService->getMstCustomer($root_customer_id);
+                    $emailcc                            = "";
+
+                    if (
+                        !empty($customer2['customer_email']) &&
+                        !empty($customer['customer_email']) &&
+                        $customer2['customer_email'] != $customer['customer_email']
+                    ) {
+                        $emailcc                        = $customer2['customer_email'];
+                    }
+                    /* End */
+
                     $newOrder['name']                   = $customer['name01'] ?? "";
                     $newOrder['subtotal']               = $Order['subtotal'];
                     $newOrder['charge']                 = $Order['charge'];
@@ -967,6 +982,7 @@ class MyShoppingController extends AbstractShoppingController
                     $newOrder['addr03']                 = $customer['addr03'] ?? "";
                     $newOrder['phone_number']           = $customer['phone_number'] ?? "";
                     $newOrder['email']                  = $customer['customer_email'] ?? "";
+                    $newOrder['emailcc']                = $emailcc;
                     $goods                              = $commonService->getMstProductsOrderCustomer($order_id);
                     $newOrder['ProductOrderItems']      = $goods;
                     $newOrder['tax']                    = $newOrder['subtotal'] / $newOrder['rate'];
