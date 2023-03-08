@@ -20,6 +20,8 @@ file that was distributed with this source code.
     }
 
     var interval    = 5000;
+    var increment   = 1;
+
     $(document).ready(function () {
         setInterval(function () {
             $.ajax({
@@ -28,12 +30,11 @@ file that was distributed with this source code.
                 data: {},
                 dataType: 'json'
             })
-            .done(function(data) {})
-            .always(function(data) {
-               interval = interval + 10000;
-            });
+            .done(function(data) {});
 
-        }, interval)
+            increment++;
+
+        }, interval * increment)
     })
 </script>
 {% endblock javascript %}
