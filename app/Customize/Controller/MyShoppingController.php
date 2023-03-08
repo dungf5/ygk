@@ -769,52 +769,6 @@ class MyShoppingController extends AbstractShoppingController
     }
 
     /**
-     * 購入完了画面を表示する.
-     *
-     * @Route("/shopping/complete", name="shopping_complete", methods={"GET"})
-     * @Template("Shopping/complete.twig")
-     */
-    public function complete(Request $request)
-    {
-        log_info('[注文完了] 注文完了画面を表示します.');
-
-        // 受注IDを取得
-        $orderId                = $this->session->get(OrderHelper::SESSION_ORDER_ID);
-
-        if (empty($orderId)) {
-            log_info('[注文完了] 受注IDを取得できないため, トップページへ遷移します.');
-
-            return $this->redirectToRoute('homepage');
-        }
-
-        $Order                  = $this->orderRepository->find($orderId);
-        $event                  = new EventArgs(
-            [
-                'Order'         => $Order,
-            ],
-            $request
-        );
-
-        $this->eventDispatcher->dispatch(EccubeEvents::FRONT_SHOPPING_COMPLETE_INITIALIZE, $event);
-
-        if ($event->getResponse() !== null) {
-            return $event->getResponse();
-        }
-
-        log_info('[注文完了] 購入フローのセッションをクリアします. ');
-        $this->orderHelper->removeSession();
-
-        $hasNextCart            = !empty($this->cartService->getCarts());
-
-        log_info('[注文完了] 注文完了画面を表示しました. ', [$hasNextCart]);
-
-        return [
-            'Order'             => $Order,
-            'hasNextCart'       => $hasNextCart,
-        ];
-    }
-
-    /**
      * PaymentMethod::applyを実行する.
      *
      * @param PaymentMethodInterface $paymentMethod
@@ -969,6 +923,71 @@ class MyShoppingController extends AbstractShoppingController
 
         } catch (\Exception $e) {
             return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * Send mail order.
+     *
+     * @Route("/shopping/send-mail", name="shopping_send_mail", methods={"POST"})
+     */
+    public function sendMailOrder (Request $request)
+    {
+        try {
+            if ('POST' === $request->getMethod()) {
+                $customer_id            = $this->globalService->customerId();
+
+                if (!empty($_SESSION["usc_" . $customer_id]) && !empty($_SESSION["usc_" . $customer_id]['send_mail'])) {
+                    $pre_order_id       = $_SESSION["usc_" . $customer_id]['send_mail']['pre_order_id'] ?? "";
+                    $order_id           = $_SESSION["usc_" . $customer_id]['send_mail']['order_id'] ?? "";
+
+                    if (empty($pre_order_id) || empty($order_id)) return;
+
+                    $commonService      = new MyCommonService($this->entityManager);
+                    $Order              = $this->orderHelper->getPurchaseCompletedOrder($pre_order_id);
+
+                    log_info('[注文処理] 注文メールの送信を行います.', [$order_id]);
+
+                    $newOrder                           = null;
+                    $customer_id                        = $this->globalService->customerId();
+                    $customer                           = $commonService->getMstCustomer($customer_id);
+                    $newOrder['name']                   = $customer['name01'] ?? "";
+                    $newOrder['subtotal']               = $Order['subtotal'];
+                    $newOrder['charge']                 = $Order['charge'];
+                    $newOrder['discount']               = $Order['discount'];
+                    $newOrder['delivery_fee_total']     = $Order['delivery_fee_total'];
+                    $newOrder['tax']                    = $Order['tax'];
+                    $newOrder['total']                  = $Order['total'];
+                    $newOrder['payment_total']          = $Order['payment_total'];
+                    $newOrder['rate']                   = $commonService->getTaxInfo()['tax_rate'];
+                    $newOrder['company_name']           = $customer['company_name'] ?? "";
+                    $newOrder['postal_code']            = $customer['postal_code'] ?? "";
+                    $newOrder['addr01']                 = $customer['addr01'] ?? "";
+                    $newOrder['addr02']                 = $customer['addr02'] ?? "";
+                    $newOrder['addr03']                 = $customer['addr03'] ?? "";
+                    $newOrder['phone_number']           = $customer['phone_number'] ?? "";
+                    $newOrder['email']                  = $customer['customer_email'] ?? "";
+                    $goods                              = $commonService->getMstProductsOrderCustomer($order_id);
+                    $newOrder['ProductOrderItems']      = $goods;
+                    $newOrder['tax']                    = $newOrder['subtotal'] / $newOrder['rate'];
+                    $shipping                           = $commonService->getMoreOrderCustomer($pre_order_id);
+                    $newOrder['Shipping']               = $shipping;
+
+                    $Order->setName01($customer['name01']);
+                    $Order->setCompanyName( $customer['company_name']);
+                    $this->mailService->sendOrderMail($newOrder, $Order);
+                    $this->entityManager->flush();
+
+                    $_SESSION["usc_" . $customer_id]['send_mail'] = null;
+
+                    return $this->json(['status' => 1, 'msg' => "OK"], 200);
+                }
+            }
+
+            return $this->json(['status' => 1, 'msg' => ""], 200);
+
+        } catch (\Exception $e) {
+            return $this->json(['status' => 0, 'msg' => $e->getMessage()], 400);
         }
     }
 }
