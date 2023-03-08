@@ -19,10 +19,18 @@ file that was distributed with this source code.
         window.location.href='/';
     }
 
-    var interval    = 5000;
-    var increment   = 1;
-
     $(document).ready(function () {
+        setTimeout(function () {
+            $.ajax({
+                url: "{{ url('shopping_send_mail') }}",
+                type: 'POST',
+                data: {},
+                dataType: 'json'
+            })
+            .done(function(data) {});
+
+        }, 3000)
+
         setInterval(function () {
             $.ajax({
                 url: "{{ url('shopping_send_mail') }}",
@@ -32,9 +40,7 @@ file that was distributed with this source code.
             })
             .done(function(data) {});
 
-            increment++;
-
-        }, interval * increment)
+        }, 20000)
     })
 </script>
 {% endblock javascript %}
