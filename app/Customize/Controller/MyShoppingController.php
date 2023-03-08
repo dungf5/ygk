@@ -702,7 +702,7 @@ class MyShoppingController extends AbstractShoppingController
                             'remarks2'              => $remarks2,
                             'remarks3'              => $remarks3,
                             'remarks4'              => $remarks4,
-                            'location'              => !empty($location) ? $location : "XB0101001",
+                            'location'              => !empty($location) ? $location : "XB0201001",
                             ];
                     }
                 }
