@@ -1417,7 +1417,7 @@ a { color: #07c; }
 .topNewitem .ec-newItemRole .ec-newItemRole__listItemTitle {
   font-size: 100%;
   font-weight: 700;
-  word-break: break-all;
+  word-break: break-word;
   margin: 1em 0 0;
 }
 .topNewitem .ec-newItemRole .ec-newItemRole__listItemPrice {
