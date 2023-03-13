@@ -9,7 +9,9 @@
             <div class="ec-newItemRole__list">
                 <div>
                     <a href="/products/list?category_id=84" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
-                        <img src="/html/upload/save_image/UPGLEADERV12.jpg">
+                        <div class="item-image">
+                            <img src="/html/upload/save_image/UPGLEADERV12.jpg">
+                        </div>
                         <p class="ec-newItemRole__listItemTitle">
                             <span style="font-size:68.75%;">エックスブレイド アップジーリーダーV12ハード</span><br>
                             X-BRAID UP-G LEADER V12 HARD
@@ -22,7 +24,9 @@
 
                 <div>
                     <a href="/products/list?category_id=135" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
-                        <img src="/html/upload/save_image/D-PET.jpg">
+                        <div class="item-image">
+                            <img src="/html/upload/save_image/D-PET.jpg">
+                        </div>
                         <p class="ec-newItemRole__listItemTitle">
                             <span style="font-size:68.75%;">ｴｯｸｽﾌﾞﾚｲﾄﾞ ﾃﾞｨｰﾍﾟｯﾄ ｱｼﾞﾝｸ</span><br>
                             X-BRAID D-PET AJING
@@ -35,7 +39,9 @@
 
                 <div>
                     <a href="/products/list?category_id=136" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
-                        <img src="/html/upload/save_image/s-pet1.jpg">
+                        <div class="item-image">
+                            <img src="/html/upload/save_image/s-pet1.jpg">
+                        </div>
                         <p class="ec-newItemRole__listItemTitle">
                             <span style="font-size:68.75%;">ｴｯｸｽﾌﾞﾚｲﾄﾞ ｴｽﾍﾟｯﾄ ｱｼﾞﾝｸﾞ</span><br>
                             X-BRAID S-PET AJING
@@ -48,7 +54,9 @@
 
                 <div>
                     <a href="/products/list?category_id=132" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
-                        <img src="/html/upload/save_image/DPETAREA.jpg">
+                        <div class="item-image">
+                            <img src="/html/upload/save_image/DPETAREA.jpg">
+                        </div>
                         <p class="ec-newItemRole__listItemTitle">
                             <span style="font-size:68.75%;">ｴｯｸｽﾌﾞﾚｲﾄﾞ ﾃﾞｨｰﾍﾟｯﾄ ｴﾘｱ</span><br>
                             X-BRAID D-PET AREA
@@ -61,7 +69,9 @@
 
                 <div>
                     <a href="/products/list?category_id=133" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
-                        <img src="/html/upload/save_image/SP-1.jpg">
+                        <div class="item-image">
+                            <img src="/html/upload/save_image/SP-1.jpg">
+                        </div>
                         <p class="ec-newItemRole__listItemTitle">
                             <span style="font-size:68.75%;">ｴｯｸｽﾌﾞﾚｲﾄﾞ ｴｽﾍﾟｯﾄ ｴﾘｱ</span><br>
                             X-BRAID S-PET AREA
@@ -74,7 +84,9 @@
 
                 <div>
                     <a href="/products/list?category_id=134" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
-                        <img src="/html/upload/save_image/hfa.jpg">
+                        <div class="item-image">
+                            <img src="/html/upload/save_image/hfa.jpg">
+                        </div>
                         <p class="ec-newItemRole__listItemTitle">
                             <span style="font-size:68.75%;">ｴｯｸｽﾌﾞﾚｲﾄﾞ ﾊｲｴﾝﾄﾞﾌﾙｵﾛ ｴﾘｱ v12</span><br>
                             X-BRAID HIGHENDFLUORO AREA
@@ -93,7 +105,7 @@
     .ec-newItemRole .ec-newItemRole__list a {
         width: 100%;
     }
-    .ec-newItemRole .ec-newItemRole__list img {
+    .ec-newItemRole .ec-newItemRole__list .item-image {
         margin: auto;
         height: 70%;
         width: 90%;
