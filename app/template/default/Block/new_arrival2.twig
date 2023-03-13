@@ -5,76 +5,110 @@
             <span>新商品</span>
         </div>
 
-        <script>
-            $(function() {
-                $('.ec-newItemRole__list').slick({
-                    slidesToShow: 3,
-                    slidesToScroll: 1,
-                    adaptiveHeight: true,
-                    swipeToSlide: true,
-                    dots: true,
-                    arrows: true,
-                    responsive: [{
-                        breakpoint: 1280,
-                        settings: {
-                            slidesToShow: 2,
-                            slidesToScroll: 1,
-                        }
-                    },{
-                        breakpoint: 640,
-                        settings: {
-                            slidesToShow: 1,
-                            slidesToScroll: 1,
-                        }
-                    }]
-                });
-            });
-        </script>
-<!---
         <div class="ec-newItemRole">
             <div class="ec-newItemRole__list">
-                                            <div class="ec-newItemRole__listItem1">
-                            <a href="https://staging-ecuoya.xbraid.net/products/detail/133872" >
-                                <img src="https://ecuoya.xbraid.net/html/upload/save_image/UPGLEADERV12.jpg">
-                                <p class="ec-newItemRole__listItemTitle">特注 ｽｸﾗﾑ16  20号</p>
-                                <span class="btn01" style="margin: 1em auto 0;"><i class="fas fa-angle-double-right"></i>and more</span>
-                            </a>
-                        </div>
---->
-<!---
-        <div class="ec-newItemRole">
-            <div class="ec-newItemRole__list">
-                                            <div class="ec-newItemRole__listItem1">
-                            <a href="/products/list?category_id=84" style="color:#07c;">
-                                <img src="/html/upload/save_image/UPGLEADERV12.jpg">
-                                <p class="ec-newItemRole__listItemTitle">
-                                    <span style="font-size:68.75%;">エックスブレイド アップジーリーダーV12ハード</span><br>
-                                    X-BRAID UP-G LEADER V12 HARD
-                                </p>
-                                <span class="btn01" style="margin: 1em auto 0;"><i class="fas fa-angle-double-right"></i>and more</span>
-                            </a>
-                        </div>
---->
+                <div>
+                    <a href="/products/list?category_id=135" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
+                        <img src="/html/upload/save_image/D-PET.jpg">
+                        <p class="ec-newItemRole__listItemTitle">
+                            <span style="font-size:68.75%;">ｴｯｸｽﾌﾞﾚｲﾄﾞ ﾃﾞｨｰﾍﾟｯﾄ ｱｼﾞﾝｸ</span><br>
+                            X-BRAID D-PET AJING
+                        </p>
+                        {% if is_granted('ROLE_USER') %}
+                            <span class="btn01" style="margin: 1em auto 0;"><i class="fas fa-angle-double-right"></i>and more</span>
+                        {% endif %}
+                    </a>
+                </div>
 
-<div class="ec-newItemRole">
-            <div class="ec-newItemRole__list">
-                                            <div class="ec-newItemRole__listItem1">
-                            <a href="/products/list?category_id=84" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
-                                <img src="/html/upload/save_image/UPGLEADERV12.jpg">
-                                <p class="ec-newItemRole__listItemTitle">
-                                    <span style="font-size:68.75%;">エックスブレイド アップジーリーダーV12ハード</span><br>
-                                    X-BRAID UP-G LEADER V12 HARD
-                                </p>
-                                {% if is_granted('ROLE_USER') %}
-                                <span class="btn01" style="margin: 1em auto 0;"><i class="fas fa-angle-double-right"></i>and more</span>
-                                {% endif %}
-                            </a>
-</div>
+                <div>
+                    <a href="/products/list?category_id=136" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
+                        <img src="/html/upload/save_image/s-pet1.jpg">
+                        <p class="ec-newItemRole__listItemTitle">
+                            <span style="font-size:68.75%;">ｴｯｸｽﾌﾞﾚｲﾄﾞ ｴｽﾍﾟｯﾄ ｱｼﾞﾝｸﾞ</span><br>
+                            X-BRAID S-PET AJING
+                        </p>
+                        {% if is_granted('ROLE_USER') %}
+                            <span class="btn01" style="margin: 1em auto 0;"><i class="fas fa-angle-double-right"></i>and more</span>
+                        {% endif %}
+                    </a>
+                </div>
 
+                <div>
+                    <a href="/products/list?category_id=132" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
+                        <img src="/html/upload/save_image/DPETAREA.jpg">
+                        <p class="ec-newItemRole__listItemTitle">
+                            <span style="font-size:68.75%;">ｴｯｸｽﾌﾞﾚｲﾄﾞ ﾃﾞｨｰﾍﾟｯﾄ ｴﾘｱ</span><br>
+                            X-BRAID D-PET AREA
+                        </p>
+                        {% if is_granted('ROLE_USER') %}
+                            <span class="btn01" style="margin: 1em auto 0;"><i class="fas fa-angle-double-right"></i>and more</span>
+                        {% endif %}
+                    </a>
+                </div>
 
-                                                </div>
-        </div>
+                <div>
+                    <a href="/products/list?category_id=133" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
+                        <img src="/html/upload/save_image/SP-1.jpg">
+                        <p class="ec-newItemRole__listItemTitle">
+                            <span style="font-size:68.75%;">ｴｯｸｽﾌﾞﾚｲﾄﾞ ｴｽﾍﾟｯﾄ ｴﾘｱ</span><br>
+                            X-BRAID S-PET AREA
+                        </p>
+                        {% if is_granted('ROLE_USER') %}
+                            <span class="btn01" style="margin: 1em auto 0;"><i class="fas fa-angle-double-right"></i>and more</span>
+                        {% endif %}
+                    </a>
+                </div>
 
-
+                <div>
+                    <a href="/products/list?category_id=134" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
+                        <img src="/html/upload/save_image/hfa.jpg">
+                        <p class="ec-newItemRole__listItemTitle">
+                            <span style="font-size:68.75%;">ｴｯｸｽﾌﾞﾚｲﾄﾞ ﾊｲｴﾝﾄﾞﾌﾙｵﾛ ｴﾘｱ v12</span><br>
+                            X-BRAID HIGHENDFLUORO AREA
+                        </p>
+                        {% if is_granted('ROLE_USER') %}
+                            <span class="btn01" style="margin: 1em auto 0;"><i class="fas fa-angle-double-right"></i>and more</span>
+                        {% endif %}
+                    </a>
+                </div>
             </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .ec-newItemRole .ec-newItemRole__list a {
+        width: 100%;
+    }
+    .ec-newItemRole .ec-newItemRole__list img {
+        margin: auto;
+        height: 70%;
+        width: 90%;
+    }
+</style>
+
+<script>
+    $(function() {
+        $('.ec-newItemRole__list').slick({
+            slidesToShow: 3,
+            slidesToScroll: 1,
+            adaptiveHeight: true,
+            swipeToSlide: true,
+            dots: true,
+            arrows: true,
+            responsive: [{
+                breakpoint: 1280,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                }
+            },{
+                breakpoint: 640,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                }
+            }]
+        });
+    });
+</script>
