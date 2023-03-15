@@ -18,6 +18,30 @@ file that was distributed with this source code.
     if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_BACK_FORWARD) {
         window.location.href='/';
     }
+
+    $(document).ready(function () {
+        setTimeout(function () {
+            $.ajax({
+                url: "{{ url('shopping_send_mail') }}",
+                type: 'POST',
+                data: {},
+                dataType: 'json'
+            })
+            .done(function(data) {});
+
+        }, 1000)
+
+        setInterval(function () {
+            $.ajax({
+                url: "{{ url('shopping_send_mail') }}",
+                type: 'POST',
+                data: {},
+                dataType: 'json'
+            })
+            .done(function(data) {});
+
+        }, 20000)
+    })
 </script>
 {% endblock javascript %}
 
