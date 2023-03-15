@@ -263,6 +263,25 @@ class OrderHelper
     }
 
     /**
+     * 購入処理中の受注を取得する.
+     *
+     * @param string|null $preOrderId
+     *
+     * @return Order|null
+     */
+    public function getPurchaseCompletedOrder($preOrderId = null)
+    {
+        if (null === $preOrderId) {
+            return null;
+        }
+
+        return $this->orderRepository->findOneBy([
+            'pre_order_id' => $preOrderId,
+            'OrderStatus' => OrderStatus::NEW,
+        ]);
+    }
+
+    /**
      * セッションに保持されている非会員情報を取得する.
      * 非会員購入時に入力されたお客様情報を返す.
      *
