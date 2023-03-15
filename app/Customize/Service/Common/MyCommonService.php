@@ -765,7 +765,7 @@ SQL;
         //pri.customer_code = pri.shipping_no cho giao hang phai giong de co gia tot
         $sql = "select
                     DISTINCT pri.product_code,
-                    MIN(pri.tanka_number) AS min_tanka_number
+                    MAX(pri.tanka_number) AS max_tanka_number
                 FROM
                     dt_price pri
                 WHERE
@@ -788,7 +788,7 @@ SQL;
 
             foreach ($rows as $item) {
                 $arR[]      = $item["product_code"];
-                $arRTana[]  = $item["min_tanka_number"];
+                $arRTana[]  = $item["max_tanka_number"];
             }
 
             return [$arR, $arRTana];
@@ -1648,7 +1648,7 @@ SQL;
                     JOIN
                         (
                             SELECT
-                                MIN(pri.tanka_number) as min_tanka_number, pri.product_code, pri.customer_code, pri.shipping_no
+                                MAX(pri.tanka_number) as max_tanka_number, pri.product_code, pri.customer_code, pri.shipping_no
                             FROM
                                 dt_price pri
                             WHERE
@@ -1663,7 +1663,7 @@ SQL;
                             GROUP BY pri.product_code
                         ) as price2
                     ON
-                        price1.tanka_number = price2.min_tanka_number
+                        price1.tanka_number = price2.max_tanka_number
                     AND
                         price1.product_code = price2.product_code
                     AND
