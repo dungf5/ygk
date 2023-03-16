@@ -13,6 +13,7 @@
 
 namespace Customize\Service\Common;
 
+use Customize\Entity\DtImportCSV;
 use Customize\Entity\DtOrder;
 use Customize\Entity\DtOrderStatus;
 use Customize\Entity\MoreOrder;
@@ -2459,6 +2460,83 @@ SQL;
         $objRep = $this->entityManager->getRepository(Customer::class)->findOneBy(['id' => $customer_id]);
 
         return $objRep;
+    }
+
+    public function checkFileExistInDB($condition = [])
+    {
+        if (empty($condition)) return false;
+
+        $where          = "WHERE ";
+        $param          = [];
+        foreach ($condition AS $key => $value) {
+            $where      .= " {$key} = ? AND ";
+            $param[]    = $value;
+        }
+
+        $where          = trim($where, "AND ");
+
+        $sql = "
+                SELECT
+                    1
+                FROM
+                    dt_import_csv
+                {$where}
+                LIMIT 1
+            ";
+
+        $statement      = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result     = $statement->executeQuery($param);
+            $rows       = $result->fetchAllAssociative();
+
+            return empty($rows);
+
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    public function saveFileToDB($data = [])
+    {
+        if (empty($data)) return;
+
+        $importCsv      = new DtImportCSV();
+
+        $importCsv->setFileName($data['file_name']);
+        $importCsv->setDirectory($data['directory']);
+        $importCsv->setMessage($data['message']);
+        $importCsv->setIsSync($data['is_sync']);
+        $importCsv->setIsError($data['is_error']);
+        $importCsv->setIsSendMail($data['is_send_mail']);
+        $importCsv->setInDate($data['in_date']);
+        $importCsv->setUpDate($data['up_date']);
+
+        $this->entityManager->persist($importCsv);
+        $this->entityManager->flush();
+    }
+
+    public function updateFileToDB($data = [])
+    {
+        if (empty($data)) return;
+
+        $updateCsv  = $this->entityManager->getRepository(DtImportCSV::class)->findOneBy(['file_name' => $data['file_name']]);
+
+        if (!empty($updateCsv)) {
+            foreach ($data AS $key => $value) {
+                if ($key == "file_name") $updateCsv->setFileName($value);
+                if ($key == "directory") $updateCsv->setDirectory($value);
+                if ($key == "message") $updateCsv->setMessage($value);
+                if ($key == "is_sync") $updateCsv->setIsSync($value);
+                if ($key == "is_error") $updateCsv->setIsError($value);
+                if ($key == "is_send_mail") $updateCsv->setIsSendMail($value);
+                if ($key == "in_date") $updateCsv->setInDate($value);
+                if ($key == "up_date") $updateCsv->setUpDate($value);
+            }
+
+            $this->entityManager->persist($updateCsv);
+            $this->entityManager->flush();
+        }
     }
 }
 

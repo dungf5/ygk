@@ -3,7 +3,11 @@
 
 namespace Customize\Service;
 
-
+use _PHPStan_76800bfb5\Nette\Utils\DateTime;
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Service\Common\MyCommonService;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\EntityManagerInterface;
 
 class FTPService
 {
@@ -12,12 +16,19 @@ class FTPService
     private $userName;
     private $password;
 
-    public function __construct()
+    /** @var EntityManagerInterface */
+    private $entityManager;
+    private $commonService;
+
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->host = getenv("FTP_CSV_HOST") ?? "";
         $this->port = getenv("FTP_CSV_PORT") ?? 21;
         $this->userName = getenv("FTP_CSV_USERNAME") ?? '';
         $this->password = getenv("FTP_CSV_PASSWORD") ?? '';
+
+        $this->entityManager    = $entityManager;
+        $this->commonService    = new MyCommonService($entityManager);
     }
 
     function connect()
@@ -46,30 +57,95 @@ class FTPService
         }
     }
 
-    function getData ()
+    function getFiles($path, $path_local)
     {
         try {
             if ($conn = self::connect()) {
-                @ftp_pasv($conn, true);
-                $path   = "/var/www/html/HACHU";
+                @ftp_set_option($conn, FTP_USEPASVADDRESS, false);
+                @ftp_pasv($conn, false);
 
                 if (@ftp_chdir($conn, $path)) {
-                    $file_list  = ftp_nlist($conn, $path);
+                    $file_list  = @ftp_nlist($conn, $path);
 
-                    foreach ($file_list as $file)
-                    {
-                        var_dump($file);
+                    if (!empty($file_list) && is_array($file_list) && count($file_list)) {
+                        $path_local_file    = $path_local;
 
-                        return [
-                            'status'    => 1,
-                            'message'   => '',
-                        ];
+                        $yearDir = $path_local_file . date("Y");
+                        if (file_exists($yearDir) == false) {
+                            mkdir($yearDir);
+                        }
+
+                        $monthDir = $path_local_file . date("Y/m");
+                        if (file_exists($monthDir) == false) {
+                            mkdir($monthDir);
+                        }
+
+                        foreach ($file_list as $remote_file)
+                        {
+                            $file_name      = explode("/", $remote_file);
+                            $file_name      = $file_name[count($file_name) - 1] ?? "";
+
+                            if (empty($file_name)) continue;
+
+                            $file_name      = strtolower(trim($file_name));
+
+                            if (!str_ends_with($file_name, ".csv")) continue;
+
+                            //Check file in DB
+                            if (!$this->commonService->checkFileExistInDB(['file_name' => $file_name]))
+                                continue;
+
+                            $local_file     = $monthDir . '/' . $file_name;
+
+                            // open file to write to
+                            $handle         = fopen($local_file, 'w');
+
+                            // try to download $remote_file and save it to $handle
+                            if (ftp_fget($conn, $handle, $remote_file, FTP_ASCII, 0)) {
+                                // Save file information to DB
+                                Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                                $insertDate = [
+                                    'file_name'     => $file_name,
+                                    'directory'     => $monthDir,
+                                    'message'       => null,
+                                    'is_sync'       => 0,
+                                    'is_error'      => 0,
+                                    'is_send_mail'  => 0,
+                                    'in_date'       => new DateTime(),
+                                    'up_date'       => null,
+                                ];
+                                $this->commonService->saveFileToDB($insertDate);
+
+                                echo "successfully written to $local_file\n";
+                            } else {
+                                echo "There was a problem while downloading $remote_file to $local_file\n";
+                            }
+
+                            //close
+                            @ftp_close($conn);
+
+                            return [
+                                'status'    => 1,
+                                'message'   => '',
+                            ];
+                        }
                     }
 
                     //close
                     @ftp_close($conn);
+
+                    return [
+                        'status'    => 0,
+                        'message'   => "No files",
+                    ];
                 }
             }
+
+            return [
+                'status'    => 0,
+                'message'   => "Connect FTP server error",
+            ];
+
         } catch (\Exception $e) {
             return [
                 'status'    => 0,

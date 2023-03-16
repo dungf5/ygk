@@ -15,7 +15,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class ProcessImportCsvOrderCommand extends Command
+/* Run Batch: php bin/console get-file-ftp-command */
+class GetFileFTPCommand extends Command
 {
     use PluginCommandTrait;
 
@@ -25,7 +26,7 @@ class ProcessImportCsvOrderCommand extends Command
     private $csvService;
     private $ftpService;
 
-    protected static $defaultName = 'process-import-csv-order';
+    protected static $defaultName = 'get-file-ftp-command';
     protected static $defaultDescription = 'Add a short description for your command';
 
     public function __construct(EntityManagerInterface $entityManager)
@@ -48,42 +49,24 @@ class ProcessImportCsvOrderCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-//        $arg1 = $input->getArgument('arg1');
-//
-//        if ($arg1) {
-//            $io->note(sprintf('You passed an argument: %s', $arg1));
-//        }
-//
-//        if ($input->getOption('option1')) {
-//            // ...
-//        }
+        $io         = new SymfonyStyle($input, $output);
 
+        /* Get files from FTP server*/
+        $path       = getenv("FTP_DIRECTORY") ?? "";
+        $path_local = getenv("LOCAL_FTP_DIRECTORY") ?? "/html/dowload/csv/order/";
 
-        /* Connet FTP to get file*/
-        $this->ftpService->getData();
+        if (getenv("APP_IS_LOCAL") == 1)
+            $path_local = "." . $path_local;
 
-        /* Read file CSV*/
-        //$path           = "./html/dowload/csv/order/2023/03/20230313150102HACHU.CSV";
-        $path           = "";
-        $result         = $this->csvService->readFile($path);
-        if ($result['status'] == 1) {
-            $csvData    = $result['message'];
+        if (!empty($path)) {
+            $result = $this->ftpService->getFiles($path, $path_local);
 
-            if (!empty($csvData)) {
-                // Read and save data
-            }
+            if ($result['status']) {
 
-            else {
-                // Log empty
             }
         }
 
-        else {
-            //Log error
-        }
-
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+        $io->success('Process Get File FTP Successfully');
 
         return 0;
     }
