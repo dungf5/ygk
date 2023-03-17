@@ -45,6 +45,7 @@ class UTCDateTimeTzType extends DateTimeTzType
 
         return $this->myConvertToDatabaseValue($value, $platform);
     }
+
     /**
      * {@inheritdoc}
      */
@@ -56,19 +57,21 @@ class UTCDateTimeTzType extends DateTimeTzType
 
         //nvtrong modify
         if ($value === null || $value instanceof \DateTime) {
-            return $value->format("Y-m-d H:i:s.u");
+            return $value->format('Y-m-d H:i:s.u');
         }
         if ($value instanceof DateTimeInterface) {
             $stringFormat = $platform->getDateTimeTzFormatString();
-            if(strpos($value,".") !==false){
-                $stringFormat = "Y-m-d H:i:s.u";
+            if (strpos($value, '.') !== false) {
+                $stringFormat = 'Y-m-d H:i:s.u';
             }
+
             return $stringFormat;
             // return $value->format("Y-m-d H:i:s.u");
         }
 
         throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'DateTime']);
     }
+
     /**
      * {@inheritdoc}
      */
@@ -80,8 +83,8 @@ class UTCDateTimeTzType extends DateTimeTzType
         }
 
         $stringFormat = $platform->getDateTimeTzFormatString();
-        if(strpos($value,".") !==false){
-            $stringFormat = "Y-m-d H:i:s.u";
+        if (strpos($value, '.') !== false) {
+            $stringFormat = 'Y-m-d H:i:s.u';
         }
         $converted = \DateTime::createFromFormat(
         // $platform->getDateTimeTzFormatString(),
@@ -89,7 +92,6 @@ class UTCDateTimeTzType extends DateTimeTzType
             $value,
             self::getUtcTimeZone()
         );
-
 
         if (!$converted) {
             throw ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateTimeTzFormatString());
@@ -106,8 +108,8 @@ class UTCDateTimeTzType extends DateTimeTzType
     protected static function getUtcTimeZone()
     {
         if (is_null(self::$utc)) {
-            // self::$utc = new \DateTimeZone('Asia/Tokyo');;
-            self::$utc = new \DateTimeZone('UTC');;
+            self::$utc = new \DateTimeZone('Asia/Tokyo');
+            //self::$utc = new \DateTimeZone('UTC');;
         }
 
         return self::$utc;
