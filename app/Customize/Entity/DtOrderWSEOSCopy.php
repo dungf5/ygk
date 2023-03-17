@@ -43,6 +43,7 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOSCopy', false)) {
          * @var string
          *
          * @ORM\Column(name="order_no", type="string", length=20,options={"comment":"注文伝票番号'=客先発注№(cus_order_no)"}, nullable=false)
+         * @ORM\Id
          */
         private $order_no;
         /**
