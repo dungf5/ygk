@@ -90,7 +90,7 @@ if (!class_exists('\Customize\Entity\DtImportCSV', false)) {
         /**
          * @param string|null $file_name
          */
-        public function setFileName($file_name = null): void
+        public function setFileName($file_name = null)
         {
             $this->file_name = $file_name;
         }
@@ -106,7 +106,7 @@ if (!class_exists('\Customize\Entity\DtImportCSV', false)) {
         /**
          * @param string|null $directory
          */
-        public function setDirectory($directory = null): void
+        public function setDirectory($directory = null)
         {
             $this->directory = $directory;
         }
@@ -127,7 +127,7 @@ if (!class_exists('\Customize\Entity\DtImportCSV', false)) {
          *
          * @param string|null $message
          */
-        public function setMessage($message = null): void
+        public function setMessage($message = null)
         {
             $this->message = $message;
         }
@@ -143,7 +143,7 @@ if (!class_exists('\Customize\Entity\DtImportCSV', false)) {
         /**
          * @param integer|null $is_sync
          */
-        public function setIsSync($is_sync = null): void
+        public function setIsSync($is_sync = null)
         {
             $this->is_sync = $is_sync;
         }
@@ -159,7 +159,7 @@ if (!class_exists('\Customize\Entity\DtImportCSV', false)) {
         /**
          * @param integer|null $is_error
          */
-        public function setIsError($is_error = null): void
+        public function setIsError($is_error = null)
         {
             $this->is_error = $is_error;
         }
@@ -175,7 +175,7 @@ if (!class_exists('\Customize\Entity\DtImportCSV', false)) {
         /**
          * @param integer|null $is_send_mail
          */
-        public function setIsSendMail($is_send_mail = null): void
+        public function setIsSendMail($is_send_mail = null)
         {
             $this->is_send_mail = $is_send_mail;
         }
@@ -191,7 +191,7 @@ if (!class_exists('\Customize\Entity\DtImportCSV', false)) {
         /**
          * @param \DateTime|null $in_date
          */
-        public function setInDate($in_date = null): void
+        public function setInDate($in_date = null)
         {
             $this->in_date = $in_date;
         }
@@ -207,7 +207,7 @@ if (!class_exists('\Customize\Entity\DtImportCSV', false)) {
         /**
          * @param \DateTime|null $up_date
          */
-        public function setUpDate($up_date = null): void
+        public function setUpDate($up_date = null)
         {
             $this->up_date = $up_date;
         }

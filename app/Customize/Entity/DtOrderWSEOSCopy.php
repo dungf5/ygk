@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -25,8 +36,13 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOSCopy', false)) {
         /**
          * @var string
          *
+         * @ORM\Column(name="order_date", type="string", nullable=true, options={"comment":"発注日付"})
+         */
+        private $order_date;
+        /**
+         * @var string
+         *
          * @ORM\Column(name="order_no", type="string", length=20,options={"comment":"注文伝票番号'=客先発注№(cus_order_no)"}, nullable=false)
-         * @ORM\Id
          */
         private $order_no;
         /**
@@ -126,6 +142,12 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOSCopy', false)) {
          */
         private $shipping_fax;
         /**
+         * @var string
+         *
+         * @ORM\Column(name="delivery_date", type="string", nullable=true, options={"comment":"納入希望日"})
+         */
+        private $delivery_date;
+        /**
          * @ORM\Column(name="export_type",type="integer",nullable=true, options={"comment":"出力区分" ,"default":0 })
          */
         private $export_type;
@@ -150,7 +172,6 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOSCopy', false)) {
          *
          * @ORM\Column(name="order_line_no", type="integer", options={"unsigned":true})
          * @ORM\Id
-         * @ORM\GeneratedValue(strategy="IDENTITY")
          */
         private $order_line_no;
         /**
@@ -226,15 +247,27 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOSCopy', false)) {
          */
         private $cash_type_code;
         /**
+         * @var string
+         *
+         * @ORM\Column(name="order_create_day", type="string", nullable=true, options={"comment":"作成日時"})
+         */
+        private $order_create_day;
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="order_update_day", type="string", nullable=true, options={"comment":"最終更新日時"})
+         */
+        private $order_update_day;
+        /**
          * @var \DateTime
          *
-         * @ORM\Column(name="create_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'データ登録日時'")
+         * @ORM\Column(name="create_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ登録日時'")
          */
         private $create_date;
         /**
          * @var \DateTime
          *
-         * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'データ更新日時'")
+         * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ更新日時'")
          */
         private $update_date;
 
@@ -268,6 +301,22 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOSCopy', false)) {
         public function setWebOrderType($web_order_type)
         {
             $this->web_order_type = $web_order_type;
+        }
+
+        /**
+         * @return string
+         */
+        public function getOrderDate()
+        {
+            return $this->order_date;
+        }
+
+        /**
+         * @param $order_date
+         */
+        public function setOrderDate($order_date)
+        {
+            $this->order_date = $order_date;
         }
 
         /**
@@ -543,6 +592,22 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOSCopy', false)) {
         }
 
         /**
+         * @return string
+         */
+        public function getDeliveryDate()
+        {
+            return $this->delivery_date;
+        }
+
+        /**
+         * @param $delivery_date
+         */
+        public function setDeliveryDate($delivery_date)
+        {
+            $this->delivery_date = $delivery_date;
+        }
+
+        /**
          * @return mixed
          */
         public function getExportType()
@@ -625,7 +690,7 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOSCopy', false)) {
         /**
          * @return int
          */
-        public function getOrderLineNo()
+        public function getOrderLineNo(): int
         {
             return $this->order_line_no;
         }
@@ -633,7 +698,7 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOSCopy', false)) {
         /**
          * @param int $order_line_no
          */
-        public function setOrderLineNo($order_line_no)
+        public function setOrderLineNo(int $order_line_no)
         {
             $this->order_line_no = $order_line_no;
         }
@@ -844,6 +909,38 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOSCopy', false)) {
         public function setCashTypeCode($cash_type_code)
         {
             $this->cash_type_code = $cash_type_code;
+        }
+
+        /**
+         * @return string
+         */
+        public function getOrderCreateDay()
+        {
+            return $this->order_create_day;
+        }
+
+        /**
+         * @param $order_create_day
+         */
+        public function setOrderCreateDay($order_create_day)
+        {
+            $this->order_create_day = $order_create_day;
+        }
+
+        /**
+         * @return string
+         */
+        public function getOrderUpdateDay()
+        {
+            return $this->order_update_day;
+        }
+
+        /**
+         * @param $order_update_day
+         */
+        public function setOrderUpdateDay($order_update_day)
+        {
+            $this->order_update_day = $order_update_day;
         }
 
         /**

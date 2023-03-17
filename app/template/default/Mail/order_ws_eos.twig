@@ -1,0 +1,32 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+MyShoppingController.php 643 order.twig
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% autoescape 'safe_textmail' %}
+    {% if information.status == 1 %}
+        {{ information.title_mail }}
+
+        {{ information.subject_mail }}
+
+        {{ information.title_time }} : {{ information.finish_time }}
+
+        {{ information.content1 }}
+        {{ information.content2 }}
+    {% else %}
+        {{ information.title_mail }}
+
+        {{ information.subject_mail }}
+        {{ information.content1 }}
+
+        {{ information.error_title }} : {{ information.error_content }}
+
+        {{ information.content2 }}
+        {{ information.content3 }}
+    {% endif %}
+{% endautoescape %}

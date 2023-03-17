@@ -4,6 +4,7 @@ namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Eccube\Entity\AbstractEntity;
+use phpDocumentor\Reflection\Types\Integer;
 
 if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
     /**
@@ -25,8 +26,31 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         /**
          * @var string
          *
+         * @ORM\Column(name="order_date", type="string", nullable=true, options={"comment":"発注日付"})
+         */
+        private $order_date;
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="delivery_date", type="string", nullable=true, options={"comment":"納入希望日"})
+         */
+        private $delivery_date;
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="order_create_day", type="string", nullable=true, options={"comment":"作成日時"})
+         */
+        private $order_create_day;
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="order_update_day", type="string", nullable=true, options={"comment":"最終更新日時"})
+         */
+        private $order_update_day;
+        /**
+         * @var string
+         *
          * @ORM\Column(name="order_no", type="string", length=20,options={"comment":"注文伝票番号'=客先発注№(cus_order_no)"}, nullable=false)
-         * @ORM\Id
          */
         private $order_no;
         /**
@@ -150,7 +174,6 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
          *
          * @ORM\Column(name="order_line_no", type="integer", options={"unsigned":true})
          * @ORM\Id
-         * @ORM\GeneratedValue(strategy="IDENTITY")
          */
         private $order_line_no;
         /**
@@ -945,7 +968,7 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         }
 
         /**
-         * @return mixed
+         * @return integer
          */
         public function getOrderRegistedFlg()
         {
@@ -953,7 +976,7 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         }
 
         /**
-         * @param mixed $order_registed_flg
+         * @param $order_registed_flg
          */
         public function setOrderRegistedFlg($order_registed_flg)
         {
@@ -1217,11 +1240,11 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         }
 
         /**
-         * @return
+         * @return string
          */
         public function getCreateDate()
         {
-            return $this->create_date;
+            return (string) $this->create_date;
         }
 
         /**
@@ -1233,11 +1256,11 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         }
 
         /**
-         * @return
+         * @return string
          */
         public function getUpdateDate()
         {
-            return $this->update_date;
+            return (string) $this->update_date;
         }
 
         /**
@@ -1246,6 +1269,70 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         public function setUpdateDate($update_date)
         {
             $this->update_date = $update_date;
+        }
+
+        /**
+         * @return \DateTime
+         */
+        public function getOrderDate()
+        {
+            return $this->order_date;
+        }
+
+        /**
+         * @param $order_date
+         */
+        public function setOrderDate($order_date)
+        {
+            $this->order_date = $order_date;
+        }
+
+        /**
+         * @return \DateTime
+         */
+        public function getDeliveryDate()
+        {
+            return $this->delivery_date;
+        }
+
+        /**
+         * @param $delivery_date
+         */
+        public function setDeliveryDate($delivery_date)
+        {
+            $this->delivery_date = $delivery_date;
+        }
+
+        /**
+         * @return \DateTime
+         */
+        public function getOrderCreateDay()
+        {
+            return $this->order_create_day;
+        }
+
+        /**
+         * @param $order_create_day
+         */
+        public function setOrderCreateDay($order_create_day)
+        {
+            $this->order_create_day = $order_create_day;
+        }
+
+        /**
+         * @return \DateTime
+         */
+        public function getOrderUpdateDay()
+        {
+            return $this->order_update_day;
+        }
+
+        /**
+         * @param $order_update_day
+         */
+        public function setOrderUpdateDay($order_update_day)
+        {
+            $this->order_update_day = $order_update_day;
         }
     }
 }

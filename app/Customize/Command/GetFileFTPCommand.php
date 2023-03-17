@@ -1,6 +1,18 @@
 <?php
 
 declare(strict_types=1);
+
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Command;
 
 use Customize\Service\Common\MyCommonService;
@@ -16,6 +28,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /* Run Batch: php bin/console get-file-ftp-command */
+
 class GetFileFTPCommand extends Command
 {
     use PluginCommandTrait;
@@ -32,10 +45,10 @@ class GetFileFTPCommand extends Command
     public function __construct(EntityManagerInterface $entityManager)
     {
         parent::__construct();
-        $this->entityManager    = $entityManager;
-        $this->commonService    = new MyCommonService($entityManager);
-        $this->csvService       = new CSVService($entityManager);
-        $this->ftpService       = new FTPService($entityManager);
+        $this->entityManager = $entityManager;
+        $this->commonService = new MyCommonService($entityManager);
+        $this->csvService = new CSVService($entityManager);
+        $this->ftpService = new FTPService($entityManager);
     }
 
     protected function configure(): void
@@ -43,30 +56,25 @@ class GetFileFTPCommand extends Command
         $this
             ->setDescription(self::$defaultDescription)
             ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
+            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io         = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
+        log_info('Start process Get File FTP');
 
         /* Get files from FTP server*/
-        $path       = getenv("FTP_DIRECTORY") ?? "";
-        $path_local = getenv("LOCAL_FTP_DIRECTORY") ?? "/html/dowload/csv/order/";
-
-        if (getenv("APP_IS_LOCAL") == 1)
-            $path_local = "." . $path_local;
+        $path = getenv('FTP_DIRECTORY') ?? '';
+        $path_local = getenv('LOCAL_FTP_DIRECTORY') ?? '/html/dowload/csv/order/';
 
         if (!empty($path)) {
             $result = $this->ftpService->getFiles($path, $path_local);
-
-            if ($result['status']) {
-
-            }
+            log_info($result['message']);
         }
 
-        $io->success('Process Get File FTP Successfully');
+        log_info('End process Get File FTP');
+        $io->success('End Process Get File FTP');
 
         return 0;
     }
