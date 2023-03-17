@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Service;
 
 use Eccube\Common\EccubeConfig;
@@ -321,8 +332,6 @@ class MailService
     /**
      * Send order mail.
      *
-     *
-     *
      * @return \Swift_Message
      */
     public function sendOrderMail($Order, $EC_Order)
@@ -330,10 +339,10 @@ class MailService
         log_info('受注メール送信開始');
 
         if (empty($Order['email'])) {
-            $company    = $Order['company_name'] ?? '';
+            $company = $Order['company_name'] ?? '';
             log_info("Company name: {$company} no email");
 
-            return ;
+            return;
         }
 
         $MailTemplate = $this->mailTemplateRepository->find($this->eccubeConfig['eccube_order_mail_template_id']);
@@ -743,5 +752,61 @@ class MailService
         } else {
             return null;
         }
+    }
+
+    /**
+     * Send order mail.
+     *
+     * @param string $template
+     * @param array $information
+     *
+     * @return \Swift_Message
+     *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function sendMailWSEOS($information = [])
+    {
+        if (empty($information)) {
+            return;
+        }
+
+        if (empty($information['email'])) {
+            return;
+        }
+
+        log_info('[WS-EOS] 受注メール送信開始');
+
+        $body = $this->twig->render($information['file_name'], [
+            'information' => $information,
+        ]);
+
+        $message = (new \Swift_Message())
+            ->setSubject('['.$this->BaseInfo->getShopName().'] '.$information['subject_mail'])
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$information['email']])
+            ->setReplyTo($this->BaseInfo->getEmail03())
+            ->setReturnPath($this->BaseInfo->getEmail04());
+
+        // HTMLテンプレートが存在する場合
+        $htmlFileName = $this->getHtmlTemplate($information['file_name']);
+        if (!is_null($htmlFileName)) {
+            $htmlBody = $this->twig->render($htmlFileName, [
+                'information' => $information,
+            ]);
+
+            $message
+                ->setContentType('text/plain; charset=UTF-8')
+                ->setBody($body, 'text/plain')
+                ->addPart($htmlBody, 'text/html');
+        } else {
+            $message->setBody($body);
+        }
+
+        $count = $this->mailer->send($message);
+        log_info('[WS-EOS]受注メール送信完了', ['count' => $count]);
+
+        return $message;
     }
 }
