@@ -280,6 +280,8 @@ class ImportCsvOrderCommand extends Command
     {
         $information = [
             'email' => getenv('EMAIL_WS_EOS') ?? '',
+            'email_cc' => 'dunghp76@mail.com',
+            'email_bcc' => 'nvthuan@monotos.biz',
             'file_name' => 'Mail/order_ws_eos.twig',
         ];
 

@@ -789,6 +789,14 @@ class MailService
             ->setReplyTo($this->BaseInfo->getEmail03())
             ->setReturnPath($this->BaseInfo->getEmail04());
 
+        if (!empty($information['email_cc'])) {
+            $message->setCc($information['email_cc']);
+        }
+
+        if (!empty($information['email_bcc'])) {
+            $message->setBcc($information['email_bcc']);
+        }
+
         // HTMLテンプレートが存在する場合
         $htmlFileName = $this->getHtmlTemplate($information['file_name']);
         if (!is_null($htmlFileName)) {
