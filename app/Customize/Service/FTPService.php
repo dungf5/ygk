@@ -134,7 +134,9 @@ class FTPService
                             $local_file = $monthDir.'/'.$file_name;
 
                             // open file to write to
-                            $handle = fopen($local_file, 'w');
+                            if (!$handle = fopen($local_file, 'w')) {
+                                continue;
+                            }
 
                             // try to download $remote_file and save it to $handle
                             if (ftp_fget($conn, $handle, $remote_file, FTP_ASCII, 0)) {
@@ -159,6 +161,7 @@ class FTPService
                             }
 
                             //close
+                            fclose($handle);
                             @ftp_close($conn);
 
                             return [

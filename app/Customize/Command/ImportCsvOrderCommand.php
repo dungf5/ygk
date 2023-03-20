@@ -235,18 +235,37 @@ class ImportCsvOrderCommand extends Command
         log_info('Start save/update data Order WS EOS');
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
+        // Insert cache file to validation data
+        $cache_file = getenv('LOCAL_FTP_DIRECTORY') ?? '/html/dowload/csv/order/';
+        if (getenv('APP_IS_LOCAL') == 1) {
+            $cache_file = '.'.$cache_file;
+        }
+        $cache_file .= 'ws_eos_cache_file.txt';
+        // open file to write to
+        if (!$handle = fopen($cache_file, 'a')) {
+            log_error("Cannot open file ({$cache_file})");
+        }
+
         // Foreach row
         foreach ($data as $x => $row) {
             // Foreach column
             $objData = [];
             foreach ($this->headers as $y => $col) {
-                $objData["{$col}"] = $data[$x][$y];
+                $objData["{$col}"] = trim($data[$x][$y]);
             }
 
             $objectExist = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy([
                 'order_no' => $objData['order_no'] ?? '',
                 'order_line_no' => $objData['order_line_no'] ?? '',
             ]);
+
+            // Write to cache file
+            if ($handle) {
+                $cache_data = $objData['order_no'].'-'.$objData['order_line_no']."\n";
+                if (fwrite($handle, $cache_data) === false) {
+                    log_error("Cannot write ({$cache_data}) to file ({$cache_file})");
+                }
+            }
 
             // Insert dt_order_ws_eos
             if (empty($objectExist)) {
@@ -285,6 +304,11 @@ class ImportCsvOrderCommand extends Command
                         break;
                 }
             }
+        }
+
+        //close
+        if ($handle) {
+            fclose($handle);
         }
 
         log_info('End save/update data Order WS EOS');
