@@ -120,13 +120,33 @@ class ImportCsvOrderCommand extends Command
         $io = new SymfonyStyle($input, $output);
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
-        /* Read file CSV*/
+        /* The local path to load csv file */
         $path = getenv('LOCAL_FTP_DIRECTORY') ?? '/html/dowload/csv/order/';
         if (getenv('APP_IS_LOCAL') == 1) {
             $path = '.'.$path;
         }
 
-        $path .= date('Y/m');
+        // If the current day is the first of month. Run first for day - 1
+        $currentDay = date('j');
+        if ($currentDay == 1) {
+            log_info('Start Process Import Order CSV for month '.date('m', strtotime('-1 day')));
+            $this->handleImportCsvOrder($path.date('Y/m', strtotime('-1 day')));
+            log_info('End Process Import Order CSV for month '.date('m', strtotime('-1 day')));
+        }
+
+        log_info('Start Process Import Order CSV for month '.date('m'));
+        $this->handleImportCsvOrder($path.date('Y/m'));
+        log_info('End Process Import Order CSV for month '.date('m'));
+
+        $io->success('End Process Import Order CSV');
+        return 0;
+    }
+
+    private function handleImportCsvOrder($path)
+    {
+        if (empty($path)) {
+            return;
+        }
 
         try {
             $file_list = scandir($path);
@@ -164,8 +184,6 @@ class ImportCsvOrderCommand extends Command
                 $this->SendMailWSEOS($result['status'], $data);
             }
         }
-
-        return 0;
     }
 
     private function LoadFileReadData($path, $file)
