@@ -18,6 +18,7 @@ namespace Customize\Command;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\CSVService;
 use Customize\Service\FTPService;
+use Customize\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Command\PluginCommandTrait;
 use Symfony\Component\Console\Command\Command;
@@ -39,16 +40,22 @@ class GetFileFTPCommand extends Command
     private $csvService;
     private $ftpService;
 
+    /**
+     * @var MailService
+     */
+    protected $mailService;
+
     protected static $defaultName = 'get-file-ftp-command';
     protected static $defaultDescription = 'Add a short description for your command';
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, MailService $mailService)
     {
         parent::__construct();
         $this->entityManager = $entityManager;
         $this->commonService = new MyCommonService($entityManager);
         $this->csvService = new CSVService($entityManager);
         $this->ftpService = new FTPService($entityManager);
+        $this->mailService = $mailService;
     }
 
     protected function configure(): void
@@ -71,7 +78,25 @@ class GetFileFTPCommand extends Command
         if (!empty($path)) {
             $result = $this->ftpService->getFiles($path, $path_local);
             log_info($result['message']);
-        }
+
+            // Send mail error
+            if ($result['status'] == -1) {
+                log_info('[WS-EOS] 注文メールの送信を行います.');
+                $information = [
+                    'email' => getenv('EMAIL_WS_EOS') ?? '',
+                    'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
+                    'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
+                    'file_name' => 'Mail/order_ws_eos.twig',
+                    'status' => 0,
+                    'error_content' => $result['message'],
+                ];
+
+                try {
+                    $this->mailService->sendMailWSEOS($information);
+                } catch (\Exception $e) {
+                    log_error($e->getMessage());
+                }
+            }
 
         log_info('End Process Get File FTP');
         $io->success('End Process Get File FTP');
