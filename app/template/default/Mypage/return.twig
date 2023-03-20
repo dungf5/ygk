@@ -125,7 +125,36 @@ body_class = 'mypage' %}
 					</tr>
 				</thead>
 				{% if pagination and pagination.totalItemCount > 0 %}
-					<tbody></tbody>
+					<tbody>
+						{% for item in pagination %}
+							<td title="return_type">
+								{{ item.return_type }}
+							</td>
+							<td title="return_number">
+								{{ item.return_number }}
+							</td>
+							<td title="return_status">
+								{{ item.return_status }}
+							</td>
+							<td title="shipping_no">
+								{{ item.shipping_no }}
+							</td>
+							<td title="shipping_date">
+								{{ item.shipping_date }}
+							</td>
+							<td title="shiping_code otodoke_code">
+								{{ item.shiping_code }}
+								{{ item.otodoke_code }}
+							</td>
+							<td title="jan_code product_name">
+								{{ item.jan_code }}
+								{{ item.product_name }}
+							</td>
+							<td title="shipping_num">
+								{{ item.shipping_num }}
+							</td>
+						{% endfor %}
+					</tbody>
 				{% else %}
 					<tbody>
 						<tr>

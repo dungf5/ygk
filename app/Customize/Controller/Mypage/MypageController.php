@@ -893,8 +893,42 @@ class MypageController extends AbstractController
      */
     public function return(Request $request, PaginatorInterface $paginator)
     {
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
+
+        //Params
+        $param = [
+            'pageno'          => $request->get('pageno', 1),
+            'search_jan_code' => $request->get('jan_code', ''),
+        ];
+
+        // paginator
+        $user_login    = $this->twig->getGlobals()["app"]->getUser();
+        $customer_id   = $this->globalService->customerId();
+        $login_type    = $this->globalService->getLoginType();
+        $my_common     = new MyCommonService($this->entityManager);
+        $customer_code = $user_login->getCustomerCode();
+
+        if (!empty($_SESSION["usc_" . $customer_id]) && !empty($_SESSION["usc_" . $customer_id]['login_code'])) {
+            $represent_code     = $_SESSION["usc_" . $customer_id]['login_code'];
+            $temp_customer_code = $my_common->getCustomerRelation($represent_code);
+            if (!empty($temp_customer_code)) {
+                $customer_code = $temp_customer_code['customer_code'];
+            }
+        }
+        $order_status = $my_common->getOrderStatus($customer_code, $login_type);
+        
+        $qb = $this->orderItemRepository->getQueryBuilderReturnByCustomer($param, $order_status);
+        
+        $pagination = $paginator->paginate(
+            $qb,
+            $request->get('pageno', 1),
+            $this->eccubeConfig['eccube_search_pmax'],
+            ['distinct' => false]
+        );
+
         return [
-            'pagination' => [],
+            'pagination' => $pagination,
         ];
     }
 }
