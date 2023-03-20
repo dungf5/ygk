@@ -62,7 +62,7 @@ class GetFileFTPCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        log_info('Start process Get File FTP');
+        log_info('Start Process Get File FTP');
 
         /* Get files from FTP server*/
         $path = getenv('FTP_DIRECTORY') ?? '';
@@ -73,7 +73,7 @@ class GetFileFTPCommand extends Command
             log_info($result['message']);
         }
 
-        log_info('End process Get File FTP');
+        log_info('End Process Get File FTP');
         $io->success('End Process Get File FTP');
 
         return 0;
