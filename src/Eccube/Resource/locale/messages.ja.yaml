@@ -276,6 +276,7 @@ front.mypage.withdraw_complete_message__body: |
 front.mypage.nav_order__history: 注文履歴
 front.mypage.nav_shipping__history: 出荷履歴
 front.mypage.nav_delivery__history: 納品書一覧
+front.mypage.nav_return_product: 返品手続き
 
 #------------------------------------------------------------------------------------
 # 商品

@@ -1,0 +1,150 @@
+{% extends 'default_frame.twig' %}
+{% set mypageno = 'return' %}
+{% set
+body_class = 'mypage' %}
+{% block main %}
+	<style>
+		.alert-search {
+			border: solid 1px #333;
+			background-color: #ccc;
+			border-radius: 8px;
+		}
+		.btn-search,
+		.btn-search:hover,
+		.btn-search:focus {
+			background-color: #000;
+			color: #fff;
+			border-radius: 8px;
+		}
+		.alert-return {
+			float: right;
+		}
+		.btn-return,
+		.btn-return:hover,
+		.btn-return:focus {
+			border: none;
+			border-radius: 0;
+			background-color: #f00;
+			color: #fff;
+			font-weight: bold;
+			font-size: 16px;
+			padding: 12px 36px;
+			position: relative;
+		}
+		.btn-return:after {
+			content: "";
+			position: absolute;
+			left: -25px;
+			bottom: 0;
+			width: 0;
+			height: 0;
+			border-left: 25px solid transparent;
+			border-top: 23px solid #f00;
+			border-bottom: 23px solid #f00;
+		}
+		.btn-return:before {
+			content: "";
+			position: absolute;
+			right: -25px;
+			bottom: 0;
+			width: 0;
+			height: 0;
+			border-left: 25px solid red;
+			border-top: 23px solid transparent;
+			border-bottom: 23px solid transparent;
+		}
+	</style>
+
+	<div class="ec-layoutRole__main">
+		<div class="ec-mypageRole">
+			<div class="ec-pageHeader">
+				<h1>{{ "front.mypage.title" | trans }}/{{"front.mypage.nav_return_product" | trans}}</h1>
+			</div>
+			{% include 'Mypage/navi.twig' %}
+		</div>
+		<div class="ec-mypageRole">
+			<div class="row">
+				<div class="col-md-6">
+					<div class="alert alert-search" role="alert">
+						<form class="form-inline" method="GET">
+							<div class="form-group">
+								<label for="jan_code">JANコード</label>
+								<input type="text" class="form-control" id="jan_code" name="jan_code"/>
+							</div>
+							<button type="submit" class="btn btn-search">
+								<i class="fas fa-angle-double-right" style="color: #f00"></i > 絞り込み
+							</button>
+						</form>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="alert alert-return" role="alert">
+						<a class="btn btn-return">
+							<i class="fas fa-arrow-right"></i> 一覧にない場合はこちら
+						</a>
+					</div>
+				</div>
+			</div>
+
+			{% if pagination and pagination.totalItemCount > 0 %}
+				<p class="ec-para-normal">
+					{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}
+				</p>
+			{% endif %}
+
+			<table class="table myTable">
+				<thead>
+					<tr>
+						<th title="return_type">
+							{{ "front.mypage.return.return_type" | trans | raw }}
+						</th>
+						<th title="return_number">
+							{{ "front.mypage.return.return_number" | trans | raw }}
+						</th>
+						<th title="return_status">
+							{{ "front.mypage.return.return_status" | trans | raw }}
+						</th>
+						<th title="shipping_no">
+							{{ "front.mypage.return.shipping_no" | trans | raw }}
+						</th>
+						<th title="shipping_date">
+							{{ "front.mypage.return.shipping_date" | trans | raw }}
+						</th>
+						<th title="shiping_code otodoke_code">
+							{{ "front.mypage.return.shiping_code" | trans | raw
+                        }}<br/>
+							{{ "front.mypage.return.otodoke_code" | trans | raw }}
+						</th>
+						<th title="jan_code product_name">
+							{{ "front.mypage.return.jan_code" | trans | raw }}<br/>
+							{{ "front.mypage.return.product_name" | trans | raw }}
+						</th>
+						<th title="shipping_num">
+							{{ "front.mypage.return.shipping_num" | trans | raw }}
+						</th>
+					</tr>
+				</thead>
+				{% if pagination and pagination.totalItemCount > 0 %}
+					<tbody></tbody>
+				{% else %}
+					<tbody>
+						<tr>
+							<td colspan="8">
+								<p>返品手続きの履歴がありません。</p>
+							</td>
+						</tr>
+					</tbody>
+				{% endif %}
+			</table>
+
+			{% if pagination and pagination.totalItemCount > 0 %}
+				<div class="ec-pagerRole">
+					{% include "pager.twig" with {'pages': pagination.paginationData} %}
+				</div>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}
+{% block javascript %}
+	<script></script>
+{% endblock %}
