@@ -139,6 +139,7 @@ class ImportCsvOrderCommand extends Command
         log_info('End Process Import Order CSV for month '.date('m'));
 
         $io->success('End Process Import Order CSV');
+
         return 0;
     }
 
@@ -169,7 +170,7 @@ class ImportCsvOrderCommand extends Command
                 // Get data from file and save DB
                 $result = $this->LoadFileReadData($path, $file);
 
-                // Update information
+                // Update information dt_import_csv
                 Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                 $data = [
                     'file_name' => $file,
@@ -298,8 +299,8 @@ class ImportCsvOrderCommand extends Command
     {
         $information = [
             'email' => getenv('EMAIL_WS_EOS') ?? '',
-            'email_cc' => 'dunghp76@mail.com',
-            'email_bcc' => 'nvthuan@monotos.biz',
+            'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
+            'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
             'file_name' => 'Mail/order_ws_eos.twig',
         ];
 
@@ -330,8 +331,19 @@ class ImportCsvOrderCommand extends Command
             log_info('[WS-EOS] 注文メールの送信を行います.');
 
             $this->mailService->sendMailWSEOS($information);
+
+            // Update information dt_import_csv
+            $data = [
+                'file_name' => $data['file_name'],
+                'is_send_mail' => 1,
+            ];
+            $this->entityManager->getRepository(DtImportCSV::class)->updateData($data);
+
+            return;
         } catch (\Exception $e) {
             log_error($e->getMessage());
+
+            return;
         }
     }
 }
