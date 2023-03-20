@@ -179,12 +179,12 @@ class FTPService
             }
 
             return [
-                'status' => 0,
+                'status' => -1,
                 'message' => 'Connect FTP server error',
             ];
         } catch (\Exception $e) {
             return [
-                'status' => 0,
+                'status' => -1,
                 'message' => $e->getMessage(),
             ];
         }

@@ -778,6 +778,25 @@ class MailService
 
         log_info('[WS-EOS] 受注メール送信開始');
 
+        // Information successfully
+        if ($information['status'] == 1) {
+            $information['subject_mail'] = 'EOS注文データ受信が完了しました';
+            $information['title_mail'] = '※本メールは自動配信メールです。';
+            $information['title_time'] = '受信完了日時';
+            $information['content1'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+            $information['content2'] = 'ご連絡くださいますようお願いいたします。';
+        }
+
+        // Information error
+        if ($information['status'] == 0) {
+            $information['subject_mail'] = 'EOS注文データ受信にエラーが発生しました';
+            $information['title_mail'] = '※本メールは自動配信メールです。';
+            $information['content1'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
+            $information['content2'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+            $information['content3'] = 'ご連絡くださいますようお願いいたします。';
+            $information['error_title'] = 'エラー内容';
+        }
+
         $body = $this->twig->render($information['file_name'], [
             'information' => $information,
         ]);
