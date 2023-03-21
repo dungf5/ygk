@@ -318,9 +318,9 @@ class OrderItemRepository extends AbstractRepository
         // $qb->addOrderBy('order_status.cus_order_no', 'DESC');
         // $qb->addOrderBy('order_status.cus_order_lineno', 'asc');
 
-        dump($qb->getQuery()->getSQL());
-        dump($qb->getParameters());
-        die();
+        // dump($qb->getQuery()->getSQL());
+        // dump($qb->getParameters());
+        // die();
         return $qb;
     }
 }
