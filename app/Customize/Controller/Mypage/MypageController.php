@@ -917,9 +917,9 @@ class MypageController extends AbstractController
             }
         }
         $order_status = $my_common->getOrderStatus($customer_code, $login_type);
-        
+
         $qb = $this->orderItemRepository->getQueryBuilderReturnByCustomer($param, $order_status);
-        
+
         $pagination = $paginator->paginate(
             $qb,
             $request->get('pageno', 1),
@@ -930,6 +930,26 @@ class MypageController extends AbstractController
         return [
             'pagination' => $pagination,
             'param'      => $param,
+        ];
+    }
+
+    /**
+     * 返品手続き
+     *
+     * @Route("/mypage/return/create", name="mypage_return_create", methods={"GET"})
+     * @Template("Mypage/return_create.twig")
+     */
+    public function returnCreate(Request $request)
+    {
+        $commonService = new MyCommonService($this->entityManager);
+        $login_type    = $this->globalService->getLoginType();
+        $customer_id   = $this->globalService->customerId();
+
+        $shippings       = $commonService->getMstShippingCustomer($login_type, $customer_id);
+        
+        return [
+            'customer_id' => $customer_id,
+            'shippings'   => $shippings,
         ];
     }
 }
