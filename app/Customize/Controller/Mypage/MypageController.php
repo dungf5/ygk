@@ -927,7 +927,7 @@ class MypageController extends AbstractController
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
-        
+
         /*create list order date*/
         $shipping_date_list          = [];
         for ($i = 0; $i < 24; $i++) {
@@ -937,11 +937,32 @@ class MypageController extends AbstractController
                 'value'         => (string)$date,
             ];
         }
-        
+
         return [
             'pagination'         => $pagination,
             'param'              => $param,
             'shipping_date_list' => $shipping_date_list,
+        ];
+    }
+
+
+    /**
+     * 返品手続き
+     *
+     * @Route("/mypage/return/create", name="mypage_return_create", methods={"GET"})
+     * @Template("Mypage/return_create.twig")
+     */
+    public function returnCreate(Request $request)
+    {
+        $commonService = new MyCommonService($this->entityManager);
+        $login_type    = $this->globalService->getLoginType();
+        $customer_id   = $this->globalService->customerId();
+
+        $shippings       = $commonService->getMstShippingCustomer($login_type, $customer_id);
+
+        return [
+            'customer_id' => $customer_id,
+            'shippings'   => $shippings,
         ];
     }
 }
