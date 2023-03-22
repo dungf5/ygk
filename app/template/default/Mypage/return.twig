@@ -2,59 +2,67 @@
 {% set mypageno = 'return' %}
 {% set
 body_class = 'mypage' %}
-{% block main %}
-	<style>
-		.alert-search {
-			border: solid 1px #333;
-			background-color: #ccc;
-			border-radius: 8px;
-		}
-		.btn-search,
-		.btn-search:hover,
-		.btn-search:focus {
-			background-color: #000;
-			color: #fff;
-			border-radius: 8px;
-		}
-		.alert-return {
-			float: right;
-		}
-		.btn-return,
-		.btn-return:hover,
-		.btn-return:focus {
-			border: none;
-			border-radius: 0;
-			background-color: #f00;
-			color: #fff;
-			font-weight: bold;
-			font-size: 16px;
-			padding: 12px 36px;
-			position: relative;
-		}
-		.btn-return:after {
-			content: "";
-			position: absolute;
-			left: -25px;
-			bottom: 0;
-			width: 0;
-			height: 0;
-			border-left: 25px solid transparent;
-			border-top: 23px solid #f00;
-			border-bottom: 23px solid #f00;
-		}
-		.btn-return:before {
-			content: "";
-			position: absolute;
-			right: -25px;
-			bottom: 0;
-			width: 0;
-			height: 0;
-			border-left: 25px solid red;
-			border-top: 23px solid transparent;
-			border-bottom: 23px solid transparent;
-		}
-	</style>
+{% block stylesheet %}
+<link rel="stylesheet" href="{{ asset('assets/css/select2/select2.min.css', 'user_data') }}">
+<style>
+	.alert-search {
+		border: solid 1px #333;
+		background-color: #ccc;
+		border-radius: 8px;
+	}
+	.btn-search,
+	.btn-search:hover,
+	.btn-search:focus {
+		background-color: #000;
+		color: #fff;
+		border-radius: 8px;
+	}
+	.alert-return {
+		float: right;
+	}
+	.btn-return,
+	.btn-return:hover,
+	.btn-return:focus {
+		border: none;
+		border-radius: 0;
+		background-color: #f00;
+		color: #fff;
+		font-weight: bold;
+		font-size: 16px;
+		padding: 12px 36px;
+		position: relative;
+	}
+	.btn-return:after {
+		content: "";
+		position: absolute;
+		left: -25px;
+		bottom: 0;
+		width: 0;
+		height: 0;
+		border-left: 25px solid transparent;
+		border-top: 23px solid #f00;
+		border-bottom: 23px solid #f00;
+	}
+	.btn-return:before {
+		content: "";
+		position: absolute;
+		right: -25px;
+		bottom: 0;
+		width: 0;
+		height: 0;
+		border-left: 25px solid red;
+		border-top: 23px solid transparent;
+		border-bottom: 23px solid transparent;
+	}
+	.search_shipping_date,
+	.search_shipping_date:focus,
+	.search_shipping_date:hover {
+		color: #fff;
+	}
+</style>
+{% endblock stylesheet %}
 
+{% block main %}
 	<div class="ec-layoutRole__main">
 		<div class="ec-mypageRole">
 			<div class="ec-pageHeader">
@@ -108,7 +116,13 @@ body_class = 'mypage' %}
 							<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
 						</th>
 						<th title="shipping_date">
-							<p class="text-nowrap">{{ "front.mypage.return.shipping_date" | trans | raw }}</p>
+							<a class="text-nowrap search_shipping_date" href="javascript:void(0)">{{ "front.mypage.return.shipping_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span></a>
+							<select class="form-control text-nowrap" id="search_shipping_date" name="search_shipping_date">
+                                <option value="0" {% if 0 == param.search_shipping_date %}selected{%  endif %}>すべて</option>
+                                {% for shipping_date in shipping_date_list %}
+                                    <option value="{{ shipping_date.key }}" {% if shipping_date.key == param.search_shipping_date %}selected{%  endif %}>{{ shipping_date.value }}</option>
+                                {% endfor %}
+                            </select>
 						</th>
 						<th title="shiping_code otodoke_code">
 							<p class="text-nowrap">{{ "front.mypage.return.shiping_code" | trans | raw}}</p>
@@ -174,7 +188,13 @@ body_class = 'mypage' %}
 			{% endif %}
 		</div>
 	</div>
-{% endblock %}
+{% endblock main %}
+
 {% block javascript %}
-	<script></script>
-{% endblock %}
+<script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
+<script>
+	$( function() {
+		$("#search_shipping_date").select2();
+	})
+</script>
+{% endblock javascript %}
