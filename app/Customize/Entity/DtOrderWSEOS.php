@@ -50,6 +50,12 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         /**
          * @var string
          *
+         * @ORM\Column(name="order_import_day", type="string", nullable=true, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '取込日付'")
+         */
+        private $order_import_day;
+        /**
+         * @var string
+         *
          * @ORM\Column(name="order_no", type="string", length=20,options={"comment":"注文伝票番号'=客先発注№(cus_order_no)"}, nullable=false)
          * @ORM\Id
          */
@@ -1273,7 +1279,7 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         }
 
         /**
-         * @return \DateTime
+         * @return string
          */
         public function getOrderDate()
         {
@@ -1334,6 +1340,22 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         public function setOrderUpdateDay($order_update_day)
         {
             $this->order_update_day = $order_update_day;
+        }
+
+        /**
+         * @return \DateTime
+         */
+        public function getOrderImportDay()
+        {
+            return $this->order_import_day;
+        }
+
+        /**
+         * @param $order_import_day
+         */
+        public function setOrderImportDay($order_import_day)
+        {
+            $this->order_import_day = $order_import_day;
         }
     }
 }

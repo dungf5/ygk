@@ -39,7 +39,7 @@ class DtOrderWSEOSRepository extends AbstractRepository
             $object = new DtOrderWSEOS();
             $object->setOrderType((int) $data['order_type']);
             $object->setWebOrderType((int) $data['web_order_type']);
-            $object->setOrderDate($data['order_date'] ? date('Y-m-d H:i:s', strtotime($data['order_date'])) : null);
+            $object->setOrderDate($data['order_date'] ? date('Y-m-d', strtotime($data['order_date'])) : null);
             $object->setOrderNo($data['order_no']);
             $object->setSystemCode($data['system_code']);
             $object->setOrderCompanyCode($data['order_company_code']);
@@ -77,8 +77,9 @@ class DtOrderWSEOSRepository extends AbstractRepository
             $object->setRemarksLineNo($data['remarks_line_no']);
             $object->setJanCode($data['jan_code']);
             $object->setCashTypeCode($data['cash_type_code']);
-            $object->setOrderCreateDay($data['order_create_day'] ? date('Y-m-d H:i:s', strtotime($data['order_create_day'])) : null);
-            $object->setOrderUpdateDay($data['order_update_day'] ? date('Y-m-d H:i:s', strtotime($data['order_update_day'])) : null);
+            $object->setOrderCreateDay($data['order_create_day'] ? date('Y-m-d', strtotime($data['order_create_day'])) : null);
+            $object->setOrderUpdateDay($data['order_update_day'] ? date('Y-m-d', strtotime($data['order_update_day'])) : null);
+            $object->setOrderImportDay(date('Y-m-d'));
             $object->setOrderRegistedFlg(0);
 
             $this->getEntityManager()->persist($object);
@@ -158,6 +159,62 @@ class DtOrderWSEOSRepository extends AbstractRepository
             log_info('Update dt_order_ws_eos error');
             log_info($e->getMessage());
 
+            return;
+        }
+    }
+
+    public function updateError($data = [])
+    {
+        try {
+            if (empty($data)) {
+                return;
+            }
+
+            $object = $this->findOneBy([
+                'order_no' => $data['order_no'],
+                'order_line_no' => $data['order_line_no'],
+            ]);
+
+            if (!empty($object)) {
+                foreach ($data as $key => $value) {
+                    if ($key == 'error_content1') {
+                        $object->setErrorContent1($value);
+                    }
+                    if ($key == 'error_content2') {
+                        $object->setErrorContent2($value);
+                    }
+                    if ($key == 'error_content3') {
+                        $object->setErrorContent3($value);
+                    }
+                    if ($key == 'error_content4') {
+                        $object->setErrorContent4($value);
+                    }
+                    if ($key == 'error_content5') {
+                        $object->setErrorContent5($value);
+                    }
+                    if ($key == 'error_content6') {
+                        $object->setErrorContent6($value);
+                    }
+                    if ($key == 'error_content7') {
+                        $object->setErrorContent7($value);
+                    }
+                    if ($key == 'error_content8') {
+                        $object->setErrorContent8($value);
+                    }
+                    if ($key == 'error_content9') {
+                        $object->setErrorContent9($value);
+                    }
+                    if ($key == 'error_content10') {
+                        $object->setErrorContent10($value);
+                    }
+                }
+
+                $this->getEntityManager()->persist($object);
+                $this->getEntityManager()->flush();
+            }
+
+            return;
+        } catch (\Exception $e) {
             return;
         }
     }

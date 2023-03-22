@@ -755,7 +755,7 @@ class MailService
     }
 
     /**
-     * Send order mail.
+     * Send order ws eos mail.
      *
      * @param string $template
      * @param array $information
@@ -833,6 +833,78 @@ class MailService
 
         $count = $this->mailer->send($message);
         log_info('[WS-EOS]受注メール送信完了', ['count' => $count]);
+
+        return $message;
+    }
+
+    /**
+     * Send error ws eos mail.
+     *
+     * @param string $template
+     * @param array $information
+     *
+     * @return \Swift_Message
+     *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function sendMailErrorWSEOS($information = [])
+    {
+        if (empty($information)) {
+            return;
+        }
+
+        if (empty($information['email'])) {
+            return;
+        }
+
+        log_info('[WS-EOS] Start Send Mail Error.');
+
+        // Information
+        $information['subject_mail'] = 'EOS注文データにエラーがありました';
+        $information['title_mail'] = '※本メールは自動配信メールです。';
+        $information['error_title'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
+        $information['error_title'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
+        $information['content'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+        $information['content2'] = 'ご連絡くださいますようお願いいたします。';
+
+        $body = $this->twig->render($information['file_name'], [
+            'information' => $information,
+        ]);
+
+        $message = (new \Swift_Message())
+            ->setSubject('['.$this->BaseInfo->getShopName().'] '.$information['subject_mail'])
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$information['email']])
+            ->setReplyTo($this->BaseInfo->getEmail03())
+            ->setReturnPath($this->BaseInfo->getEmail04());
+
+        if (!empty($information['email_cc'])) {
+            $message->setCc($information['email_cc']);
+        }
+
+        if (!empty($information['email_bcc'])) {
+            $message->setBcc($information['email_bcc']);
+        }
+
+        // HTMLテンプレートが存在する場合
+        $htmlFileName = $this->getHtmlTemplate($information['file_name']);
+        if (!is_null($htmlFileName)) {
+            $htmlBody = $this->twig->render($htmlFileName, [
+                'information' => $information,
+            ]);
+
+            $message
+                ->setContentType('text/plain; charset=UTF-8')
+                ->setBody($body, 'text/plain')
+                ->addPart($htmlBody, 'text/html');
+        } else {
+            $message->setBody($body);
+        }
+
+        $count = $this->mailer->send($message);
+        log_info('[WS-EOS] End Send Mail Error.', ['count' => $count]);
 
         return $message;
     }
