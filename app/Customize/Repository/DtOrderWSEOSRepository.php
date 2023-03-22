@@ -39,7 +39,7 @@ class DtOrderWSEOSRepository extends AbstractRepository
             $object = new DtOrderWSEOS();
             $object->setOrderType((int) $data['order_type']);
             $object->setWebOrderType((int) $data['web_order_type']);
-            $object->setOrderDate($data['order_date'] ? date('Y-m-d H:i:s', strtotime($data['order_date'])) : null);
+            $object->setOrderDate($data['order_date'] ? date('Y-m-d', strtotime($data['order_date'])) : null);
             $object->setOrderNo($data['order_no']);
             $object->setSystemCode($data['system_code']);
             $object->setOrderCompanyCode($data['order_company_code']);
@@ -77,8 +77,9 @@ class DtOrderWSEOSRepository extends AbstractRepository
             $object->setRemarksLineNo($data['remarks_line_no']);
             $object->setJanCode($data['jan_code']);
             $object->setCashTypeCode($data['cash_type_code']);
-            $object->setOrderCreateDay($data['order_create_day'] ? date('Y-m-d H:i:s', strtotime($data['order_create_day'])) : null);
-            $object->setOrderUpdateDay($data['order_update_day'] ? date('Y-m-d H:i:s', strtotime($data['order_update_day'])) : null);
+            $object->setOrderCreateDay($data['order_create_day'] ? date('Y-m-d', strtotime($data['order_create_day'])) : null);
+            $object->setOrderUpdateDay($data['order_update_day'] ? date('Y-m-d', strtotime($data['order_update_day'])) : null);
+            $object->setOrderImportDay(date('Y-m-d'));
             $object->setOrderRegistedFlg(0);
 
             $this->getEntityManager()->persist($object);

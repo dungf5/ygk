@@ -100,6 +100,13 @@ class ValidateCsvDataCommand extends Command
     {
         try {
             log_info('Start Handle Validate WS EOS DATA');
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            // Get data to validate ws eos
+//            $data = $this->entityManager->getRepository(DtOrderWSEOS::class)->findBy([
+//                'order_import_day' => $order_no,
+//                'order_registed_flg' => $order_line_no,
+//            ]);
+
 
             $cache_file = getenv('LOCAL_FTP_DIRECTORY') ?? '/html/dowload/csv/order/';
             $cache_file .= 'ws_eos_cache_file.txt';

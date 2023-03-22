@@ -19,7 +19,6 @@ use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtImportCSV;
 use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\DtOrderWSEOSCopy;
-use Customize\Service\Common\MyCommonService;
 use Customize\Service\CSVService;
 use Customize\Service\FTPService;
 use Customize\Service\MailService;
@@ -238,7 +237,7 @@ class ImportCsvOrderCommand extends Command
         if (getenv('APP_IS_LOCAL') == 1) {
             $cache_file = '.'.$cache_file;
         }
-        $cache_file .= 'ws_eos_cache_file.txt';
+        $cache_file .= 'ws_eos_cache_file'.date('Ymd').'.txt';
         // open file to write to
         if (!$handle = fopen($cache_file, 'a')) {
             log_error("Cannot open file ({$cache_file})");
