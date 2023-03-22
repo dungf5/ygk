@@ -121,8 +121,13 @@
                             </a>
 						</th>
 						<th title="shiping_code otodoke_code">
-							<p class="text-nowrap">{{ "front.mypage.return.shiping_code" | trans | raw}}</p>
-							<p class="text-nowrap">{{ "front.mypage.return.otodoke_code" | trans | raw }}</p>
+							<a href="javascript:void(0)" class="text-nowrap search_shipping_date">
+                                {{ "front.mypage.return.shiping_code" | trans | raw}} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+                            </a>
+							<br/>
+							<a href="javascript:void(0)" class="text-nowrap search_shipping_date">
+                                {{ "front.mypage.return.otodoke_code" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+                            </a>
 						</th>
 						<th title="jan_code product_name">
 							<p class="text-nowrap">{{ "front.mypage.return.jan_code" | trans | raw }}</p>
