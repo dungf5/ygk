@@ -4,7 +4,21 @@
 
 {% block stylesheet %}
 <link rel="stylesheet" href="{{ asset('assets/css/select2/select2.min.css', 'user_data') }}">
-<style></style>
+<style>
+	.left_background{
+		background-color: #fce4d6;
+		color: #000;
+		font-weight: normal;
+	}
+	.preview {
+		position: relative;
+	}
+	.preview>button {
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+</style>
 {% endblock stylesheet%}
 
 {% block main %}
@@ -15,124 +29,171 @@
 			</div>
 		</div>
 		<div class="ec-mypageRole">
-			<form class="form-horizontal">
-				<div class="form-group">
-					<label class="col-xs-12 text-right">※返品確定日は返品商品到着後となります</label>
-				</div>
-				<div class="form-group">
-					<label for="customer_code" class="col-xs-2 control-label">お客様</label>
-					<div class="col-xs-10">
-						<input type="email" class="form-control" id="customer_code" name="customer_code"/>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="shipping_code" class="col-xs-2 control-label">出荷先</label>
-					<div class="col-xs-10">
-						<select class="form-control" name="shipping_code" id="shipping_code" onChange="changeShippingSode( this.value )">
-							{% for shipping in shippings %}
-								<option selected value="{{ shipping.shipping_no }}">{{ shipping.name01 }} 〒 {{ shipping.postal_code }} {{ shipping.addr01 }} {{ shipping.addr02 }} {{ shipping.addr03 }}</option>
-							{% endfor %}
-						</select>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="otodoke_code" class="col-xs-2 control-label">届け先</label>
-					<div class="col-xs-10">
-						<select class="form-control" name="otodoke_code" id="otodoke_code"></select>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="shipping_no" class="col-xs-2 control-label">出荷指示№</label>
-					<div class="col-xs-10">
-						<input type="email" class="form-control" id="shipping_no" name="shipping_no"/>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="shipping_day" class="col-xs-2 control-label">出荷日</label>
-					<div class="col-xs-10">
-						<input type="email" class="form-control" id="shipping_day" name="shipping_day"/>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="jan_code" class="col-xs-2 control-label">JANコード</label>
-					<div class="col-xs-10">
-						<input type="email" class="form-control" id="jan_code" name="jan_code"/>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="product_name" class="col-xs-2 control-label">商品名</label>
-					<div class="col-xs-10">
-						<input type="email" class="form-control" id="product_name" name="product_name"/>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="shipping_num" class="col-xs-2 control-label">出荷数</label>
-					<div class="col-xs-10">
-						<input type="email" class="form-control" id="shipping_num" name="shipping_num"/>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="return_status" class="col-xs-2 control-label">返品中</label>
-					<div class="col-xs-10">
-						<input type="email" class="form-control" id="return_status" name="return_status"/>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="return_reason" class="col-xs-2 control-label">返品理由</label>
-					<div class="col-xs-10">
-						<select class="form-control" name="return_reason" id="return_reason">
-							<option value="1">商品を間違えて注文した</option>
-							<option value="2">注文した商品とは違う商品が届いた・・・出荷日より30日以内承認自動化</option>
-							<option value="3">商品に不具合または損傷がある</option>
-							<option value="4">注文した商品が余分に届いた・・・出荷日より30日以内承認自動化</option>
-							<option value="5">注文した覚えがない</option>
-							<option value="6">サイト上の説明と違った</option>
-							<option value="7">客注キャンセル</option>
-							<option value="8">定番商品入れ替え</option>
-							<option value="9">納品遅れによるキャンセル</option>
-							<option value="10">その他</option>
-						</select>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="customer_comment" class="col-xs-2 control-label">顧客コメント</label>
-					<div class="col-xs-10">
-						<textarea class="form-control" id="customer_comment" name="customer_comment" rows="3"></textarea>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="rerurn_num" class="col-xs-2 control-label">返品数</label>
-					<div class="col-xs-2">
-						<input type="number" class="form-control" id="rerurn_num" name="rerurn_num"/>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="product_status1" class="col-xs-2 control-label">良品・不良品</label>
-					<div class="col-xs-10">
-						<label class="radio-inline">
-							<input type="radio" name="product_status" id="product_status1" value="1">
-							良品
-						</label>
-						<label class="radio-inline">
-							<input type="radio" name="product_status" id="product_status2" value="2">
-							不良品
-						</label>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="images" class="col-xs-12 text-center">商品画像</label>
-					<div class="col-xs-2">
-						<button type="button" class="btn btn-primary">画像添付</button>
-					</div>
-					<div class="col-xs-6"></div>
-					<div class="col-xs-2 text-center">
-						<button type="button" class="btn btn-warning">返品リクエスト送信</button>
-					</div>
-					<div class="col-xs-2 text-center">
-						<button type="button" class="btn btn-warning">返品手続きに戻る</button>
-					</div>
-				</div>
-			</form>
+			<div class="col-xs-12 text-right">
+				<label>※返品確定日は返品商品到着後となります</label>
+			</div>
+			<div class="col-xs-12">
+				<form class="form-horizontal">
+					<table class="table table-bordered">
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="customer_code">お客様</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<input type="email" class="form-control" id="customer_code" name="customer_code"/>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="shipping_code">出荷先</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<select class="form-control" name="shipping_code" id="shipping_code" onChange="changeShippingSode( this.value )">
+									{% for shipping in shippings %}
+										<option selected value="{{ shipping.shipping_no }}">{{ shipping.name01 }} 〒 {{ shipping.postal_code }} {{ shipping.addr01 }} {{ shipping.addr02 }} {{ shipping.addr03 }}</option>
+									{% endfor %}
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="otodoke_code">届け先</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<select class="form-control" name="otodoke_code" id="otodoke_code"></select>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="shipping_no">出荷指示№</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<input type="email" class="form-control" id="shipping_no" name="shipping_no"/>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="shipping_day">出荷日</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<input type="email" class="form-control" id="shipping_day" name="shipping_day"/>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="jan_code">JANコード</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<input type="email" class="form-control" id="jan_code" name="jan_code"/>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="product_name">商品名</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<input type="email" class="form-control" id="product_name" name="product_name"/>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="shipping_num">出荷数</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<input type="email" class="form-control" id="shipping_num" name="shipping_num"/>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="return_status">返品中</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<input type="email" class="form-control" id="return_status" name="return_status"/>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="return_reason">返品理由</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<select class="form-control" name="return_reason" id="return_reason">
+									<option value="1">商品を間違えて注文した</option>
+									<option value="2">注文した商品とは違う商品が届いた・・・出荷日より30日以内承認自動化</option>
+									<option value="3">商品に不具合または損傷がある</option>
+									<option value="4">注文した商品が余分に届いた・・・出荷日より30日以内承認自動化</option>
+									<option value="5">注文した覚えがない</option>
+									<option value="6">サイト上の説明と違った</option>
+									<option value="7">客注キャンセル</option>
+									<option value="8">定番商品入れ替え</option>
+									<option value="9">納品遅れによるキャンセル</option>
+									<option value="10">その他</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="customer_comment">顧客コメント</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<textarea class="form-control" id="customer_comment" name="customer_comment" rows="3"></textarea>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="rerurn_num">返品数</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<div class="row">
+									<div class="col-xs-2">
+										<input type="number" class="form-control" id="rerurn_num" name="rerurn_num"/>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="product_status1">良品・不良品</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<label class="radio-inline">
+									<input type="radio" name="product_status" id="product_status1" value="1">
+									良品
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="product_status" id="product_status2" value="2">
+									不良品
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-center left_background" colspan="2">
+								<label for="images">商品画像</label>
+								<input type="file" class="hidden" id="images" name="images" accept="image/*" multiple onchange="imagesPreview( this )"/>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right">
+								<label class="btn btn-primary" for="images">画像添付</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<div class="col-xs-6"></div>
+								<div class="col-xs-3 text-center">
+									<button type="button" class="btn btn-warning">返品リクエスト送信</button>
+								</div>
+								<div class="col-xs-3 text-center">
+									<button type="button" class="btn btn-warning">返品手続きに戻る</button>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<div class="row" id="images_preview">
+								</div>
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
 		</div>
 	</div>
 {% endblock %}
@@ -171,6 +232,41 @@
 		.fail(function(json) {
 			alert("更新に失敗しました。")
 		})
+	}
+	const imagesPreview = (e)=>{
+		let _images_preview = $("#images_preview")
+		_images_preview.empty() 
+		let _files = e.files
+
+		if( _files.length > 6 ) {
+			e.value = null;
+			alert("最大6枚の画像")
+			return
+		}
+
+		for (var i = 0; i < 6 ; i++) {
+			let _i = i
+			let _f = _files[i]
+			let _fileReader = new FileReader();
+			_fileReader.onload = (e)=>{
+				_images_preview.append( `<div class="col-xs-2 preview">
+					<img src="${e.target.result}" class="img-thumbnail" />
+					<button type="button" class="btn btn-danger" onclick="imagesPreviewDelete( ${_i} )"><i class="fas fa-times"></i></button>
+				</div>` );
+			}
+			_fileReader.readAsDataURL( _f )
+		}
+	}
+	const imagesPreviewDelete = (index)=>{
+		let _dt = new DataTransfer()
+		let _input = document.getElementById('images')
+		let { files } = _input
+		for (let i = 0; i < files.length; i++) {
+			let _file = files[i]
+			if( index !== i ) _dt.items.add( _file )
+		}
+		_input.files = _dt.files
+		imagesPreview( _input )
 	}
 	$( function() {
 		let _shipping_code_first = $("#shipping_code option:first").val()
