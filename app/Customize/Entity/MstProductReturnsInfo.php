@@ -25,7 +25,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @var string
          *
-         * @ORM\Column(name="customer_code", type="string", length=25,options={"comment":"顧客"}, nullable=true)
+         * @ORM\Column(name="customer_code", type="string")
          */
         private $customer_code;
         /**

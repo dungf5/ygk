@@ -918,9 +918,9 @@ class MypageController extends AbstractController
             }
         }
         $order_status = $my_common->getOrderStatus($customer_code, $login_type);
-        
+
         $qb = $this->orderItemRepository->getQueryBuilderReturnByCustomer($param, $order_status);
-        
+
         $pagination = $paginator->paginate(
             $qb,
             $request->get('pageno', 1),

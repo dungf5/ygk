@@ -1,0 +1,181 @@
+{% extends 'default_frame.twig' %}
+
+{% set body_class = 'mypage' %}
+
+{% block stylesheet %}
+<link rel="stylesheet" href="{{ asset('assets/css/select2/select2.min.css', 'user_data') }}">
+<style></style>
+{% endblock stylesheet%}
+
+{% block main %}
+	<div class="ec-layoutRole__main">
+		<div class="ec-mypageRole">
+			<div class="ec-pageHeader">
+				<h1>返品リクエスト送信</h1>
+			</div>
+		</div>
+		<div class="ec-mypageRole">
+			<form class="form-horizontal">
+				<div class="form-group">
+					<label class="col-xs-12 text-right">※返品確定日は返品商品到着後となります</label>
+				</div>
+				<div class="form-group">
+					<label for="customer_code" class="col-xs-2 control-label">お客様</label>
+					<div class="col-xs-10">
+						<input type="email" class="form-control" id="customer_code" name="customer_code"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="shipping_code" class="col-xs-2 control-label">出荷先</label>
+					<div class="col-xs-10">
+						<select class="form-control" name="shipping_code" id="shipping_code" onChange="changeShippingSode( this.value )">
+							{% for shipping in shippings %}
+								<option selected value="{{ shipping.shipping_no }}">{{ shipping.name01 }} 〒 {{ shipping.postal_code }} {{ shipping.addr01 }} {{ shipping.addr02 }} {{ shipping.addr03 }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="otodoke_code" class="col-xs-2 control-label">届け先</label>
+					<div class="col-xs-10">
+						<select class="form-control" name="otodoke_code" id="otodoke_code"></select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="shipping_no" class="col-xs-2 control-label">出荷指示№</label>
+					<div class="col-xs-10">
+						<input type="email" class="form-control" id="shipping_no" name="shipping_no"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="shipping_day" class="col-xs-2 control-label">出荷日</label>
+					<div class="col-xs-10">
+						<input type="email" class="form-control" id="shipping_day" name="shipping_day"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="jan_code" class="col-xs-2 control-label">JANコード</label>
+					<div class="col-xs-10">
+						<input type="email" class="form-control" id="jan_code" name="jan_code"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="product_name" class="col-xs-2 control-label">商品名</label>
+					<div class="col-xs-10">
+						<input type="email" class="form-control" id="product_name" name="product_name"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="shipping_num" class="col-xs-2 control-label">出荷数</label>
+					<div class="col-xs-10">
+						<input type="email" class="form-control" id="shipping_num" name="shipping_num"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="return_status" class="col-xs-2 control-label">返品中</label>
+					<div class="col-xs-10">
+						<input type="email" class="form-control" id="return_status" name="return_status"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="return_reason" class="col-xs-2 control-label">返品理由</label>
+					<div class="col-xs-10">
+						<select class="form-control" name="return_reason" id="return_reason">
+							<option value="1">商品を間違えて注文した</option>
+							<option value="2">注文した商品とは違う商品が届いた・・・出荷日より30日以内承認自動化</option>
+							<option value="3">商品に不具合または損傷がある</option>
+							<option value="4">注文した商品が余分に届いた・・・出荷日より30日以内承認自動化</option>
+							<option value="5">注文した覚えがない</option>
+							<option value="6">サイト上の説明と違った</option>
+							<option value="7">客注キャンセル</option>
+							<option value="8">定番商品入れ替え</option>
+							<option value="9">納品遅れによるキャンセル</option>
+							<option value="10">その他</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="customer_comment" class="col-xs-2 control-label">顧客コメント</label>
+					<div class="col-xs-10">
+						<textarea class="form-control" id="customer_comment" name="customer_comment" rows="3"></textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="rerurn_num" class="col-xs-2 control-label">返品数</label>
+					<div class="col-xs-2">
+						<input type="number" class="form-control" id="rerurn_num" name="rerurn_num"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="product_status1" class="col-xs-2 control-label">良品・不良品</label>
+					<div class="col-xs-10">
+						<label class="radio-inline">
+							<input type="radio" name="product_status" id="product_status1" value="1">
+							良品
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="product_status" id="product_status2" value="2">
+							不良品
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="images" class="col-xs-12 text-center">商品画像</label>
+					<div class="col-xs-2">
+						<button type="button" class="btn btn-primary">画像添付</button>
+					</div>
+					<div class="col-xs-6"></div>
+					<div class="col-xs-2 text-center">
+						<button type="button" class="btn btn-warning">返品リクエスト送信</button>
+					</div>
+					<div class="col-xs-2 text-center">
+						<button type="button" class="btn btn-warning">返品手続きに戻る</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
+<script>
+	const changeShippingSode = ( shipping_no )=>{
+		if( ! shipping_no ) return
+		
+		let _el = $("#otodoke_code")
+		_el.empty()
+		$.ajax({
+			url: "{{ url('otodoke_option') }}",
+			type: 'POST',
+			dataType: 'json',
+			data: {
+				'customer_id'  : "{{ customer_id }}",
+				'shipping_code': shipping_no,
+				'_csrf_token'  : "{{ csrf_token('authenticate') }}",
+			},
+			beforeSend : ()=>loadingOverlay("show"),
+			complete : ()=>loadingOverlay("hide"),
+		})
+		.done(function(json) {
+			if( json.status ) {
+				let _data = json.data
+				if( _data.length > 0 ) {
+					_data.forEach( (item)=> {
+						_el.append( new Option( `${(item.name01?item.name01:'')} 〒 ${(item.postal_code?item.postal_code:'')} ${(item.addr01?item.addr01:'')} ${(item.addr02?item.addr02:'')} ${(item.addr03?item.addr03:'')}`, item.otodoke_code) )
+					})
+				}
+				_el.select2()
+			}
+		})
+		.fail(function(json) {
+			alert("更新に失敗しました。")
+		})
+	}
+	$( function() {
+		let _shipping_code_first = $("#shipping_code option:first").val()
+		$("#shipping_code").val( _shipping_code_first )
+		changeShippingSode( _shipping_code_first )
+	})
+</script>
+{% endblock javascript%}

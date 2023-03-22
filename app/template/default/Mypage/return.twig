@@ -116,9 +116,19 @@
 							<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
 						</th>
 						<th title="shipping_date">
+<<<<<<< HEAD
 							<a href="javascript:void(0)" class="text-nowrap search_shipping_date">
                                 {{ "front.mypage.return.shipping_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
                             </a>
+=======
+							<a class="text-nowrap search_shipping_date" href="javascript:void(0)">{{ "front.mypage.return.shipping_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span></a>
+							<select class="form-control text-nowrap" id="search_shipping_date" name="search_shipping_date">
+                                <option value="0" {% if 0 == param.search_shipping_date %}selected{%  endif %}>すべて</option>
+                                {% for shipping_date in shipping_date_list %}
+                                    <option value="{{ shipping_date.key }}" {% if shipping_date.key == param.search_shipping_date %}selected{%  endif %}>{{ shipping_date.value }}</option>
+                                {% endfor %}
+                            </select>
+>>>>>>> 2023/hdhai/9078
 						</th>
 						<th title="shiping_code otodoke_code">
 							<p class="text-nowrap">{{ "front.mypage.return.shiping_code" | trans | raw}}</p>
@@ -184,6 +194,7 @@
 			{% endif %}
 		</div>
 	</div>
+<<<<<<< HEAD
 {% endblock main%}
 
 {% block javascript %}
@@ -192,3 +203,15 @@
 	
 </script>
 {% endblock %}
+=======
+{% endblock main %}
+
+{% block javascript %}
+<script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
+<script>
+	$( function() {
+		$("#search_shipping_date").select2();
+	})
+</script>
+{% endblock javascript %}
+>>>>>>> 2023/hdhai/9078
