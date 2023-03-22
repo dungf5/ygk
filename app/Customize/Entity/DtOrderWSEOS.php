@@ -1273,7 +1273,7 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         }
 
         /**
-         * @return \DateTime
+         * @return string
          */
         public function getOrderDate()
         {

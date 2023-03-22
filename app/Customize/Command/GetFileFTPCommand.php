@@ -46,7 +46,7 @@ class GetFileFTPCommand extends Command
     protected $mailService;
 
     protected static $defaultName = 'get-file-ftp-command';
-    protected static $defaultDescription = 'Add a short description for your command';
+    protected static $defaultDescription = 'Process Get File Ftp Command';
 
     public function __construct(EntityManagerInterface $entityManager, MailService $mailService)
     {

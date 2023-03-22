@@ -161,4 +161,60 @@ class DtOrderWSEOSRepository extends AbstractRepository
             return;
         }
     }
+
+    public function updateError($data = [])
+    {
+        try {
+            if (empty($data)) {
+                return;
+            }
+
+            $object = $this->findOneBy([
+                'order_no' => $data['order_no'],
+                'order_line_no' => $data['order_line_no'],
+            ]);
+
+            if (!empty($object)) {
+                foreach ($data as $key => $value) {
+                    if ($key == 'error_content1') {
+                        $object->setErrorContent1($value);
+                    }
+                    if ($key == 'error_content2') {
+                        $object->setErrorContent2($value);
+                    }
+                    if ($key == 'error_content3') {
+                        $object->setErrorContent3($value);
+                    }
+                    if ($key == 'error_content4') {
+                        $object->setErrorContent4($value);
+                    }
+                    if ($key == 'error_content5') {
+                        $object->setErrorContent5($value);
+                    }
+                    if ($key == 'error_content6') {
+                        $object->setErrorContent6($value);
+                    }
+                    if ($key == 'error_content7') {
+                        $object->setErrorContent7($value);
+                    }
+                    if ($key == 'error_content8') {
+                        $object->setErrorContent8($value);
+                    }
+                    if ($key == 'error_content9') {
+                        $object->setErrorContent9($value);
+                    }
+                    if ($key == 'error_content10') {
+                        $object->setErrorContent10($value);
+                    }
+                }
+
+                $this->getEntityManager()->persist($object);
+                $this->getEntityManager()->flush();
+            }
+
+            return;
+        } catch (\Exception $e) {
+            return;
+        }
+    }
 }

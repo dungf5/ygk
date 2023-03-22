@@ -40,16 +40,15 @@ class ImportCsvOrderCommand extends Command
 
     /** @var EntityManagerInterface */
     private $entityManager;
-    private $commonService;
     private $csvService;
     private $ftpService;
     /**
      * @var MailService
      */
-    protected $mailService;
+    private $mailService;
 
     protected static $defaultName = 'import-csv-order-command';
-    protected static $defaultDescription = 'Add a short description for your command';
+    protected static $defaultDescription = 'Process Import Csv Order Command';
 
     private $headers = [
         'order_type',
@@ -100,7 +99,6 @@ class ImportCsvOrderCommand extends Command
     {
         parent::__construct();
         $this->entityManager = $entityManager;
-        $this->commonService = new MyCommonService($entityManager);
         $this->csvService = new CSVService($entityManager);
         $this->ftpService = new FTPService($entityManager);
         $this->mailService = $mailService;
