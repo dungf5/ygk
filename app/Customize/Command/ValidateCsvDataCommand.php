@@ -175,7 +175,7 @@ class ValidateCsvDataCommand extends Command
             log_info("Validate order ({$order_no}-{$order_line_no})");
 
             // validate order_date
-            if (empty($object['order_date']) || (date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d'))) {
+            if (empty($object['order_date']) || (date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d') && $object['order_registed_flg'] != 1)) {
                 $error['error_content1'] = '発注日付が過去日付になっています';
             }
 
