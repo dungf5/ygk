@@ -38,13 +38,6 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @var string
          *
-         * @ORM\Column(name="shipping_name", type="string", length=4,options={"comment":"出荷先コード khohang"}, nullable=false)
-         * @ORM\Id
-         */
-        private $otodoke_code;
-        /**
-         * @var string
-         *
          * @ORM\Column(name="otodoke_code", type="string", length=4,options={"comment":"出荷先コード khohang"}, nullable=false)
          * @ORM\Id
          */

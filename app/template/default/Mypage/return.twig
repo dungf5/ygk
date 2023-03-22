@@ -69,7 +69,7 @@ body_class = 'mypage' %}
 						<form class="form-inline" method="GET">
 							<div class="form-group">
 								<label for="jan_code">JANコード</label>
-								<input type="text" class="form-control" id="jan_code" name="jan_code"/>
+								<input type="text" class="form-control" id="jan_code" name="jan_code" value="{{ param.search_jan_code }}"/>
 							</div>
 							<button type="submit" class="btn btn-search">
 								<i class="fas fa-angle-double-right" style="color: #f00"></i > 絞り込み
@@ -96,63 +96,64 @@ body_class = 'mypage' %}
 				<thead>
 					<tr>
 						<th title="return_type">
-							{{ "front.mypage.return.return_type" | trans | raw }}
+							<p class="text-nowrap">{{ "front.mypage.return.return_type" | trans | raw }}</p>
 						</th>
 						<th title="return_number">
-							{{ "front.mypage.return.return_number" | trans | raw }}
+							<p class="text-nowrap">{{ "front.mypage.return.return_number" | trans | raw }}</p>
 						</th>
 						<th title="return_status">
-							{{ "front.mypage.return.return_status" | trans | raw }}
+							<p class="text-nowrap">{{ "front.mypage.return.return_status" | trans | raw }}</p>
 						</th>
 						<th title="shipping_no">
-							{{ "front.mypage.return.shipping_no" | trans | raw }}
+							<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
 						</th>
 						<th title="shipping_date">
-							{{ "front.mypage.return.shipping_date" | trans | raw }}
+							<p class="text-nowrap">{{ "front.mypage.return.shipping_date" | trans | raw }}</p>
 						</th>
 						<th title="shiping_code otodoke_code">
-							{{ "front.mypage.return.shiping_code" | trans | raw
-                        }}<br/>
-							{{ "front.mypage.return.otodoke_code" | trans | raw }}
+							<p class="text-nowrap">{{ "front.mypage.return.shiping_code" | trans | raw}}</p>
+							<p class="text-nowrap">{{ "front.mypage.return.otodoke_code" | trans | raw }}</p>
 						</th>
 						<th title="jan_code product_name">
-							{{ "front.mypage.return.jan_code" | trans | raw }}<br/>
-							{{ "front.mypage.return.product_name" | trans | raw }}
+							<p class="text-nowrap">{{ "front.mypage.return.jan_code" | trans | raw }}</p>
+							<p class="text-nowrap">{{ "front.mypage.return.product_name" | trans | raw }}</p>
 						</th>
 						<th title="shipping_num">
-							{{ "front.mypage.return.shipping_num" | trans | raw }}
+							<p class="text-nowrap">{{ "front.mypage.return.shipping_num" | trans | raw }}</p>
 						</th>
 					</tr>
 				</thead>
 				{% if pagination and pagination.totalItemCount > 0 %}
 					<tbody>
 						{% for item in pagination %}
-							<td title="return_type">
-								{{ item.return_type }}
-							</td>
-							<td title="return_number">
-								{{ item.return_number }}
-							</td>
-							<td title="return_status">
-								{{ item.return_status }}
-							</td>
-							<td title="shipping_no">
-								{{ item.shipping_no }}
-							</td>
-							<td title="shipping_date">
-								{{ item.shipping_date }}
-							</td>
-							<td title="shiping_code otodoke_code">
-								{{ item.shiping_code }}
-								{{ item.otodoke_code }}
-							</td>
-							<td title="jan_code product_name">
-								{{ item.jan_code }}
-								{{ item.product_name }}
-							</td>
-							<td title="shipping_num">
-								{{ item.shipping_num }}
-							</td>
+							<tr>
+								<td title="return_type">
+									<a href="#" class="btn btn-warning" role="button">手続き</a>
+								</td>
+								<td title="return_number">
+									<input type="number" class="form-control" />
+								</td>
+								<td title="return_status">
+									1
+								</td>
+								<td title="shipping_no">
+									<p class="text-nowrap">{{ item.shipping_no }}</p>
+								</td>
+								<td title="shipping_date">
+									<p class="text-nowrap">{{ item.shipping_date }}</p>
+								</td>
+								<td title="shiping_code otodoke_code">
+									<p class="text-nowrap">{{ item.shipping_name }}</p>
+									<p class="text-nowrap">{{ item.otodoke_name }}</p>
+								</td>
+								<td title="jan_code product_name">
+									<p class="text-nowrap">{{ item.jan_code }}</p>
+									<p class="text-nowrap">{{ item.product_name }}</p>
+								</td>
+								<td title="shipping_num">
+									<p class="text-nowrap">{{ item.shipping_num }}</p>
+								</td>
+							</tr>
 						{% endfor %}
 					</tbody>
 				{% else %}

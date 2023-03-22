@@ -926,9 +926,10 @@ class MypageController extends AbstractController
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
-
+        
         return [
             'pagination' => $pagination,
+            'param'      => $param,
         ];
     }
 }
