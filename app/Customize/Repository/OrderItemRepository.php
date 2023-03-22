@@ -226,4 +226,67 @@ class OrderItemRepository extends AbstractRepository
          //die();
         return $qb;
     }
+
+    public function getQueryBuilderReturnByCustomer($paramSearch = [], $order_status = [])
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('shipping.shipping_no');
+        $qb->from('Customize\Entity\DtOrderStatus', 'order_status');
+        $qb->innerJoin(
+            'Customize\Entity\MstProduct',
+            'product',
+            Join::WITH,
+            "product.product_code = order_status.product_code"
+        );
+        $qb->leftJoin(
+            'Customize\Entity\MstShipping',
+            'shipping',
+            Join::WITH,
+            "shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno"
+        );
+
+        $qb->addSelect(
+            'shipping.shipping_date',
+            'product.jan_code',
+            'product.product_name',
+            'order_status.shipping_num'
+        );
+        $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = order_status.shipping_code) shipping_name');
+        $qb->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = order_status.otodoke_code) otodoke_name');
+        $qb->where('shipping.delete_flg IS NULL OR shipping.delete_flg <> 0');
+        $qb->andWhere('order_status.order_date >= :order_date')
+            ->setParameter('order_date', date("Y-m-d", strtotime("-24 MONTH")));
+        $qb->andWhere('shipping.shipping_status = :shipping_status' )
+            ->setParameter('shipping_status', 2);
+
+        if( count($order_status) > 0 ) {
+            $where = '';
+            foreach($order_status as $k=>$os ) {
+                if( ! empty($where) ) $where .= ' OR ';
+                $where .= " ( order_status.cus_order_no = :order_status_cus_order_no_{$k} AND order_status.cus_order_lineno = :order_status_cus_order_lineno_{$k} ) ";
+                $qb->setParameter("order_status_cus_order_no_{$k}", $os['cus_order_no']);
+                $qb->setParameter("order_status_cus_order_lineno_{$k}", $os['cus_order_lineno']);
+            }
+            $qb->andWhere( $where );
+        }
+
+        if ( $paramSearch['search_jan_code'] != '' ) {
+            $qb->andWhere( 'product.jan_code LIKE :search_jan_code' )
+                ->setParameter(':search_jan_code', "%{$paramSearch['search_jan_code']}%");
+        }
+
+        //group
+        $qb->addGroupBy('order_status.order_no');
+        $qb->addGroupBy('order_status.order_line_no');
+
+        // Order By
+        $qb->addOrderBy('order_status.order_date', 'DESC');
+        $qb->addOrderBy('order_status.cus_order_no', 'DESC');
+        $qb->addOrderBy('order_status.cus_order_lineno', 'ASC');
+
+        // dump($qb->getQuery()->getSQL());
+        // dump($qb->getParameters());
+        // die();
+        return $qb;
+    }
 }

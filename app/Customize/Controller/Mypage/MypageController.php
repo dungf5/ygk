@@ -69,7 +69,7 @@ class MypageController extends AbstractController
      */
     protected $productImageRepository;
 
-     /**
+    /**
      * @var MstShippingRepository
      */
     protected $mstShippingRepository;
@@ -150,7 +150,7 @@ class MypageController extends AbstractController
             $otodoke_code   = $arRe[0]["otodoke_code"];
             $shipping_code  = $arRe[0]["shipping_code"];
 
-            foreach ($arRe AS $key => &$item) {
+            foreach ($arRe as $key => &$item) {
                 if ($item['jan_code'] == $jan_code) {
                     $item['highlight'] = true;
                 } else {
@@ -160,7 +160,7 @@ class MypageController extends AbstractController
         }
 
         $arMore             = $comS->getShipListExtend($otodoke_code, $shipping_code);
-        $arReturn           = [ "myData"=>$arRe, "arMore"=>$arMore, "login_type"=>$login_type ];
+        $arReturn           = ["myData" => $arRe, "arMore" => $arMore, "login_type" => $login_type];
 
         return $arReturn;
     }
@@ -174,14 +174,14 @@ class MypageController extends AbstractController
     public function exportOrderPdf(Request $request)
     {
         $login_type         = $this->globalService->getLoginType();
-        if( in_array($login_type, ['shipping_code', 'otodoke_code']) ) return;
+        if (in_array($login_type, ['shipping_code', 'otodoke_code'])) return;
 
         $htmlFileName               = "Mypage/exportOrderPdf.twig";
         $delivery_no                = MyCommon::getPara("delivery_no");
         $order_no_line_no           = MyCommon::getPara("order_no_line_no");
 
         $comS                       = new MyCommonService($this->entityManager);
-        $orderNo                    = explode("-",$order_no_line_no)[0];
+        $orderNo                    = explode("-", $order_no_line_no)[0];
         $arRe                       = $comS->getPdfDelivery($delivery_no, $orderNo);
 
         //add special line
@@ -194,17 +194,17 @@ class MypageController extends AbstractController
             $inCr++;
             $totalTax               = $totalTax + $item["tax"];
             $totalaAmount           = $totalaAmount + $item["amount"];
-            $totalTaxRe             = $totalTaxRe +  (10/100)*(int) $item["amount"];
+            $totalTaxRe             = $totalTaxRe +  (10 / 100) * (int) $item["amount"];
             $item['is_total']       = 0;
             $item['autoIncr']       = $inCr;
-            $item['delivery_date']  = explode(" ",$item['delivery_date'])[0] ;
+            $item['delivery_date']  = explode(" ", $item['delivery_date'])[0];
         }
 
-        $totalaAmountTax            = $totalaAmount + $totalTaxRe;//$item["tax"];
-        $arSpecial                  = ["is_total"=>1,'totalaAmount'=>$totalaAmount,'totalTax'=>$totalTax];
+        $totalaAmountTax            = $totalaAmount + $totalTaxRe; //$item["tax"];
+        $arSpecial                  = ["is_total" => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
         $arRe[]                     = $arSpecial;
 
-        $dirPdf                     = MyCommon::getHtmluserDataDir()."/pdf";
+        $dirPdf                     = MyCommon::getHtmluserDataDir() . "/pdf";
         FileUtil::makeDirectory($dirPdf);
         $arReturn                   = [
             "myDatas"               => array_chunk($arRe, 20),
@@ -212,21 +212,19 @@ class MypageController extends AbstractController
             "totalTaxRe"            => $totalTaxRe,
             "totalaAmountTax"       => $totalaAmountTax
         ];
-        $namePdf                    = "ship_".$delivery_no.".pdf";
-        $file                       = $dirPdf."/".$namePdf;
+        $namePdf                    = "ship_" . $delivery_no . ".pdf";
+        $file                       = $dirPdf . "/" . $namePdf;
 
         if (getenv("APP_IS_LOCAL") == 0) {
-          $htmlBody                 = $this->twig->render($htmlFileName, $arReturn);
-            MyCommon::converHtmlToPdf($dirPdf,$namePdf,$htmlBody);
+            $htmlBody                 = $this->twig->render($htmlFileName, $arReturn);
+            MyCommon::converHtmlToPdf($dirPdf, $namePdf, $htmlBody);
             header("Content-Description: File Transfer");
             header("Content-Type: application/octet-stream");
-            header("Content-Disposition: attachment; filename=\"". basename($file) ."\"");
+            header("Content-Disposition: attachment; filename=\"" . basename($file) . "\"");
 
-            readfile ($file);
+            readfile($file);
             exit();
-        }
-
-        else{
+        } else {
             exec('"C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe" c:/wamp/www/test/pdf.html c:/wamp/www/test/pdf.pdf');
         }
 
@@ -304,15 +302,13 @@ class MypageController extends AbstractController
                 $myItem['update_date']      = $myItem['update_date']->format('Y-m-d');
                 if (MyCommon::checkExistText($myItem['update_date'], '.000000')) {
                     $myItem['update_date']  = str_replace('.000000', '', $myItem['update_date']);
-                }
-
-                else {
+                } else {
                     $myItem['update_date']  = str_replace('000', '', $myItem['update_date']);
                 }
             }
 
             if (isset(MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']])) {
-                $myItem['order_status_name']= MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']];
+                $myItem['order_status_name'] = MyConstant::ARR_ORDER_STATUS_TEXT[$myItem['order_status']];
             }
 
             if (isset(MyConstant::ARR_SHIPPING_STATUS_TEXT[$myItem['shipping_status']])) {
@@ -324,14 +320,14 @@ class MypageController extends AbstractController
             $myItem['shipping_num']         = $myItem['shipping_num'] * $myItem['quantity'];
 
             $myItem['order_type']           = '';
-             if (!empty($myItem['ec_type'])) {
-                 if ($myItem['ec_type'] == "1") {
-                     $myItem['order_type']  = 'EC';
-                 }
+            if (!empty($myItem['ec_type'])) {
+                if ($myItem['ec_type'] == "1") {
+                    $myItem['order_type']  = 'EC';
+                }
 
-                 if ($myItem['ec_type'] == "2") {
-                     $myItem['order_type']  = 'EOS';
-                 }
+                if ($myItem['ec_type'] == "2") {
+                    $myItem['order_type']  = 'EOS';
+                }
             }
         }
 
@@ -360,9 +356,7 @@ class MypageController extends AbstractController
         foreach ($listItem as &$myItem) {
             if (isset($hsKeyImg[$myItem['product_id']])) {
                 $myItem['main_img'] = $hsKeyImg[$myItem['product_id']];
-            }
-
-            else {
+            } else {
                 $myItem['main_img'] = null;
             }
 
@@ -382,8 +376,8 @@ class MypageController extends AbstractController
         /*create list order date*/
         $orderDateList          = [];
         $orderDateList[]        = [
-            'key'               => (string)date("Y-m", ),
-            'value'             => (string)date("Y-m", ),
+            'key'               => (string)date("Y-m",),
+            'value'             => (string)date("Y-m",),
         ];
 
         for ($i = 1; $i < 14; $i++) {
@@ -407,7 +401,7 @@ class MypageController extends AbstractController
         $orderShippingList      = [];
         $shippingList           = $this->globalService->shippingOption();
         if (count($shippingList) > 1) {
-            foreach ($shippingList AS $item) {
+            foreach ($shippingList as $item) {
                 $orderShippingList[]    = [
                     'key'               => $item["shipping_no"],
                     'value'             => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
@@ -420,7 +414,7 @@ class MypageController extends AbstractController
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
-            foreach ($otodokeList AS $item) {
+            foreach ($otodokeList as $item) {
                 $orderOtodeokeList[]    = [
                     'key'               => $item["otodoke_code"],
                     'value'             => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
@@ -451,7 +445,7 @@ class MypageController extends AbstractController
     public function login(Request $request, AuthenticationUtils $utils)
     {
         // Check case must to choose represent
-        if(!empty($_SESSION["choose_represent"])) {
+        if (!empty($_SESSION["choose_represent"])) {
             $my_common              = new MyCommonService($this->entityManager);
             $representList          = $my_common->getListRepresent();
 
@@ -475,7 +469,6 @@ class MypageController extends AbstractController
                         $_SESSION['customer_id']                                = $new_customer_id;
                         $_SESSION["usc_{$new_customer_id}"]['login_type']       = $my_common->checkLoginType($represent_code);
                         $_SESSION["usc_{$new_customer_id}"]['login_code']       = $represent_code;
-
                     } catch (\Exception $e) {
                         $_SESSION["choose_represent"]                           = TRUE;
                         $_SESSION['customer_id']                                = $customerId;
@@ -486,7 +479,7 @@ class MypageController extends AbstractController
         }
 
         // Check case must to choose shipping
-        if(!empty($_SESSION["choose_shipping"])) {
+        if (!empty($_SESSION["choose_shipping"])) {
             $shippingList           = $this->globalService->shippingOption();
 
             if (count($shippingList) > 1) {
@@ -508,7 +501,6 @@ class MypageController extends AbstractController
                             $_SESSION['s_shipping_code']                    = $shipping_code;
                             $_SESSION["usc_{$customerId}"]['login_type']    = "change_type";
                         }
-
                     } catch (\Exception $e) {
                         $_SESSION["choose_shipping"]                    = TRUE;
                         $_SESSION['s_shipping_code']                    = '';
@@ -598,7 +590,7 @@ class MypageController extends AbstractController
      * @Route("/mypage/shipping/change", name="mypage_shipping", methods={"POST"})
      * @Template("Mypage/login.twig")
      */
-    public function changeShippingCode (Request $request)
+    public function changeShippingCode(Request $request)
     {
         try {
             if ('POST' === $request->getMethod()) {
@@ -614,7 +606,6 @@ class MypageController extends AbstractController
                             $_SESSION['s_shipping_code']                    = $shipping_code;
                             $_SESSION["usc_{$customerId}"]['login_type']    = "change_type";
                         }
-
                     } catch (\Exception $e) {
                         return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
                     }
@@ -624,7 +615,6 @@ class MypageController extends AbstractController
             }
 
             return $this->json(['status' => 0], 400);
-
         } catch (\Exception $e) {
             return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
         }
@@ -683,7 +673,7 @@ class MypageController extends AbstractController
 
         //modify data
         foreach ($listItem as &$myItem) {
-            $myItem['shipping_company_code']= trim($myItem['shipping_company_code']);
+            $myItem['shipping_company_code'] = trim($myItem['shipping_company_code']);
             $myItem['delivery_url']         = "";
 
             if ($myItem['shipping_company_code'] == '8003') {
@@ -729,7 +719,7 @@ class MypageController extends AbstractController
         $orderShippingList      = [];
         $shippingList           = $this->globalService->shippingOption();
         if (count($shippingList) > 1) {
-            foreach ($shippingList AS $item) {
+            foreach ($shippingList as $item) {
                 $orderShippingList[]    = [
                     'key'               => $item["shipping_no"],
                     'value'             => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
@@ -741,7 +731,7 @@ class MypageController extends AbstractController
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
-            foreach ($otodokeList AS $item) {
+            foreach ($otodokeList as $item) {
                 $orderOtodeokeList[]    = [
                     'key'               => $item["otodoke_code"],
                     'value'             => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
@@ -799,8 +789,8 @@ class MypageController extends AbstractController
         /*create list order date*/
         $shippingDateList       = [];
         $shippingDateList[]     = [
-            'key'               => (string)date("Y-m", ),
-            'value'             => (string)date("Y-m", ),
+            'key'               => (string)date("Y-m",),
+            'value'             => (string)date("Y-m",),
         ];
 
         for ($i = 1; $i < 14; $i++) {
@@ -824,7 +814,7 @@ class MypageController extends AbstractController
         $orderShippingList      = [];
         $shippingList           = $this->globalService->shippingOption();
         if (count($shippingList) > 1) {
-            foreach ($shippingList AS $item) {
+            foreach ($shippingList as $item) {
                 $orderShippingList[]    = [
                     'key'               => $item["shipping_no"],
                     'value'             => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
@@ -837,7 +827,7 @@ class MypageController extends AbstractController
         $orderOtodeokeList      = [];
         $otodokeList            = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
         if (count($otodokeList)) {
-            foreach ($otodokeList AS $item) {
+            foreach ($otodokeList as $item) {
                 $orderOtodeokeList[]    = [
                     'key'               => $item["otodoke_code"],
                     'value'             => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
@@ -863,7 +853,7 @@ class MypageController extends AbstractController
      * @Route("/mypage/represent/change", name="mypage_represent", methods={"POST"})
      * @Template("Mypage/login.twig")
      */
-    public function changeRepresentCode (Request $request)
+    public function changeRepresentCode(Request $request)
     {
         try {
             if ('POST' === $request->getMethod()) {
@@ -881,7 +871,6 @@ class MypageController extends AbstractController
                         $_SESSION['customer_id']                                = $new_customer_id;
                         $_SESSION["usc_{$new_customer_id}"]['login_type']       = $my_common->checkLoginType($represent_code[1] ?? "");
                         $_SESSION["usc_{$new_customer_id}"]['login_code']       = $represent_code[1] ?? "";
-
                     } catch (\Exception $e) {
                         return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
                     }
@@ -891,9 +880,56 @@ class MypageController extends AbstractController
             }
 
             return $this->json(['status' => 0], 400);
-
         } catch (\Exception $e) {
             return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
         }
+    }
+
+    /**
+     * 返品手続き
+     *
+     * @Route("/mypage/return", name="mypage_return", methods={"GET"})
+     * @Template("Mypage/return.twig")
+     */
+    public function return(Request $request, PaginatorInterface $paginator)
+    {
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
+
+        //Params
+        $param = [
+            'pageno'          => $request->get('pageno', 1),
+            'search_jan_code' => $request->get('jan_code', ''),
+        ];
+
+        // paginator
+        $user_login    = $this->twig->getGlobals()["app"]->getUser();
+        $customer_id   = $this->globalService->customerId();
+        $login_type    = $this->globalService->getLoginType();
+        $my_common     = new MyCommonService($this->entityManager);
+        $customer_code = $user_login->getCustomerCode();
+
+        if (!empty($_SESSION["usc_" . $customer_id]) && !empty($_SESSION["usc_" . $customer_id]['login_code'])) {
+            $represent_code     = $_SESSION["usc_" . $customer_id]['login_code'];
+            $temp_customer_code = $my_common->getCustomerRelation($represent_code);
+            if (!empty($temp_customer_code)) {
+                $customer_code = $temp_customer_code['customer_code'];
+            }
+        }
+        $order_status = $my_common->getOrderStatus($customer_code, $login_type);
+        
+        $qb = $this->orderItemRepository->getQueryBuilderReturnByCustomer($param, $order_status);
+        
+        $pagination = $paginator->paginate(
+            $qb,
+            $request->get('pageno', 1),
+            $this->eccubeConfig['eccube_search_pmax'],
+            ['distinct' => false]
+        );
+        
+        return [
+            'pagination' => $pagination,
+            'param'      => $param,
+        ];
     }
 }
