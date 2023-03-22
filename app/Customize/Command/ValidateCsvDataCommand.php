@@ -17,6 +17,8 @@ namespace Customize\Command;
 
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtOrderWSEOS;
+use Customize\Entity\MstCustomer;
+use Customize\Entity\MstProduct;
 use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
@@ -150,6 +152,14 @@ class ValidateCsvDataCommand extends Command
                 'order_line_no' => $order_line_no,
             ]);
 
+            $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy([
+                'jan_code' => $object['jan_code'],
+            ]);
+
+            $customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
+                'customer_code' => $object['shipping_shop_code'],
+            ]);
+
             if (empty($object)) {
                 log_info("No order ({$order_no}-{$order_line_no})");
 
@@ -164,8 +174,35 @@ class ValidateCsvDataCommand extends Command
 
             log_info("Validate order ({$order_no}-{$order_line_no})");
 
-            if (date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d')) {
+            // validate order_date
+            if (empty($object['order_date']) || (date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d'))) {
                 $error['error_content1'] = '発注日付が過去日付になっています';
+            }
+
+            // Validate shipping_shop_code
+            if (empty($object['shipping_shop_code']) || empty($customer)) {
+                $error['error_content3'] = '出荷先支店コードが登録されていません';
+            }
+
+            // validate delivery_date
+            if (empty($object['delivery_date']) || (date('Y-m-d', strtotime($object['delivery_date'])) < date('Y-m-d'))) {
+                $error['error_content4'] = '納入希望日が過去日付になっています';
+            }
+
+            // Validate jan_code
+            if (empty($object['jan_code']) || empty($product)) {
+                $error['error_content5'] = 'JANコードが存在しません';
+            }
+
+            // Validate order_num
+            if (!empty($product)) {
+                if ((int) $object['order_num'] % (int) $product['quantity']) {
+                    $error['error_content6'] = '発注数量の販売単位に誤りがあります';
+                }
+            }
+
+            if (!empty($product) && !empty($object['customer_code']) && !empty($object['shipping_code'])) {
+
             }
 
             if (count($error)) {
