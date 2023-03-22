@@ -1,8 +1,9 @@
 {% extends 'default_frame.twig' %}
 {% set mypageno = 'return' %}
-{% set
-body_class = 'mypage' %}
-{% block main %}
+{% set body_class = 'mypage' %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap-multiselect.min.css') }}">
 	<style>
 		.alert-search {
 			border: solid 1px #333;
@@ -53,8 +54,15 @@ body_class = 'mypage' %}
 			border-top: 23px solid transparent;
 			border-bottom: 23px solid transparent;
 		}
+		.search_shipping_date,
+		.search_shipping_date:hover,
+		.search_shipping_date:focus {
+			color: #fff;
+		}
 	</style>
+{% endblock stylesheet %}
 
+{% block main %}
 	<div class="ec-layoutRole__main">
 		<div class="ec-mypageRole">
 			<div class="ec-pageHeader">
@@ -108,7 +116,9 @@ body_class = 'mypage' %}
 							<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
 						</th>
 						<th title="shipping_date">
-							<p class="text-nowrap">{{ "front.mypage.return.shipping_date" | trans | raw }}</p>
+							<a href="javascript:void(0)" class="text-nowrap search_shipping_date">
+                                {{ "front.mypage.return.shipping_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+                            </a>
 						</th>
 						<th title="shiping_code otodoke_code">
 							<p class="text-nowrap">{{ "front.mypage.return.shiping_code" | trans | raw}}</p>
@@ -174,7 +184,11 @@ body_class = 'mypage' %}
 			{% endif %}
 		</div>
 	</div>
-{% endblock %}
+{% endblock main%}
+
 {% block javascript %}
-	<script></script>
+<script src="{{ asset('assets/js/bootstrap-multiselect.min.js') }}"></script>
+<script>
+	
+</script>
 {% endblock %}

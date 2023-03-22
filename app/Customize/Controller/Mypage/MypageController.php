@@ -898,8 +898,9 @@ class MypageController extends AbstractController
 
         //Params
         $param = [
-            'pageno'          => $request->get('pageno', 1),
-            'search_jan_code' => $request->get('jan_code', ''),
+            'pageno'               => $request->get('pageno', 1),
+            'search_jan_code'      => $request->get('jan_code', ''),
+            'search_shipping_date' => $request->get('search_shipping_date', 0),
         ];
 
         // paginator
@@ -927,9 +928,20 @@ class MypageController extends AbstractController
             ['distinct' => false]
         );
         
+        /*create list order date*/
+        $shipping_date_list          = [];
+        for ($i = 0; $i < 24; $i++) {
+            $date               = date("Y-m", strtotime("- $i month"));
+            $shipping_date_list[]    = [
+                'key'           => (string)$date,
+                'value'         => (string)$date,
+            ];
+        }
+        
         return [
-            'pagination' => $pagination,
-            'param'      => $param,
+            'pagination'         => $pagination,
+            'param'              => $param,
+            'shipping_date_list' => $shipping_date_list,
         ];
     }
 }
