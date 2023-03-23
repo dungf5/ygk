@@ -751,7 +751,7 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         }
 
         /**
-         * @return int
+         * @return integer
          */
         public function getOrderLineNo()
         {
@@ -759,7 +759,7 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         }
 
         /**
-         * @param int $order_line_no
+         * @param integer $order_line_no
          */
         public function setOrderLineNo($order_line_no)
         {

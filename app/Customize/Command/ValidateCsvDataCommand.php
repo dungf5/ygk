@@ -16,6 +16,8 @@ declare(strict_types=1);
 namespace Customize\Command;
 
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\DtOrder;
+use Customize\Entity\DtOrderStatus;
 use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstCustomer;
 use Customize\Entity\MstProduct;
@@ -42,6 +44,10 @@ class ValidateCsvDataCommand extends Command
      * @var MailService
      */
     private $mailService;
+    /**
+     * @var MyCommonService
+     */
+    private $commonService;
     private $errors = [];
 
     protected static $defaultName = 'validate-csv-data-command';
@@ -52,6 +58,7 @@ class ValidateCsvDataCommand extends Command
         parent::__construct();
         $this->entityManager = $entityManager;
         $this->mailService = $mailService;
+        $this->commonService = new MyCommonService($entityManager);
     }
 
     protected function configure(): void
@@ -91,6 +98,7 @@ class ValidateCsvDataCommand extends Command
         switch ($param) {
             case 'ws-eos':
                     $this->handleValidateWSEOS();
+                    $this->handleImportDataWSEOS();
                 break;
 
             default:
@@ -273,6 +281,94 @@ class ValidateCsvDataCommand extends Command
         try {
             log_info('[WS-EOS] Send Mail Error.');
             $this->mailService->sendMailErrorWSEOS($information);
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            return;
+        }
+    }
+
+    private function handleImportDataWSEOS()
+    {
+        try {
+            log_info('Start Handle Import Data To dt_order, dt_order_status');
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
+            // Get data to import
+            $data = $this->entityManager->getRepository(DtOrderWSEOS::class)->findBy([
+                'order_import_day' => date('Y-m-d'),
+                'order_registed_flg' => 0,
+                'error_type' => null,
+            ], [
+                'shipping_shop_code' => 'ASC',
+                'order_shop_code' => 'ASC',
+                'order_no' => 'ASC',
+                'order_line_no' => 'ASC',
+            ]);
+
+            foreach ($data as $item) {
+                $this->importDtOrder($item->toArray());
+                $this->importDtOrderStatus($item);
+            }
+
+            log_info('End Handle Import Data To dt_order, dt_order_status');
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            return;
+        }
+    }
+
+    private function importDtOrder($data)
+    {
+        try {
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
+            $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findOneBy([
+                'order_no' => $data['order_no'],
+                'order_lineno' => $data['order_line_no'],
+            ]);
+
+            // Create order if empty
+            if (empty($dtOrder)) {
+                log_info('Import data dt_order '.$data['order_no'].'-'.$data['order_line_no']);
+
+                $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy([
+                    'jan_code' => $data['jan_code'] ?? '',
+                ]);
+                $data['demand_unit'] = (!empty($product) && $product['quantity'] > 1) ? 'CS' : 'PC';
+
+                $location = $this->commonService->getCustomerLocation($data['customer_code']);
+                $data['location'] = !empty($location) ? $location['stock_location'] : 'XB0201001';
+
+                $this->entityManager->getRepository(DtOrder::class)->insertData($data);
+            }
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            return;
+        }
+    }
+
+    private function importDtOrderStatus($data)
+    {
+        try {
+            $dtOrderStatus = $this->entityManager->getRepository(DtOrderStatus::class)->findOneBy([
+                'cus_order_no' => $data['order_no'],
+                'cus_order_lineno' => $data['order_line_no'],
+            ]);
+
+            // Create order_status if empty
+            if (empty($dtOrderStatus)) {
+                log_info('Import data dt_order_status '.$data['order_no'].'-'.$data['order_line_no']);
+                $this->entityManager->getRepository(DtOrderStatus::class)->insertData($data);
+            }
 
             return;
         } catch (\Exception $e) {
