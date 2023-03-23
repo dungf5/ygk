@@ -31,7 +31,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/* Run Batch: php bin/console validate-csv-data-command */
+/* Run Batch: php bin/console validate-csv-data-command [param] */
 class ValidateCsvDataCommand extends Command
 {
     use PluginCommandTrait;
