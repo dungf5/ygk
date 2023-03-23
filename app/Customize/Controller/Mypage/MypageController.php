@@ -23,6 +23,8 @@ use Customize\Repository\OrderItemRepository;
 use Customize\Repository\OrderRepository;
 use Customize\Repository\ProductImageRepository;
 use Customize\Repository\MstShippingRepository;
+use Customize\Repository\MstProductReturnsInfoRepository;
+use Customize\Repository\DtReturnsImageInfoRepository;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\GlobalService;
 use Doctrine\DBAL\Types\Type;
@@ -75,6 +77,15 @@ class MypageController extends AbstractController
     protected $mstShippingRepository;
 
     /**
+     * @var MstProductReturnsInfoRepository
+     */
+    protected $mstProductReturnsInfoRepository;
+    /**
+     * @var DtReturnsImageInfoRepository
+     */
+    protected $dtReturnsImageInfoRepository;
+
+    /**
      * @var \Twig_Environment
      */
     protected $twig;
@@ -102,6 +113,8 @@ class MypageController extends AbstractController
         OrderRepository $orderRepository,
         ProductImageRepository $productImageRepository,
         MstShippingRepository $mstShippingRepository,
+        MstProductReturnsInfoRepository $mstProductReturnsInfoRepository,
+        DtReturnsImageInfoRepository $dtReturnsImageInfoRepository,
         OrderItemRepository $orderItemRepository,
         \Twig_Environment $twig,
         EntityManagerInterface $entityManager,
@@ -109,14 +122,16 @@ class MypageController extends AbstractController
         CustomerFavoriteProductRepository $customerFavoriteProductRepository,
         GlobalService $globalService
     ) {
-        $this->orderRepository        = $orderRepository;
-        $this->productImageRepository = $productImageRepository;
-        $this->mstShippingRepository  = $mstShippingRepository;
-        $this->orderItemRepository    = $orderItemRepository;
-        $this->twig                   = $twig;
-        $this->entityManager          = $entityManager;
-        $myCm                         = new MyCommonService($this->entityManager);
-        $this->globalService          = $globalService;
+        $this->orderRepository                 = $orderRepository;
+        $this->productImageRepository          = $productImageRepository;
+        $this->mstShippingRepository           = $mstShippingRepository;
+        $this->mstProductReturnsInfoRepository = $mstProductReturnsInfoRepository;
+        $this->dtReturnsImageInfoRepository    = $dtReturnsImageInfoRepository;
+        $this->orderItemRepository             = $orderItemRepository;
+        $this->twig                            = $twig;
+        $this->entityManager                   = $entityManager;
+        $myCm                           = new MyCommonService($this->entityManager);
+        $this->globalService            = $globalService;
 
         if ($this->twig->getGlobals()["app"]->getUser() != null) {
             $MyDataMstCustomer                                  = $myCm->getMstCustomer($this->globalService->customerId());
@@ -949,20 +964,126 @@ class MypageController extends AbstractController
     /**
      * 返品手続き
      *
-     * @Route("/mypage/return/create", name="mypage_return_create", methods={"GET"})
+     * @Route("/mypage/return/create", name="mypage_return_create", methods={"GET", "POST"})
      * @Template("Mypage/return_create.twig")
      */
     public function returnCreate(Request $request)
     {
-        $commonService = new MyCommonService($this->entityManager);
-        $login_type    = $this->globalService->getLoginType();
-        $customer_id   = $this->globalService->customerId();
+        $alert                  = false;
+        $commonService          = new MyCommonService($this->entityManager);
+        $login_type             = $this->globalService->getLoginType();
+        $customer_id            = $this->globalService->customerId();
+        $customer_shipping_code = $this->globalService->getShippingCode();
+        $customer_otodoke_code  = $this->globalService->getOtodokeCode();
+        //Params
+        $param = [
+            'shipping_no'   => $request->get('shipping_no'),
+            'shipping_day'  => $request->get('shipping_day'),
+            'jan_code'      => $request->get('jan_code'),
+            'product_name'  => $request->get('product_name'),
+            'shipping_num'  => $request->get('shipping_num'),
+            'return_status' => $request->get('return_status'),
+            'shipping_code' => $request->get('shipping_code', $customer_shipping_code),
+            'otodoke_code' => $request->get('otodoke_code', $customer_otodoke_code),
+        ];
 
-        $shippings       = $commonService->getMstShippingCustomer($login_type, $customer_id);
+        $returns_reson = $commonService->getReturnsReson();
+        $shippings     = $commonService->getMstShippingCustomer($login_type, $customer_id);
+        $otodokes      = [];
+        if( count($shippings) == 1 
+            && empty($param['shipping_code']) ) {
+            $param['shipping_code'] = $shippings[0]['shipping_no'];
+        }
+        
+        if( ! empty($param['shipping_code']) ) {
+            $otodokes = $this->globalService->otodokeOption($customer_id, $param['shipping_code']);
+            if( count($otodokes) == 1
+                && empty($param['otodoke_code']) ) {
+                $param['otodoke_code'] = $otodokes[0]['otodoke_code'];
+            }
+        }
+
+        if( 'POST' === $request->getMethod() ) {
+            $shipping_code = $param['shipping_code'];
+            $shipping_name = '';
+            foreach( $shippings as $shipping ) {
+                if( $shipping['shipping_no'] == $shipping_code ) {
+                    $shipping_name = "{$shipping['name01']} 〒 {$shipping['postal_code']} {$shipping['addr01']} {$shipping['addr03']} {$shipping['addr03']}";
+                }
+            }
+
+            $otodoke_code = $param['otodoke_code'];
+            $otodoke_name = '';
+            foreach( $otodokes as $otodoke ) {
+                if( $otodoke['otodoke_code'] == $otodoke_code ) {
+                    $otodoke_name = "{$otodoke['name01']} 〒 {$otodoke['postal_code']} {$otodoke['addr01']} {$otodoke['addr03']} {$otodoke['addr03']}";
+                }
+            }
+            
+            $cus_image_url_path = [];
+            $images = $request->files->get('images');
+            if( count($images) > 0 ) {
+                foreach( $images as $k=>$image ) {
+                    $mimeType = $image->getMimeType();
+                    if( 0 !== strpos( $mimeType, 'image' ) ) break;
+
+                    $extension = $image->getClientOriginalExtension();
+                    if( !in_array( strtolower($extension), ['jpg', 'jpeg', 'png'] ) ) break;
+
+                    $filename = date('ymdHis').uniqid('_').'.'.$extension;
+                    $path = $this->getParameter('eccube_return_image_dir');
+                    if( $image->move( $this->getParameter('eccube_return_image_dir'), $filename ) ) {
+                        $cus_image_url_path[ $k ] = str_replace($this->getParameter('eccube_html_dir'), "html", $path).'/'.$filename;
+                    }
+                }
+            }
+            
+            $mst_product_returns_info = $this->mstProductReturnsInfoRepository->insertData([
+                'customer_code'       => $customer_id,
+                'shipping_code'       => $shipping_code,
+                'shipping_name'       => $shipping_name,
+                'otodoke_code'        => $otodoke_code,
+                'otodoke_name'        => $otodoke_name,
+                'shipping_no'         => $request->get('shipping_no'),
+                'shipping_date'       => $request->get('shipping_day'),
+                'jan_code'            => $request->get('jan_code'),
+                'product_name'        => $request->get('product_name'),
+                'shipping_num'        => $request->get('shipping_num'),
+                'reason_returns_code' => $request->get('return_reason'),
+                'customer_comment'    => $request->get('customer_comment'),
+                'rerurn_num'          => $request->get('rerurn_num'),
+                'cus_reviews_flag'    => $request->get('product_status'),
+                'cus_image_url_path1' => @$cus_image_url_path[0],
+                'cus_image_url_path2' => @$cus_image_url_path[1],
+                'cus_image_url_path3' => @$cus_image_url_path[2],
+                'cus_image_url_path4' => @$cus_image_url_path[3],
+                'cus_image_url_path5' => @$cus_image_url_path[4],
+                'cus_image_url_path6' => @$cus_image_url_path[5],
+            ]);
+            if( count($images) > 0 ) {
+                $this->dtReturnsImageInfoRepository->insertData([
+                    'returns_no'          => $mst_product_returns_info->getReturnsNo(),
+                    'cus_image_url_path1' => $mst_product_returns_info->getCusImageUrlPath1(),
+                    'cus_image_url_path2' => $mst_product_returns_info->getCusImageUrlPath2(),
+                    'cus_image_url_path3' => $mst_product_returns_info->getCusImageUrlPath3(),
+                    'cus_image_url_path4' => $mst_product_returns_info->getCusImageUrlPath4(),
+                    'cus_image_url_path5' => $mst_product_returns_info->getCusImageUrlPath5(),
+                    'cus_image_url_path6' => $mst_product_returns_info->getCusImageUrlPath6(),
+                ]);
+            }
+
+            $alert = true;
+        }
 
         return [
-            'customer_id' => $customer_id,
-            'shippings'   => $shippings,
+            'customer_id'            => $customer_id,
+            'returns_reson'          => $returns_reson,
+            'shippings'              => $shippings,
+            'otodokes'               => $otodokes,
+            'customer_shipping_code' => $customer_shipping_code,
+            'customer_otodoke_code'  => $customer_otodoke_code,
+            'param'                  => $param,
+            'alert'                  => $alert,
         ];
     }
 }

@@ -2460,5 +2460,21 @@ SQL;
 
         return $objRep;
     }
+
+    public function getReturnsReson()
+    {
+        $sql = "SELECT `returns_reson_id`, `returns_reson` FROM `dt_returns_reson`";
+
+        $statement      = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result     = $statement->executeQuery();
+            $rows       = $result->fetchAllAssociative();
+            return $rows;
+
+        } catch (Exception $e) {
+            return [];
+        }
+    }
 }
 

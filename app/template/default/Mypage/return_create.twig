@@ -4,6 +4,7 @@
 
 {% block stylesheet %}
 <link rel="stylesheet" href="{{ asset('assets/css/select2/select2.min.css', 'user_data') }}">
+<link rel="stylesheet" href="{{ asset('assets/jquery-ui/jquery-ui.min.css', 'user_data') }}">
 <style>
 	.left_background{
 		background-color: #fce4d6;
@@ -29,177 +30,188 @@
 			</div>
 		</div>
 		<div class="ec-mypageRole">
-			<div class="col-xs-12 text-right">
-				<label>※返品確定日は返品商品到着後となります</label>
+			{% if alert %}
+			<div class="col-xs-12 text-center">
+				<p>返品リクエストを送信しました</p>
+				<a href="{{ url('mypage_return') }}" class="btn btn-warning">返品手続きに戻る</a>
 			</div>
-			<div class="col-xs-12">
-				<form class="form-horizontal">
-					<table class="table table-bordered">
-						<tr>
-							<td class="col-xs-2 text-right left_background">
-								<label for="customer_code">お客様</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<input type="email" class="form-control" id="customer_code" name="customer_code"/>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-right left_background">
-								<label for="shipping_code">出荷先</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<select class="form-control" name="shipping_code" id="shipping_code" onChange="changeShippingSode( this.value )">
-									{% for shipping in shippings %}
-										<option selected value="{{ shipping.shipping_no }}">{{ shipping.name01 }} 〒 {{ shipping.postal_code }} {{ shipping.addr01 }} {{ shipping.addr02 }} {{ shipping.addr03 }}</option>
-									{% endfor %}
-								</select>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-right left_background">
-								<label for="otodoke_code">届け先</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<select class="form-control" name="otodoke_code" id="otodoke_code"></select>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-right left_background">
-								<label for="shipping_no">出荷指示№</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<input type="email" class="form-control" id="shipping_no" name="shipping_no"/>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-right left_background">
-								<label for="shipping_day">出荷日</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<input type="email" class="form-control" id="shipping_day" name="shipping_day"/>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-right left_background">
-								<label for="jan_code">JANコード</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<input type="email" class="form-control" id="jan_code" name="jan_code"/>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-right left_background">
-								<label for="product_name">商品名</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<input type="email" class="form-control" id="product_name" name="product_name"/>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-right left_background">
-								<label for="shipping_num">出荷数</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<input type="email" class="form-control" id="shipping_num" name="shipping_num"/>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-right left_background">
-								<label for="return_status">返品中</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<input type="email" class="form-control" id="return_status" name="return_status"/>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-right left_background">
-								<label for="return_reason">返品理由</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<select class="form-control" name="return_reason" id="return_reason">
-									<option value="1">商品を間違えて注文した</option>
-									<option value="2">注文した商品とは違う商品が届いた・・・出荷日より30日以内承認自動化</option>
-									<option value="3">商品に不具合または損傷がある</option>
-									<option value="4">注文した商品が余分に届いた・・・出荷日より30日以内承認自動化</option>
-									<option value="5">注文した覚えがない</option>
-									<option value="6">サイト上の説明と違った</option>
-									<option value="7">客注キャンセル</option>
-									<option value="8">定番商品入れ替え</option>
-									<option value="9">納品遅れによるキャンセル</option>
-									<option value="10">その他</option>
-								</select>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-right left_background">
-								<label for="customer_comment">顧客コメント</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<textarea class="form-control" id="customer_comment" name="customer_comment" rows="3"></textarea>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-right left_background">
-								<label for="rerurn_num">返品数</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<div class="row">
-									<div class="col-xs-2">
-										<input type="number" class="form-control" id="rerurn_num" name="rerurn_num"/>
+			{% else %}
+				<div class="col-xs-12 text-right">
+					<label>※返品確定日は返品商品到着後となります</label>
+				</div>
+				<div class="col-xs-12">
+					<form class="form-horizontal" method="POST" enctype="multipart/form-data">
+						<table class="table table-bordered">
+							<tr>
+								<td class="col-xs-2 text-right left_background">
+									<label for="customer_code">お客様</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<input type="text" class="form-control" id="customer_code" name="customer_code" disabled value={{ customer_id }} />
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-right left_background">
+									<label for="shipping_code">出荷先</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<select class="form-control" name="shipping_code" id="shipping_code" onChange="changeShippingSode( this.value )">
+										{% for shipping in shippings %}
+											<option
+												{% if customer_shipping_code == shipping.shipping_no %} selected {% endif %}
+												value="{{ shipping.shipping_no }}">
+													{{ shipping.name01 }} 〒 {{ shipping.postal_code }} {{ shipping.addr01 }} {{ shipping.addr02 }} {{ shipping.addr03 }}
+											</option>
+										{% endfor %}
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-right left_background">
+									<label for="otodoke_code">届け先</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<select class="form-control" name="otodoke_code" id="otodoke_code">
+										{% for otodoke in otodokes %}
+											<option
+												{% if otodoke.otodoke_code == param.otodoke_code %} selected {% endif %}
+												value="{{ otodoke.otodoke_code }}">
+													{{ otodoke.name01 }} 〒 {{ otodoke.postal_code }} {{ otodoke.addr01 }} {{ otodoke.addr02 }} {{ otodoke.addr03 }}
+											</option>
+										{% endfor %}
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-right left_background">
+									<label for="shipping_no">出荷指示№</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<input type="text" class="form-control" id="shipping_no" name="shipping_no" value="{{ param.shipping_no }}"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-right left_background">
+									<label for="shipping_day">出荷日</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<input type="text" class="form-control" id="shipping_day" name="shipping_day" value="{{ param.shipping_day }}"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-right left_background">
+									<label for="jan_code">JANコード</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<input type="text" class="form-control" id="jan_code" name="jan_code" value="{{ param.jan_code }}"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-right left_background">
+									<label for="product_name">商品名</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<input type="text" class="form-control" id="product_name" name="product_name" value="{{ param.product_name }}"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-right left_background">
+									<label for="shipping_num">出荷数</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<input type="text" class="form-control" id="shipping_num" name="shipping_num" value="{{ param.shipping_num }}"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-right left_background">
+									<label for="return_status">返品中</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<input type="text" class="form-control" id="return_status" name="return_status" value="{{ param.return_status }}"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-right left_background">
+									<label for="return_reason">返品理由</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<select class="form-control" name="return_reason" id="return_reason" required>
+										{% for reson in returns_reson %}
+											<option value="{{ reson.returns_reson_id }}">{{ reson.returns_reson }}</option>
+										{% endfor %}
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-right left_background">
+									<label for="customer_comment">顧客コメント</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<textarea class="form-control" id="customer_comment" name="customer_comment" rows="3" required></textarea>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-right left_background">
+									<label for="rerurn_num">返品数</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<div class="row">
+										<div class="col-xs-2">
+											<input type="number" class="form-control" id="rerurn_num" name="rerurn_num" required/>
+										</div>
 									</div>
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-right left_background">
-								<label for="product_status1">良品・不良品</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<label class="radio-inline">
-									<input type="radio" name="product_status" id="product_status1" value="1">
-									良品
-								</label>
-								<label class="radio-inline">
-									<input type="radio" name="product_status" id="product_status2" value="2">
-									不良品
-								</label>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-center left_background" colspan="2">
-								<label for="images">商品画像</label>
-								<input type="file" class="hidden" id="images" name="images" accept="image/*" multiple onchange="imagesPreview( this )"/>
-							</td>
-						</tr>
-						<tr>
-							<td class="col-xs-2 text-right">
-								<label class="btn btn-primary" for="images">画像添付</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<div class="col-xs-6"></div>
-								<div class="col-xs-3 text-center">
-									<button type="button" class="btn btn-warning">返品リクエスト送信</button>
-								</div>
-								<div class="col-xs-3 text-center">
-									<button type="button" class="btn btn-warning">返品手続きに戻る</button>
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td colspan="2">
-								<div class="row" id="images_preview">
-								</div>
-							</td>
-						</tr>
-					</table>
-				</form>
-			</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-right left_background">
+									<label for="product_status1">良品・不良品</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<label class="radio-inline">
+										<input type="radio" name="product_status" id="product_status1" value="1" required checked> 良品
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="product_status" id="product_status2" value="2" required> 不良品
+									</label>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-center left_background" colspan="2">
+									<label for="images">商品画像</label>
+									<input type="file" class="hidden" id="images" name="images[]" accept="image/*" multiple onchange="imagesPreview( this )"/>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-2 text-right">
+									<label class="btn btn-primary" for="images">画像添付</label>
+								</td>
+								<td class="col-xs-10 text-left">
+									<div class="col-xs-6"></div>
+									<div class="col-xs-3 text-center">
+										<button type="submit" class="btn btn-warning">返品リクエスト送信</button>
+									</div>
+									<div class="col-xs-3 text-center">
+										<a href="{{ url('mypage_return') }}" class="btn btn-warning">返品手続きに戻る</a>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<div class="row" id="images_preview">
+									</div>
+								</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			{% endif %}
 		</div>
 	</div>
 {% endblock %}
 
 {% block javascript %}
 <script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
+<script src="{{ asset('assets/jquery-ui/jquery-ui.min.js', 'user_data') }}"></script>
 <script>
 	const changeShippingSode = ( shipping_no )=>{
 		if( ! shipping_no ) return
@@ -223,7 +235,12 @@
 				let _data = json.data
 				if( _data.length > 0 ) {
 					_data.forEach( (item)=> {
-						_el.append( new Option( `${(item.name01?item.name01:'')} 〒 ${(item.postal_code?item.postal_code:'')} ${(item.addr01?item.addr01:'')} ${(item.addr02?item.addr02:'')} ${(item.addr03?item.addr03:'')}`, item.otodoke_code) )
+						_el.append( new Option(
+							`${(item.name01?item.name01:'')} 〒 ${(item.postal_code?item.postal_code:'')} ${(item.addr01?item.addr01:'')} ${(item.addr02?item.addr02:'')} ${(item.addr03?item.addr03:'')}`,
+							item.otodoke_code,
+							false,
+							item.otodoke_code == "{{ customer_otodoke_code }}"
+						) )
 					})
 				}
 				_el.select2()
@@ -269,9 +286,10 @@
 		imagesPreview( _input )
 	}
 	$( function() {
-		let _shipping_code_first = $("#shipping_code option:first").val()
-		$("#shipping_code").val( _shipping_code_first )
-		changeShippingSode( _shipping_code_first )
+		$("#shipping_code").select2();
+		$("#otodoke_code").select2();
+
+		$( "#shipping_day" ).datepicker({ dateFormat: 'dd/mm/yy' })
 	})
 </script>
 {% endblock javascript%}

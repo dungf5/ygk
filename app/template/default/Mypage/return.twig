@@ -35,7 +35,7 @@
 		.btn-return:after {
 			content: "";
 			position: absolute;
-			left: -25px;
+			left: -24px;
 			bottom: 0;
 			width: 0;
 			height: 0;
@@ -46,7 +46,7 @@
 		.btn-return:before {
 			content: "";
 			position: absolute;
-			right: -25px;
+			right: -24px;
 			bottom: 0;
 			width: 0;
 			height: 0;
@@ -87,7 +87,7 @@
 				</div>
 				<div class="col-md-6">
 					<div class="alert alert-return" role="alert">
-						<a class="btn btn-return">
+						<a class="btn btn-return" href={{ url('mypage_return_create') }}>
 							<i class="fas fa-arrow-right"></i> 一覧にない場合はこちら
 						</a>
 					</div>
@@ -141,7 +141,8 @@
 				{% if pagination and pagination.totalItemCount > 0 %}
 					<tbody>
 						{% for item in pagination %}
-							<tr>
+							<tr 
+								onclick="window.location=`{{ url('mypage_return_create') }}?shipping_no={{ item.shipping_no }}&shipping_day={{ item.shipping_date|date('d/m/Y') }}&jan_code={{ item.jan_code }}&product_name={{ item.product_name }}&shipping_num={{ item.shipping_num }}&return_status=1`">
 								<td title="return_type">
 									<a href="#" class="btn btn-warning" role="button">手続き</a>
 								</td>
@@ -155,7 +156,7 @@
 									<p class="text-nowrap">{{ item.shipping_no }}</p>
 								</td>
 								<td title="shipping_date">
-									<p class="text-nowrap">{{ item.shipping_date }}</p>
+									<p class="text-nowrap">{{ item.shipping_date|date('Y-m-d') }}</p>
 								</td>
 								<td title="shiping_code otodoke_code">
 									<p class="text-nowrap">{{ item.shipping_name }}</p>
