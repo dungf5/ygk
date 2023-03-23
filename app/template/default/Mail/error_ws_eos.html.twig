@@ -27,19 +27,26 @@ file that was distributed with this source code.
                                 <br/>
                                 {{ information['error_title'] }}
                                 <br/>
-                                <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
-                                <pre>注文伝票番号 ＝ {{ information['error_data'][0]['order_no'] }}     注文伝票行番号 ＝ {{ information['error_data'][0]['order_line_no'] }}</pre>
-                                <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
-                                <pre>エラー内容：{{ information['error_data'][0]['error_content1'] }}</pre>
-                                <br/>
-                                <br/>
-                                <br/>
-                                <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
-                                <pre>注文伝票番号 ＝ {{ information['error_data'][1]['order_no'] }}     注文伝票行番号 ＝ {{ information['error_data'][1]['order_line_no'] }}</pre>
-                                <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
-                                <pre>エラー内容：{{ information['error_data'][1]['error_content1'] }}</pre>
-                                <br/>
-                                <br/>
+
+                                {% if information['error_data'] %}
+                                    {% for error in information['error_data'] %}
+                                        <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
+                                        <pre>注文伝票番号 ＝ {{ error['order_no'] }}     注文伝票行番号 ＝ {{ error['order_line_no'] }}</pre>
+                                        <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
+
+                                        {% for i in 1..10 %}
+                                            {% if error["error_content#{i}"] is defined %}
+                                                <pre>エラー内容：{{ error["error_content#{i}"] }}</pre>
+                                            {% endif %}
+                                        {% endfor %}
+
+                                        <br/>
+                                        <br/>
+                                        <br/>
+
+                                    {% endfor %}
+                                {% endif %}
+
                                 {{ information['content'] }}
                                 <br/>
                                 {{ information['content2'] }}

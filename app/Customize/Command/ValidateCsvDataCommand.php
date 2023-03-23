@@ -19,6 +19,7 @@ use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstCustomer;
 use Customize\Entity\MstProduct;
+use Customize\Service\Common\MyCommonService;
 use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
@@ -74,8 +75,9 @@ class ValidateCsvDataCommand extends Command
 
             return 0;
         }
-
+        log_info('Param: '.$param);
         //if ($input->getOption('option1')) {}
+
         $this->handleValidateCsvData(trim($param));
 
         log_info('End Process Validate Csv Data Command');
@@ -102,36 +104,41 @@ class ValidateCsvDataCommand extends Command
             log_info('Start Handle Validate WS EOS DATA');
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             // Get data to validate ws eos
-//            $data = $this->entityManager->getRepository(DtOrderWSEOS::class)->findBy([
-//                'order_import_day' => $order_no,
-//                'order_registed_flg' => $order_line_no,
-//            ]);
+            $data = $this->entityManager->getRepository(DtOrderWSEOS::class)->findBy([
+                'order_import_day' => date('Y-m-d'),
+                'order_registed_flg' => 0,
+            ]);
 
-
-            $cache_file = getenv('LOCAL_FTP_DIRECTORY') ?? '/html/dowload/csv/order/';
-            $cache_file .= 'ws_eos_cache_file.txt';
-            if (getenv('APP_IS_LOCAL') == 1) {
-                $cache_file = '.'.$cache_file;
+            foreach ($data as $item) {
+                $this->validateWSEOS($item['order_no'], $item['order_line_no']);
             }
+
+            /* Get data by File cache */
+            //$cache_file = getenv('LOCAL_FTP_DIRECTORY') ?? '/html/dowload/csv/order/';
+            //$cache_file .= 'ws_eos_cache_file'.date('Ymd').'.txt';
+            //if (getenv('APP_IS_LOCAL') == 1) {
+            //    $cache_file = '.'.$cache_file;
+            //}
 
             // open file to write to
-            $fp = @fopen($cache_file, 'r');
-            if ($fp) {
-                while (($buffer = fgets($fp, 4096)) !== false) {
-                    $buffer = explode('-', $buffer);
+            //$fp = @fopen($cache_file, 'r');
+            //if ($fp) {
+            //    while (($buffer = fgets($fp, 4096)) !== false) {
+            //        $buffer = explode('-', $buffer);
 
-                    if (count($buffer) == 2) {
-                        $order_no = $buffer[0];
-                        $order_line_no = $buffer[1];
-                        $this->validateWSEOS($order_no, $order_line_no);
-                    }
-                }
-                if (!feof($fp)) {
-                    log_error('unexpected fgets() fail');
-                }
-                fclose($fp);
-                //unlink($cache_file);
-            }
+            //        if (count($buffer) == 2) {
+            //            $order_no = $buffer[0];
+            //            $order_line_no = $buffer[1];
+            //            $this->validateWSEOS($order_no, $order_line_no);
+            //        }
+            //    }
+            //    if (!feof($fp)) {
+            //        log_error('unexpected fgets() fail');
+            //    }
+            //    fclose($fp);
+            //    unlink($cache_file);
+            //}
+            /* End - Get data by File cache */
 
             if (count($this->errors)) {
                 foreach ($this->errors as $error) {
@@ -153,6 +160,7 @@ class ValidateCsvDataCommand extends Command
     {
         try {
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            $common = new MyCommonService($this->entityManager);
 
             $object = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy([
                 'order_no' => $order_no,
@@ -182,13 +190,22 @@ class ValidateCsvDataCommand extends Command
             log_info("Validate order ({$order_no}-{$order_line_no})");
 
             // validate order_date
-            if (empty($object['order_date']) || (date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d') && $object['order_registed_flg'] != 1)) {
+            if (empty($object['order_date']) || date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d')) {
                 $error['error_content1'] = '発注日付が過去日付になっています';
             }
 
             // Validate shipping_shop_code
+            if (!empty($object['shipping_shop_code']) && !empty($object['customer_code']) && !empty($object['shipping_code']) && !empty($object['otodoke_code'])) {
+                $dtCusRelation = $common->getDtCustomerRelation($object['customer_code'], $object['shipping_code'], $object['otodoke_code'].$object['shipping_shop_code']);
+
+                if (empty($dtCusRelation) || $dtCusRelation['customer_code'] != $object['shipping_shop_code']) {
+                    $error['error_content2'] = '出荷先支店コード(顧客関連)が登録されていません';
+                }
+            }
+
+            // Validate shipping_shop_code
             if (empty($object['shipping_shop_code']) || empty($customer)) {
-                $error['error_content3'] = '出荷先支店コードが登録されていません';
+                $error['error_content3'] = '出荷先支店コード(顧客情報)が登録されていません';
             }
 
             // validate delivery_date
@@ -201,15 +218,29 @@ class ValidateCsvDataCommand extends Command
                 $error['error_content5'] = 'JANコードが存在しません';
             }
 
+            // Validate discontinued_date
+            if (!empty($product) && !empty($product['discontinued_date']) && date('Y-m-d') > date('Y-m-d', strtotime($product['discontinued_date']))) {
+                $error['error_content6'] = '対象商品は廃番品となっております';
+            }
+
+            // Validdate special_order_flg
+            if (!empty($customer) && $customer['special_order_flg'] == 0 && !empty($product) && strtolower($product['special_order_flg']) == 'y') {
+                $error['error_content7'] = '取り扱い対象商品ではありません';
+            }
+
             // Validate order_num
             if (!empty($product)) {
                 if ((int) $object['order_num'] % (int) $product['quantity']) {
-                    $error['error_content6'] = '発注数量の販売単位に誤りがあります';
+                    $error['error_content8'] = '発注数量の販売単位に誤りがあります';
                 }
             }
 
             if (!empty($product) && !empty($object['customer_code']) && !empty($object['shipping_code'])) {
+                $dtPrice = $common->getDtPrice($product, $object['customer_code'], $object['shipping_code']);
 
+                if (empty($dtPrice) || $dtPrice['price_s01'] != $object['order_price']) {
+                    $error['error_content9'] = '発注単価が異なっています';
+                }
             }
 
             if (count($error)) {
@@ -241,7 +272,6 @@ class ValidateCsvDataCommand extends Command
 
         try {
             log_info('[WS-EOS] Send Mail Error.');
-
             $this->mailService->sendMailErrorWSEOS($information);
 
             return;

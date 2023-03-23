@@ -1,13 +1,23 @@
 <?php
+
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\OneToOne;
 
 if (!class_exists('\Customize\Entity\MstProduct', false)) {
     /**
      * MstProduct
-     *
      *
      * @ORM\Table(name="mst_product")
      * @ORM\Entity(repositoryClass="Customize\Repository\MstProductRepository")
@@ -363,7 +373,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
          */
         public function getQuantityBox(): int
         {
-            return (int)$this->quantity_box;
+            return (int) $this->quantity_box;
         }
 
         /**
@@ -371,7 +381,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
          */
         public function setQuantityBox(int $quantity_box): void
         {
-            $this->quantity_box = (int)$quantity_box;
+            $this->quantity_box = (int) $quantity_box;
         }
 
         /**
@@ -761,15 +771,15 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         /**
          * @return \DateTime
          */
-        public function getDiscontinuedDate(): \DateTime
+        public function getDiscontinuedDate()
         {
             return $this->discontinued_date;
         }
 
         /**
-         * @param \DateTime $discontinued_date
+         * @param $discontinued_date
          */
-        public function setDiscontinuedDate(\DateTime $discontinued_date): void
+        public function setDiscontinuedDate($discontinued_date)
         {
             $this->discontinued_date = $discontinued_date;
         }
