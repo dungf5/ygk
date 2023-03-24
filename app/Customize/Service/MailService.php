@@ -836,4 +836,26 @@ class MailService
 
         return $message;
     }
+
+    public function testSendMail()
+    {
+        $message = (new \Swift_Message())
+            ->setSubject("Email Test")
+            ->setFrom([ 'order_support@xbraid.net'=>'Admin' ])
+            ->setTo([ 'hdhai@monotos.biz'])
+            ->setReplyTo('hdhai@monotos.biz')
+            ->setReturnPath('hdhai@monotos.biz')
+            ->setContentType('text/plain; charset=UTF-8')
+            ->setBody( "Test Send Mail",'text/plain');
+            
+        dd( $this->mailer->send($message) );
+        // Create the Transport
+        $transport = (new \Swift_SmtpTransport('smtp.gmail.com', 587, 'tls'))
+            ->setUsername('hdhai@monotos.biz')
+            ->setPassword('vyvgtjvpqjwouyxp');
+        // Create the Mailer using your created Transport
+        $mailer = new \Swift_Mailer($transport);
+        // Send the message
+        dd( $mailer->send($message) );
+    }
 }

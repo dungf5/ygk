@@ -25,6 +25,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         try {
             $object = new MstProductReturnsInfo();
 
+            $object->setReturnsNo($data['returns_no']);
             $object->setCustomerCode($data['customer_code']);
             $object->setShippingCode($data['shipping_code']);
             $object->setShippingName($data['shipping_name']);
@@ -33,6 +34,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             $object->setShippingNo($data['shipping_no']);
             $object->setShippingDate($data['shipping_date']);
             $object->setJanCode($data['jan_code']);
+            $object->setProductCode($data['product_code']);
             $object->setShippingNum($data['shipping_num']);
             $object->setReasonReturnsCode($data['reason_returns_code']);
             $object->setCustomerComment($data['customer_comment']);
@@ -44,12 +46,13 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             $object->setCusImageUrlPath4($data['cus_image_url_path4']);
             $object->setCusImageUrlPath5($data['cus_image_url_path5']);
             $object->setCusImageUrlPath6($data['cus_image_url_path6']);
-
+            
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();
 
             return $object;
         } catch (\Exception $e) {
+            dd($e);
         }
 
         return;

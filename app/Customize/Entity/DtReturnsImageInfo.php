@@ -17,7 +17,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
     {
         /**
          * @var integer
-         * @ORM\Column(name="returns_no", type="integer", nullable=false)
+         * @ORM\Column(name="returns_no", type="string", nullable=false)
          * @ORM\Id
          */
         private $returns_no;
@@ -31,7 +31,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         /**
          * @param string $returns_no
          */
-        public function setReturnsNo(int $returns_no): void
+        public function setReturnsNo(string $returns_no): void
         {
             $this->returns_no = $returns_no;
         }

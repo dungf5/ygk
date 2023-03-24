@@ -31,9 +31,11 @@
 		</div>
 		<div class="ec-mypageRole">
 			{% if alert %}
-			<div class="col-xs-12 text-center">
-				<p>返品リクエストを送信しました</p>
-				<a href="{{ url('mypage_return') }}" class="btn btn-warning">返品手続きに戻る</a>
+			<div class="col-xs-12">
+				<div class="alert alert-success text-center" role="alert">
+					<h3>返品リクエストを送信しました</h3>
+					<a href="{{ url('mypage_return') }}" class="btn btn-warning">返品手続きに戻る</a>
+				</div>
 			</div>
 			{% else %}
 				<div class="col-xs-12 text-right">

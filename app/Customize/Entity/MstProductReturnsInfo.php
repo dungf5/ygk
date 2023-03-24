@@ -17,17 +17,23 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
     {
         /**
          * @var integer
-         * @ORM\Column(name="id", type="integer", nullable=false)
+         * @ORM\Column(name="returns_no", type="string", nullable=false)
          * @ORM\Id
-         * @ORM\GeneratedValue(strategy="AUTO")
          */
         private $returns_no;
         /**
-         * @return interger
+         * @return string
          */
-        public function getReturnsNo(): int
+        public function getReturnsNo(): string
         {
             return $this->returns_no;
+        }
+        /**
+         * @param string $returns_no
+         */
+        public function setReturnsNo(string $returns_no): void
+        {
+            $this->returns_no = $returns_no;
         }
 
         /**

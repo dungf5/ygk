@@ -27,6 +27,7 @@ use Customize\Repository\MstProductReturnsInfoRepository;
 use Customize\Repository\DtReturnsImageInfoRepository;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\GlobalService;
+use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Controller\AbstractController;
@@ -99,6 +100,10 @@ class MypageController extends AbstractController
      * @var GlobalService
      */
     protected $globalService;
+    /**
+     * @var MailService
+     */
+    protected $mailService;
 
     /**
      * MypageController constructor.
@@ -120,7 +125,8 @@ class MypageController extends AbstractController
         EntityManagerInterface $entityManager,
         BaseInfoRepository $baseInfoRepository,
         CustomerFavoriteProductRepository $customerFavoriteProductRepository,
-        GlobalService $globalService
+        GlobalService $globalService,
+        MailService $mailService
     ) {
         $this->orderRepository                 = $orderRepository;
         $this->productImageRepository          = $productImageRepository;
@@ -132,6 +138,7 @@ class MypageController extends AbstractController
         $this->entityManager                   = $entityManager;
         $myCm                           = new MyCommonService($this->entityManager);
         $this->globalService            = $globalService;
+        $this->mailService            = $mailService;
 
         if ($this->twig->getGlobals()["app"]->getUser() != null) {
             $MyDataMstCustomer                                  = $myCm->getMstCustomer($this->globalService->customerId());
@@ -1037,17 +1044,22 @@ class MypageController extends AbstractController
                     }
                 }
             }
+            $jan_code      = $request->get('jan_code');
+            $product_code  = $commonService->getJanCodeToProductCode( $jan_code );
+            $returns_no    = $commonService->getReturnsNo();
+            $shipping_date = date('Y-m-d h:i:s', strtotime( str_replace( '/', '-', $request->get('shipping_day') ) ) );
             
             $mst_product_returns_info = $this->mstProductReturnsInfoRepository->insertData([
+                'returns_no'          => $returns_no,
                 'customer_code'       => $customer_id,
                 'shipping_code'       => $shipping_code,
                 'shipping_name'       => $shipping_name,
                 'otodoke_code'        => $otodoke_code,
                 'otodoke_name'        => $otodoke_name,
                 'shipping_no'         => $request->get('shipping_no'),
-                'shipping_date'       => $request->get('shipping_day'),
-                'jan_code'            => $request->get('jan_code'),
-                'product_name'        => $request->get('product_name'),
+                'shipping_date'       => $shipping_date,
+                'jan_code'            => $jan_code,
+                'product_code'        => $product_code,
                 'shipping_num'        => $request->get('shipping_num'),
                 'reason_returns_code' => $request->get('return_reason'),
                 'customer_comment'    => $request->get('customer_comment'),
