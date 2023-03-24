@@ -2505,4 +2505,54 @@ SQL;
             return [];
         }
     }
+
+    public function getReturnsReson()
+    {
+        $sql = "SELECT `returns_reson_id`, `returns_reson` FROM `dt_returns_reson`";
+
+        $statement      = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result     = $statement->executeQuery();
+            $rows       = $result->fetchAllAssociative();
+            return $rows;
+
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getJanCodeToProductCode( $jan_code = '' )
+    {
+        $sql = "SELECT `product_code` FROM `mst_product` WHERE `jan_code` = :jan_code limit 1";
+
+        try {
+            $statement      = $this->entityManager->getConnection()->prepare($sql);
+            $result         = $statement->executeQuery([ 'jan_code'=>$jan_code ]);
+            $row            = $result->fetchAllAssociative();
+            
+            return @$row[0]['product_code'];
+        } catch (Exception $e) {
+        }
+
+        return null;
+    }
+
+    public function getReturnsNo()
+    {
+        $sql = "SELECT MAX(`returns_no`) AS `max_returns_no` FROM `mst_product_returns_info`";
+
+        try {
+            $statement      = $this->entityManager->getConnection()->prepare($sql);
+            $result         = $statement->executeQuery();
+            $row            = $result->fetchAllAssociative();
+            
+            $max_returns_no = (int)@$row[0]['max_returns_no'];
+            $max_returns_no = $max_returns_no > 1000 ? $max_returns_no + 1 : 1001;
+            return (string)$max_returns_no;
+        } catch (Exception $e) {
+        }
+
+        return null;
+    }
 }
