@@ -244,7 +244,7 @@ class ValidateCsvDataCommand extends Command
             }
 
             if (!empty($product) && !empty($object['customer_code']) && !empty($object['shipping_code'])) {
-                $dtPrice = $common->getDtPrice($product, $object['customer_code'], $object['shipping_code']);
+                $dtPrice = $common->getDtPrice($product['product_code'], $object['customer_code'], $object['shipping_code']);
 
                 if (empty($dtPrice) || $dtPrice['price_s01'] != $object['order_price']) {
                     $error['error_content9'] = '発注単価が異なっています';
@@ -348,7 +348,7 @@ class ValidateCsvDataCommand extends Command
                 $data['demand_unit'] = (!empty($product) && $product['quantity'] > 1) ? 'CS' : 'PC';
 
                 $location = $this->commonService->getCustomerLocation($data['customer_code']);
-                $data['location'] = !empty($location) ? $location['stock_location'] : 'XB0201001';
+                $data['location'] = $location ?? 'XB0201001';
 
                 return $this->entityManager->getRepository(DtOrder::class)->insertData($data);
             }

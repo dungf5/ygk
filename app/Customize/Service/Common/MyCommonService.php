@@ -2448,7 +2448,7 @@ SQL;
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getDtPrice($product, $customer_code, $shipping_code)
+    public function getDtPrice($product_code, $customer_code, $shipping_code)
     {
         $sql = "
             SELECT dp.*
@@ -2464,7 +2464,7 @@ SQL;
 
         try {
             $statement = $this->entityManager->getConnection()->prepare($sql);
-            $result = $statement->executeQuery([$product, $customer_code, $shipping_code]);
+            $result = $statement->executeQuery([$product_code, $customer_code, $shipping_code]);
             $rows = $result->fetchAllAssociative();
 
             return $rows[0] ?? [];
