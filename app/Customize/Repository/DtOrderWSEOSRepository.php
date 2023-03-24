@@ -79,8 +79,9 @@ class DtOrderWSEOSRepository extends AbstractRepository
             $object->setCashTypeCode($data['cash_type_code']);
             $object->setOrderCreateDay($data['order_create_day'] ? date('Y-m-d', strtotime($data['order_create_day'])) : null);
             $object->setOrderUpdateDay($data['order_update_day'] ? date('Y-m-d', strtotime($data['order_update_day'])) : null);
-            $object->setOrderImportDay(date('Y-m-d'));
+            $object->setOrderImportDay(date('Ymd'));
             $object->setOrderRegistedFlg(0);
+            $object->setErrorType(0);
 
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();

@@ -35,7 +35,7 @@ class DtOrderRepository extends AbstractRepository
     {
         try {
             if (empty($data)) {
-                return;
+                return 0;
             }
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
@@ -68,12 +68,12 @@ class DtOrderRepository extends AbstractRepository
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();
 
-            return;
+            return 1;
         } catch (\Exception $e) {
             log_info('Insert dt_order error');
             log_info($e->getMessage());
 
-            return;
+            return 0;
         }
     }
 }

@@ -33,7 +33,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/* Run Batch: php bin/console validate-csv-data-command */
+/* Run Batch: php bin/console validate-csv-data-command [param] */
 class ValidateCsvDataCommand extends Command
 {
     use PluginCommandTrait;
@@ -113,7 +113,7 @@ class ValidateCsvDataCommand extends Command
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             // Get data to validate ws eos
             $data = $this->entityManager->getRepository(DtOrderWSEOS::class)->findBy([
-                'order_import_day' => date('Y-m-d'),
+                'order_import_day' => date('Ymd'),
                 'order_registed_flg' => 0,
             ]);
 
@@ -298,9 +298,9 @@ class ValidateCsvDataCommand extends Command
 
             // Get data to import
             $data = $this->entityManager->getRepository(DtOrderWSEOS::class)->findBy([
-                'order_import_day' => date('Y-m-d'),
+                'order_import_day' => date('Ymd'),
                 'order_registed_flg' => 0,
-                'error_type' => null,
+                'error_type' => 0,
             ], [
                 'shipping_shop_code' => 'ASC',
                 'order_shop_code' => 'ASC',
@@ -309,8 +309,13 @@ class ValidateCsvDataCommand extends Command
             ]);
 
             foreach ($data as $item) {
-                $this->importDtOrder($item->toArray());
-                $this->importDtOrderStatus($item);
+                $result = $this->importDtOrder($item->toArray());
+                $result1 = $this->importDtOrderStatus($item);
+
+                if ($result && $result1) {
+                    $item->setOrderRegistedFlg(1);
+                    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
+                }
             }
 
             log_info('End Handle Import Data To dt_order, dt_order_status');
@@ -345,14 +350,14 @@ class ValidateCsvDataCommand extends Command
                 $location = $this->commonService->getCustomerLocation($data['customer_code']);
                 $data['location'] = !empty($location) ? $location['stock_location'] : 'XB0201001';
 
-                $this->entityManager->getRepository(DtOrder::class)->insertData($data);
+                return $this->entityManager->getRepository(DtOrder::class)->insertData($data);
             }
 
-            return;
+            return 0;
         } catch (\Exception $e) {
             log_error($e->getMessage());
 
-            return;
+            return 0;
         }
     }
 
@@ -367,14 +372,14 @@ class ValidateCsvDataCommand extends Command
             // Create order_status if empty
             if (empty($dtOrderStatus)) {
                 log_info('Import data dt_order_status '.$data['order_no'].'-'.$data['order_line_no']);
-                $this->entityManager->getRepository(DtOrderStatus::class)->insertData($data);
+                return $this->entityManager->getRepository(DtOrderStatus::class)->insertData($data);
             }
 
-            return;
+            return 0;
         } catch (\Exception $e) {
             log_error($e->getMessage());
 
-            return;
+            return 0;
         }
     }
 }

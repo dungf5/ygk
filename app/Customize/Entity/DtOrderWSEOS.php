@@ -50,7 +50,7 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         /**
          * @var string
          *
-         * @ORM\Column(name="order_import_day", type="string", nullable=true, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '取込日付'")
+         * @ORM\Column(name="order_import_day", type="string", nullable=true, length=8, options={"comment":"取込日付"})
          */
         private $order_import_day;
         /**
@@ -1343,7 +1343,7 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         }
 
         /**
-         * @return \DateTime
+         * @return string
          */
         public function getOrderImportDay()
         {
