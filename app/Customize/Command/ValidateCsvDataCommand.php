@@ -127,6 +127,12 @@ class ValidateCsvDataCommand extends Command
                 $this->validateWSEOS($item['order_no'], $item['order_line_no']);
             }
 
+            if (count($this->errors)) {
+                foreach ($this->errors as $error) {
+                    $this->entityManager->getRepository(DtOrderWSEOS::class)->updateError($error);
+                }
+            }
+
             log_info('End Handle Validate WS EOS DATA');
         } catch (\Exception $e) {
             log_error($e->getMessage());
@@ -272,18 +278,21 @@ class ValidateCsvDataCommand extends Command
             'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
             'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
             'file_name' => 'Mail/ws_eos_order_success.twig',
-            'success_data' => $this->success,
         ];
 
-        try {
-            log_info('[WS-EOS] Send Mail Order Success.');
-            $this->mailService->sendMailOrderSuccessWSEOS($information);
+        foreach ($this->success as $key => $success) {
+            $information['success_data'] = $success;
 
-            return;
-        } catch (\Exception $e) {
-            log_error($e->getMessage());
+            try {
+                log_info('[WS-EOS] Send Mail Order Success. '.$key);
+                $this->mailService->sendMailOrderSuccessWSEOS($information);
 
-            return;
+                return;
+            } catch (\Exception $e) {
+                log_error($e->getMessage());
+
+                return;
+            }
         }
     }
 

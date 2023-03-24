@@ -30,54 +30,53 @@ file that was distributed with this source code.
                                 <br/>
 
                                 {% if information['success_data'] is defined %}
-                                    {% for success in information['success_data'] %}
+                                    {% set success = information['success_data'] %}
 
-                                        {% if success['detail'] is defined %}
-                                            <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
-                                            <pre>ご注文商品明細</pre>
-                                            <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
+                                    {% if success['detail'] is defined %}
+                                        <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
+                                        <pre>ご注文商品明細</pre>
+                                        <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
 
-                                            {% for detail in success['detail'] %}
-                                                <pre>JANコード：{{ detail['jan_code'] }} </pre>
-                                                <pre>商品名：{{ detail['product_name'] }} </pre>
-                                                <pre>単価：{{ detail['order_price'] }} </pre>
-                                                <pre>数量：{{ detail['order_num'] }} </pre>
-                                                <hr style="height:1px; border-top:2px dashed black;">
-                                            {% endfor %}
-                                        {% endif %}
+                                        {% for detail in success['detail'] %}
+                                            <pre>JANコード：{{ detail['jan_code'] }} </pre>
+                                            <pre>商品名：{{ detail['product_name'] }} </pre>
+                                            <pre>単価：{{ detail['order_price'] }} </pre>
+                                            <pre>数量：{{ detail['order_num'] }} </pre>
+                                            <hr style="height:1px; border-top:2px dashed black;">
+                                        {% endfor %}
+                                    {% endif %}
 
-                                        {% if success['summary'] is defined %}
-                                            <pre>小　計：{{ roundPriceZeroTotal(success['summary']['order_amount']) | raw }}</pre>
-                                            <pre>消費税：{{ roundPriceZeroTax(success['summary']['tax']) | raw }}</pre>
-                                            <hr style="height:1px; border-top:2px dotted black;">
-                                            <pre>お支払い合計：{{ roundPriceZeroTotalAll(success['summary']['total_amount']) | raw }}(税込)</pre>
-                                            <br/>
+                                    {% if success['summary'] is defined %}
+                                        <pre>小　計：{{ roundPriceZeroTotal(success['summary']['order_amount']) | raw }}</pre>
+                                        <pre>消費税：{{ roundPriceZeroTax(success['summary']['tax']) | raw }}</pre>
+                                        <hr style="height:1px; border-top:2px dotted black;">
+                                        <pre>お支払い合計：{{ roundPriceZeroTotalAll(success['summary']['total_amount']) | raw }}(税込)</pre>
+                                        <br/>
 
-                                            <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
-                                            <pre>ご注文者情報</pre>
-                                            <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
-                                            <pre>会社名：{{ success['summary']['order_company_name'] }} </pre>
-                                            <pre>担当者：{{ success['summary']['order_shop_name'] }} </pre>
-                                            <pre>郵便番号：</pre>
-                                            <pre>住所：</pre>
-                                            <pre>電話番号：</pre>
-                                            <pre>メールアドレス：</pre>
-                                            <br/>
+                                        <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
+                                        <pre>ご注文者情報</pre>
+                                        <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
+                                        <pre>会社名：{{ success['summary']['order_company_name'] }} </pre>
+                                        <pre>担当者：{{ success['summary']['order_shop_name'] }} </pre>
+                                        <pre>郵便番号：</pre>
+                                        <pre>住所：</pre>
+                                        <pre>電話番号：</pre>
+                                        <pre>メールアドレス：</pre>
+                                        <br/>
 
-                                            <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
-                                            <pre>配送情報</pre>
-                                            <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
-                                            <pre>◎お届け先</pre>
-                                            <br/>
-                                            <pre>会社名：{{ success['summary']['order_company_name'] }} </pre>
-                                            <pre>担当者：{{ success['summary']['shipping_name'] }} </pre>
-                                            <pre>郵便番号：</pre>
-                                            <pre>住所：</pre>
-                                            <pre>電話番号：</pre>
-                                            <br/>
-                                            <pre>お届け希望日：{{ success['summary']['delivery_date'] }}</pre>
-                                        {% endif %}
-                                    {% endfor %}
+                                        <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
+                                        <pre>配送情報</pre>
+                                        <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
+                                        <pre>◎お届け先</pre>
+                                        <br/>
+                                        <pre>会社名：{{ success['summary']['order_company_name'] }} </pre>
+                                        <pre>担当者：{{ success['summary']['shipping_name'] }} </pre>
+                                        <pre>郵便番号：</pre>
+                                        <pre>住所：</pre>
+                                        <pre>電話番号：</pre>
+                                        <br/>
+                                        <pre>お届け希望日：{{ success['summary']['delivery_date'] }}</pre>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </td>
