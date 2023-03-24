@@ -200,6 +200,7 @@
 
 {% block javascript %}
 <script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
+<script src="{{ asset('assets/jquery-ui/jquery-ui.min.js', 'user_data') }}"></script>
 <script>
 	const changeShippingSode = ( shipping_no )=>{
 		if( ! shipping_no ) return
@@ -223,7 +224,12 @@
 				let _data = json.data
 				if( _data.length > 0 ) {
 					_data.forEach( (item)=> {
-						_el.append( new Option( `${(item.name01?item.name01:'')} 〒 ${(item.postal_code?item.postal_code:'')} ${(item.addr01?item.addr01:'')} ${(item.addr02?item.addr02:'')} ${(item.addr03?item.addr03:'')}`, item.otodoke_code) )
+						_el.append( new Option(
+							`${(item.name01?item.name01:'')} 〒 ${(item.postal_code?item.postal_code:'')} ${(item.addr01?item.addr01:'')} ${(item.addr02?item.addr02:'')} ${(item.addr03?item.addr03:'')}`,
+							item.otodoke_code,
+							false,
+							item.otodoke_code == "{{ customer_otodoke_code }}"
+						) )
 					})
 				}
 				_el.select2()
@@ -269,9 +275,10 @@
 		imagesPreview( _input )
 	}
 	$( function() {
-		let _shipping_code_first = $("#shipping_code option:first").val()
-		$("#shipping_code").val( _shipping_code_first )
-		changeShippingSode( _shipping_code_first )
+		$("#shipping_code").select2();
+		$("#otodoke_code").select2();
+
+		$( "#shipping_day" ).datepicker({ dateFormat: 'dd/mm/yy' })
 	})
 </script>
 {% endblock javascript%}

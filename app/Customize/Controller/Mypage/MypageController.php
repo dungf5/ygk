@@ -23,8 +23,11 @@ use Customize\Repository\OrderItemRepository;
 use Customize\Repository\OrderRepository;
 use Customize\Repository\ProductImageRepository;
 use Customize\Repository\MstShippingRepository;
+use Customize\Repository\MstProductReturnsInfoRepository;
+use Customize\Repository\DtReturnsImageInfoRepository;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\GlobalService;
+use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Controller\AbstractController;
@@ -75,6 +78,15 @@ class MypageController extends AbstractController
     protected $mstShippingRepository;
 
     /**
+     * @var MstProductReturnsInfoRepository
+     */
+    protected $mstProductReturnsInfoRepository;
+    /**
+     * @var DtReturnsImageInfoRepository
+     */
+    protected $dtReturnsImageInfoRepository;
+
+    /**
      * @var \Twig_Environment
      */
     protected $twig;
@@ -88,6 +100,10 @@ class MypageController extends AbstractController
      * @var GlobalService
      */
     protected $globalService;
+    /**
+     * @var MailService
+     */
+    protected $mailService;
 
     /**
      * MypageController constructor.
@@ -102,21 +118,27 @@ class MypageController extends AbstractController
         OrderRepository $orderRepository,
         ProductImageRepository $productImageRepository,
         MstShippingRepository $mstShippingRepository,
+        MstProductReturnsInfoRepository $mstProductReturnsInfoRepository,
+        DtReturnsImageInfoRepository $dtReturnsImageInfoRepository,
         OrderItemRepository $orderItemRepository,
         \Twig_Environment $twig,
         EntityManagerInterface $entityManager,
         BaseInfoRepository $baseInfoRepository,
         CustomerFavoriteProductRepository $customerFavoriteProductRepository,
-        GlobalService $globalService
+        GlobalService $globalService,
+        MailService $mailService
     ) {
-        $this->orderRepository        = $orderRepository;
-        $this->productImageRepository = $productImageRepository;
-        $this->mstShippingRepository  = $mstShippingRepository;
-        $this->orderItemRepository    = $orderItemRepository;
-        $this->twig                   = $twig;
-        $this->entityManager          = $entityManager;
-        $myCm                         = new MyCommonService($this->entityManager);
-        $this->globalService          = $globalService;
+        $this->orderRepository                 = $orderRepository;
+        $this->productImageRepository          = $productImageRepository;
+        $this->mstShippingRepository           = $mstShippingRepository;
+        $this->mstProductReturnsInfoRepository = $mstProductReturnsInfoRepository;
+        $this->dtReturnsImageInfoRepository    = $dtReturnsImageInfoRepository;
+        $this->orderItemRepository             = $orderItemRepository;
+        $this->twig                            = $twig;
+        $this->entityManager                   = $entityManager;
+        $myCm                           = new MyCommonService($this->entityManager);
+        $this->globalService            = $globalService;
+        $this->mailService            = $mailService;
 
         if ($this->twig->getGlobals()["app"]->getUser() != null) {
             $MyDataMstCustomer                                  = $myCm->getMstCustomer($this->globalService->customerId());
