@@ -92,14 +92,14 @@ class DtOrderWSEOSCopyRepository extends AbstractRepository
         }
     }
 
-    public function updateData($object = [])
+    public function updateData($data = [])
     {
         try {
             if (empty($data)) {
                 return;
             }
 
-            $object = $this->entityManager->getRepository(DtOrderWSEOSCopy::class)->findOneBy([
+            $object = $this->findOneBy([
                 'order_no' => $object['order_no'] ?? '',
                 'order_line_no' => $object['order_line_no'] ?? '',
             ]);

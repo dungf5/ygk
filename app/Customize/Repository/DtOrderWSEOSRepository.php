@@ -99,14 +99,14 @@ class DtOrderWSEOSRepository extends AbstractRepository
         }
     }
 
-    public function updateData($object, $data = [])
+    public function updateData($data = [])
     {
         try {
             if (empty($data)) {
                 return;
             }
 
-            $object = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy([
+            $object = $this->findOneBy([
                 'order_no' => $data['order_no'] ?? '',
                 'order_line_no' => $data['order_line_no'] ?? '',
             ]);
@@ -154,6 +154,16 @@ class DtOrderWSEOSRepository extends AbstractRepository
                 $object->setCashTypeCode($data['cash_type_code']);
                 $object->setOrderCreateDay($data['order_create_day'] ? date('Y-m-d H:i:s', strtotime($data['order_create_day'])) : null);
                 $object->setOrderUpdateDay($data['order_update_day'] ? date('Y-m-d H:i:s', strtotime($data['order_update_day'])) : null);
+                $object->setErrorContent1(null);
+                $object->setErrorContent2(null);
+                $object->setErrorContent3(null);
+                $object->setErrorContent4(null);
+                $object->setErrorContent5(null);
+                $object->setErrorContent6(null);
+                $object->setErrorContent7(null);
+                $object->setErrorContent8(null);
+                $object->setErrorContent9(null);
+                $object->setErrorContent10(null);
 
                 $this->getEntityManager()->persist($object);
                 $this->getEntityManager()->flush();
@@ -213,6 +223,7 @@ class DtOrderWSEOSRepository extends AbstractRepository
                         $object->setErrorContent10($value);
                     }
                 }
+                $object->setErrorType(1);
 
                 $this->getEntityManager()->persist($object);
                 $this->getEntityManager()->flush();

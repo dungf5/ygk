@@ -124,6 +124,8 @@ class ImportCsvOrderCommand extends Command
             $path = '.'.$path;
         }
 
+        log_info('----------------------------------');
+
         // If the current day is the first of month. Run first for day - 1
         $currentDay = date('j');
         if ($currentDay == 1) {
@@ -252,15 +254,6 @@ class ImportCsvOrderCommand extends Command
                 $objData["{$col}"] = trim($data[$x][$y]);
             }
 
-            // Set more data
-            $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy([
-                'jan_code' => $objData['jan_code'] ?? '',
-            ]);
-            $objData['customer_code'] = '7001';
-            $objData['shipping_code'] = '7001001000';
-            $objData['otodoke_code'] = '7001001'.str_pad($objData['shipping_shop_code'], 3, '0');
-            $objData['product_code'] = !empty($product) ? $product['product_code'] : '';
-
             $objectExist = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy([
                 'order_no' => $objData['order_no'] ?? '',
                 'order_line_no' => $objData['order_line_no'] ?? '',
@@ -277,6 +270,16 @@ class ImportCsvOrderCommand extends Command
             // Insert dt_order_ws_eos
             if (empty($objectExist)) {
                 log_info('Insert dt_order_ws_eos '.$objData['order_no'].'-'.$objData['order_line_no']);
+
+                // Set more data
+                $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy([
+                    'jan_code' => $objData['jan_code'] ?? '',
+                ]);
+                $objData['customer_code'] = '7001';
+                $objData['shipping_code'] = '7001001000';
+                $objData['otodoke_code'] = '7001001'.str_pad($objData['shipping_shop_code'], 3, '0');
+                $objData['product_code'] = !empty($product) ? $product['product_code'] : '';
+
                 $this->entityManager->getRepository(DtOrderWSEOS::class)->insertData($objData);
             }
 

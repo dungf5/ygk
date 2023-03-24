@@ -121,33 +121,6 @@ class ValidateCsvDataCommand extends Command
                 $this->validateWSEOS($item['order_no'], $item['order_line_no']);
             }
 
-            /* Get data by File cache */
-            //$cache_file = getenv('LOCAL_FTP_DIRECTORY') ?? '/html/dowload/csv/order/';
-            //$cache_file .= 'ws_eos_cache_file'.date('Ymd').'.txt';
-            //if (getenv('APP_IS_LOCAL') == 1) {
-            //    $cache_file = '.'.$cache_file;
-            //}
-
-            // open file to write to
-            //$fp = @fopen($cache_file, 'r');
-            //if ($fp) {
-            //    while (($buffer = fgets($fp, 4096)) !== false) {
-            //        $buffer = explode('-', $buffer);
-
-            //        if (count($buffer) == 2) {
-            //            $order_no = $buffer[0];
-            //            $order_line_no = $buffer[1];
-            //            $this->validateWSEOS($order_no, $order_line_no);
-            //        }
-            //    }
-            //    if (!feof($fp)) {
-            //        log_error('unexpected fgets() fail');
-            //    }
-            //    fclose($fp);
-            //    unlink($cache_file);
-            //}
-            /* End - Get data by File cache */
-
             if (count($this->errors)) {
                 foreach ($this->errors as $error) {
                     $this->entityManager->getRepository(DtOrderWSEOS::class)->updateError($error);
