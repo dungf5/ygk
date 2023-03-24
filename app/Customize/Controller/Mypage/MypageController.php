@@ -1047,7 +1047,7 @@ class MypageController extends AbstractController
             $jan_code      = $request->get('jan_code');
             $product_code  = $commonService->getJanCodeToProductCode( $jan_code );
             $returns_no    = $commonService->getReturnsNo();
-            $shipping_date = date('Y-m-d h:i:s', strtotime( str_replace( '/', '-', $request->get('shipping_day') ) ) );
+            $shipping_date = date('Y-m-d', strtotime( str_replace( '/', '-', $request->get('shipping_day') ) ) );
             
             $mst_product_returns_info = $this->mstProductReturnsInfoRepository->insertData([
                 'returns_no'          => $returns_no,
@@ -1096,6 +1096,42 @@ class MypageController extends AbstractController
             'customer_otodoke_code'  => $customer_otodoke_code,
             'param'                  => $param,
             'alert'                  => $alert,
+        ];
+    }
+    /**
+     * 返品履歴
+     *
+     * @Route("/mypage/return/history", name="mypage_return_history", methods={"GET"})
+     * @Template("Mypage/return_history.twig")
+     */
+    public function returnHistory(Request $request, PaginatorInterface $paginator)
+    {
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
+        // 購入処理中/決済処理中ステータスの受注を非表示にする.
+        $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
+
+        //Params
+        $param = [
+        ];
+
+        // paginator
+        $my_common     = new MyCommonService($this->entityManager);
+        $customer_id   = $this->globalService->customerId();
+        $login_type    = $this->globalService->getLoginType();
+        $customer_code = $this->globalService->getLoginCode();
+        $qb            = $this->mstProductReturnsInfoRepository->getQueryBuilderByCustomer($param, $customer_id);
+
+        // Paginator
+        $pagination             = $paginator->paginate(
+            $qb,
+            $request->get('pageno', 1),
+            $this->eccubeConfig['eccube_search_pmax'],
+            ['distinct' => false]
+        );
+
+        return [
+            'pagination' => $pagination,
         ];
     }
 }

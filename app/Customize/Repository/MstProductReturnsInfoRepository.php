@@ -5,6 +5,7 @@ namespace Customize\Repository;
 use Eccube\Repository\AbstractRepository;
 use Customize\Entity\MstProductReturnsInfo;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\Query\Expr\Join;
 
 class MstProductReturnsInfoRepository extends AbstractRepository
 {
@@ -56,5 +57,47 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         }
 
         return;
+    }
+
+    public function getQueryBuilderByCustomer($param = [], $customer_id = '')
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('product_returns_info.returns_no');
+        $qb->from('Customize\Entity\MstProductReturnsInfo', 'product_returns_info');
+        $qb->leftJoin('Customize\Entity\DtReturnsReson', 'returns_reson', Join::WITH, 'returns_reson.returns_reson_id=product_returns_info.reason_returns_code');
+        
+        $qb->addSelect(
+            'product_returns_info.shipping_date',
+            'returns_reson.returns_reson',
+            'product_returns_info.shipping_no',
+            'product_returns_info.shipping_date',
+            'product_returns_info.shipping_name',
+            'product_returns_info.otodoke_name',
+            'product_returns_info.jan_code',
+            'product_returns_info.product_code',
+            'product_returns_info.shipping_num',
+            'product_returns_info.returns_num',
+        );
+        
+        $qb->andWhere('product_returns_info.customer_code = :customer_code')
+            ->setParameter('customer_code', $customer_id);
+        $qb->andWhere('product_returns_info.shipping_date >= :shipping_date')
+            ->setParameter('shipping_date', date("Y-m-d", strtotime("-14 MONTH")));
+
+        // if ( $param['search_jan_code'] != '' ) {
+        //     $qb->andWhere( 'product.jan_code LIKE :search_jan_code' )
+        //         ->setParameter(':search_jan_code', "%{$param['search_jan_code']}%");
+        // }
+
+        // //group
+        $qb->addGroupBy('product_returns_info.returns_no');
+
+        // // Order By
+        $qb->addOrderBy('product_returns_info.shipping_date', 'DESC');
+
+        // dump($qb->getQuery()->getSQL());
+        // dump($qb->getParameters());
+        // die();
+        return $qb;
     }
 }
