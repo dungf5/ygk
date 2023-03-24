@@ -776,7 +776,7 @@ class MailService
             return;
         }
 
-        log_info('[WS-EOS] 受注メール送信開始');
+        log_info('[WS-EOS] Start Send Mail FTP');
 
         // Information successfully
         if ($information['status'] == 1) {
@@ -832,7 +832,7 @@ class MailService
         }
 
         $count = $this->mailer->send($message);
-        log_info('[WS-EOS]受注メール送信完了', ['count' => $count]);
+        log_info('[WS-EOS] End Send Mail FTP', ['count' => $count]);
 
         return $message;
     }
@@ -859,7 +859,7 @@ class MailService
             return;
         }
 
-        log_info('[WS-EOS] Start Send Mail Error.');
+        log_info('[WS-EOS] Start Send Mail Validate Error.');
 
         // Information
         $information['subject_mail'] = 'EOS注文データにエラーがありました';
@@ -904,7 +904,7 @@ class MailService
         }
 
         $count = $this->mailer->send($message);
-        log_info('[WS-EOS] End Send Mail Error.', ['count' => $count]);
+        log_info('[WS-EOS] End Send Mail Validate Error.', ['count' => $count]);
 
         return $message;
     }

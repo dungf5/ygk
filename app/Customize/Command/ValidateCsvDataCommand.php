@@ -247,12 +247,12 @@ class ValidateCsvDataCommand extends Command
             'email' => getenv('EMAIL_WS_EOS') ?? '',
             'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
             'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
-            'file_name' => 'Mail/error_ws_eos.twig',
+            'file_name' => 'Mail/ws_eos_validate_error.twig',
             'error_data' => $errors,
         ];
 
         try {
-            log_info('[WS-EOS] Send Mail Error.');
+            log_info('[WS-EOS] Send Mail Validate Error.');
             $this->mailService->sendMailErrorWSEOS($information);
 
             return;

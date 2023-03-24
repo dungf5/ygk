@@ -81,12 +81,12 @@ class GetFileFTPCommand extends Command
 
             // Send mail error
             if ($result['status'] == -1) {
-                log_info('[WS-EOS] 注文メールの送信を行います.');
+                log_info('[WS-EOS] Send Mail FTP.');
                 $information = [
                     'email' => getenv('EMAIL_WS_EOS') ?? '',
                     'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
                     'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
-                    'file_name' => 'Mail/order_ws_eos.twig',
+                    'file_name' => 'Mail/ws_eos_ftp.twig',
                     'status' => 0,
                     'error_content' => $result['message'],
                 ];
