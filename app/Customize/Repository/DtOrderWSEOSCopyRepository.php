@@ -13,7 +13,9 @@
 
 namespace Customize\Repository;
 
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtOrderWSEOSCopy;
+use Doctrine\DBAL\Types\Type;
 use Eccube\Repository\AbstractRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -36,6 +38,7 @@ class DtOrderWSEOSCopyRepository extends AbstractRepository
                 return;
             }
 
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = new DtOrderWSEOSCopy();
             $object->setOrderType((int) $data['order_type']);
             $object->setWebOrderType((int) $data['web_order_type']);
@@ -99,6 +102,7 @@ class DtOrderWSEOSCopyRepository extends AbstractRepository
                 return;
             }
 
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = $this->findOneBy([
                 'order_no' => $object['order_no'] ?? '',
                 'order_line_no' => $object['order_line_no'] ?? '',

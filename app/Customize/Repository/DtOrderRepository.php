@@ -37,8 +37,8 @@ class DtOrderRepository extends AbstractRepository
             if (empty($data)) {
                 return 0;
             }
-            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = new DtOrder();
             $object->setCustomerCode($data['customer_code'] ?? '');
             $object->setSeikyuCode($data['customer_code'] ?? '');

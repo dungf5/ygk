@@ -1,12 +1,22 @@
 <?php
 
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Repository;
 
-
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\DtOrderStatus;
 use Doctrine\DBAL\Types\Type;
 use Eccube\Repository\AbstractRepository;
-use Customize\Entity\DtOrderStatus;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class DtOrderStatusRepository extends AbstractRepository
@@ -27,8 +37,8 @@ class DtOrderStatusRepository extends AbstractRepository
             if (empty($data)) {
                 return 0;
             }
-            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = new DtOrderStatus();
             $object->setOrderNo('');
             $object->setOrderLineNo('');

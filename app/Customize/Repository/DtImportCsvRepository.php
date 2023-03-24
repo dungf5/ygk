@@ -13,7 +13,9 @@
 
 namespace Customize\Repository;
 
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtImportCSV;
+use Doctrine\DBAL\Types\Type;
 use Eccube\Repository\AbstractRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -36,6 +38,7 @@ class DtImportCsvRepository extends AbstractRepository
                 return;
             }
 
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = new DtImportCSV();
 
             $object->setFileName($data['file_name']);
@@ -63,6 +66,7 @@ class DtImportCsvRepository extends AbstractRepository
                 return;
             }
 
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = $this->findOneBy(['file_name' => $data['file_name']]);
 
             if (!empty($object)) {
