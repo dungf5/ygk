@@ -49,6 +49,8 @@ class ValidateCsvDataCommand extends Command
      */
     private $commonService;
     private $errors = [];
+    private $success = [];
+    private $rate = 0;
 
     protected static $defaultName = 'validate-csv-data-command';
     protected static $defaultDescription = 'Process Validate Csv Data Command';
@@ -82,6 +84,8 @@ class ValidateCsvDataCommand extends Command
 
             return 0;
         }
+
+        $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
         log_info('Param: '.$param);
         //if ($input->getOption('option1')) {}
 
@@ -99,6 +103,8 @@ class ValidateCsvDataCommand extends Command
             case 'ws-eos':
                     $this->handleValidateWSEOS();
                     $this->handleImportDataWSEOS();
+                    $this->sendMailErrorWSEOS();
+                    $this->sendMailOrderSuccess();
                 break;
 
             default:
@@ -119,14 +125,6 @@ class ValidateCsvDataCommand extends Command
 
             foreach ($data as $item) {
                 $this->validateWSEOS($item['order_no'], $item['order_line_no']);
-            }
-
-            if (count($this->errors)) {
-                foreach ($this->errors as $error) {
-                    $this->entityManager->getRepository(DtOrderWSEOS::class)->updateError($error);
-                }
-
-                $this->sendMailErrorWSEOS($this->errors);
             }
 
             log_info('End Handle Validate WS EOS DATA');
@@ -237,9 +235,9 @@ class ValidateCsvDataCommand extends Command
         }
     }
 
-    private function sendMailErrorWSEOS($errors = [])
+    private function sendMailErrorWSEOS()
     {
-        if (empty($errors)) {
+        if (!count($this->errors)) {
             return;
         }
 
@@ -248,12 +246,38 @@ class ValidateCsvDataCommand extends Command
             'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
             'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
             'file_name' => 'Mail/ws_eos_validate_error.twig',
-            'error_data' => $errors,
+            'error_data' => $this->errors,
         ];
 
         try {
             log_info('[WS-EOS] Send Mail Validate Error.');
             $this->mailService->sendMailErrorWSEOS($information);
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            return;
+        }
+    }
+
+    private function sendMailOrderSuccess()
+    {
+        if (!count($this->success)) {
+            return;
+        }
+
+        $information = [
+            'email' => getenv('EMAIL_WS_EOS') ?? '',
+            'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
+            'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
+            'file_name' => 'Mail/ws_eos_order_success.twig',
+            'success_data' => $this->success,
+        ];
+
+        try {
+            log_info('[WS-EOS] Send Mail Order Success.');
+            $this->mailService->sendMailOrderSuccessWSEOS($information);
 
             return;
         } catch (\Exception $e) {
@@ -286,6 +310,25 @@ class ValidateCsvDataCommand extends Command
                 $result1 = $this->importDtOrderStatus($item);
 
                 if ($result && $result1) {
+                    // Save to success array to send mail
+                    $this->success["{$item['order_no']}"]['detail'][] = [
+                        'jan_code' => $item['jan_code'],
+                        'product_name' => $item['product_name'],
+                        'order_price' => $item['order_price'],
+                        'order_num' => $item['order_num'],
+                    ];
+
+                    $this->success["{$item['order_no']}"]['summary'] = [
+                        'order_amount' => ($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + ($item['order_price'] * $item['order_num']),
+                        'tax' => $this->rate == 0 ? 0 : (int) ((($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + ($item['order_price'] * $item['order_num'])) / $this->rate),
+                        'order_company_name' => $item['order_company_name'],
+                        'order_shop_name' => $item['order_shop_name'],
+                        'shipping_name' => $item['shipping_name'],
+                        'delivery_date' => $item['delivery_date'],
+                    ];
+
+                    $this->success["{$item['order_no']}"]['summary']['total_amount'] = ($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + (int) ($this->success["{$item['order_no']}"]['summary']['tax'] ?? 0);
+
                     $item->setOrderRegistedFlg(1);
                     $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
                 }
@@ -345,6 +388,7 @@ class ValidateCsvDataCommand extends Command
             // Create order_status if empty
             if (empty($dtOrderStatus)) {
                 log_info('Import data dt_order_status '.$data['order_no'].'-'.$data['order_line_no']);
+
                 return $this->entityManager->getRepository(DtOrderStatus::class)->insertData($data);
             }
 
