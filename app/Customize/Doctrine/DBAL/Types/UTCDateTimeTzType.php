@@ -108,8 +108,8 @@ class UTCDateTimeTzType extends DateTimeTzType
     protected static function getUtcTimeZone()
     {
         if (is_null(self::$utc)) {
-            self::$utc = new \DateTimeZone('Asia/Tokyo');
-            //self::$utc = new \DateTimeZone('UTC');;
+            //self::$utc = new \DateTimeZone('Asia/Tokyo');
+            self::$utc = new \DateTimeZone('UTC');
         }
 
         return self::$utc;
