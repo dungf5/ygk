@@ -971,7 +971,7 @@ class MypageController extends AbstractController
     /**
      * 返品手続き
      *
-     * @Route("/mypage/return/create", name="mypage_return_create", methods={"GET"})
+     * @Route("/mypage/return/create", name="mypage_return_create", methods={"GET", "POST"})
      * @Template("Mypage/return_create.twig")
      */
     public function returnCreate(Request $request)
@@ -1118,7 +1118,8 @@ class MypageController extends AbstractController
         $my_common     = new MyCommonService($this->entityManager);
         $customer_id   = $this->globalService->customerId();
         $login_type    = $this->globalService->getLoginType();
-        $customer_id   = $this->globalService->customerId();
+        $customer_code = $this->globalService->getLoginCode();
+        $qb            = $this->mstProductReturnsInfoRepository->getQueryBuilderByCustomer($param, $customer_id);
 
         // Paginator
         $pagination             = $paginator->paginate(
@@ -1129,8 +1130,7 @@ class MypageController extends AbstractController
         );
         
         return [
-            'customer_id' => $customer_id,
-            'shippings'   => $shippings,
+            'pagination' => $pagination,
         ];
     }
 }
