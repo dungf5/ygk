@@ -1112,8 +1112,7 @@ class MypageController extends AbstractController
         $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
 
         //Params
-        $param = [
-        ];
+        $param = [];
 
         // paginator
         $my_common     = new MyCommonService($this->entityManager);
@@ -1129,7 +1128,7 @@ class MypageController extends AbstractController
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
-
+        
         return [
             'pagination' => $pagination,
         ];
