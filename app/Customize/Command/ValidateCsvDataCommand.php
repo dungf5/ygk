@@ -204,7 +204,7 @@ class ValidateCsvDataCommand extends Command
             }
 
             // Validate discontinued_date
-            if (!empty($product) && !empty($product['discontinued_date']) && date('Y-m-d') > date('Y-m-d', strtotime((string) $product['discontinued_date']))) {
+            if (!empty($product) && !empty($product['discontinued_date']) && date('Y-m-d') > date('Y-m-d', strtotime($product['discontinued_date']))) {
                 $error['error_content6'] = '対象商品は廃番品となっております';
             }
 
