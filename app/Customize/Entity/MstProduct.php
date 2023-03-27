@@ -266,9 +266,9 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         private $special_order_flg;
 
         /**
-         * @var \DateTime
+         * @var string
          *
-         * @ORM\Column(name="discontinued_date", type="datetimetz", nullable=true)
+         * @ORM\Column(name="discontinued_date", type="string", nullable=true)
          */
         private $discontinued_date;
 
@@ -769,7 +769,7 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         }
 
         /**
-         * @return \DateTime
+         * @return string
          */
         public function getDiscontinuedDate()
         {
