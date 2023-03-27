@@ -157,7 +157,7 @@ class ValidateCsvDataCommand extends Command
             ]);
 
             $customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
-                'customer_code' => $object['shipping_shop_code'],
+                'customer_code' => $object['shipping_code'],
             ]);
 
             if (empty($object)) {
@@ -180,10 +180,10 @@ class ValidateCsvDataCommand extends Command
             }
 
             // Validate shipping_shop_code
-            if (!empty($object['shipping_shop_code']) && !empty($object['customer_code']) && !empty($object['shipping_code']) && !empty($object['otodoke_code'])) {
-                $dtCusRelation = $common->getDtCustomerRelation($object['customer_code'], $object['shipping_code'], $object['otodoke_code'].$object['shipping_shop_code']);
+            if (!empty($object['customer_code']) && !empty($object['shipping_code']) && !empty($object['otodoke_code'])) {
+                $dtCusRelation = $common->getDtCustomerRelation($object['customer_code'], $object['shipping_code'], $object['otodoke_code']);
 
-                if (empty($dtCusRelation) || $dtCusRelation['customer_code'] != $object['shipping_shop_code']) {
+                if (empty($dtCusRelation)) {
                     $error['error_content2'] = '出荷先支店コード(顧客関連)が登録されていません';
                 }
             }

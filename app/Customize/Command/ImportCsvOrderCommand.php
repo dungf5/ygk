@@ -277,7 +277,7 @@ class ImportCsvOrderCommand extends Command
                 ]);
                 $objData['customer_code'] = '7001';
                 $objData['shipping_code'] = '7001001000';
-                $objData['otodoke_code'] = '7001001'.str_pad($objData['shipping_shop_code'], 3, '0');
+                $objData['otodoke_code'] = '7001001'.str_pad($objData['shipping_shop_code'], 3, '0', STR_PAD_LEFT);
                 $objData['product_code'] = !empty($product) ? $product['product_code'] : '';
 
                 $this->entityManager->getRepository(DtOrderWSEOS::class)->insertData($objData);
