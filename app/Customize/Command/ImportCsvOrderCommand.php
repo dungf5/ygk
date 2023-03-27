@@ -335,7 +335,7 @@ class ImportCsvOrderCommand extends Command
             'email' => getenv('EMAIL_WS_EOS') ?? '',
             'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
             'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
-            'file_name' => 'Mail/order_ws_eos.twig',
+            'file_name' => 'Mail/ws_eos_ftp.twig',
         ];
 
         // Send mail successfully
