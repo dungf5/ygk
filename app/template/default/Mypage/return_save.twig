@@ -1,0 +1,30 @@
+{% extends 'default_frame.twig' %}
+
+{% set body_class = 'mypage' %}
+
+{% block stylesheet %}
+</style>
+{% endblock stylesheet%}
+
+{% block main %}
+	<div class="ec-layoutRole__main">
+		<div class="ec-mypageRole">
+			<div class="ec-pageHeader">
+				<h1>返品リクエスト送信</h1>
+			</div>
+		</div>
+		<div class="ec-mypageRole">
+			<div class="alert alert-success" role="alert">
+				<div class="col-xs-12 text-center">
+					<p class="text-nowrap">返品リクエストを送信しました</p>
+					<a href="{{ url('mypage_return') }}" class="btn btn-warning">返品手続きに戻る</a>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+</script>
+{% endblock javascript%}

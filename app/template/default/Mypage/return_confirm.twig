@@ -1,0 +1,191 @@
+{% extends 'default_frame.twig' %}
+
+{% set body_class = 'mypage' %}
+
+{% block stylesheet %}
+<style>
+	.left_background{
+		background-color: #fce4d6;
+		color: #000;
+		font-weight: normal;
+	}
+</style>
+{% endblock stylesheet%}
+
+{% block main %}
+	<div class="ec-layoutRole__main">
+		<div class="ec-mypageRole">
+			<div class="ec-pageHeader">
+				<h1>返品リクエスト送信</h1>
+			</div>
+		</div>
+		<div class="ec-mypageRole">
+			<div class="col-xs-12">
+				<form class="form-horizontal"  action="{{ url('mypage_return_save') }}" method="POST">
+					<table class="table table-bordered">
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="customer_code">お客様</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<p class="text-nowrap">{{ customer_id }}</p>
+								<input type="hidden" id="customer_id" name="customer_id" value="{{ customer_id }}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="shipping_code">出荷先</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<p class="text-nowrap">{{ shipping_name }}</p>
+								<input type="hidden" id="shipping_code" name="shipping_code" value="{{ shipping_code }}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="otodoke_code">届け先</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<p class="text-nowrap">{{ otodoke_name }}</p>
+								<input type="hidden" id="otodoke_code" name="otodoke_code" value="{{ otodoke_code }}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="shipping_no">出荷指示№</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<p class="text-nowrap">{{ shipping_no }}</p>
+								<input type="hidden" id="shipping_no" name="shipping_no" value="{{ shipping_no }}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="shipping_day">出荷日</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<p class="text-nowrap">{{ shipping_day }}</p>
+								<input type="hidden" id="shipping_day" name="shipping_day" value="{{ shipping_day }}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="jan_code">JANコード</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<p class="text-nowrap">{{ jan_code }}</p>
+								<input type="hidden" id="jan_code" name="jan_code" value="{{ jan_code }}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="product_name">商品名</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<p class="text-nowrap">{{ product_name }}</p>
+								<input type="hidden" id="product_code" name="product_code" value="{{ product_code }}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="shipping_num">出荷数</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<p class="text-nowrap">{{ shipping_num }}</p>
+								<input type="hidden" id="shipping_num" name="shipping_num" value="{{ shipping_num }}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="return_status">返品中</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<p class="text-nowrap">{{ return_status }}</p>
+								<input type="hidden" id="return_status" name="return_status" value="{{ return_status }}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="return_reason">返品理由</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<p class="text-nowrap">{{ returns_reson_text }}</p>
+								<input type="hidden" id="return_reason" name="return_reason" value="{{ return_reason }}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="customer_comment">顧客コメント</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<p class="text-nowrap">{{ customer_comment }}</p>
+								<input type="hidden" id="customer_comment" name="customer_comment" value="{{ customer_comment }}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="rerurn_num">返品数</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								<div class="row">
+									<div class="col-xs-2">
+										<input type="number" class="form-control" id="rerurn_num" name="rerurn_num" value="{{ rerurn_num }}" required/>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right left_background">
+								<label for="product_status1">良品・不良品</label>
+							</td>
+							<td class="col-xs-10 text-left">
+								{% if product_status == 1 %}
+									<p class="text-nowrap">良品</p>
+								{% endif %}
+								{% if product_status == 2 %}
+									<p class="text-nowrap">不良品</p>
+								{% endif %}
+								<input type="hidden" id="product_status" name="product_status" value="{{ product_status }}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-center left_background" colspan="2">
+								<label for="images">商品画像</label>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<div class="row" id="images_preview">
+									{% for image_url in cus_image_url_path %}
+										<div class="col-xs-2">
+											<img src="{{ url('homepage') }}{{ image_url }}" class="img-thumbnail" />
+											<input type="hidden" id="cus_image_url_path" name="cus_image_url_path[]" value="{{ image_url }}" />
+										</div>
+									{% endfor %}
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-2 text-right">
+							</td>
+							<td class="col-xs-10 text-left">
+								<div class="col-xs-6"></div>
+								<div class="col-xs-3 text-center">
+									<button type="submit" class="btn btn-warning">返品リクエスト送信</button>
+								</div>
+								<div class="col-xs-3 text-center">
+									<a href="{{ url('mypage_return') }}" class="btn btn-warning">返品手続きに戻る</a>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+</script>
+{% endblock javascript%}

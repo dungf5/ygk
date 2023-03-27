@@ -257,7 +257,8 @@ class OrderItemRepository extends AbstractRepository
             'product.product_name',
             'order_status.shipping_num',
             'product_returns_info.returns_status_flag',
-            'product_returns_info.returns_num'
+            'product_returns_info.returns_num',
+            'product_returns_info.returns_status_flag',
         );
         $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = order_status.shipping_code) shipping_name');
         $qb->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = order_status.otodoke_code) otodoke_name');
