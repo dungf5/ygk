@@ -168,6 +168,7 @@ class DtOrderWSEOSRepository extends AbstractRepository
                 $object->setErrorContent8(null);
                 $object->setErrorContent9(null);
                 $object->setErrorContent10(null);
+                $object->setErrorType(0);
 
                 $this->getEntityManager()->persist($object);
                 $this->getEntityManager()->flush();
