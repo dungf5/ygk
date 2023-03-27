@@ -89,6 +89,7 @@ class ValidateCsvDataCommand extends Command
         }
 
         /* Initial data */
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
             'customer_code' => $this->shipping_code,
         ]);
