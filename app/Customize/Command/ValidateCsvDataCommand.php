@@ -92,7 +92,7 @@ class ValidateCsvDataCommand extends Command
         $this->handleValidateCsvData(trim($param));
 
         log_info('End Process Validate Csv Data Command');
-        $io->success('End Process Validate Csv Data Command');
+        //$io->success('End Process Validate Csv Data Command');
 
         return 0;
     }

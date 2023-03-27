@@ -99,7 +99,7 @@ class GetFileFTPCommand extends Command
             }
 
             log_info('End Process Get File FTP');
-            $io->success('End Process Get File FTP');
+            //$io->success('End Process Get File FTP');
 
             return 0;
         }

@@ -138,7 +138,7 @@ class ImportCsvOrderCommand extends Command
         $this->handleImportCsvOrder($path.date('Y/m'));
         log_info('End Process Import Order CSV for month '.date('m'));
 
-        $io->success('End Process Import Order CSV');
+        //$io->success('End Process Import Order CSV');
 
         return 0;
     }
