@@ -85,10 +85,6 @@ class DtOrderWSEOSRepository extends AbstractRepository
             $object->setOrderImportDay(date('Ymd'));
             $object->setOrderRegistedFlg(0);
             $object->setErrorType(0);
-            $object->setCustomerCode($data['customer_code']);
-            $object->setShippingCode($data['shipping_code']);
-            $object->setOtodokeCode($data['otodoke_code']);
-            $object->setProductCode($data['product_code']);
             $object->setShippingSentFlg(0);
 
             $this->getEntityManager()->persist($object);
@@ -170,10 +166,6 @@ class DtOrderWSEOSRepository extends AbstractRepository
                 $object->setErrorContent9(null);
                 $object->setErrorContent10(null);
                 $object->setErrorType(0);
-
-                if (empty($object->getProductCode())) {
-                    $object->setProductCode($data['product_code']);
-                }
 
                 $this->getEntityManager()->persist($object);
                 $this->getEntityManager()->flush();
