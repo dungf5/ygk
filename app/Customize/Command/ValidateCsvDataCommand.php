@@ -344,9 +344,13 @@ class ValidateCsvDataCommand extends Command
                     $this->success["{$item['order_no']}"]['summary'] = [
                         'order_amount' => ($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + ($item['order_price'] * $item['order_num']),
                         'tax' => $this->rate == 0 ? 0 : (int) ((($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + ($item['order_price'] * $item['order_num'])) / $this->rate),
-                        'order_company_name' => $item['order_company_name'],
-                        'order_shop_name' => $item['order_shop_name'],
-                        'shipping_name' => $item['shipping_name'],
+                        'order_company_name' => $this->customer['company_name'] ?? '',
+                        'order_shop_name' => $this->customer['company_name'] ?? '',
+                        'shipping_name' => $this->customer['company_name'] ?? '',
+                        'postal_code' => $this->customer['postal_code'] ?? '',
+                        'address' => ($this->customer['addr01'] ?? '').($this->customer['addr02'] ?? '').($this->customer['addr03'] ?? ''),
+                        'phone_number' => $this->customer['phone_number'] ?? '',
+                        'email' => $this->customer['email'] ?? '',
                         'delivery_date' => $item['delivery_date'],
                     ];
 

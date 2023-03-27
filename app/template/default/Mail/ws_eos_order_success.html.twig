@@ -58,10 +58,10 @@ file that was distributed with this source code.
                                         <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
                                         <pre>会社名：{{ success['summary']['order_company_name'] }} </pre>
                                         <pre>担当者：{{ success['summary']['order_shop_name'] }} </pre>
-                                        <pre>郵便番号：</pre>
-                                        <pre>住所：</pre>
-                                        <pre>電話番号：</pre>
-                                        <pre>メールアドレス：</pre>
+                                        <pre>郵便番号：{{ success['summary']['postal_code'] }} </pre>
+                                        <pre>住所：{{ success['summary']['address'] }} </pre>
+                                        <pre>電話番号：{{ success['summary']['phone_number'] }} </pre>
+                                        <pre>メールアドレス：{{ success['summary']['email'] }} </pre>
                                         <br/>
 
                                         <hr style="height:1px; border-top:1px solid black; border-bottom:1px solid black;">
@@ -71,9 +71,9 @@ file that was distributed with this source code.
                                         <br/>
                                         <pre>会社名：{{ success['summary']['order_company_name'] }} </pre>
                                         <pre>担当者：{{ success['summary']['shipping_name'] }} </pre>
-                                        <pre>郵便番号：</pre>
-                                        <pre>住所：</pre>
-                                        <pre>電話番号：</pre>
+                                        <pre>郵便番号：{{ success['summary']['postal_code'] }} </pre>
+                                        <pre>住所：{{ success['summary']['address'] }} </pre>
+                                        <pre>電話番号：{{ success['summary']['phone_number'] }} </pre>
                                         <br/>
                                         <pre>お届け希望日：{{ success['summary']['delivery_date'] }}</pre>
                                     {% endif %}
