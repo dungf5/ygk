@@ -88,7 +88,13 @@ class ValidateCsvDataCommand extends Command
             return 0;
         }
 
+        /* Initial data */
+        $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
+            'customer_code' => $this->shipping_code,
+        ]);
         $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
+        /* End - Initial data */
+
         log_info('Param: '.$param);
         //if ($input->getOption('option1')) {}
 
@@ -125,12 +131,6 @@ class ValidateCsvDataCommand extends Command
                 'order_import_day' => date('Ymd'),
                 'order_registed_flg' => 0,
             ]);
-
-            if (count($data)) {
-                $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
-                    'customer_code' => $this->shipping_code,
-                ]);
-            }
 
             foreach ($data as $item) {
                 $this->validateWSEOS($item['order_no'], $item['order_line_no']);
