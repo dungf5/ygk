@@ -209,7 +209,7 @@ class ValidateCsvDataCommand extends Command
             }
 
             // Validdate special_order_flg
-            if (!empty($customer) && $customer['special_order_flg'] == 0 && !empty($product) && strtolower($product['special_order_flg']) == 'y') {
+            if (!empty($customer) && $customer['special_order_flg'] == 0 && !empty($product) && !empty($product['special_order_flg']) && strtolower($product['special_order_flg']) == 'y') {
                 $error['error_content7'] = '取り扱い対象商品ではありません';
             }
 
