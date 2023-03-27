@@ -166,6 +166,12 @@ class ValidateCsvDataCommand extends Command
                 return;
             }
 
+            // Set more data
+            $object->setCustomerCode('7001');
+            $object->setShippingCode('7001001000');
+            $object->setOtodokeCode('7001001'.str_pad($object['shipping_shop_code'] ?? '', 3, '0', STR_PAD_LEFT));
+            $object->setProductCode(!empty($product) ? $product['product_code'] : '');
+
             // Array contain error if any
             $error = [];
 
@@ -231,6 +237,8 @@ class ValidateCsvDataCommand extends Command
 
                 $this->errors[] = $error;
             }
+
+            $this->entityManager->getRepository(DtOrderWSEOS::class)->save($object);
 
             return;
         } catch (\Exception $e) {
