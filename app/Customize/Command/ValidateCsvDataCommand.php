@@ -152,12 +152,16 @@ class ValidateCsvDataCommand extends Command
                 'order_line_no' => $order_line_no,
             ]);
 
+            $customer_code = '7001';
+            $shipping_code = '7001001000';
+            $otodoke_code = '7001001'.str_pad($object['shipping_shop_code'] ?? '', 3, '0', STR_PAD_LEFT);
+
             $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy([
                 'jan_code' => $object['jan_code'],
             ]);
 
             $customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
-                'customer_code' => $object['shipping_code'],
+                'customer_code' => $shipping_code,
             ]);
 
             if (empty($object)) {
@@ -167,9 +171,9 @@ class ValidateCsvDataCommand extends Command
             }
 
             // Set more data
-            $object->setCustomerCode('7001');
-            $object->setShippingCode('7001001000');
-            $object->setOtodokeCode('7001001'.str_pad($object['shipping_shop_code'] ?? '', 3, '0', STR_PAD_LEFT));
+            $object->setCustomerCode($customer_code);
+            $object->setShippingCode($shipping_code);
+            $object->setOtodokeCode($otodoke_code);
             $object->setProductCode(!empty($product) ? $product['product_code'] : '');
 
             // Array contain error if any
