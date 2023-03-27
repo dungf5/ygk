@@ -167,10 +167,7 @@ class ValidateCsvDataCommand extends Command
             }
 
             // Array contain error if any
-            $error = [
-                'order_no' => $order_no,
-                'order_line_no' => $order_line_no,
-            ];
+            $error = [];
 
             log_info("Validate order ({$order_no}-{$order_line_no})");
 
@@ -229,8 +226,10 @@ class ValidateCsvDataCommand extends Command
             }
 
             if (count($error)) {
+                $error['order_no'] = $order_no;
+                $error['order_line_no'] = $order_line_no;
+
                 $this->errors[] = $error;
-                $error = null;
             }
 
             return;
