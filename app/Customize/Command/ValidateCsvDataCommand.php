@@ -51,6 +51,9 @@ class ValidateCsvDataCommand extends Command
     private $errors = [];
     private $success = [];
     private $rate = 0;
+    private $customer_code = '7001';
+    private $shipping_code = '7001001000';
+    private $customer = null;
 
     protected static $defaultName = 'validate-csv-data-command';
     protected static $defaultDescription = 'Process Validate Csv Data Command';
@@ -123,6 +126,12 @@ class ValidateCsvDataCommand extends Command
                 'order_registed_flg' => 0,
             ]);
 
+            if (count($data)) {
+                $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
+                    'customer_code' => $this->shipping_code,
+                ]);
+            }
+
             foreach ($data as $item) {
                 $this->validateWSEOS($item['order_no'], $item['order_line_no']);
             }
@@ -152,16 +161,10 @@ class ValidateCsvDataCommand extends Command
                 'order_line_no' => $order_line_no,
             ]);
 
-            $customer_code = '7001';
-            $shipping_code = '7001001000';
             $otodoke_code = '7001001'.str_pad($object['shipping_shop_code'] ?? '', 3, '0', STR_PAD_LEFT);
 
             $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy([
                 'jan_code' => $object['jan_code'],
-            ]);
-
-            $customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
-                'customer_code' => $shipping_code,
             ]);
 
             if (empty($object)) {
@@ -171,8 +174,8 @@ class ValidateCsvDataCommand extends Command
             }
 
             // Set more data
-            $object->setCustomerCode($customer_code);
-            $object->setShippingCode($shipping_code);
+            $object->setCustomerCode($this->customer_code);
+            $object->setShippingCode($this->shipping_code);
             $object->setOtodokeCode($otodoke_code);
             $object->setProductCode(!empty($product) ? $product['product_code'] : '');
 
@@ -196,7 +199,7 @@ class ValidateCsvDataCommand extends Command
             }
 
             // Validate shipping_shop_code
-            if (empty($object['shipping_shop_code']) || empty($customer)) {
+            if (empty($object['shipping_shop_code']) || empty($this->customer)) {
                 $error['error_content3'] = '出荷先支店コード(顧客情報)が登録されていません';
             }
 
@@ -216,7 +219,7 @@ class ValidateCsvDataCommand extends Command
             }
 
             // Validdate special_order_flg
-            if (!empty($customer) && $customer['special_order_flg'] == 0 && !empty($product) && !empty($product['special_order_flg']) && strtolower($product['special_order_flg']) == 'y') {
+            if (!empty($this->customer) && $this->customer['special_order_flg'] == 0 && !empty($product) && !empty($product['special_order_flg']) && strtolower($product['special_order_flg']) == 'y') {
                 $error['error_content7'] = '取り扱い対象商品ではありません';
             }
 
