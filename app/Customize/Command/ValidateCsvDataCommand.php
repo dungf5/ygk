@@ -102,7 +102,7 @@ class ValidateCsvDataCommand extends Command
         switch ($param) {
             case 'ws-eos':
                     $this->handleValidateWSEOS();
-                    $this->handleImportDataWSEOS();
+                    $this->handleImportOrderWSEOS();
                     $this->sendMailErrorWSEOS();
                     $this->sendMailOrderSuccess();
                 break;
@@ -295,7 +295,7 @@ class ValidateCsvDataCommand extends Command
         }
     }
 
-    private function handleImportDataWSEOS()
+    private function handleImportOrderWSEOS()
     {
         try {
             log_info('Start Handle Import Data To dt_order, dt_order_status');
@@ -405,6 +405,62 @@ class ValidateCsvDataCommand extends Command
             log_error($e->getMessage());
 
             return 0;
+        }
+    }
+
+    private function handleImportShippingWSEOS()
+    {
+        try {
+            log_info('Start Handle Import Data To mst_shipping_ws_eos');
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
+            // Get data to import
+            $data = $this->entityManager->getRepository(DtOrderWSEOS::class)->findBy([
+                'order_registed_flg' => 1,
+                'shipping_sent_flg' => 0,
+            ], [
+                'shipping_shop_code' => 'ASC',
+                'order_shop_code' => 'ASC',
+                'order_no' => 'ASC',
+                'order_line_no' => 'ASC',
+            ]);
+
+            foreach ($data as $item) {
+                $result = $this->importDtOrder($item->toArray());
+                $result1 = $this->importDtOrderStatus($item);
+
+                if ($result && $result1) {
+                    // Save to success array to send mail
+                    $this->success["{$item['order_no']}"]['detail'][] = [
+                        'jan_code' => $item['jan_code'],
+                        'product_name' => $item['product_name'],
+                        'order_price' => $item['order_price'],
+                        'order_num' => $item['order_num'],
+                    ];
+
+                    $this->success["{$item['order_no']}"]['summary'] = [
+                        'order_amount' => ($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + ($item['order_price'] * $item['order_num']),
+                        'tax' => $this->rate == 0 ? 0 : (int) ((($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + ($item['order_price'] * $item['order_num'])) / $this->rate),
+                        'order_company_name' => $item['order_company_name'],
+                        'order_shop_name' => $item['order_shop_name'],
+                        'shipping_name' => $item['shipping_name'],
+                        'delivery_date' => $item['delivery_date'],
+                    ];
+
+                    $this->success["{$item['order_no']}"]['summary']['total_amount'] = ($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + (int) ($this->success["{$item['order_no']}"]['summary']['tax'] ?? 0);
+
+                    $item->setOrderRegistedFlg(1);
+                    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
+                }
+            }
+
+            log_info('End Handle Import Data To mst_shipping_ws_eos');
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            return;
         }
     }
 }
