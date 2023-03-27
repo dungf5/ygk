@@ -171,6 +171,10 @@ class DtOrderWSEOSRepository extends AbstractRepository
                 $object->setErrorContent10(null);
                 $object->setErrorType(0);
 
+                if (empty($object->getProductCode())) {
+                    $object->setProductCode($data['product_code']);
+                }
+
                 $this->getEntityManager()->persist($object);
                 $this->getEntityManager()->flush();
             }
