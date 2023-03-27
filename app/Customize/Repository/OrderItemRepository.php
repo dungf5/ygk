@@ -238,6 +238,12 @@ class OrderItemRepository extends AbstractRepository
             Join::WITH,
             "product.product_code = order_status.product_code"
         );
+        $qb->innerJoin(
+            'Customize\Entity\MstProductReturnsInfo',
+            'product_returns_info',
+            Join::WITH,
+            "product_returns_info.jan_code = product.jan_code AND product_returns_info.product_code = product.product_code"
+        );
         $qb->leftJoin(
             'Customize\Entity\MstShipping',
             'shipping',
@@ -249,7 +255,9 @@ class OrderItemRepository extends AbstractRepository
             'shipping.shipping_date',
             'product.jan_code',
             'product.product_name',
-            'order_status.shipping_num'
+            'order_status.shipping_num',
+            'product_returns_info.returns_status_flag',
+            'product_returns_info.returns_num'
         );
         $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = order_status.shipping_code) shipping_name');
         $qb->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = order_status.otodoke_code) otodoke_name');
