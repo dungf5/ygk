@@ -959,7 +959,7 @@ class MypageController extends AbstractController
                 'value'         => (string)$date,
             ];
         }
-
+        
         return [
             'pagination'         => $pagination,
             'param'              => $param,
@@ -1071,6 +1071,7 @@ class MypageController extends AbstractController
                 'cus_image_url_path4' => @$cus_image_url_path[3],
                 'cus_image_url_path5' => @$cus_image_url_path[4],
                 'cus_image_url_path6' => @$cus_image_url_path[5],
+                'returns_status_flag' => 0,
             ]);
             if( count($images) > 0 ) {
                 $this->dtReturnsImageInfoRepository->insertData([

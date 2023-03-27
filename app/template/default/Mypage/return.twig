@@ -144,13 +144,25 @@
 							<tr 
 								onclick="window.location=`{{ url('mypage_return_create') }}?shipping_no={{ item.shipping_no }}&shipping_day={{ item.shipping_date|date('d/m/Y') }}&jan_code={{ item.jan_code }}&product_name={{ item.product_name }}&shipping_num={{ item.shipping_num }}&return_status=1`">
 								<td title="return_type">
-									<a href="#" class="btn btn-warning" role="button">手続き</a>
+									<button type="button" class="btn btn-warning" role="button">手続き</button> 
 								</td>
 								<td title="return_number">
-									<input type="number" class="form-control" />
+									<input type="number" class="form-control" value="{{ item.returns_num }}"/>
 								</td>
 								<td title="return_status">
-									1
+									{% if item.returns_status_flag == 1 %}
+										<p class="text-nowrap">承認</p>
+									{% elseif item.returns_status_flag == 2 %}
+										<p class="text-nowrap">未承認</p>
+									{% elseif item.returns_status_flag == 3 %}
+										<p class="text-nowrap">受取受理</p>
+									{% elseif item.returns_status_flag == 4 %}
+										<p class="text-nowrap">受取未受理</p>
+									{% elseif item.returns_status_flag == 5 %}
+										<p class="text-nowrap">返品完了</p>
+									{% else %}
+										<p class="text-nowrap">申請中</p>
+									{% endif %}
 								</td>
 								<td title="shipping_no">
 									<p class="text-nowrap">{{ item.shipping_no }}</p>
