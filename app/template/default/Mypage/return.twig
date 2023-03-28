@@ -3,63 +3,63 @@
 {% set body_class = 'mypage' %}
 
 {% block stylesheet %}
-    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap-multiselect.min.css') }}">
-	<style>
-		.alert-search {
-			border: solid 1px #333;
-			background-color: #ccc;
-			border-radius: 8px;
-		}
-		.btn-search,
-		.btn-search:hover,
-		.btn-search:focus {
-			background-color: #000;
-			color: #fff;
-			border-radius: 8px;
-		}
-		.alert-return {
-			float: right;
-		}
-		.btn-return,
-		.btn-return:hover,
-		.btn-return:focus {
-			border: none;
-			border-radius: 0;
-			background-color: #f00;
-			color: #fff;
-			font-weight: bold;
-			font-size: 16px;
-			padding: 12px 36px;
-			position: relative;
-		}
-		.btn-return:after {
-			content: "";
-			position: absolute;
-			left: -24px;
-			bottom: 0;
-			width: 0;
-			height: 0;
-			border-left: 25px solid transparent;
-			border-top: 23px solid #f00;
-			border-bottom: 23px solid #f00;
-		}
-		.btn-return:before {
-			content: "";
-			position: absolute;
-			right: -24px;
-			bottom: 0;
-			width: 0;
-			height: 0;
-			border-left: 25px solid red;
-			border-top: 23px solid transparent;
-			border-bottom: 23px solid transparent;
-		}
-		.search_shipping_date,
-		.search_shipping_date:hover,
-		.search_shipping_date:focus {
-			color: #fff;
-		}
-	</style>
+<link rel="stylesheet" href="{{ asset('assets/css/select2/select2.min.css', 'user_data') }}">
+<style>
+	.alert-search {
+		border: solid 1px #333;
+		background-color: #ccc;
+		border-radius: 8px;
+	}
+	.btn-search,
+	.btn-search:hover,
+	.btn-search:focus {
+		background-color: #000;
+		color: #fff;
+		border-radius: 8px;
+	}
+	.alert-return {
+		float: right;
+	}
+	.btn-return,
+	.btn-return:hover,
+	.btn-return:focus {
+		border: none;
+		border-radius: 0;
+		background-color: #f00;
+		color: #fff;
+		font-weight: bold;
+		font-size: 16px;
+		padding: 12px 36px;
+		position: relative;
+	}
+	.btn-return:after {
+		content: "";
+		position: absolute;
+		left: -24px;
+		bottom: 0;
+		width: 0;
+		height: 0;
+		border-left: 25px solid transparent;
+		border-top: 24px solid #f00;
+		border-bottom: 23px solid #f00;
+	}
+	.btn-return:before {
+		content: "";
+		position: absolute;
+		right: -24px;
+		bottom: 0;
+		width: 0;
+		height: 0;
+		border-left: 25px solid red;
+		border-top: 24px solid transparent;
+		border-bottom: 23px solid transparent;
+	}
+	.search_shipping_date,
+	.search_shipping_date:hover,
+	.search_shipping_date:focus {
+		color: #fff;
+	}
+</style>
 {% endblock stylesheet %}
 
 {% block main %}
@@ -116,7 +116,13 @@
 							<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
 						</th>
 						<th title="shipping_date">
-							<a href="javascript:void(0)" class="text-nowrap search_shipping_date">
+							<select class="hidden" id="shipping_date" name="shipping_date">
+								<option value="0" {% if param.search_shipping_date == 0 %} selected {% endif %}>全て</option>
+								{% for shipping_date in shipping_date_list %}
+									<option value="{{ shipping_date }}" {% if param.search_shipping_date == shipping_date %} selected {% endif %}>{{ shipping_date }}</option>
+								{% endfor %}
+							</select>
+							<a href="javascript:void(0)" class="text-nowrap search_shipping_date" onclick="clickSearchShippingDate()">
                                 {{ "front.mypage.return.shipping_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
                             </a>
 						</th>
@@ -205,8 +211,26 @@
 {% endblock main%}
 
 {% block javascript %}
-<script src="{{ asset('assets/js/bootstrap-multiselect.min.js') }}"></script>
+<script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
 <script>
-	
+	function clickSearchShippingDate() {
+		$("#shipping_date").select2("open")
+	}
+
+	$( function() {
+		$("#shipping_date").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			let _parser = new URL( window.location );
+			let _params = new URLSearchParams( _parser.search );
+			if( _params.has('jan_code') ) {
+				_parser.searchParams.set( 'jan_code', _params.get('jan_code') );
+			}
+			_parser.searchParams.set( 'search_shipping_date', e.params.data.id );
+			window.location = _parser.href;
+		})
+	} )
 </script>
 {% endblock %}

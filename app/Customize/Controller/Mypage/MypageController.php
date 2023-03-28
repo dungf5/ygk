@@ -952,13 +952,9 @@ class MypageController extends AbstractController
         );
 
         /*create list order date*/
-        $shipping_date_list          = [];
+        $shipping_date_list = [];
         for ($i = 0; $i < 24; $i++) {
-            $date               = date("Y-m", strtotime("- $i month"));
-            $shipping_date_list[]    = [
-                'key'           => (string)$date,
-                'value'         => (string)$date,
-            ];
+            $shipping_date_list[] = (string)date("Y-m", strtotime("- $i month"));
         }
         
         return [
@@ -997,15 +993,13 @@ class MypageController extends AbstractController
         $returns_reson = $commonService->getReturnsReson();
         $shippings     = $commonService->getMstShippingCustomer($login_type, $customer_id);
         $otodokes      = [];
-        if( count($shippings) == 1 
-            && empty($param['shipping_code']) ) {
+        if( empty($param['shipping_code']) ) {
             $param['shipping_code'] = $shippings[0]['shipping_no'];
         }
         
         if( ! empty($param['shipping_code']) ) {
             $otodokes = $this->globalService->otodokeOption($customer_id, $param['shipping_code']);
-            if( count($otodokes) == 1
-                && empty($param['otodoke_code']) ) {
+            if( empty($param['otodoke_code']) ) {
                 $param['otodoke_code'] = $otodokes[0]['otodoke_code'];
             }
         }
@@ -1034,11 +1028,9 @@ class MypageController extends AbstractController
         $login_type             = $this->globalService->getLoginType();
         $customer_id            = $this->globalService->customerId();
         $company_name           = $this->globalService->companyName();
-        $customer_shipping_code = $this->globalService->getShippingCode();
-        $customer_otodoke_code  = $this->globalService->getOtodokeCode();
         
-        $shipping_code    = $customer_shipping_code;
-        $otodoke_code     = $customer_otodoke_code;
+        $shipping_code    = $request->get('shipping_code');
+        $otodoke_code     = $request->get('otodoke_code');
         $shipping_no      = $request->get('shipping_no');
         $shipping_day     = $request->get('shipping_day');
         $jan_code         = $request->get('jan_code');
@@ -1123,12 +1115,10 @@ class MypageController extends AbstractController
         $commonService          = new MyCommonService($this->entityManager);
         $login_type             = $this->globalService->getLoginType();
         $customer_id            = $this->globalService->customerId();
-        $customer_shipping_code = $this->globalService->getShippingCode();
-        $customer_otodoke_code  = $this->globalService->getOtodokeCode();
         $customer               = $this->globalService->customer();
 
-        $shipping_code      = $customer_shipping_code;
-        $otodoke_code       = $customer_otodoke_code;
+        $shipping_code      = $request->get('shipping_code');
+        $otodoke_code       = $request->get('otodoke_code');
         $shipping_no        = $request->get('shipping_no');
         $shipping_day       = $request->get('shipping_day');
         $jan_code           = $request->get('jan_code');
@@ -1221,7 +1211,7 @@ class MypageController extends AbstractController
         $commonService        = new MyCommonService($this->entityManager);
         $product_returns_info = $this->mstProductReturnsInfoRepository->find( $returns_no );
         $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode());
-        $product_name             = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode());
+        $product_name         = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode());
 
         $returns_reson      = $commonService->getReturnsReson();
         $returns_reson      = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
@@ -1230,8 +1220,8 @@ class MypageController extends AbstractController
         return [
             'product_returns_info' => $product_returns_info,
             'customer'             => $customer,
-            'product_name'             => $product_name,
-            'returns_reson_text'             => $returns_reson_text,
+            'product_name'         => $product_name,
+            'returns_reson_text'   => $returns_reson_text,
         ];
     }
 
