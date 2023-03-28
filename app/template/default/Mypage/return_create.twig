@@ -171,13 +171,14 @@
 						</tr>
 						<tr>
 							<td class="col-xs-2 text-center left_background" colspan="2">
-								<label for="images">商品画像</label>
-								<input type="file" class="hidden" id="images" name="images[]" accept="image/*" multiple onchange="imagesPreview( this )"/>
+								<label for="images_input">商品画像</label>
+								<input type="file" class="hidden" id="images_input" accept="image/*" multiple onchange="imagesInputChange()"/>
+								<input type="file" class="hidden" id="images" name="images[]" accept="image/*" multiple />
 							</td>
 						</tr>
 						<tr>
 							<td class="col-xs-2 text-right">
-								<label class="btn btn-primary" for="images">画像添付</label>
+								<label class="btn btn-primary" for="images_input">画像添付</label>
 							</td>
 							<td class="col-xs-10 text-left">
 								<div class="col-xs-6"></div>
@@ -206,11 +207,63 @@
 <script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
 <script src="{{ asset('assets/jquery-ui/jquery-ui.min.js', 'user_data') }}"></script>
 <script>
+	function imagesInputChange() {
+		let _dt = new DataTransfer()
+		let _images_files = $('#images').prop('files')
+		let _images_input_files = $('#images_input').prop('files')
+		
+		for (let i = 0; i < _images_files.length; i++) {
+			_dt.items.add( _images_files[i] )
+		}
+		for (let i = 0; i < _images_input_files.length; i++) {
+			_dt.items.add( _images_input_files[i] )
+		}
+
+		if( _dt.files.length > 6 ) {
+			alert("最大6枚の画像")
+		} else {
+			$('#images').prop('files', _dt.files)
+			imagesPreview()
+		}
+		$('#images_input').val( null )
+	}
+
+	function imagesPreview() {
+		let _images_preview = $("#images_preview")
+		_images_preview.empty() 
+		let _files = $('#images').prop('files')
+
+		for (var i = 0; i < 6 ; i++) {
+			let _i = i
+			let _f = _files[i]
+			let _fileReader = new FileReader();
+			_fileReader.onload = (e)=>{
+				_images_preview.append( `<div class="col-xs-2 preview">
+					<img src="${e.target.result}" class="img-thumbnail" />
+					<button type="button" class="btn btn-danger" onclick="imagesPreviewClick( ${_i} )"><i class="fas fa-times"></i></button>
+				</div>` );
+			}
+			_fileReader.readAsDataURL( _f )
+		}
+	}
+
+	function imagesPreviewClick( index ) {
+		let _dt = new DataTransfer()
+		let _images_files = $('#images').prop('files')
+
+		for (let i = 0; i < _images_files.length; i++) {
+			if( index !== i ) _dt.items.add( _images_files[i] )
+		}
+
+		$('#images').prop('files', _dt.files)
+		imagesPreview()
+	}
+
 	const changeShippingSode = ( shipping_no )=>{
 		if( ! shipping_no ) return
 		
 		let _el = $("#otodoke_code")
-		_el.empty()
+		_el.select2('destroy')
 		$.ajax({
 			url: "{{ url('otodoke_option') }}",
 			type: 'POST',
@@ -243,41 +296,7 @@
 			alert("更新に失敗しました。")
 		})
 	}
-	const imagesPreview = (e)=>{
-		let _images_preview = $("#images_preview")
-		_images_preview.empty() 
-		let _files = e.files
 
-		if( _files.length > 6 ) {
-			e.value = null;
-			alert("最大6枚の画像")
-			return
-		}
-
-		for (var i = 0; i < 6 ; i++) {
-			let _i = i
-			let _f = _files[i]
-			let _fileReader = new FileReader();
-			_fileReader.onload = (e)=>{
-				_images_preview.append( `<div class="col-xs-2 preview">
-					<img src="${e.target.result}" class="img-thumbnail" />
-					<button type="button" class="btn btn-danger" onclick="imagesPreviewDelete( ${_i} )"><i class="fas fa-times"></i></button>
-				</div>` );
-			}
-			_fileReader.readAsDataURL( _f )
-		}
-	}
-	const imagesPreviewDelete = (index)=>{
-		let _dt = new DataTransfer()
-		let _input = document.getElementById('images')
-		let { files } = _input
-		for (let i = 0; i < files.length; i++) {
-			let _file = files[i]
-			if( index !== i ) _dt.items.add( _file )
-		}
-		_input.files = _dt.files
-		imagesPreview( _input )
-	}
 	$( function() {
 		$("#shipping_code").select2();
 		$("#otodoke_code").select2();

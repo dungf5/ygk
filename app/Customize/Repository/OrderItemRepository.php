@@ -284,6 +284,11 @@ class OrderItemRepository extends AbstractRepository
                 ->setParameter(':search_jan_code', "%{$paramSearch['search_jan_code']}%");
         }
 
+        if ( $paramSearch['search_shipping_date'] != 0 ) {
+            $qb->andWhere( 'shipping.shipping_date like :search_shipping_date' )
+                ->setParameter(':search_shipping_date', $paramSearch['search_shipping_date']."-%");
+        }
+
         //group
         $qb->addGroupBy('order_status.order_no');
         $qb->addGroupBy('order_status.order_line_no');
