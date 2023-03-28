@@ -2570,4 +2570,35 @@ SQL;
 
         return null;
     }
+
+    /**
+     * Get mst_delivery
+     *
+     * @param $shipping_no
+     * @param $order_no
+     * @param $order_line_no
+     * @return array|mixed
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getMstDelivery($shipping_no, $order_no, $order_line_no)
+    {
+        $sql = '
+            SELECT md.*
+            FROM mst_delivery md
+            WHERE md.shipping_no  = ?
+            AND TRIM(md.order_no) = ?
+            LIMIT 1
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$shipping_no, trim($order_no).'-'.trim($order_line_no)]);
+            $rows = $result->fetchAllAssociative();
+
+            return $rows[0] ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
 }

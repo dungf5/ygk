@@ -21,6 +21,8 @@ use Customize\Entity\DtOrderStatus;
 use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstCustomer;
 use Customize\Entity\MstProduct;
+use Customize\Entity\MstShipping;
+use Customize\Entity\MstShippingWSEOS;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
@@ -115,6 +117,7 @@ class ValidateCsvDataCommand extends Command
                     $this->handleImportOrderWSEOS();
                     $this->sendMailErrorWSEOS();
                     $this->sendMailOrderSuccess();
+                    $this->handleImportShippingWSEOS();
                 break;
 
             default:
@@ -446,30 +449,10 @@ class ValidateCsvDataCommand extends Command
             ]);
 
             foreach ($data as $item) {
-                $result = $this->importDtOrder($item->toArray());
-                $result1 = $this->importDtOrderStatus($item);
+                $result = $this->importShippingWSEOS($item->toArray());
 
-                if ($result && $result1) {
-                    // Save to success array to send mail
-                    $this->success["{$item['order_no']}"]['detail'][] = [
-                        'jan_code' => $item['jan_code'],
-                        'product_name' => $item['product_name'],
-                        'order_price' => $item['order_price'],
-                        'order_num' => $item['order_num'],
-                    ];
-
-                    $this->success["{$item['order_no']}"]['summary'] = [
-                        'order_amount' => ($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + ($item['order_price'] * $item['order_num']),
-                        'tax' => $this->rate == 0 ? 0 : (int) ((($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + ($item['order_price'] * $item['order_num'])) / $this->rate),
-                        'order_company_name' => $item['order_company_name'],
-                        'order_shop_name' => $item['order_shop_name'],
-                        'shipping_name' => $item['shipping_name'],
-                        'delivery_date' => $item['delivery_date'],
-                    ];
-
-                    $this->success["{$item['order_no']}"]['summary']['total_amount'] = ($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + (int) ($this->success["{$item['order_no']}"]['summary']['tax'] ?? 0);
-
-                    $item->setOrderRegistedFlg(1);
+                if ($result) {
+                    $item->setShippingSentFlg(1);
                     $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
                 }
             }
@@ -481,6 +464,56 @@ class ValidateCsvDataCommand extends Command
             log_error($e->getMessage());
 
             return;
+        }
+    }
+
+    private function importShippingWSEOS($data)
+    {
+        try {
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
+            $mstShipping = $this->entityManager->getRepository(MstShipping::class)->findOneBy([
+                'cus_order_no' => $data['order_no'],
+                'cus_order_lineno' => $data['order_line_no'],
+                'shipping_status' => 2,
+            ]);
+
+            if (empty($mstShipping)) {
+                return 0;
+            }
+
+            $mstShippingWSEOS = $this->entityManager->getRepository(MstShippingWSEOS::class)->findOneBy([
+                'order_no' => $data['order_no'],
+                'order_line_no' => $data['order_line_no'],
+            ]);
+
+            if (!empty($mstShippingWSEOS)) {
+                return 1;
+            }
+
+            // Insert shipping_sent_flg
+            if (empty($mstShippingWSEOS)) {
+                log_info('Import data shipping_sent_flg '.$data['order_no'].'-'.$data['order_line_no']);
+                $data['shipping_date'] = $mstShipping['shipping_date'] ?? null;
+                $data['product_maker_code'] = $mstShipping['product_code'] ?? null;
+                $data['shipping_no'] = $mstShipping['shipping_no'] ?? null;
+
+                $mstDelivery = $this->commonService->getMstDelivery($mstShipping['shipping_no'], $data['order_no'], $data['order_line_no']);
+                $data['delivery_no'] = $mstDelivery['delivery_no'] ?? null;
+                $data['delivery_line_no'] = $mstDelivery['delivery_lineno'] ?? null;
+                $data['delivery_day'] = $mstDelivery['delivery_date'] ?? null;
+                $data['delivery_num'] = $mstDelivery['quanlity'] ?? 0;
+                $data['delivery_price'] = $mstDelivery['unit_price'] ?? 0;
+                $data['delivery_amount'] = $mstDelivery['amount'] ?? 0;
+
+                return $this->entityManager->getRepository(MstShippingWSEOS::class)->insertData($data);
+            }
+
+            return 0;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            return 0;
         }
     }
 }
