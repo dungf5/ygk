@@ -978,6 +978,7 @@ class MypageController extends AbstractController
         $commonService          = new MyCommonService($this->entityManager);
         $login_type             = $this->globalService->getLoginType();
         $customer_id            = $this->globalService->customerId();
+        $company_name           = $this->globalService->companyName();
         $customer_shipping_code = $this->globalService->getShippingCode();
         $customer_otodoke_code  = $this->globalService->getOtodokeCode();
         //Params
@@ -1010,6 +1011,7 @@ class MypageController extends AbstractController
 
         return [
             'customer_id'            => $customer_id,
+            'company_name'           => $company_name,
             'returns_reson'          => $returns_reson,
             'shippings'              => $shippings,
             'otodokes'               => $otodokes,
@@ -1030,9 +1032,10 @@ class MypageController extends AbstractController
         $commonService          = new MyCommonService($this->entityManager);
         $login_type             = $this->globalService->getLoginType();
         $customer_id            = $this->globalService->customerId();
+        $company_name           = $this->globalService->companyName();
         $customer_shipping_code = $this->globalService->getShippingCode();
         $customer_otodoke_code  = $this->globalService->getOtodokeCode();
-
+        
         $shipping_code    = $customer_shipping_code;
         $otodoke_code     = $customer_otodoke_code;
         $shipping_no      = $request->get('shipping_no');
@@ -1087,6 +1090,7 @@ class MypageController extends AbstractController
 
         return [
             'customer_id'        => $customer_id,
+            'company_name'       => $company_name,
             'shipping_code'      => $shipping_code,
             'shipping_name'      => $shipping_name,
             'otodoke_code'       => $otodoke_code,
@@ -1120,6 +1124,7 @@ class MypageController extends AbstractController
         $customer_id            = $this->globalService->customerId();
         $customer_shipping_code = $this->globalService->getShippingCode();
         $customer_otodoke_code  = $this->globalService->getOtodokeCode();
+        $customer               = $this->globalService->customer();
 
         $shipping_code      = $customer_shipping_code;
         $otodoke_code       = $customer_otodoke_code;
@@ -1160,15 +1165,15 @@ class MypageController extends AbstractController
                 'shipping_name'       => $shipping_name,
                 'otodoke_code'        => $otodoke_code,
                 'otodoke_name'        => $otodoke_name,
-                'shipping_no'         => $request->get('shipping_no'),
+                'shipping_no'         => $shipping_no,
                 'shipping_date'       => $shipping_date,
                 'jan_code'            => $jan_code,
                 'product_code'        => $product_code,
-                'shipping_num'        => $request->get('shipping_num'),
-                'reason_returns_code' => $request->get('return_reason'),
-                'customer_comment'    => $request->get('customer_comment'),
-                'rerurn_num'          => $request->get('rerurn_num'),
-                'cus_reviews_flag'    => $request->get('product_status'),
+                'shipping_num'        => $shipping_num,
+                'reason_returns_code' => $return_reason,
+                'customer_comment'    => $customer_comment,
+                'rerurn_num'          => $rerurn_num,
+                'cus_reviews_flag'    => $product_status,
                 'cus_image_url_path1' => @$cus_image_url_path[0],
                 'cus_image_url_path2' => @$cus_image_url_path[1],
                 'cus_image_url_path3' => @$cus_image_url_path[2],
@@ -1188,6 +1193,10 @@ class MypageController extends AbstractController
                     'cus_image_url_path6' => $mst_product_returns_info->getCusImageUrlPath6(),
                 ]);
             }
+            
+            $email = $customer['customer_email'] ?? $customer['email'];
+            $this->mailService->sendMailReturnProduct( $email );
+            
             return [
                 'save' => true,
             ];

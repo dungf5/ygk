@@ -979,25 +979,41 @@ class MailService
         return $message;
     }
 
-    public function testSendMail()
+    public function sendMailReturnProduct( $email )
     {
-        $message = (new \Swift_Message())
-            ->setSubject("Email Test")
-            ->setFrom([ 'order_support@xbraid.net'=>'Admin' ])
-            ->setTo([ 'hdhai@monotos.biz'])
-            ->setReplyTo('hdhai@monotos.biz')
-            ->setReturnPath('hdhai@monotos.biz')
-            ->setContentType('text/plain; charset=UTF-8')
-            ->setBody( "Test Send Mail",'text/plain');
+        if( !filter_var($email, FILTER_VALIDATE_EMAIL) ) return;
 
-        dd( $this->mailer->send($message) );
-        // Create the Transport
-        $transport = (new \Swift_SmtpTransport('smtp.gmail.com', 587, 'tls'))
-            ->setUsername('hdhai@monotos.biz')
-            ->setPassword('vyvgtjvpqjwouyxp');
-        // Create the Mailer using your created Transport
-        $mailer = new \Swift_Mailer($transport);
-        // Send the message
-        dd( $mailer->send($message) );
+        $body = $this->twig->render('Mail/return_product.twig');
+        
+        $message = (new \Swift_Message())
+            ->setSubject("[XBRAID JAPAN] 返品リクエストが届きました")
+            ->setFrom([ $this->BaseInfo->getEmail01()=>$this->BaseInfo->getShopName() ])
+            ->setTo([ $email ])
+            ->setBody( $body );
+
+        return $this->mailer->send( $message );
     }
+
+    // public function testSendMail()
+    // {
+    //     $body = $this->twig->render('Mail/return_product.twig');
+        
+    //     $message = (new \Swift_Message())
+    //         ->setSubject("Email Test")
+    //         ->setFrom([ 'order_support@xbraid.net'=>'Admin' ])
+    //         ->setTo([ 'hdhai@monotos.biz'])
+    //         ->setReplyTo('hdhai@monotos.biz')
+    //         ->setReturnPath('hdhai@monotos.biz')
+    //         ->setBody( $body );
+
+    //     dd( $this->mailer->send($message) );
+    //     // Create the Transport
+    //     $transport = (new \Swift_SmtpTransport('smtp.gmail.com', 587, 'tls'))
+    //         ->setUsername('hdhai@monotos.biz')
+    //         ->setPassword('vyvgtjvpqjwouyxp');
+    //     // Create the Mailer using your created Transport
+    //     $mailer = new \Swift_Mailer($transport);
+    //     // Send the message
+    //     dd( $mailer->send($message) );
+    // }
 }

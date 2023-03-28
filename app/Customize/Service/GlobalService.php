@@ -59,6 +59,15 @@ class GlobalService
         return $_SESSION['customer_id'] ?? '';
     }
 
+    public function customer()
+    {
+        if ($this->customerId() != '') {
+            return $this->myCommon->getMstCustomer( $this->customerId() );
+        }
+
+        return  null;
+    }
+
     public function customerCode()
     {
         if ($this->customerId() != '') {
