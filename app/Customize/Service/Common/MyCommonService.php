@@ -2537,6 +2537,21 @@ SQL;
 
         return null;
     }
+    public function getJanCodeToProductName( $jan_code = '' )
+    {
+        $sql = "SELECT `product_name` FROM `mst_product` WHERE `jan_code` = :jan_code limit 1";
+
+        try {
+            $statement      = $this->entityManager->getConnection()->prepare($sql);
+            $result         = $statement->executeQuery([ 'jan_code'=>$jan_code ]);
+            $row            = $result->fetchAllAssociative();
+            
+            return @$row[0]['product_name'];
+        } catch (Exception $e) {
+        }
+
+        return null;
+    }
 
     public function getReturnsNo()
     {

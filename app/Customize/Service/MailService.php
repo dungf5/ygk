@@ -979,12 +979,13 @@ class MailService
         return $message;
     }
 
-    public function sendMailReturnProduct( $email )
+    public function sendMailReturnProduct( $email, $url)
     {
         if( !filter_var($email, FILTER_VALIDATE_EMAIL) ) return;
 
-        $body = $this->twig->render('Mail/return_product.twig');
-        
+        $body = $this->twig->render('Mail/return_product.twig', [
+            'url' => $url,
+        ]);
         $message = (new \Swift_Message())
             ->setSubject("[XBRAID JAPAN] 返品リクエストが届きました")
             ->setFrom([ $this->BaseInfo->getEmail01()=>$this->BaseInfo->getShopName() ])

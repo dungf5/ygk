@@ -48,6 +48,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class MypageController extends AbstractController
 {
@@ -906,7 +907,7 @@ class MypageController extends AbstractController
             return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
         }
     }
-
+    
     /**
      * 返品手続き
      *
@@ -1195,7 +1196,8 @@ class MypageController extends AbstractController
             }
             
             $email = $customer['customer_email'] ?? $customer['email'];
-            $this->mailService->sendMailReturnProduct( $email );
+            $url = $this->generateUrl( 'mypage_return_preview', [ 'returns_no'=>  $mst_product_returns_info->getReturnsNo() ], UrlGeneratorInterface::ABSOLUTE_URL );
+            $this->mailService->sendMailReturnProduct( $email, $url );
             
             return [
                 'save' => true,
@@ -1205,6 +1207,31 @@ class MypageController extends AbstractController
         }
         return [
             'save' => false,
+        ];
+    }
+
+    /**
+     * 返品プロセスのプレビュー
+     *
+     * @Route("/mypage/return/preview/{returns_no}", name="mypage_return_preview", methods={"GET"})
+     * @Template("Mypage/return_preview.twig")
+     */
+    public function returnPreview(Request $request, string $returns_no )
+    {
+        $commonService        = new MyCommonService($this->entityManager);
+        $product_returns_info = $this->mstProductReturnsInfoRepository->find( $returns_no );
+        $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode());
+        $product_name             = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode());
+
+        $returns_reson      = $commonService->getReturnsReson();
+        $returns_reson      = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
+        $returns_reson_text = $returns_reson[ $product_returns_info->getReasonReturnsCode() ];
+        
+        return [
+            'product_returns_info' => $product_returns_info,
+            'customer'             => $customer,
+            'product_name'             => $product_name,
+            'returns_reson_text'             => $returns_reson_text,
         ];
     }
 
