@@ -206,7 +206,7 @@ class ExportCsvShippingCommand extends Command
         // Save file information to DB
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $insertDate = [
-            'file_name' => $file_name,
+            'file_name' => strtolower(trim($file_name)),
             'increment' => $increment + 1,
             'directory' => $path,
             'message' => null,

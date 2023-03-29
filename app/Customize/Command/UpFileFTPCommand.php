@@ -142,7 +142,7 @@ class UpFileFTPCommand extends Command
                 $increment = !empty($dtExporCSv) ? (int) $dtExporCSv['increment'] : 0;
                 Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                 $insertDate = [
-                    'file_name' => $file,
+                    'file_name' => strtolower(trim($file)),
                     'increment' => $increment + 1,
                     'directory' => $path,
                     'message' => null,
