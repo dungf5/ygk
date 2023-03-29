@@ -163,7 +163,7 @@ class ImportCsvOrderCommand extends Command
                     continue;
                 }
 
-                $fileExist = $this->entityManager->getRepository(DtImportCSV::class)->findOneBy(['file_name' => $file, 'is_sync' => 1]);
+                $fileExist = $this->entityManager->getRepository(DtImportCSV::class)->findOneBy(['file_name' => strtolower(trim($file)), 'is_sync' => 1]);
                 if (!empty($fileExist)) {
                     continue;
                 }
