@@ -944,7 +944,7 @@ class MypageController extends AbstractController
         }
         $order_status = $my_common->getOrderStatus($customer_code, $login_type);
 
-        $qb = $this->orderItemRepository->getQueryBuilderReturnByCustomer($param, $order_status);
+        $qb = $this->mstProductReturnsInfoRepository->getReturnByCustomer($param, $customer_id);
 
         $pagination = $paginator->paginate(
             $qb,

@@ -170,7 +170,7 @@
 					<tbody>
 						{% for item in pagination %}
 							<tr 
-								ondblclick="window.location=`{{ url('mypage_return_create') }}?shipping_no={{ item.shipping_no }}&shipping_day={{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}&jan_code={{ item.jan_code }}&product_name={{ item.product_name }}&shipping_num={{ item.shipping_num }}&return_status={{ item.returns_status_flag }}`">
+								ondblclick="window.location=`">
 								<td title="return_type">
 									<button type="button" class="btn btn-warning" role="button">手続き</button> 
 								</td>
