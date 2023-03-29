@@ -63,7 +63,6 @@ if (!class_exists('\Customize\Entity\DtImportCSV', false)) {
          * @ORM\Column(name="is_send_mail", type="integer", length=10, nullable=false, options={"comment":""})
          */
         private $is_send_mail;
-
         /**
          * @var \DateTime
          *
