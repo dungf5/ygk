@@ -2530,7 +2530,7 @@ SQL;
             $statement      = $this->entityManager->getConnection()->prepare($sql);
             $result         = $statement->executeQuery([ 'jan_code'=>$jan_code ]);
             $row            = $result->fetchAllAssociative();
-            
+
             return @$row[0]['product_code'];
         } catch (Exception $e) {
         }
@@ -2545,7 +2545,7 @@ SQL;
             $statement      = $this->entityManager->getConnection()->prepare($sql);
             $result         = $statement->executeQuery([ 'jan_code'=>$jan_code ]);
             $row            = $result->fetchAllAssociative();
-            
+
             return @$row[0]['product_name'];
         } catch (Exception $e) {
         }
@@ -2561,7 +2561,7 @@ SQL;
             $statement      = $this->entityManager->getConnection()->prepare($sql);
             $result         = $statement->executeQuery();
             $row            = $result->fetchAllAssociative();
-            
+
             $max_returns_no = (int)@$row[0]['max_returns_no'];
             $max_returns_no = $max_returns_no > 1000 ? $max_returns_no + 1 : 1001;
             return (string)$max_returns_no;
@@ -2594,6 +2594,26 @@ SQL;
         try {
             $statement = $this->entityManager->getConnection()->prepare($sql);
             $result = $statement->executeQuery([$shipping_no, trim($order_no).'-'.trim($order_line_no)]);
+            $rows = $result->fetchAllAssociative();
+
+            return $rows[0] ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getDtExportCsv()
+    {
+        $sql = '
+                SELECT * FROM dt_export_csv dec2
+                WHERE  dec2.file_name IS  NOT NULL
+                ORDER BY dec2.id DESC
+                LIMIT 1
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery();
             $rows = $result->fetchAllAssociative();
 
             return $rows[0] ?? [];
