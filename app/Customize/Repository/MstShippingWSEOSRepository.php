@@ -53,6 +53,7 @@ class MstShippingWSEOSRepository extends AbstractRepository
             $object->setOrderType('0');
             $object->setTaxType('0');
             $object->setShippingSendFlg('1');
+            $object->setShippingSentFlg('0');
             /* End - fixed value */
 
             $object->setSalesCompanyCode($data['sales_company_code']);
