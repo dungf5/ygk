@@ -278,67 +278,6 @@
 			search_otodoke = e.params.data.id
 			reload()
 		});
-		
-		// $("#search_shipping").select2({
-		// 	'dropdownAutoWidth': true,
-		// 	'selectionCssClass': 'hidden',
-		// })
-		// .on('select2:select', function (e) {
-		// 	search_shipping = e.params.data.id
-		// 	let _el = $('#search_otodoke')
-		// 	_el
-		// 		.select2('destroy')
-		// 		.empty()
-		// 		.append( new Option( "全て", 0 ) )
-		// 	if( search_shipping > 0 ) {
-		// 		$.ajax({
-		// 			url: "{{ url('otodoke_option') }}",
-		// 			type: 'POST',
-		// 			dataType: 'json',
-		// 			data: {
-		// 				'customer_id'  : "{{ customer_id }}",
-		// 				'shipping_code': search_shipping,
-		// 				'_csrf_token'  : "{{ csrf_token('authenticate') }}",
-		// 			},
-		// 			beforeSend : ()=>loadingOverlay("show"),
-		// 			complete : ()=>loadingOverlay("hide"),
-		// 		})
-		// 		.done(function(json) {
-		// 			if( json.status ) {
-		// 				if( json.data.length > 0 ) {
-		// 					json.data.forEach( (item)=> {
-		// 						_el.append( new Option(
-		// 							`${(item.name01?item.name01:'')} 〒 ${(item.postal_code?item.postal_code:'')} ${(item.addr01?item.addr01:'')} ${(item.addr02?item.addr02:'')} ${(item.addr03?item.addr03:'')}`,
-		// 							item.otodoke_code,
-		// 							false,
-		// 							false
-		// 						) )
-		// 					})
-		// 				}
-		// 				_el.select2({
-		// 					'dropdownAutoWidth': true,
-		// 					'selectionCssClass': 'hidden',
-		// 				})
-		// 				.on('select2:select', function (e) {
-		// 					search_otodoke  = e.params.data.id
-		// 					reload()
-		// 				} )
-		// 				.select2( "open" )
-		// 			}
-		// 		})
-		// 		.fail(function(json) {
-		// 			alert("更新に失敗しました。")
-		// 		})
-		// 	} else {
-		// 		_el.select2({
-		// 			'dropdownAutoWidth': true,
-		// 			'selectionCssClass': 'hidden',
-		// 		})
-
-		// 		search_otodoke  = 0
-		// 		reload()
-		// 	}
-		// });
 	} );
 </script>
 {% endblock %}
