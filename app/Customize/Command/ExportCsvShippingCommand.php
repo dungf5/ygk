@@ -137,7 +137,7 @@ class ExportCsvShippingCommand extends Command
         $temp_path_local = null;
         // End - Create directory local if have'n
 
-        $fp = fopen($file, 'w');
+        $fp = fopen(strtolower(trim($file)), 'w');
 
         foreach ($mstShippingWSEOS as $item) {
             $fields = [
