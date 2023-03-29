@@ -28,9 +28,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/* Run Batch: php bin/console get-file-ftp-command */
+/* Run Batch: php bin/console up-file-ftp-command */
 
-class GetFileFTPCommand extends Command
+class UpFileFTPCommand extends Command
 {
     use PluginCommandTrait;
 
@@ -45,8 +45,8 @@ class GetFileFTPCommand extends Command
      */
     protected $mailService;
 
-    protected static $defaultName = 'get-file-ftp-command';
-    protected static $defaultDescription = 'Process Get File Ftp Command';
+    protected static $defaultName = 'up-file-ftp-command';
+    protected static $defaultDescription = 'Process Up File Ftp Command';
 
     public function __construct(EntityManagerInterface $entityManager, MailService $mailService)
     {
@@ -69,12 +69,12 @@ class GetFileFTPCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        log_info('Start Process Get File FTP');
+        log_info('Start Process Up File FTP');
 
         /* Get files from FTP server*/
-        $path = getenv('FTP_DIRECTORY') ?? '';
-        $path_local = getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') ?? '/html/download/';
-        $path_local .= 'csv/order/';
+        $path = getenv('FTP_UPLOAD_DIRECTORY') ?? '';
+        $path_local = getenv('LOCAL_FTP_UPLOAD_DIRECTORY') ?? '/html/upload/';
+        $path_local .= 'csv/shipping/';
 
         if (!empty($path)) {
             $result = $this->ftpService->getFiles($path, $path_local);
@@ -93,14 +93,13 @@ class GetFileFTPCommand extends Command
                 ];
 
                 try {
-                    $this->mailService->sendMailImportWSEOS($information);
+                    $this->mailService->sendMailExportWSEOS($information);
                 } catch (\Exception $e) {
                     log_error($e->getMessage());
                 }
             }
 
-            log_info('End Process Get File FTP');
-            //$io->success('End Process Get File FTP');
+            log_info('End Process Up File FTP');
 
             return 0;
         }

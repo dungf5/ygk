@@ -118,7 +118,9 @@ class ImportCsvOrderCommand extends Command
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         /* The local path to load csv file */
-        $path = getenv('LOCAL_FTP_DIRECTORY') ?? '/html/dowload/csv/order/';
+        $path = getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') ?? '/html/download/';
+        $path .= 'csv/order/';
+
         if (getenv('APP_IS_LOCAL') == 1) {
             $path = '.'.$path;
         }
@@ -235,7 +237,9 @@ class ImportCsvOrderCommand extends Command
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // Insert cache file to validation data
-        $cache_file = getenv('LOCAL_FTP_DIRECTORY') ?? '/html/dowload/csv/order/';
+        $cache_file = getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') ?? '/html/download/';
+        $cache_file .= 'csv/order/';
+
         if (getenv('APP_IS_LOCAL') == 1) {
             $cache_file = '.'.$cache_file;
         }
@@ -343,7 +347,7 @@ class ImportCsvOrderCommand extends Command
         try {
             log_info('[WS-EOS] 注文メールの送信を行います.');
 
-            $this->mailService->sendMailWSEOS($information);
+            $this->mailService->sendMailImportWSEOS($information);
 
             // Update information dt_import_csv
             $data = [
