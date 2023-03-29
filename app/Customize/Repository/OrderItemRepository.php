@@ -230,7 +230,7 @@ class OrderItemRepository extends AbstractRepository
     public function getQueryBuilderReturnByCustomer($paramSearch = [], $order_status = [])
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->select('shipping.shipping_no');
+        $qb->select('order_status.cus_order_no', 'order_status.cus_order_lineno');
         $qb->from('Customize\Entity\DtOrderStatus', 'order_status');
         $qb->innerJoin(
             'Customize\Entity\MstProduct',
@@ -252,6 +252,7 @@ class OrderItemRepository extends AbstractRepository
         );
 
         $qb->addSelect(
+            'shipping.shipping_no',
             'shipping.shipping_date',
             'product.jan_code',
             'product.product_name',
@@ -285,8 +286,18 @@ class OrderItemRepository extends AbstractRepository
         }
 
         if ( $paramSearch['search_shipping_date'] != 0 ) {
-            $qb->andWhere( 'shipping.shipping_date like :search_shipping_date' )
-                ->setParameter(':search_shipping_date', $paramSearch['search_shipping_date']."-%");
+            $qb->andWhere( 'shipping.shipping_date LIKE :search_shipping_date' )
+                ->setParameter(':search_shipping_date', "{$paramSearch['search_shipping_date']}-%");
+        }
+
+        if ( $paramSearch['search_shipping'] != '0' ) {
+            $qb->andWhere( 'shipping.shipping_code = :search_shipping' )
+                ->setParameter(':search_shipping', $paramSearch['search_shipping']);
+        }
+
+        if ( $paramSearch['search_otodoke'] != '0' ) {
+            $qb->andWhere( 'shipping.otodoke_code = :search_otodoke' )
+                ->setParameter(':search_otodoke', $paramSearch['search_otodoke']);
         }
 
         //group

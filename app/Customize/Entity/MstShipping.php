@@ -145,6 +145,29 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         private $shipping_code;
 
         /**
+         * @return string
+         */
+        public function getOtodokeCode()
+        {
+            return $this->otodoke_code;
+        }
+
+        /**
+         * @param $otodoke_code
+         */
+        public function setOtodokeCode($otodoke_code)
+        {
+            $this->otodoke_code = $otodoke_code;
+        }
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="otodoke_code", type="string", length=25)
+         */
+        private $otodoke_code;
+
+        /**
          * @var string
          *
          * @ORM\Column(name="product_code", type="string", length=25)

@@ -54,9 +54,9 @@
 		border-top: 24px solid transparent;
 		border-bottom: 23px solid transparent;
 	}
-	.search_shipping_date,
-	.search_shipping_date:hover,
-	.search_shipping_date:focus {
+	.search,
+	.search:hover,
+	.search:focus {
 		color: #fff;
 	}
 </style>
@@ -77,7 +77,7 @@
 						<form class="form-inline" method="GET">
 							<div class="form-group">
 								<label for="jan_code">JANコード</label>
-								<input type="text" class="form-control" id="jan_code" name="jan_code" value="{{ param.search_jan_code }}"/>
+								<input type="text" class="form-control" id="search_jan_code" name="search_jan_code" value="{{ param.search_jan_code }}"/>
 							</div>
 							<button type="submit" class="btn btn-search">
 								<i class="fas fa-angle-double-right" style="color: #f00"></i > 絞り込み
@@ -116,22 +116,44 @@
 							<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
 						</th>
 						<th title="shipping_date">
-							<select class="hidden" id="shipping_date" name="shipping_date">
+							<select class="hidden" id="search_shipping_date" name="search_shipping_date">
 								<option value="0" {% if param.search_shipping_date == 0 %} selected {% endif %}>全て</option>
 								{% for shipping_date in shipping_date_list %}
 									<option value="{{ shipping_date }}" {% if param.search_shipping_date == shipping_date %} selected {% endif %}>{{ shipping_date }}</option>
 								{% endfor %}
 							</select>
-							<a href="javascript:void(0)" class="text-nowrap search_shipping_date" onclick="clickSearchShippingDate()">
+							<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_shipping_date').select2('open')">
                                 {{ "front.mypage.return.shipping_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
                             </a>
 						</th>
 						<th title="shiping_code otodoke_code">
-							<a href="javascript:void(0)" class="text-nowrap search_shipping_date">
+							<select class="hidden" id="search_shipping" name="search_shipping">
+								<option value="0" {% if param.search_shipping == 0 %} selected {% endif %}>全て</option>
+								{% for shipping in shippings %}
+									<option
+										value="{{ shipping.shipping_no }}"
+										{% if param.search_shipping == shipping.shipping_no %} selected {% endif %}
+									>
+										{{ shipping.name01 }} 〒 {{ shipping.postal_code }} {{ shipping.addr01 }} {{ shipping.addr02 }} {{ shipping.addr03 }}
+									</option>
+								{% endfor %}
+							</select>
+							<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_shipping').select2('open')">
                                 {{ "front.mypage.return.shiping_code" | trans | raw}} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
                             </a>
 							<br/>
-							<a href="javascript:void(0)" class="text-nowrap search_shipping_date">
+							<select class="hidden" id="search_otodoke" name="search_otodoke">
+								<option value="0" {% if param.search_otodoke == 0 %} selected {% endif %}>全て</option>
+								{% for otodoke in otodokes %}
+									<option
+										value="{{ otodoke.otodoke_code }}"
+										{% if param.search_otodoke == otodoke.otodoke_code %} selected {% endif %}
+									>
+										{{ otodoke.name01 }} 〒 {{ otodoke.postal_code }} {{ otodoke.addr01 }} {{ otodoke.addr02 }} {{otodoke.addr03 }}
+									</option>
+								{% endfor %}
+							</select>
+							<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_otodoke').select2('open')">
                                 {{ "front.mypage.return.otodoke_code" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
                             </a>
 						</th>
@@ -148,7 +170,7 @@
 					<tbody>
 						{% for item in pagination %}
 							<tr 
-								ondblclick="window.location=`{{ url('mypage_return_create') }}?shipping_no={{ item.shipping_no }}&shipping_day={{ item.shipping_date|date('d/m/Y') }}&jan_code={{ item.jan_code }}&product_name={{ item.product_name }}&shipping_num={{ item.shipping_num }}&return_status={{ item.returns_status_flag }}`">
+								ondblclick="window.location=`{{ url('mypage_return_create') }}?shipping_no={{ item.shipping_no }}&shipping_day={{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}&jan_code={{ item.jan_code }}&product_name={{ item.product_name }}&shipping_num={{ item.shipping_num }}&return_status={{ item.returns_status_flag }}`">
 								<td title="return_type">
 									<button type="button" class="btn btn-warning" role="button">手続き</button> 
 								</td>
@@ -174,7 +196,7 @@
 									<p class="text-nowrap">{{ item.shipping_no }}</p>
 								</td>
 								<td title="shipping_date">
-									<p class="text-nowrap">{{ item.shipping_date|date('Y-m-d') }}</p>
+									<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
 								</td>
 								<td title="shiping_code otodoke_code">
 									<p class="text-nowrap">{{ item.shipping_name }}</p>
@@ -213,24 +235,110 @@
 {% block javascript %}
 <script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
 <script>
-	function clickSearchShippingDate() {
-		$("#shipping_date").select2("open")
+	var search_jan_code      = "{{ param.search_jan_code }}"
+	var search_shipping_date = "{{ param.search_shipping_date }}"
+	var search_shipping      = "{{ param.search_shipping }}"
+	var search_otodoke       = "{{ param.search_otodoke }}"
+
+	function reload() {
+		loadingOverlay("show")
+		let _parser = new URL( window.location.href )
+		_parser.searchParams.set( 'search_jan_code', search_jan_code )
+		_parser.searchParams.set( 'search_shipping_date', search_shipping_date )
+		_parser.searchParams.set( 'search_shipping', search_shipping )
+		_parser.searchParams.set( 'search_otodoke', search_otodoke )
+		window.location = _parser.href
 	}
 
 	$( function() {
-		$("#shipping_date").select2({
+		$("#search_shipping_date").select2({
 			'dropdownAutoWidth': true,
 			'selectionCssClass': 'hidden',
 		})
 		.on('select2:select', function (e) {
-			let _parser = new URL( window.location );
-			let _params = new URLSearchParams( _parser.search );
-			if( _params.has('jan_code') ) {
-				_parser.searchParams.set( 'jan_code', _params.get('jan_code') );
-			}
-			_parser.searchParams.set( 'search_shipping_date', e.params.data.id );
-			window.location = _parser.href;
+			search_shipping_date = e.params.data.id
+			reload()
+		});
+
+		$("#search_shipping").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
 		})
-	} )
+		.on('select2:select', function (e) {
+			search_shipping = e.params.data.id
+			if( search_shipping == 0 ) search_otodoke = 0
+			reload()
+		});
+
+		$("#search_otodoke").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_otodoke = e.params.data.id
+			reload()
+		});
+		
+		// $("#search_shipping").select2({
+		// 	'dropdownAutoWidth': true,
+		// 	'selectionCssClass': 'hidden',
+		// })
+		// .on('select2:select', function (e) {
+		// 	search_shipping = e.params.data.id
+		// 	let _el = $('#search_otodoke')
+		// 	_el
+		// 		.select2('destroy')
+		// 		.empty()
+		// 		.append( new Option( "全て", 0 ) )
+		// 	if( search_shipping > 0 ) {
+		// 		$.ajax({
+		// 			url: "{{ url('otodoke_option') }}",
+		// 			type: 'POST',
+		// 			dataType: 'json',
+		// 			data: {
+		// 				'customer_id'  : "{{ customer_id }}",
+		// 				'shipping_code': search_shipping,
+		// 				'_csrf_token'  : "{{ csrf_token('authenticate') }}",
+		// 			},
+		// 			beforeSend : ()=>loadingOverlay("show"),
+		// 			complete : ()=>loadingOverlay("hide"),
+		// 		})
+		// 		.done(function(json) {
+		// 			if( json.status ) {
+		// 				if( json.data.length > 0 ) {
+		// 					json.data.forEach( (item)=> {
+		// 						_el.append( new Option(
+		// 							`${(item.name01?item.name01:'')} 〒 ${(item.postal_code?item.postal_code:'')} ${(item.addr01?item.addr01:'')} ${(item.addr02?item.addr02:'')} ${(item.addr03?item.addr03:'')}`,
+		// 							item.otodoke_code,
+		// 							false,
+		// 							false
+		// 						) )
+		// 					})
+		// 				}
+		// 				_el.select2({
+		// 					'dropdownAutoWidth': true,
+		// 					'selectionCssClass': 'hidden',
+		// 				})
+		// 				.on('select2:select', function (e) {
+		// 					search_otodoke  = e.params.data.id
+		// 					reload()
+		// 				} )
+		// 				.select2( "open" )
+		// 			}
+		// 		})
+		// 		.fail(function(json) {
+		// 			alert("更新に失敗しました。")
+		// 		})
+		// 	} else {
+		// 		_el.select2({
+		// 			'dropdownAutoWidth': true,
+		// 			'selectionCssClass': 'hidden',
+		// 		})
+
+		// 		search_otodoke  = 0
+		// 		reload()
+		// 	}
+		// });
+	} );
 </script>
 {% endblock %}
