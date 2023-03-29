@@ -404,7 +404,7 @@ class MypageController extends AbstractController
         ];
 
         for ($i = 1; $i < 14; $i++) {
-            $date               = date("Y-m", strtotime("- $i month"));
+            $date               = date("Y-m", strtotime( date( 'Y-m-01' )." -$i months" ));
             $orderDateList[]    = [
                 'key'           => (string)$date,
                 'value'         => (string)$date,
@@ -817,7 +817,7 @@ class MypageController extends AbstractController
         ];
 
         for ($i = 1; $i < 14; $i++) {
-            $date               = date("Y-m", strtotime("- $i month"));
+            $date               = date("Y-m", strtotime( date( 'Y-m-01' )." -$i months" ));
             $shippingDateList[] = [
                 'key'           => (string)$date,
                 'value'         => (string)$date,
@@ -1161,28 +1161,29 @@ class MypageController extends AbstractController
         $shipping_date = date('Y-m-d', strtotime( str_replace( '/', '-', $shipping_day ) ) );
         try {
             $mst_product_returns_info = $this->mstProductReturnsInfoRepository->insertData([
-                'returns_no'          => $returns_no,
-                'customer_code'       => $customer_id,
-                'shipping_code'       => $shipping_code,
-                'shipping_name'       => $shipping_name,
-                'otodoke_code'        => $otodoke_code,
-                'otodoke_name'        => $otodoke_name,
-                'shipping_no'         => $shipping_no,
-                'shipping_date'       => $shipping_date,
-                'jan_code'            => $jan_code,
-                'product_code'        => $product_code,
-                'shipping_num'        => $shipping_num,
-                'reason_returns_code' => $return_reason,
-                'customer_comment'    => $customer_comment,
-                'rerurn_num'          => $rerurn_num,
-                'cus_reviews_flag'    => $product_status,
-                'cus_image_url_path1' => @$cus_image_url_path[0],
-                'cus_image_url_path2' => @$cus_image_url_path[1],
-                'cus_image_url_path3' => @$cus_image_url_path[2],
-                'cus_image_url_path4' => @$cus_image_url_path[3],
-                'cus_image_url_path5' => @$cus_image_url_path[4],
-                'cus_image_url_path6' => @$cus_image_url_path[5],
-                'returns_status_flag' => 0,
+                'returns_no'           => $returns_no,
+                'customer_code'        => $customer_id,
+                'shipping_code'        => $shipping_code,
+                'shipping_name'        => $shipping_name,
+                'otodoke_code'         => $otodoke_code,
+                'otodoke_name'         => $otodoke_name,
+                'shipping_no'          => $shipping_no,
+                'shipping_date'        => $shipping_date,
+                'jan_code'             => $jan_code,
+                'product_code'         => $product_code,
+                'shipping_num'         => $shipping_num,
+                'reason_returns_code'  => $return_reason,
+                'customer_comment'     => $customer_comment,
+                'rerurn_num'           => $rerurn_num,
+                'cus_reviews_flag'     => $product_status,
+                'cus_image_url_path1'  => @$cus_image_url_path[0],
+                'cus_image_url_path2'  => @$cus_image_url_path[1],
+                'cus_image_url_path3'  => @$cus_image_url_path[2],
+                'cus_image_url_path4'  => @$cus_image_url_path[3],
+                'cus_image_url_path5'  => @$cus_image_url_path[4],
+                'cus_image_url_path6'  => @$cus_image_url_path[5],
+                'returns_status_flag'  => 0,
+                'returns_request_date' => date( 'Y-m-d H:i:s' ),
             ]);
             if( count($cus_image_url_path) > 0 ) {
                 $this->dtReturnsImageInfoRepository->insertData([
@@ -1204,7 +1205,7 @@ class MypageController extends AbstractController
                 'save' => true,
             ];
         } catch (\Exception $e) {
-            log_error( $e->getMessage() );
+            log_error( "mypage/return/save: " . $e->getMessage() );
         }
         return [
             'save' => false,
@@ -1250,7 +1251,12 @@ class MypageController extends AbstractController
         $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
 
         //Params
-        $param = [];
+        $param = [
+            'search_request_date'  => $request->get('search_request_date', 0),
+            'search_reason_return' => $request->get('search_reason_return', 0),
+            'search_shipping'      => $request->get('search_shipping', 0),
+            'search_otodoke'       => $request->get('search_otodoke', 0),
+        ];
 
         // paginator
         $my_common     = new MyCommonService($this->entityManager);
@@ -1267,8 +1273,26 @@ class MypageController extends AbstractController
             ['distinct' => false]
         );
         
+        /*create list order date*/
+        $request_date_list = [];
+        for ($i = 0; $i < 14; $i++) {
+            $request_date_list[] = (string)date( "Y-m", strtotime( date( 'Y-m-01' )." -$i months" ) );
+        }
+
+        $returns_resons = $my_common->getReturnsReson();
+        $shippings = $my_common->getMstShippingCustomer($login_type, $customer_id);
+        $otodokes  = [];
+        if(  $param['search_shipping'] > 0 ) {
+            $otodokes = $this->globalService->otodokeOption($customer_id, $param['search_shipping']);
+        }
+
         return [
-            'pagination' => $pagination,
+            'pagination'        => $pagination,
+            'param'             => $param,
+            'request_date_list' => $request_date_list,
+            'returns_resons'    => $returns_resons,
+            'shippings'         => $shippings,
+            'otodokes'          => $otodokes,
         ];
     }
 }

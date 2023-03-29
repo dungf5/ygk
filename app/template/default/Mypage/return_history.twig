@@ -3,8 +3,14 @@
 {% set body_class = 'mypage' %}
 
 {% block stylesheet %}
-    <style>
-	</style>
+<link rel="stylesheet" href="{{ asset('assets/css/select2/select2.min.css', 'user_data') }}">
+<style>
+	.search,
+	.search:hover,
+	.search:focus {
+		color: #fff;
+	}
+</style>
 {% endblock stylesheet %}
 
 {% block main %}
@@ -21,93 +27,141 @@
 					{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}
 				</p>
 			{% endif %}
-
-			<table class="table myTable">
-				<thead>
-					<tr>
-						<th title="return_no">
-							<p class="text-nowrap">{{ "front.mypage.history.return_no" | trans | raw }}</p>
-						</th>
-						<th title="return_request_date">
-							<p class="text-nowrap">{{ "front.mypage.history.return_request_date" | trans | raw }}</p>
-						</th>
-						<th title="reason_return">
-							<p class="text-nowrap">{{ "front.mypage.history.reason_return" | trans | raw }}</p>
-						</th>
-						<th title="return_status">
-							<p class="text-nowrap">{{ "front.mypage.history.return_status" | trans | raw }}</p>
-						</th>
-						<th title="shipping_no">
-							<p class="text-nowrap">{{ "front.mypage.history.shipping_no" | trans | raw }}</p>
-						</th>
-						<th title="shipping_date">
-							<p class="text-nowrap">{{ "front.mypage.history.shipping_date" | trans | raw }}</p>
-						</th>
-						<th title="shiping_code | otodoke_code">
-							<p class="text-nowrap">{{ "front.mypage.history.shiping_code" | trans | raw }}</p>
-							<p class="text-nowrap">{{ "front.mypage.history.otodoke_code" | trans | raw }}</p>
-						</th>
-						<th title="jan_code | product_name">
-							<p class="text-nowrap">{{ "front.mypage.history.jan_code" | trans | raw }}</p>
-							<p class="text-nowrap">{{ "front.mypage.history.product_name" | trans | raw }}</p>
-						</th>
-						<th title="shipping_num">
-							<p class="text-nowrap">{{ "front.mypage.history.shipping_num" | trans | raw }}</p>
-						</th>
-						<th title="return_number">
-							<p class="text-nowrap">{{ "front.mypage.history.return_number" | trans | raw }}</p>
-						</th>
-					</tr>
-				</thead>
-				{% if pagination and pagination.totalItemCount > 0 %}
-					<tbody>
-						{% for item in pagination %}
+			<div class="table-responsive">
+				<table class="table myTable">
+					<thead>
+						<tr>
+							<th title="return_no">
+								<p class="text-nowrap">{{ "front.mypage.history.return_no" | trans | raw }}</p>
+							</th>
+							<th title="return_request_date" style="min-width: 110px;">
+								<select class="hidden" id="search_request_date" name="search_shipping_date">
+									<option value="0" {% if param.search_request_date == 0 %} selected {% endif %}>全て</option>
+									{% for request_date in request_date_list %}
+										<option value="{{ request_date }}" {% if param.search_request_date == request_date %} selected {% endif %}>{{ request_date }}</option>
+									{% endfor %}
+								</select>
+								<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_request_date').select2('open')">
+									{{ "front.mypage.history.return_request_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+								</a>
+							</th>
+							<th title="reason_return">
+								<select class="hidden" id="search_reason_return" name="search_reason_return">
+									<option value="0" {% if param.search_reason_return == 0 %} selected {% endif %}>全て</option>
+									{% for returns_reson in returns_resons %}
+										<option
+											value="{{ returns_reson.returns_reson_id }}" {% if param.search_reason_return == returns_reson.returns_reson_id %} selected {% endif %}
+										>
+											{{ returns_reson.returns_reson }}
+										</option>
+									{% endfor %}
+								</select>
+								<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_reason_return').select2('open')">
+									{{ "front.mypage.history.reason_return" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+								</a>
+							</th>
+							<th title="return_status">
+								<p class="text-nowrap">{{ "front.mypage.history.return_status" | trans | raw }}</p>
+							</th>
+							<th title="shipping_no">
+								<p class="text-nowrap">{{ "front.mypage.history.shipping_no" | trans | raw }}</p>
+							</th>
+							<th title="shipping_date">
+								<p class="text-nowrap">{{ "front.mypage.history.shipping_date" | trans | raw }}</p>
+							</th>
+							<th title="shiping_code | otodoke_code">
+								<select class="hidden" id="search_shipping" name="search_shipping">
+									<option value="0" {% if param.search_shipping == 0 %} selected {% endif %}>全て</option>
+									{% for shipping in shippings %}
+										<option
+											value="{{ shipping.shipping_no }}"
+											{% if param.search_shipping == shipping.shipping_no %} selected {% endif %}
+										>
+											{{ shipping.name01 }} 〒 {{ shipping.postal_code }} {{ shipping.addr01 }} {{ shipping.addr02 }} {{ shipping.addr03 }}
+										</option>
+									{% endfor %}
+								</select>
+								<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_shipping').select2('open')">
+									{{ "front.mypage.history.shiping_code" | trans | raw}} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+								</a>
+								<br/>
+								<select class="hidden" id="search_otodoke" name="search_otodoke">
+									<option value="0" {% if param.search_otodoke == 0 %} selected {% endif %}>全て</option>
+									{% for otodoke in otodokes %}
+										<option
+											value="{{ otodoke.otodoke_code }}"
+											{% if param.search_otodoke == otodoke.otodoke_code %} selected {% endif %}
+										>
+											{{ otodoke.name01 }} 〒 {{ otodoke.postal_code }} {{ otodoke.addr01 }} {{ otodoke.addr02 }} {{otodoke.addr03 }}
+										</option>
+									{% endfor %}
+								</select>
+								<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_otodoke').select2('open')">
+									{{ "front.mypage.history.otodoke_code" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+								</a>
+							</th>
+							<th title="jan_code | product_name">
+								<p class="text-nowrap">{{ "front.mypage.history.jan_code" | trans | raw }}</p>
+								<p class="text-nowrap">{{ "front.mypage.history.product_name" | trans | raw }}</p>
+							</th>
+							<th title="shipping_num">
+								<p class="text-nowrap">{{ "front.mypage.history.shipping_num" | trans | raw }}</p>
+							</th>
+							<th title="return_number">
+								<p class="text-nowrap">{{ "front.mypage.history.return_number" | trans | raw }}</p>
+							</th>
+						</tr>
+					</thead>
+					{% if pagination and pagination.totalItemCount > 0 %}
+						<tbody>
+							{% for item in pagination %}
+								<tr>
+									<td title="return_no">
+										<p class="text-nowrap">{{ item.returns_no }}</p>
+									</td>
+									<td title="return_request_date">
+										<p class="text-nowrap">{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}</p>
+									</td>
+									<td title="reason_return">
+										<p class="text-nowrap">{{ item.returns_reson }}</p>
+									</td>
+									<td title="return_status">
+										<p class="text-nowrap"></p>
+									</td>
+									<td title="shipping_no">
+										<p class="text-nowrap">{{ item.shipping_no }}</p>
+									</td>
+									<td title="shipping_date">
+										<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
+									</td>
+									<td title="shiping_code | otodoke_code">
+										<p class="text-nowrap">{{ item.shipping_name }}</p>
+										<p class="text-nowrap">{{ item.otodoke_name }}</p>
+									</td>
+									<td title="jan_code | product_name">
+										<p class="text-nowrap">{{ item.jan_code }}</p>
+										<p class="text-nowrap">{{ item.product_code }}</p>
+									</td>
+									<td title="shipping_num">
+										<p class="text-nowrap">{{ item.shipping_num }}</p>
+									</td>
+									<td title="return_number">
+										<p class="text-nowrap">{{ item.returns_num }}</p>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					{% else %}
+						<tbody>
 							<tr>
-								<td title="return_no">
-									<p class="text-nowrap">{{ item.returns_no }}</p>
-								</td>
-								<td title="return_request_date">
-									<p class="text-nowrap">{{ item.shipping_date|date('Y-m-d')}}</p>
-								</td>
-								<td title="reason_return">
-									<p class="text-nowrap">{{ item.returns_reson }}</p>
-								</td>
-								<td title="return_status">
-									<p class="text-nowrap"></p>
-								</td>
-								<td title="shipping_no">
-									<p class="text-nowrap">{{ item.shipping_no }}</p>
-								</td>
-								<td title="shipping_date">
-									<p class="text-nowrap">{{ item.shipping_date|date('Y-m-d') }}</p>
-								</td>
-								<td title="shiping_code | otodoke_code">
-									<p class="text-nowrap">{{ item.shipping_name }}</p>
-									<p class="text-nowrap">{{ item.otodoke_name }}</p>
-								</td>
-								<td title="jan_code | product_name">
-									<p class="text-nowrap">{{ item.jan_code }}</p>
-									<p class="text-nowrap">{{ item.product_code }}</p>
-								</td>
-								<td title="shipping_num">
-									<p class="text-nowrap">{{ item.shipping_num }}</p>
-								</td>
-								<td title="return_number">
-									<p class="text-nowrap">{{ item.returns_num }}</p>
+								<td colspan="10">
+									<p>返品手続きの履歴がありません。</p>
 								</td>
 							</tr>
-						{% endfor %}
-					</tbody>
-				{% else %}
-					<tbody>
-						<tr>
-							<td colspan="8">
-								<p>返品手続きの履歴がありません。</p>
-							</td>
-						</tr>
-					</tbody>
-				{% endif %}
-			</table>
+						</tbody>
+					{% endif %}
+				</table>
+			</div>
 
 			{% if pagination and pagination.totalItemCount > 0 %}
 				<div class="ec-pagerRole">
@@ -119,7 +173,60 @@
 {% endblock main%}
 
 {% block javascript %}
+<script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
 <script>
-	
+	var search_request_date = "{{ param.search_request_date }}"
+	var search_reason_return = "{{ param.search_reason_return }}"
+	var search_shipping      = "{{ param.search_shipping }}"
+	var search_otodoke       = "{{ param.search_otodoke }}"
+
+	function reload() {
+		loadingOverlay("show")
+		let _parser = new URL( "{{ url('mypage_return_history') }}" )
+		_parser.searchParams.set( 'search_request_date', search_request_date )
+		_parser.searchParams.set( 'search_reason_return', search_reason_return )
+		_parser.searchParams.set( 'search_shipping', search_shipping )
+		_parser.searchParams.set( 'search_otodoke', search_otodoke )
+		window.location = _parser.href
+	}
+
+	$( function() {
+		$("#search_request_date").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_request_date = e.params.data.id
+			reload()
+		});
+		
+		$("#search_reason_return").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_reason_return = e.params.data.id
+			reload()
+		});
+
+		$("#search_shipping").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_shipping = e.params.data.id
+			if( search_shipping == 0 ) search_otodoke = 0
+			reload()
+		});
+
+		$("#search_otodoke").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_otodoke = e.params.data.id
+			reload()
+		});
+	});
 </script>
 {% endblock %}
