@@ -72,7 +72,7 @@ class GetFileFTPCommand extends Command
         log_info('Start Process Get File FTP');
 
         /* Get files from FTP server*/
-        $path = getenv('FTP_DIRECTORY') ?? '';
+        $path = getenv('FTP_DOWNLOAD_DIRECTORY') ?? '';
         $path_local = getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') ?? '/html/download/';
         $path_local .= 'csv/order/';
 
