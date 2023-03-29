@@ -116,7 +116,7 @@ class UpFileFTPCommand extends Command
                     $file_list = array_diff(scandir($path_local), ['.', '..']);
 
                     foreach ($file_list as $file) {
-                        // Check file is sent in dt_export_csv
+                        // Check file in dt_export_csv
                         if (!$this->checkFileUpload($path_local, $file)) {
                             continue;
                         }
@@ -138,9 +138,12 @@ class UpFileFTPCommand extends Command
 
             if (empty($dtExport)) {
                 // Save file information to DB
+                $dtExporCSv = $this->commonService->getDtExportCsv();
+                $increment = !empty($dtExporCSv) ? (int) $dtExporCSv['increment'] : 0;
                 Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                 $insertDate = [
                     'file_name' => $file,
+                    'increment' => $increment + 1,
                     'directory' => $path,
                     'message' => null,
                     'is_error' => 0,

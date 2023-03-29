@@ -13,9 +13,7 @@
 
 namespace Customize\Repository;
 
-use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtExportCSV;
-use Doctrine\DBAL\Types\Type;
 use Eccube\Repository\AbstractRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -40,6 +38,7 @@ class DtExportCsvRepository extends AbstractRepository
 
             $object = new DtExportCSV();
 
+            $object->setIncrement($data['increment']);
             $object->setFileName($data['file_name']);
             $object->setDirectory($data['directory']);
             $object->setMessage($data['message']);
@@ -53,6 +52,8 @@ class DtExportCsvRepository extends AbstractRepository
 
             return;
         } catch (\Exception $e) {
+            log_error($e->getMessage());
+
             return;
         }
     }
