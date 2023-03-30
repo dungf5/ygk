@@ -97,7 +97,7 @@
 								<label for="jan_code">JANコード</label>
 							</td>
 							<td class="col-xs-10 text-left">
-								<input type="text" class="form-control" id="jan_code" name="jan_code" value="{{ param.jan_code }}"/>
+								<input type="text" class="form-control" id="jan_code" name="jan_code" value="{{ param.jan_code }}" onchange="getProductName()"/>
 							</td>
 						</tr>
 						<tr>
@@ -257,6 +257,26 @@
 
 		$('#images').prop('files', _dt.files)
 		imagesPreview()
+	}
+
+	function getProductName() {
+		let _jan_code = $("#jan_code").val()
+
+		$.ajax({
+			url: "{{ url('mypage_product_name') }}",
+			type: 'GET',
+			dataType: 'json',
+			data: {
+				'jan_code': _jan_code,
+			},
+		})
+		.done(function(json) {
+			if( json.product_name ) {
+				$("#product_name").val( json.product_name )
+			}
+		})
+		.fail(function(json) {
+		})
 	}
 
 	const changeShippingSode = ( shipping_no )=>{
