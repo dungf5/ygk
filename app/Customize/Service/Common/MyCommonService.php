@@ -109,24 +109,25 @@ class MyCommonService extends AbstractRepository
         }
     }
 
-    public function getMstCustomer2($customer_code)
+    public function getMstCustomerCode($customer_code)
     {
-        $sql = '
-                        SELECT
-                            mstcus.*
-                        FROM
-                            mst_customer AS mstcus
-                        WHERE
-                            mstcus.customer_code = ?
-                        LIMIT 1;
-                    ';
+        if (empty($customer_code)) {
+            return null;
+        }
 
-        $param = [];
-        $param[] = $customer_code;
-        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $sql = '
+                SELECT
+                    mstcus.*
+                FROM
+                    mst_customer AS mstcus
+                WHERE
+                    mstcus.customer_code = ?
+                LIMIT 1
+            ';
 
         try {
-            $result = $statement->executeQuery($param);
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$customer_code]);
             $rows = $result->fetchAllAssociative();
 
             return $rows[0] ?? null;
@@ -268,23 +269,6 @@ SQL;
             $rows = $result->fetchAllAssociative();
 
             return $rows;
-        } catch (Exception $e) {
-            return null;
-        }
-    }
-
-    public function getMstCustomerCode($customer_code)
-    {
-        $column = 'customer_code as shipping_no,customer_code, ec_customer_id,customer_name, company_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date';
-        $sql = " SELECT $column   FROM mst_customer a WHERE customer_code=?";
-        $param = [];
-        $param[] = $customer_code;
-        $statement = $this->entityManager->getConnection()->prepare($sql);
-        try {
-            $result = $statement->executeQuery($param);
-            $rows = $result->fetchAllAssociative();
-
-            return $rows[0];
         } catch (Exception $e) {
             return null;
         }
