@@ -24,9 +24,12 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         if (empty($data)) return;
 
         try {
-            $object = new MstProductReturnsInfo();
-
-            $object->setReturnsNo($data['returns_no']);
+            $object = $this->findOneBy([ 'returns_no' => $data['returns_no'] ]);
+            if( !$object ) {
+                $object = new MstProductReturnsInfo();
+                $object->setReturnsNo($data['returns_no']);
+            }
+            
             $object->setCustomerCode($data['customer_code']);
             $object->setShippingCode($data['shipping_code']);
             $object->setShippingName($data['shipping_name']);
@@ -55,24 +58,28 @@ class MstProductReturnsInfoRepository extends AbstractRepository
 
             return $object;
         } catch (\Exception $e) {
-            dd($e);
         }
 
         return;
     }
 
-    public function getReturnByCustomer($paramSearch = [], $order_status = [])
+    public function getReturnByCustomer($paramSearch = [], $customer_id)
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('product_returns_info.returns_no');
         $qb->from('Customize\Entity\MstProductReturnsInfo', 'product_returns_info');
 
-        $qb->innerJoin(
+        $qb->leftJoin(
             'Customize\Entity\MstProduct',
             'product',
             Join::WITH,
             "product.product_code = product_returns_info.product_code"
         );
+
+        $qb->andWhere('product_returns_info.customer_code = :customer_id' )
+            ->setParameter('customer_id', $customer_id);
+        $qb->andWhere('product_returns_info.returns_request_date >= :returns_request_date')
+            ->setParameter('returns_request_date', date("Y-m-d", strtotime("-24 MONTH")));
 
         $qb->addSelect(
             'product_returns_info.returns_num',
@@ -104,11 +111,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         // );
         // $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = order_status.shipping_code) shipping_name');
         // $qb->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = order_status.otodoke_code) otodoke_name');
-        // $qb->where('shipping.delete_flg IS NULL OR shipping.delete_flg <> 0');
-        // $qb->andWhere('order_status.order_date >= :order_date')
-        //     ->setParameter('order_date', date("Y-m-d", strtotime("-24 MONTH")));
-        // $qb->andWhere('shipping.shipping_status = :shipping_status' )
-        //     ->setParameter('shipping_status', 2);
+        
 
         // if( count($order_status) > 0 ) {
         //     $where = '';

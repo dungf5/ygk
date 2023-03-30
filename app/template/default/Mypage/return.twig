@@ -170,9 +170,9 @@
 					<tbody>
 						{% for item in pagination %}
 							<tr 
-								ondblclick="window.location=`">
+								ondblclick="window.location = $('#procedure').attr('href')" >
 								<td title="return_type">
-									<button type="button" class="btn btn-warning" role="button">手続き</button> 
+									<a href="{{ url( 'mypage_return_edit', { 'returns_no':item.returns_no } ) }}" id="procedure" class="btn btn-warning" role="button">手続き</a> 
 								</td>
 								<td title="return_number">
 									<input type="number" class="form-control" value="{{ item.returns_num }}"/>

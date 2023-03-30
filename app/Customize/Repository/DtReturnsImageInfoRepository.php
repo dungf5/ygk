@@ -23,9 +23,12 @@ class DtReturnsImageInfoRepository extends AbstractRepository
         if (empty($data)) return;
         
         try {
-            $object = new DtReturnsImageInfo();
-
-            $object->setReturnsNo($data['returns_no']);
+            $object = $this->findOneBy([ 'returns_no' => $data['returns_no'] ]);
+            if( !$object ) {
+                $object = new DtReturnsImageInfo();
+                $object->setReturnsNo($data['returns_no']);
+            }
+            
             $object->setCusImageUrlPath1($data['cus_image_url_path1']);
             $object->setCusImageUrlPath2($data['cus_image_url_path2']);
             $object->setCusImageUrlPath3($data['cus_image_url_path3']);

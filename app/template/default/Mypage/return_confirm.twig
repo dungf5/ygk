@@ -22,6 +22,7 @@
 		<div class="ec-mypageRole">
 			<div class="col-xs-12">
 				<form class="form-horizontal"  action="{{ url('mypage_return_save') }}" method="POST">
+					{% if returns_no is not empty %} <input type="hidden" name="returns_no" value={{ returns_no }} /> {% endif %}
 					<table class="table table-bordered">
 						<tr>
 							<td class="col-xs-2 text-right left_background">

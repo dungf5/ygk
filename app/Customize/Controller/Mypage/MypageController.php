@@ -1040,18 +1040,20 @@ class MypageController extends AbstractController
         $customer_id            = $this->globalService->customerId();
         $company_name           = $this->globalService->companyName();
         
-        $shipping_code    = $request->get('shipping_code');
-        $otodoke_code     = $request->get('otodoke_code');
-        $shipping_no      = $request->get('shipping_no');
-        $shipping_day     = $request->get('shipping_day');
-        $jan_code         = $request->get('jan_code');
-        $product_name     = $request->get('product_name');
-        $shipping_num     = $request->get('shipping_num');
-        $return_status    = $request->get('return_status');
-        $return_reason    = $request->get('return_reason');
-        $customer_comment = $request->get('customer_comment');
-        $rerurn_num       = $request->get('rerurn_num');
-        $product_status   = $request->get('product_status');
+        $returns_no         = $request->get('returns_no');
+        $shipping_code      = $request->get('shipping_code');
+        $otodoke_code       = $request->get('otodoke_code');
+        $shipping_no        = $request->get('shipping_no');
+        $shipping_day       = $request->get('shipping_day');
+        $jan_code           = $request->get('jan_code');
+        $product_name       = $request->get('product_name');
+        $shipping_num       = $request->get('shipping_num');
+        $return_status      = $request->get('return_status');
+        $return_reason      = $request->get('return_reason');
+        $customer_comment   = $request->get('customer_comment');
+        $rerurn_num         = $request->get('rerurn_num');
+        $product_status     = $request->get('product_status');
+        $cus_image_url_path = $request->get('cus_image_url_path', []);
 
         $product_code  = $commonService->getJanCodeToProductCode( $jan_code );
 
@@ -1073,11 +1075,10 @@ class MypageController extends AbstractController
                 $otodoke_name = "{$otodoke['name01']} 〒 {$otodoke['postal_code']} {$otodoke['addr01']} {$otodoke['addr03']} {$otodoke['addr03']}";
             }
         }
-
-        $cus_image_url_path = [];
+        
         $images = $request->files->get('images');
         if( count($images) > 0 ) {
-            foreach( $images as $k=>$image ) {
+            foreach( $images as $image ) {
                 $mimeType = $image->getMimeType();
                 if( 0 !== strpos( $mimeType, 'image' ) ) break;
 
@@ -1087,7 +1088,7 @@ class MypageController extends AbstractController
                 $filename = date('ymdHis').uniqid('_').'.'.$extension;
                 $path = $this->getParameter('eccube_return_image_dir');
                 if( $image->move( $this->getParameter('eccube_return_image_dir'), $filename ) ) {
-                    $cus_image_url_path[ $k ] = str_replace($this->getParameter('eccube_html_dir'), "html", $path).'/'.$filename;
+                    $cus_image_url_path[] = str_replace($this->getParameter('eccube_html_dir'), "html", $path).'/'.$filename;
                 }
             }
         }
@@ -1095,6 +1096,7 @@ class MypageController extends AbstractController
         return [
             'customer_id'        => $customer_id,
             'company_name'       => $company_name,
+            'returns_no'         => $returns_no,
             'shipping_code'      => $shipping_code,
             'shipping_name'      => $shipping_name,
             'otodoke_code'       => $otodoke_code,
@@ -1128,6 +1130,7 @@ class MypageController extends AbstractController
         $customer_id            = $this->globalService->customerId();
         $customer               = $this->globalService->customer();
 
+        $returns_no         = $request->get('returns_no');
         $shipping_code      = $request->get('shipping_code');
         $otodoke_code       = $request->get('otodoke_code');
         $shipping_no        = $request->get('shipping_no');
@@ -1157,7 +1160,7 @@ class MypageController extends AbstractController
             }
         }
 
-        $returns_no    = $commonService->getReturnsNo();
+        $returns_no    = $returns_no ?? $commonService->getReturnsNo();
         $shipping_date = date('Y-m-d', strtotime( str_replace( '/', '-', $shipping_day ) ) );
         try {
             $mst_product_returns_info = $this->mstProductReturnsInfoRepository->insertData([
@@ -1209,6 +1212,41 @@ class MypageController extends AbstractController
         }
         return [
             'save' => false,
+        ];
+    }
+
+    /**
+     * 返品手順の編集
+     *
+     * @Route("/mypage/return/edit/{returns_no}", name="mypage_return_edit", methods={"GET", "POST"})
+     * @Template("Mypage/return_edit.twig")
+     */
+    public function returnEdit(Request $request, string $returns_no)
+    {
+        $commonService        = new MyCommonService($this->entityManager);
+        $product_returns_info = $this->mstProductReturnsInfoRepository->find( $returns_no );
+        $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode());
+        $product_name         = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode());
+        $login_type           = $this->globalService->getLoginType();
+        $customer_id          = $this->globalService->customerId();
+        $company_name         = $this->globalService->companyName();
+
+        $shippings = $commonService->getMstShippingCustomer($login_type, $customer_id);
+        $otodokes  = [];
+        if( !empty( $product_returns_info['shipping_code'] ) ) {
+            $otodokes = $this->globalService->otodokeOption($customer_id, $product_returns_info['shipping_code']);
+        }
+        $returns_reson      = $commonService->getReturnsReson();
+
+        return [
+            'customer_id'          => $customer_id,
+            'product_returns_info' => $product_returns_info,
+            'customer'             => $customer,
+            'product_name'         => $product_name,
+            'company_name'         => $company_name,
+            'shippings'            => $shippings,
+            'otodokes'             => $otodokes,
+            'returns_reson'        => $returns_reson,
         ];
     }
 
@@ -1294,5 +1332,29 @@ class MypageController extends AbstractController
             'shippings'         => $shippings,
             'otodokes'          => $otodokes,
         ];
+    }
+
+    /**
+     * get product name.
+     *
+     * @Route("/mypage/product/name", name="mypage_product_name", methods={"GET"})
+     * @Template("")
+     */
+    public function getProductName(Request $request)
+    {
+        $result = [
+            'jan_code' => '',
+            'product_name' => '',
+        ];
+        try {
+            $result['jan_code'] = $request->get('jan_code');
+            $my_common              = new MyCommonService($this->entityManager);
+            $result['product_name'] = $my_common->getJanCodeToProductName(  $result['jan_code'] );;
+
+        } catch (\Exception $e) {
+            
+        }
+
+        return $this->json($result, 200);
     }
 }
