@@ -640,6 +640,7 @@ class MyShoppingController extends AbstractShoppingController
                 //save more nvtrong
                 $comS                       = new MyCommonService($this->entityManager);
                 $orderNo                    = $Order->getOrderNo();
+                $subTotal                   = $Order->getSubtotal();
                 $itemList                   = $Order->getItems()->toArray();
                 $arEcLData                  = [];
                 $hsArrEcProductCusProduct   = [];
@@ -665,6 +666,7 @@ class MyShoppingController extends AbstractShoppingController
                 $customer_id                    = $this->globalService->customerId();
                 $oneCustomer                    = $comS->getMstCustomer($customer_id);
                 $customerCode                   = $oneCustomer['customer_code'] ?? "";
+                $fusrdec1                       = $oneCustomer['fusrdec1'] ?? 0;
                 $moreOrder                      = $comS->getMoreOrder($Order->getPreOrderId());
                 $ship_code                      = $moreOrder->getShippingCode();
                 $seikyu_code                    = $moreOrder->getSeikyuCode();
@@ -703,6 +705,7 @@ class MyShoppingController extends AbstractShoppingController
                             'remarks3'              => $remarks3,
                             'remarks4'              => $remarks4,
                             'location'              => !empty($location) ? $location : "XB0201001",
+                            'fvehicleno'            => $subTotal > $fusrdec1 ? 0 : 1,
                             ];
                     }
                 }

@@ -196,6 +196,12 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         private $shiping_deposit_code;
 
         /**
+         * @var string
+         * @ORM\Column(name="fvehicleno",type="string",nullable=true, options={"comment":"便No. 0:送料なし、１：送料あり"  })
+         */
+        private $fvehicleno;
+
+        /**
          * @return string
          */
         public function getCustomerCode(): string
@@ -733,6 +739,22 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         public function setShipingDepositCode($shiping_deposit_code): void
         {
             $this->shiping_deposit_code = $shiping_deposit_code;
+        }
+
+        /**
+         * @return string
+         */
+        public function getFvehicleno()
+        {
+            return $this->fvehicleno;
+        }
+
+        /**
+         * @param string $fvehicleno
+         */
+        public function setFvehicleno($fvehicleno): void
+        {
+            $this->fvehicleno = $fvehicleno;
         }
     }
 }
