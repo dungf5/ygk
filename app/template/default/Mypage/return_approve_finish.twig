@@ -1,0 +1,217 @@
+{% extends 'default_frame.twig' %}
+
+{% set body_class = 'mypage' %}
+
+{% block stylesheet %}
+<style>
+	.left_background{
+		background-color: #fce4d6;
+		color: #000;
+		font-weight: normal;
+	}
+</style>
+{% endblock stylesheet%}
+
+{% block main %}
+	<div class="ec-layoutRole__main">
+		<div class="ec-mypageRole">
+			<div class="ec-pageHeader">
+				<h1>返品リスト</h1>
+			</div>
+		</div>
+		<div class="ec-mypageRole">
+			<div class="col-xs-12">
+				<div class="col-xs-12 text-right">
+					{% if product_returns_info.aprove_date|trim is not empty %}
+						<label class="text-right">発行日:{{ product_returns_info.aprove_date|date('Y年m月d日') }}</label>
+					{% elseif product_returns_info.aprove_date_not_yet|trim is not empty %}
+						<label class="text-right">発行日:{{ product_returns_info.aprove_date_not_yet|date('Y年m月d日') }}</label>
+					{% endif %}
+				</div>
+				<table class="table table-bordered">
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">返品番号</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<p class="text-nowrap">{{ product_returns_info.returns_no }}</p>
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">お客様</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<p class="text-nowrap">{{ customer.company_name }}</p>
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">出荷先</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<p class="text-nowrap">{{ product_returns_info.shipping_name }}</p>
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">届け先</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<p class="text-nowrap">{{ product_returns_info.otodoke_name }}</p>
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">出荷指示№</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<p class="text-nowrap">{{ product_returns_info.shipping_no }}</p>
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">出荷日</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<p class="text-nowrap">{{ product_returns_info.shipping_date|date('d/m/Y') }}</p>
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">JANコード</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<p class="text-nowrap">{{ product_returns_info.jan_code }}</p>
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">商品名</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<p class="text-nowrap">{{ product_name }}</p>
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">出荷数</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<p class="text-nowrap">{{ product_returns_info.shipping_num }}</p>
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">返品理由</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<p class="text-nowrap">{{ returns_reson_text }}</p>
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">顧客コメント</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<p class="text-nowrap">{{ product_returns_info.customer_comment }}</p>
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">返品数</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<p class="text-nowrap">{{ product_returns_info.returns_num }}</p>
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">返品依頼日</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<p class="text-nowrap">{{ product_returns_info.returns_request_date|date('d/m/Y') }}</p>
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="customer_code">返品承認日</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							{% if product_returns_info.aprove_date is not empty %}
+								<p class="text-nowrap">{{ product_returns_info.aprove_date|date('d/m/Y') }}</p>
+							{% endif %}
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-2 text-right left_background">
+							<label for="shipping_fee1">送料</label>
+						</td>
+						<td class="col-xs-10 text-left">
+							<label class="radio-inline">
+								<input type="radio" name="shipping_fee" id="shipping_fee1" value="1" disabled 
+									{% if product_returns_info.shipping_fee == 1 %} checked {% endif %}> 元払い
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="shipping_fee" id="shipping_fee2" value="2" disabled 
+									{% if product_returns_info.shipping_fee == 2 %} checked {% endif %}> 着払い
+							</label>
+						</td>
+					</tr>
+					<tr>
+						<td class="text-center left_background" colspan="2">
+							<label for="images">商品画像</label>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<div class="row" id="images_preview">
+								{% if product_returns_info.cus_image_url_path1|trim is not empty %} 
+									<div class="col-xs-2">
+										<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path1 }}" class="img-thumbnail" />
+									</div>
+								{% endif %}
+								{% if product_returns_info.cus_image_url_path2|trim is not empty %} 
+									<div class="col-xs-2">
+										<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path2 }}" class="img-thumbnail" />
+									</div>
+								{% endif %}
+								{% if product_returns_info.cus_image_url_path3|trim is not empty %} 
+									<div class="col-xs-2">
+										<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path3 }}" class="img-thumbnail" />
+									</div>
+								{% endif %}
+								{% if product_returns_info.cus_image_url_path4|trim is not empty %} 
+									<div class="col-xs-2">
+										<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path4 }}" class="img-thumbnail" />
+									</div>
+								{% endif %}
+								{% if product_returns_info.cus_image_url_path5|trim is not empty %} 
+									<div class="col-xs-2">
+										<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path5 }}" class="img-thumbnail" />
+									</div>
+								{% endif %}
+								{% if product_returns_info.cus_image_url_path6|trim is not empty %} 
+									<div class="col-xs-2">
+										<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path6 }}" class="img-thumbnail" />
+									</div>
+								{% endif %}
+							</div>
+						</td>
+					</tr>
+				</table>
+				<div class="col-xs-12 text-left">
+					<p><strong>【郵送先】</strong></p>								
+					<p>〒559-0032</p>						
+					<p>大阪府大阪市住之江区南港南2-4-43 GLP大阪3階</p>						
+					<p>株式会社HMKロジサービス XBRAID JAPAN様出荷センター</p>
+				</div>								
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+</script>
+{% endblock javascript%}

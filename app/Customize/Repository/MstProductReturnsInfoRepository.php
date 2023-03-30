@@ -63,6 +63,43 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         return;
     }
 
+    public function updadteData($returns_no, $data = [])
+    {
+        if( empty($returns_no) || empty($data) ) return;
+
+        try {
+            $object = $this->findOneBy([ 'returns_no' => $returns_no ]);
+            if( !$object ) return;
+            
+            if( !empty( $data['cus_reviews_flag'] ) ) {
+                $object->setCusReviewsFlag($data['cus_reviews_flag']);
+            }
+            if( !empty( $data['shipping_fee'] ) ) {
+                $object->setShippingFee($data['shipping_fee']);
+            }
+            if( !empty( $data['aprove_comment_not_yet'] ) ) {
+                $object->setAproveCommentNotYet($data['aprove_comment_not_yet']);
+            }
+            if( !empty( $data['returns_status_flag'] ) ) {
+                $object->setReturnsStatusFlag($data['returns_status_flag']);
+            }
+            if( !empty( $data['aprove_date'] ) ) {
+                $object->setAproveDate($data['aprove_date']);
+            }
+            if( !empty( $data['aprove_date_not_yet'] ) ) {
+                $object->setAproveDateNotYet($data['aprove_date_not_yet']);
+            }
+
+            $this->getEntityManager()->persist($object);
+            $this->getEntityManager()->flush();
+
+            return $object;
+        } catch (\Exception $e) {
+        }
+
+        return;
+    }
+
     public function getReturnByCustomer($paramSearch = [], $customer_id)
     {
         $qb = $this->getEntityManager()->createQueryBuilder();

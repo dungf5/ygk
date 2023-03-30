@@ -1200,14 +1200,19 @@ class MypageController extends AbstractController
                 ]);
             }
             
-            $email = $customer['customer_email'] ?? $customer['email'];
-            $url = $this->generateUrl( 'mypage_return_preview', [ 'returns_no'=>  $mst_product_returns_info->getReturnsNo() ], UrlGeneratorInterface::ABSOLUTE_URL );
-            $this->mailService->sendMailReturnProduct( $email, $url );
-            
+            $email       = $customer['customer_email'] ?? $customer['email'];
+            $url_preview = $this->generateUrl( 'mypage_return_preview', [ 'returns_no'=>  $mst_product_returns_info->getReturnsNo() ], UrlGeneratorInterface::ABSOLUTE_URL );
+            $this->mailService->sendMailReturnProductPreview( $email, $url_preview );
+
+            $email       = $customer['customer_email'] ?? $customer['email'];
+            $url_approve = $this->generateUrl( 'mypage_return_approve', [ 'returns_no'=>  $mst_product_returns_info->getReturnsNo() ], UrlGeneratorInterface::ABSOLUTE_URL );
+            $this->mailService->sendMailReturnProductApprove( $email, $url_approve );
+
             return [
                 'save' => true,
             ];
         } catch (\Exception $e) {
+            dd($e);
             log_error( "mypage/return/save: " . $e->getMessage() );
         }
         return [
@@ -1267,6 +1272,90 @@ class MypageController extends AbstractController
         $returns_reson      = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
         $returns_reson_text = $returns_reson[ $product_returns_info->getReasonReturnsCode() ];
         
+        return [
+            'product_returns_info' => $product_returns_info,
+            'customer'             => $customer,
+            'product_name'         => $product_name,
+            'returns_reson_text'   => $returns_reson_text,
+        ];
+    }
+
+    /**
+     * 返品プロセスを承認しました
+     *
+     * @Route("/mypage/return/approve/{returns_no}", name="mypage_return_approve", methods={"GET"})
+     * @Template("Mypage/return_approve.twig")
+     */
+    public function returnApprove(Request $request, string $returns_no )
+    {
+        $commonService        = new MyCommonService($this->entityManager);
+        $product_returns_info = $this->mstProductReturnsInfoRepository->find( $returns_no );
+        $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode());
+        $product_name         = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode());
+        
+        $returns_reson      = $commonService->getReturnsReson();
+        $returns_reson      = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
+        $returns_reson_text = $returns_reson[ $product_returns_info->getReasonReturnsCode() ];
+        
+        return [
+            'product_returns_info' => $product_returns_info,
+            'customer'             => $customer,
+            'product_name'         => $product_name,
+            'returns_reson_text'   => $returns_reson_text,
+        ];
+    }
+
+    /**
+     * 承認された返品プロセスを完了しました
+     *
+     * @Route("/mypage/return/approve/{returns_no}/finish", name="mypage_return_approve_finish", methods={"GET", "POST"})
+     * @Template("Mypage/return_approve_finish.twig")
+     */
+    public function returnApproveFinish(Request $request, string $returns_no )
+    {
+        $commonService        = new MyCommonService($this->entityManager);
+        $product_returns_info = $this->mstProductReturnsInfoRepository->find( $returns_no );
+        $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode());
+        $product_name         = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode());
+        
+        $cus_reviews_flag       = $request->get('cus_reviews_flag');
+        $shipping_fee           = $request->get('shipping_fee');
+        $aprove_comment_not_yet = $request->get('aprove_comment_not_yet');
+        $submit                 = $request->get('submit');
+
+        $returns_reson      = $commonService->getReturnsReson();
+        $returns_reson      = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
+        $returns_reson_text = $returns_reson[ $product_returns_info->getReasonReturnsCode() ];
+        
+        if('POST' === $request->getMethod() ) {
+            $data = [
+                'cus_reviews_flag'       => $cus_reviews_flag,
+                'shipping_fee'           => $shipping_fee,
+                'aprove_comment_not_yet' => $aprove_comment_not_yet,
+            ];
+            if( $submit == 'aprove' ) {
+                $data["returns_status_flag"] = 1;
+                $data["aprove_date"] = date( 'Y-m-d H:i:s' );
+            } else {
+                $data["returns_status_flag"] = 2;
+                $data["aprove_date_not_yet"] = date( 'Y-m-d H:i:s' );
+            }
+            
+            try {
+                $product_returns_info = $this->mstProductReturnsInfoRepository->updadteData($returns_no, $data);
+                
+                $email       = $customer['customer_email'] ?? $customer['email'];
+                if( $submit == 'aprove' ) {
+                    $url_approve_finish = $this->generateUrl( 'mypage_return_approve_finish', [ 'returns_no'=>  $product_returns_info->getReturnsNo() ], UrlGeneratorInterface::ABSOLUTE_URL );
+                    $this->mailService->sendMailReturnProductApproveYes( $email, $url_approve_finish );
+                } else {
+                    $this->mailService->sendMailReturnProductApproveNo( $email, $aprove_comment_not_yet );
+                }
+            } catch (\Exception $e) {
+                log_error( "mypage/return/approve/{$returns_no}}/finish: " . $e->getMessage() );
+            }
+        }
+
         return [
             'product_returns_info' => $product_returns_info,
             'customer'             => $customer,

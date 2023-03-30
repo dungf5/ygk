@@ -978,15 +978,63 @@ class MailService
         return $message;
     }
 
-    public function sendMailReturnProduct( $email, $url)
+    public function sendMailReturnProductPreview( $email, $url_preview)
     {
         if( !filter_var($email, FILTER_VALIDATE_EMAIL) ) return;
 
-        $body = $this->twig->render('Mail/return_product.twig', [
-            'url' => $url,
+        $body = $this->twig->render('Mail/return_product_preview.twig', [
+            'url_preview' => $url_preview,
         ]);
         $message = (new \Swift_Message())
             ->setSubject("[XBRAID JAPAN] 返品リクエストが届きました")
+            ->setFrom([ $this->BaseInfo->getEmail01()=>$this->BaseInfo->getShopName() ])
+            ->setTo([ $email ])
+            ->setBody( $body );
+
+        return $this->mailer->send( $message );
+    }
+
+    public function sendMailReturnProductApprove( $email, $url_approve)
+    {
+        if( !filter_var($email, FILTER_VALIDATE_EMAIL) ) return;
+
+        $body = $this->twig->render('Mail/return_product_approve.twig', [
+            'url_approve' => $url_approve,
+        ]);
+        $message = (new \Swift_Message())
+            ->setSubject("[XBRAID JAPAN] 返品リクエスト承認のご案内")
+            ->setFrom([ $this->BaseInfo->getEmail01()=>$this->BaseInfo->getShopName() ])
+            ->setTo([ $email ])
+            ->setBody( $body );
+
+        return $this->mailer->send( $message );
+    }
+
+    public function sendMailReturnProductApproveYes( $email, $url_approve_finish)
+    {
+        if( !filter_var($email, FILTER_VALIDATE_EMAIL) ) return;
+
+        $body = $this->twig->render('Mail/return_product_approve_yes.twig', [
+            'url_approve_finish' => $url_approve_finish,
+        ]);
+        $message = (new \Swift_Message())
+            ->setSubject("[XBRAID JAPAN] 返品リクエスト承認のご案内")
+            ->setFrom([ $this->BaseInfo->getEmail01()=>$this->BaseInfo->getShopName() ])
+            ->setTo([ $email ])
+            ->setBody( $body );
+
+        return $this->mailer->send( $message );
+    }
+
+    public function sendMailReturnProductApproveNo( $email, $aprove_comment_not_yet)
+    {
+        if( !filter_var($email, FILTER_VALIDATE_EMAIL) ) return;
+
+        $body = $this->twig->render('Mail/return_product_approve_no.twig', [
+            'aprove_comment_not_yet' => $aprove_comment_not_yet,
+        ]);
+        $message = (new \Swift_Message())
+            ->setSubject("[XBRAID JAPAN] 返品リクエスト未承認のお知らせ")
             ->setFrom([ $this->BaseInfo->getEmail01()=>$this->BaseInfo->getShopName() ])
             ->setTo([ $email ])
             ->setBody( $body );

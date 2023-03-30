@@ -695,7 +695,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getAproveDate(): string
+        public function getAproveDate(): ?string
         {
             return $this->aprove_date;
         }
@@ -716,7 +716,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getAproveDateNotYet(): string
+        public function getAproveDateNotYet(): ?string
         {
             return $this->aprove_date_not_yet;
         }
@@ -731,22 +731,22 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @var string
          *
-         * @ORM\Column(name="aprove_comment", type="string")
+         * @ORM\Column(name="aprove_comment_not_yet", type="string")
          */
-        private $aprove_comment;
+        private $aprove_comment_not_yet;
         /**
          * @return string
          */
-        public function getAproveComment(): string
+        public function getAproveCommentNotYet(): string
         {
-            return $this->aprove_comment;
+            return $this->aprove_comment_not_yet;
         }
         /**
-         * @param string $aprove_comment
+         * @param string $aprove_comment_not_yet
          */
-        public function setAproveComment(string $aprove_comment): void
+        public function setAproveCommentNotYet(string $aprove_comment_not_yet): void
         {
-            $this->aprove_comment = $aprove_comment;
+            $this->aprove_comment_not_yet = $aprove_comment_not_yet;
         }
         
         /**
