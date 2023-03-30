@@ -189,7 +189,7 @@ file that was distributed with this source code.
                                 {% if Shipping.delivery_no is null %}
                                     －
                                 {% else %}
-                                    {% if login_type not in ['shipping_code', 'otodoke_code'] %}
+                                    {% if global_service.getPdfExportFlg and login_type not in ['shipping_code', 'otodoke_code'] %}
                                         <a target="_blank" href="/mypage/exportOrderPdf?delivery_no={{Shipping.delivery_no}}">
                                             {{ Shipping.delivery_no }}
                                         </a>
