@@ -414,8 +414,8 @@ class ValidateCsvDataCommand extends Command
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
             $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findOneBy([
-                'order_no' => $data['order_no'],
-                'order_lineno' => $data['order_line_no'],
+                'order_no' => $data['dtb_order_no'],
+                'order_lineno' => $data['dtb_order_line_no'],
             ]);
 
             // Create order if empty
@@ -445,8 +445,8 @@ class ValidateCsvDataCommand extends Command
     {
         try {
             $dtOrderStatus = $this->entityManager->getRepository(DtOrderStatus::class)->findOneBy([
-                'cus_order_no' => $data['dtb_order_no'],
-                'cus_order_lineno' => $data['dtb_order_line_no'],
+                'cus_order_no' => $data['order_no'],
+                'cus_order_lineno' => $data['order_line_no'],
             ]);
 
             // Create order_status if empty
