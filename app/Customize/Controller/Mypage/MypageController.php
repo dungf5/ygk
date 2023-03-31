@@ -1432,16 +1432,29 @@ class MypageController extends AbstractController
     public function getProductName(Request $request)
     {
         $result = [
-            'jan_code' => '',
-            'product_name' => '',
+            'status' => false,
         ];
-        try {
-            $result['jan_code'] = $request->get('jan_code');
-            $my_common              = new MyCommonService($this->entityManager);
-            $result['product_name'] = $my_common->getJanCodeToProductName(  $result['jan_code'] );;
 
-        } catch (\Exception $e) {
+        try {
+            $jan_code    = $request->get('jan_code');
+            $shipping_no = $request->get('shipping_no');
+
+            $my_common = new MyCommonService($this->entityManager);
+            $product_code = $my_common->getJanCodeToProductCode( $jan_code );
+
+            $product_name  = $my_common->getJanCodeToProductName( $jan_code );
+            $delivered_num = $my_common->getDeliveredNum(  $shipping_no, $product_code  );
+            $returned_num  = $my_common->getReturnedNum(  $shipping_no, $product_code  );
             
+            $result['data'] = [
+                'jan_code'      => $jan_code,
+                'shipping_no'   => $shipping_no,
+                'product_name'  => $product_name,
+                'delivered_num' => $delivered_num,
+                'returned_num'  => $returned_num,
+            ];
+            $result['status'] = true;
+        } catch (\Exception $e) {
         }
 
         return $this->json($result, 200);
