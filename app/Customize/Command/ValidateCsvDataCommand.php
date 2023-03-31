@@ -193,13 +193,10 @@ class ValidateCsvDataCommand extends Command
                 $error['error_content1'] = '発注日付が過去日付になっています';
             }
 
-            // Validate shipping_shop_code
-            if (!empty($object['customer_code']) && !empty($object['shipping_code']) && !empty($object['otodoke_code'])) {
-                $dtCusRelation = $common->getDtCustomerRelation($object['customer_code'], $object['shipping_code'], $object['otodoke_code']);
-
-                if (empty($dtCusRelation)) {
-                    $error['error_content2'] = '出荷先支店コード(顧客関連)が登録されていません';
-                }
+            // Validate customer
+            $dtCusRelation = $common->getDtCustomerRelation($this->customer_code, $this->shipping_code, $otodoke_code);
+            if (empty($dtCusRelation)) {
+                $error['error_content2'] = '出荷先支店コード(顧客関連)が登録されていません';
             }
 
             // Validate shipping_shop_code
@@ -234,8 +231,9 @@ class ValidateCsvDataCommand extends Command
                 }
             }
 
-            if (!empty($product) && !empty($object['customer_code']) && !empty($object['shipping_code'])) {
-                $dtPrice = $common->getDtPrice($product['product_code'], $object['customer_code'], $object['shipping_code']);
+            // Validate price
+            if (!empty($product)) {
+                $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
 
                 if (empty($dtPrice) || $dtPrice['price_s01'] != $object['order_price']) {
                     $error['error_content9'] = '発注単価が異なっています';
