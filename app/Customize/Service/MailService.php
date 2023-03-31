@@ -1042,6 +1042,38 @@ class MailService
         return $this->mailer->send( $message );
     }
 
+    public function sendMailReturnProductReceiptYes( $email, $receipt_comment )
+    {
+        if( !filter_var($email, FILTER_VALIDATE_EMAIL) ) return;
+
+        $body = $this->twig->render('Mail/return_product_receipt_yes.twig', [
+            'receipt_comment' => $receipt_comment,
+        ]);
+        $message = (new \Swift_Message())
+            ->setSubject("[XBRAID JAPAN] 返品商品受取受理のご案内")
+            ->setFrom([ $this->BaseInfo->getEmail01()=>$this->BaseInfo->getShopName() ])
+            ->setTo([ $email ])
+            ->setBody( $body );
+
+        return $this->mailer->send( $message );
+    }
+
+    public function sendMailReturnProductReceiptNo( $email, $receipt_not_yet_comment)
+    {
+        if( !filter_var($email, FILTER_VALIDATE_EMAIL) ) return;
+
+        $body = $this->twig->render('Mail/return_product_receipt_no.twig', [
+            'receipt_not_yet_comment' => $receipt_not_yet_comment,
+        ]);
+        $message = (new \Swift_Message())
+            ->setSubject("[XBRAID JAPAN] 返品商品受取未受理のお知らせ")
+            ->setFrom([ $this->BaseInfo->getEmail01()=>$this->BaseInfo->getShopName() ])
+            ->setTo([ $email ])
+            ->setBody( $body );
+
+        return $this->mailer->send( $message );
+    }
+
     /**
      * Send mail export order ws-eos.
      *

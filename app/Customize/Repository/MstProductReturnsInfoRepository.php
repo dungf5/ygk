@@ -89,6 +89,39 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             if( !empty( $data['aprove_date_not_yet'] ) ) {
                 $object->setAproveDateNotYet($data['aprove_date_not_yet']);
             }
+            if( !empty( $data['stock_image_url_path1'] ) ) {
+                $object->setStockImageUrlPath1($data['stock_image_url_path1']);
+            }
+            if( !empty( $data['stock_image_url_path2'] ) ) {
+                $object->setStockImageUrlPath2($data['stock_image_url_path2']);
+            }
+            if( !empty( $data['stock_image_url_path3'] ) ) {
+                $object->setStockImageUrlPath3($data['stock_image_url_path3']);
+            }
+            if( !empty( $data['stock_image_url_path4'] ) ) {
+                $object->setStockImageUrlPath4($data['stock_image_url_path4']);
+            }
+            if( !empty( $data['stock_image_url_path5'] ) ) {
+                $object->setStockImageUrlPath5($data['stock_image_url_path5']);
+            }
+            if( !empty( $data['stock_image_url_path6'] ) ) {
+                $object->setStockImageUrlPath6($data['stock_image_url_path6']);
+            }
+            if( !empty( $data['receipt_comment'] ) ) {
+                $object->setReceiptComment($data['receipt_comment']);
+            }
+            if( !empty( $data['product_receipt_date'] ) ) {
+                $object->setProductReceiptDate($data['product_receipt_date']);
+            }
+            if( !empty( $data['receipt_not_yet_comment'] ) ) {
+                $object->setReceiptNotYetComment($data['receipt_not_yet_comment']);
+            }
+            if( !empty( $data['product_receipt_date_not_yet'] ) ) {
+                $object->setProductReceiptDateNotYet($data['product_receipt_date_not_yet']);
+            }
+            if( !empty( $data['stock_reviews_flag'] ) ) {
+                $object->setStockReviewsFlag($data['stock_reviews_flag']);
+            }
 
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();

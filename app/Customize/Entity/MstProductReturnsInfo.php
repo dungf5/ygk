@@ -773,6 +773,27 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @var string
          *
+         * @ORM\Column(name="receipt_comment", type="string")
+         */
+        private $receipt_comment;
+        /**
+         * @return string
+         */
+        public function getReceiptComment(): string
+        {
+            return $this->receipt_comment;
+        }
+        /**
+         * @param string $receipt_noreceipt_commentt_yet_comment
+         */
+        public function setReceiptComment(string $receipt_comment): void
+        {
+            $this->receipt_comment = $receipt_comment;
+        }
+
+        /**
+         * @var string
+         *
          * @ORM\Column(name="product_receipt_date_not_yet", type="string")
          */
         private $product_receipt_date_not_yet;
