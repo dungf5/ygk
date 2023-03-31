@@ -471,8 +471,8 @@ class ValidateCsvDataCommand extends Command
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
             $mstShipping = $this->entityManager->getRepository(MstShipping::class)->findOneBy([
-                'cus_order_no' => $data['order_no'],
-                'cus_order_lineno' => $data['order_line_no'],
+                'ec_order_no' => $data['order_no'],
+                'ec_order_lineno' => $data['order_line_no'],
                 'shipping_status' => 2,
             ]);
 
