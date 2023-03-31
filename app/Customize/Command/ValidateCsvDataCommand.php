@@ -28,6 +28,7 @@ use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Command\PluginCommandTrait;
+use Eccube\Entity\Order;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -315,7 +316,7 @@ class ValidateCsvDataCommand extends Command
     private function handleImportOrderWSEOS()
     {
         try {
-            log_info('Start Handle Import Data To dt_order, dt_order_status');
+            log_info('Start Handle Import Data To dtb_order, dt_order, dt_order_status');
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
             // Get data to import
@@ -330,40 +331,74 @@ class ValidateCsvDataCommand extends Command
                 'order_line_no' => 'ASC',
             ]);
 
-            foreach ($data as $item) {
-                $result = $this->importDtOrder($item->toArray());
-                $result1 = $this->importDtOrderStatus($item);
+            if (count($data)) {
+                // Create dtb_order
+                $order_id = [];
+                $loop = (int) (count($data) / 100) + 1;
 
-                if ($result && $result1) {
-                    // Save to success array to send mail
-                    $this->success["{$item['order_no']}"]['detail'][] = [
-                        'jan_code' => $item['jan_code'],
-                        'product_name' => $item['product_name'],
-                        'order_price' => $item['order_price'],
-                        'order_num' => $item['order_num'],
+                for ($i = 0; $i < $loop; $i++) {
+                    $dtbOrderData = [
+                        'customer' => null,
+                        'name01' => '',
+                        'name02' => '',
                     ];
+                    $id = $this->entityManager->getRepository(Order::class)->insertData($dtbOrderData);
+                    if (!empty($id)) {
+                        $order_id[] = $id;
+                        log_info('Import data dtb_order with id '.$id);
+                    }
+                }
 
-                    $this->success["{$item['order_no']}"]['summary'] = [
-                        'order_amount' => ($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + ($item['order_price'] * $item['order_num']),
-                        'tax' => $this->rate == 0 ? 0 : (int) ((($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + ($item['order_price'] * $item['order_num'])) / $this->rate),
-                        'order_company_name' => $this->customer['company_name'] ?? '',
-                        'order_shop_name' => $this->customer['company_name'] ?? '',
-                        'shipping_name' => $this->customer['company_name'] ?? '',
-                        'postal_code' => $this->customer['postal_code'] ?? '',
-                        'address' => ($this->customer['addr01'] ?? '').($this->customer['addr02'] ?? '').($this->customer['addr03'] ?? ''),
-                        'phone_number' => $this->customer['phone_number'] ?? '',
-                        'email' => $this->customer['email'] ?? '',
-                        'delivery_date' => $item['delivery_date'],
-                    ];
+                // If create dtb_order successfully
+                if (!empty($order_id)) {
+                    $i = 0;
+                    $j = 0;
+                    foreach ($data as $value) {
+                        $j++;
+                        if ($j > 99) {
+                            $i++;
+                            $j = 1;
+                        }
 
-                    $this->success["{$item['order_no']}"]['summary']['total_amount'] = ($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + (int) ($this->success["{$item['order_no']}"]['summary']['tax'] ?? 0);
+                        $item = $value->toArray();
+                        $item['dtb_order_no'] = $order_id[$i];
+                        $item['dtb_order_line_no'] = $j;
 
-                    $item->setOrderRegistedFlg(1);
-                    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
+                        $result = $this->importDtOrder($item);
+                        $result1 = $this->importDtOrderStatus($item);
+
+                        if ($result && $result1) {
+                            // Save to success array to send mail
+                            $this->success["{$item['order_no']}"]['detail'][] = [
+                                'jan_code' => $item['jan_code'],
+                                'product_name' => $item['product_name'],
+                                'order_price' => $item['order_price'],
+                                'order_num' => $item['order_num'],
+                            ];
+
+                            $this->success["{$item['order_no']}"]['summary'] = [
+                                'order_amount' => ($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + ($item['order_price'] * $item['order_num']),
+                                'tax' => $this->rate == 0 ? 0 : (int) ((($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + ($item['order_price'] * $item['order_num'])) / $this->rate),
+                                'order_company_name' => $this->customer['company_name'] ?? '',
+                                'order_shop_name' => $this->customer['company_name'] ?? '',
+                                'shipping_name' => $this->customer['company_name'] ?? '',
+                                'postal_code' => $this->customer['postal_code'] ?? '',
+                                'address' => ($this->customer['addr01'] ?? '').($this->customer['addr02'] ?? '').($this->customer['addr03'] ?? ''),
+                                'phone_number' => $this->customer['phone_number'] ?? '',
+                                'email' => $this->customer['email'] ?? '',
+                                'delivery_date' => $item['delivery_date'],
+                            ];
+
+                            $this->success["{$item['order_no']}"]['summary']['total_amount'] = ($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + (int) ($this->success["{$item['order_no']}"]['summary']['tax'] ?? 0);
+
+                            $value->setOrderRegistedFlg(1);
+                            $this->entityManager->getRepository(DtOrderWSEOS::class)->save($value);
+                        }
+                    }
                 }
             }
 
-            log_info('End Handle Import Data To dt_order, dt_order_status');
+            log_info('End Handle Import Data To dtb_order, dt_order, dt_order_status');
 
             return;
         } catch (\Exception $e) {
@@ -410,8 +445,8 @@ class ValidateCsvDataCommand extends Command
     {
         try {
             $dtOrderStatus = $this->entityManager->getRepository(DtOrderStatus::class)->findOneBy([
-                'cus_order_no' => $data['order_no'],
-                'cus_order_lineno' => $data['order_line_no'],
+                'cus_order_no' => $data['dtb_order_no'],
+                'cus_order_lineno' => $data['dtb_order_line_no'],
             ]);
 
             // Create order_status if empty
