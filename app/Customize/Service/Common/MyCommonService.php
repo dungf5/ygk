@@ -2537,8 +2537,8 @@ SQL;
 
         return null;
     }
-    public function getJanCodeToProductName( $jan_code = '' )
-    {
+    
+    public function getJanCodeToProductName( $jan_code = '' ) {
         $sql = "SELECT `product_name` FROM `mst_product` WHERE `jan_code` = :jan_code limit 1";
 
         try {
@@ -2551,6 +2551,58 @@ SQL;
         }
 
         return null;
+    }
+
+    public function getDeliveredNum(  $shipping_no='', $product_code=''  ) {
+        $result = 0;
+        if( !$shipping_no || !$product_code ) return $result;
+
+        $sql = "SELECT 
+                SUM( `shipping_num` ) AS sum_shipping_num
+            FROM `mst_shipping`
+            WHERE
+                `shipping_no` = :shipping_no
+                AND `product_code` = :product_code
+            GROUP BY shipping_no, product_code";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $query     = $statement->executeQuery([ 'shipping_no'=>$shipping_no, 'product_code'=>$product_code ]);
+            $row       = $query->fetchAllAssociative();
+
+            foreach($row as $dt) {
+                $result += (int)$dt['sum_shipping_num'];
+            }
+        } catch (Exception $e) {
+        }
+
+        return $result;
+    }
+
+    public function getReturnedNum(  $shipping_no='', $product_code=''  ) {
+        $result = 0;
+        if( !$shipping_no || !$product_code ) return $result;
+
+        $sql = "SELECT 
+                SUM( `returns_num` ) AS sum_returns_num
+            FROM `mst_product_returns_info`
+            WHERE
+                `shipping_no` = :shipping_no
+                AND `product_code` = :product_code
+            GROUP BY shipping_no, product_code";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $query     = $statement->executeQuery([ 'shipping_no'=>$shipping_no, 'product_code'=>$product_code ]);
+            $row       = $query->fetchAllAssociative();
+
+            foreach($row as $dt) {
+                $result += (int)$dt['sum_returns_num'];
+            }
+        } catch (Exception $e) {
+        }
+
+        return $result;
     }
 
     public function getReturnsNo()
