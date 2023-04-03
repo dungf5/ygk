@@ -145,6 +145,12 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             Join::WITH,
             "product.product_code = product_returns_info.product_code"
         );
+        $qb->leftJoin(
+            'Customize\Entity\DtReturnsReson',
+            'returns_reson',
+            Join::WITH,
+            'returns_reson.returns_reson_id=product_returns_info.reason_returns_code'
+        );
 
         $qb->andWhere('product_returns_info.customer_code = :customer_id' )
             ->setParameter('customer_id', $customer_id);
@@ -159,26 +165,34 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'product_returns_info.shipping_name',
             'product_returns_info.otodoke_name',
             'product_returns_info.jan_code',
-            'product.product_name',
             'product_returns_info.shipping_num',
+            'product_returns_info.returns_request_date',
+            'product.product_code',
+            'product.product_name',
+            'returns_reson.returns_reson',
         );
 
-        if ( $paramSearch['search_jan_code'] != '' ) {
+        if ( !empty($paramSearch['returns_status_flag']) ) {
+            $qb->andWhere( 'product_returns_info.returns_status_flag IN (:returns_status_flag)' )
+            ->setParameter(':returns_status_flag', $paramSearch['returns_status_flag']);
+        }
+
+        if ( !empty($paramSearch['search_jan_code']) ) {
             $qb->andWhere( 'product_returns_info.jan_code LIKE :search_jan_code' )
                 ->setParameter(':search_jan_code', "%{$paramSearch['search_jan_code']}%");
         }
 
-        if ( $paramSearch['search_shipping_date'] != 0 ) {
+        if ( !empty($paramSearch['search_shipping_date']) && $paramSearch['search_shipping_date'] != 0 ) {
             $qb->andWhere( 'product_returns_info.shipping_date LIKE :search_shipping_date' )
                 ->setParameter(':search_shipping_date', "{$paramSearch['search_shipping_date']}-%");
         }
 
-        if ( $paramSearch['search_shipping'] != '0' ) {
+        if ( !empty($paramSearch['search_shipping']) && $paramSearch['search_shipping'] != '0' ) {
             $qb->andWhere( 'product_returns_info.shipping_code = :search_shipping' )
                 ->setParameter(':search_shipping', $paramSearch['search_shipping']);
         }
 
-        if ( $paramSearch['search_otodoke'] != '0' ) {
+        if ( !empty($paramSearch['search_otodoke']) && $paramSearch['search_otodoke'] != '0' ) {
             $qb->andWhere( 'product_returns_info.otodoke_code = :search_otodoke' )
                 ->setParameter(':search_otodoke', $paramSearch['search_otodoke']);
         }

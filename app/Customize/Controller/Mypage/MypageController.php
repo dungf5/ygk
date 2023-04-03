@@ -921,6 +921,7 @@ class MypageController extends AbstractController
         
         //Params
         $param = [
+            'returns_status_flag'  => [0,1,2,3,4],
             'pageno'               => $request->get('pageno', 1),
             'search_jan_code'      => $request->get('search_jan_code', ''),
             'search_shipping_date' => $request->get('search_shipping_date', 0),
@@ -1243,6 +1244,8 @@ class MypageController extends AbstractController
         }
         $returns_reson      = $commonService->getReturnsReson();
 
+        $returns_num = $request->get( 'returns_num', $product_returns_info->getReturnsNum() );
+        
         return [
             'customer_id'          => $customer_id,
             'product_returns_info' => $product_returns_info,
@@ -1252,6 +1255,7 @@ class MypageController extends AbstractController
             'shippings'            => $shippings,
             'otodokes'             => $otodokes,
             'returns_reson'        => $returns_reson,
+            'returns_num'          => $returns_num,
         ];
     }
 
@@ -1497,6 +1501,7 @@ class MypageController extends AbstractController
 
         //Params
         $param = [
+            'returns_status_flag'  => [5],
             'search_request_date'  => $request->get('search_request_date', 0),
             'search_reason_return' => $request->get('search_reason_return', 0),
             'search_shipping'      => $request->get('search_shipping', 0),
@@ -1508,7 +1513,7 @@ class MypageController extends AbstractController
         $customer_id   = $this->globalService->customerId();
         $login_type    = $this->globalService->getLoginType();
         $customer_code = $this->globalService->getLoginCode();
-        $qb            = $this->mstProductReturnsInfoRepository->getQueryBuilderByCustomer($param, $customer_id);
+        $qb            = $this->mstProductReturnsInfoRepository->getReturnByCustomer($param, $customer_id);
 
         // Paginator
         $pagination             = $paginator->paginate(

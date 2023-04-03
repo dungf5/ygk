@@ -59,6 +59,14 @@
 	.search:focus {
 		color: #fff;
 	}
+	input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+  		-webkit-appearance: none;
+  		margin: 0;
+	}
+	input[type=number] {
+  		-moz-appearance: textfield;
+	}
 </style>
 {% endblock stylesheet %}
 
@@ -169,47 +177,49 @@
 				{% if pagination and pagination.totalItemCount > 0 %}
 					<tbody>
 						{% for item in pagination %}
-							<tr 
-								ondblclick="window.location = $('#procedure').attr('href')" >
-								<td title="return_type">
-									<a href="{{ url( 'mypage_return_edit', { 'returns_no':item.returns_no } ) }}" id="procedure" class="btn btn-warning" role="button">手続き</a> 
-								</td>
-								<td title="return_number">
-									<input type="number" class="form-control" value="{{ item.returns_num }}"/>
-								</td>
-								<td title="return_status">
-									{% if item.returns_status_flag == 1 %}
-										<p class="text-nowrap">承認</p>
-									{% elseif item.returns_status_flag == 2 %}
-										<p class="text-nowrap">未承認</p>
-									{% elseif item.returns_status_flag == 3 %}
-										<p class="text-nowrap">受取受理</p>
-									{% elseif item.returns_status_flag == 4 %}
-										<p class="text-nowrap">受取未受理</p>
-									{% elseif item.returns_status_flag == 5 %}
-										<p class="text-nowrap">返品完了</p>
-									{% else %}
-										<p class="text-nowrap">申請中</p>
-									{% endif %}
-								</td>
-								<td title="shipping_no">
-									<p class="text-nowrap">{{ item.shipping_no }}</p>
-								</td>
-								<td title="shipping_date">
-									<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
-								</td>
-								<td title="shiping_code otodoke_code">
-									<p class="text-nowrap">{{ item.shipping_name }}</p>
-									<p class="text-nowrap">{{ item.otodoke_name }}</p>
-								</td>
-								<td title="jan_code product_name">
-									<p class="text-nowrap">{{ item.jan_code }}</p>
-									<p class="text-nowrap">{{ item.product_name }}</p>
-								</td>
-								<td title="shipping_num">
-									<p class="text-nowrap">{{ item.shipping_num }}</p>
-								</td>
-							</tr>
+							<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_edit', { 'returns_no':item.returns_no } ) }}" method="GET">
+								<tr 
+									ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >
+									<td title="return_type">
+										<button type="submit" class="btn btn-warning" role="button">手続き</button> 
+									</td>
+									<td title="return_number">
+										<input type="number" id="returns_num" name="returns_num" class="form-control" value="{{ item.returns_num }}"/>
+									</td>
+									<td title="return_status">
+										{% if item.returns_status_flag == 1 %}
+											<p class="text-nowrap">承認</p>
+										{% elseif item.returns_status_flag == 2 %}
+											<p class="text-nowrap">未承認</p>
+										{% elseif item.returns_status_flag == 3 %}
+											<p class="text-nowrap">受取受理</p>
+										{% elseif item.returns_status_flag == 4 %}
+											<p class="text-nowrap">受取未受理</p>
+										{% elseif item.returns_status_flag == 5 %}
+											<p class="text-nowrap">返品完了</p>
+										{% else %}
+											<p class="text-nowrap">申請中</p>
+										{% endif %}
+									</td>
+									<td title="shipping_no">
+										<p class="text-nowrap">{{ item.shipping_no }}</p>
+									</td>
+									<td title="shipping_date">
+										<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
+									</td>
+									<td title="shiping_code otodoke_code">
+										<p class="text-nowrap">{{ item.shipping_name }}</p>
+										<p class="text-nowrap">{{ item.otodoke_name }}</p>
+									</td>
+									<td title="jan_code product_name">
+										<p class="text-nowrap">{{ item.jan_code }}</p>
+										<p class="text-nowrap">{{ item.product_name }}</p>
+									</td>
+									<td title="shipping_num">
+										<p class="text-nowrap">{{ item.shipping_num }}</p>
+									</td>
+								</tr>
+							</form>
 						{% endfor %}
 					</tbody>
 				{% else %}
