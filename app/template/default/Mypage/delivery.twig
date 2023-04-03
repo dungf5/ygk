@@ -143,7 +143,7 @@ file that was distributed with this source code.
                     {% for Order in pagination %}
                         <tr>
                             <td>
-                                {% if global_service.getPdfExportFlg and login_type not in ['shipping_code', 'otodoke_code'] %}
+                                {% if global_service.getPdfExportFlg %}
                                     <a target="_blank" href="/mypage/exportOrderPdf?delivery_no={{Order.delivery_no}}">
                                         {{ Order.delivery_no }}
                                     </a>
