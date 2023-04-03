@@ -34,7 +34,7 @@
 				<label>※返品確定日は返品商品到着後となります</label>
 			</div>
 			<div class="col-xs-12">
-				<form class="form-horizontal"  action="{{ url('mypage_return_confirm') }}" method="POST" enctype="multipart/form-data">
+				<form id="form_return_edit" class="form-horizontal"  action="{{ url('mypage_return_confirm') }}" method="POST" enctype="multipart/form-data">
 					<input type="hidden" name="returns_no" value={{ product_returns_info.returns_no }} />
 					<table class="table table-bordered">
 						<tr>
@@ -98,7 +98,7 @@
 								<label for="jan_code">JANコード</label>
 							</td>
 							<td class="col-xs-10 text-left">
-								<input type="text" class="form-control" id="jan_code" name="jan_code" value="{{ product_returns_info.jan_code }}" onchange="getProductName()" />
+								<input type="text" class="form-control" id="jan_code" name="jan_code" value="{{ product_returns_info.jan_code }}" onchange="getProduct()" />
 							</td>
 						</tr>
 						<tr>
@@ -106,23 +106,23 @@
 								<label for="product_name">商品名</label>
 							</td>
 							<td class="col-xs-10 text-left">
-								<input type="text" class="form-control" id="product_name" name="product_name" value="{{ product_name }}" />
+								<input type="text" class="form-control" id="product_name" name="product_name" value="{{ product_name }}" disabled/>
 							</td>
 						</tr>
 						<tr>
 							<td class="col-xs-2 text-right left_background">
-								<label for="shipping_num">出荷数</label>
+								<label for="delivered_num">出荷数</label>
 							</td>
 							<td class="col-xs-10 text-left">
-								<input type="text" class="form-control" id="shipping_num" name="shipping_num" disabled />
+								<input type="text" class="form-control" id="delivered_num" name="delivered_num" disabled />
 							</td>
 						</tr>
 						<tr>
 							<td class="col-xs-2 text-right left_background">
-								<label for="return_status">返品中</label>
+								<label for="returned_num">返品中</label>
 							</td>
 							<td class="col-xs-10 text-left">
-								<input type="text" class="form-control" id="return_status" name="return_status" disabled />
+								<input type="text" class="form-control" id="returned_num" name="returned_num" disabled />
 							</td>
 						</tr>
 						<tr>
@@ -257,6 +257,7 @@
 {% block javascript %}
 <script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
 <script src="{{ asset('assets/jquery-ui/jquery-ui.min.js', 'user_data') }}"></script>
+<script src="{{ asset('assets/jquery-validation/jquery.validate.min.js', 'user_data') }}"></script>
 <script>
 	var cus_image_url_path = [
 		{% if product_returns_info.cus_image_url_path1|trim is not empty %} "{{ product_returns_info.cus_image_url_path1 }}", {% endif %}
@@ -330,7 +331,8 @@
 		imagesPreview()
 	}
 
-	function getProductName() {
+	function getProduct() {
+		let _shipping_no = $("#shipping_no").val()
 		let _jan_code = $("#jan_code").val()
 
 		$.ajax({
@@ -338,12 +340,18 @@
 			type: 'GET',
 			dataType: 'json',
 			data: {
-				'jan_code': _jan_code,
+				'shipping_no': _shipping_no,
+				'jan_code'   : _jan_code,
 			},
+			beforeSend : ()=>loadingOverlay("show"),
+			complete : ()=>loadingOverlay("hide"),
 		})
 		.done(function(json) {
-			if( json.product_name ) {
-				$("#product_name").val( json.product_name )
+			if( json.status ) {
+				let _data = json.data;
+				$("#product_name").val( json.data.product_name )
+				$("#delivered_num").val( json.data.delivered_num )
+				$("#returned_num").val( json.data.returned_num )
 			}
 		})
 		.fail(function(json) {
@@ -392,7 +400,63 @@
 		$("#shipping_code").select2();
 		$("#otodoke_code").select2();
 
-		$( "#shipping_day" ).datepicker({ dateFormat: 'dd/mm/yy' })
+		$( "#shipping_day" ).datepicker({ dateFormat: 'dd/mm/yy' });
+		
+		$("#form_return_edit").validate({
+			ignore: null,
+			rules: {
+				return_reason: {
+					required: true,
+				},
+				customer_comment: {
+					required: true
+				},
+				rerurn_num: {
+					required : true,
+					min: 1,
+					max: {
+        				depends: function(e) {
+							let _rerurn_num = parseInt( $("#rerurn_num").val() );
+							let _returned_num = parseInt( $("#returned_num").val() );
+          					return _rerurn_num > _returned_num ? _rerurn_num - _returned_num : _rerurn_num;
+        				}
+      				}
+				},
+				'images[]': {
+					minupload: {
+						depends: function(e) {
+							return ( cus_image_url_path.length + $('#images_input').prop('files').length ) >= 1;
+						}
+					},
+					maxupload: {
+						depends: function(e) {
+							return ( cus_image_url_path.length + $('#images_input').prop('files').length ) <= 6;
+						}
+					},
+				},
+			},
+			messages: {
+				return_reason: "顧客コメントを入力してください。",
+				customer_comment: "顧客コメントを入力してください。",
+				rerurn_num: {
+					required: "返品数を入力してください。",
+					min     : "返品数を入力してください。",
+					max     : "出荷数以上の数量は入力できません。",
+				},
+				'images[]': {
+					minupload: "商品画像をファイル添付より選択してください。",
+					maxupload: "最大6枚の画像",
+				},
+			},
+			invalidHandler: function(event, validator) {
+				loadingOverlay("hide")
+			},
+			submitHandler: function(form) {
+				$(form).submit()
+			}
+		});
+
+		getProduct();
 	})
 </script>
 {% endblock javascript%}

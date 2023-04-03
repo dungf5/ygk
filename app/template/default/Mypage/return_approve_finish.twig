@@ -21,12 +21,17 @@
 		</div>
 		<div class="ec-mypageRole">
 			<div class="col-xs-12">
-				<div class="col-xs-12 text-right">
-					{% if product_returns_info.aprove_date|trim is not empty %}
-						<label class="text-right">発行日:{{ product_returns_info.aprove_date|date('Y年m月d日') }}</label>
-					{% elseif product_returns_info.aprove_date_not_yet|trim is not empty %}
-						<label class="text-right">発行日:{{ product_returns_info.aprove_date_not_yet|date('Y年m月d日') }}</label>
-					{% endif %}
+				<div class="row">
+					<div class="col-xs-6 text-left">
+						<img src="data:image/png;base64, {{ barcode }}" style="max-width: 250px;"/>
+					</div>
+					<div class="col-xs-6 text-right">
+						{% if product_returns_info.aprove_date|trim is not empty %}
+							<label class="text-right">発行日:{{ product_returns_info.aprove_date|date('Y年m月d日') }}</label>
+						{% elseif product_returns_info.aprove_date_not_yet|trim is not empty %}
+							<label class="text-right">発行日:{{ product_returns_info.aprove_date_not_yet|date('Y年m月d日') }}</label>
+						{% endif %}
+					</div>
 				</div>
 				<table class="table table-bordered">
 					<tr>

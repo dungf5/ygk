@@ -1331,6 +1331,9 @@ class MypageController extends AbstractController
         $returns_reson      = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
         $returns_reson_text = $returns_reson[ $product_returns_info->getReasonReturnsCode() ];
         
+        $generator = new \Picqer\Barcode\BarcodeGeneratorJPG();
+        $barcode = base64_encode( $generator->getBarcode($returns_no, $generator::TYPE_CODE_39) );
+
         if('POST' === $request->getMethod() ) {
             $data = [
                 'cus_reviews_flag'       => $cus_reviews_flag,
@@ -1365,6 +1368,7 @@ class MypageController extends AbstractController
             'customer'             => $customer,
             'product_name'         => $product_name,
             'returns_reson_text'   => $returns_reson_text,
+            'barcode'              => $barcode,
         ];
     }
 
