@@ -173,9 +173,6 @@ class MypageController extends AbstractController
      */
     public function exportOrderPdf(Request $request)
     {
-        $login_type         = $this->globalService->getLoginType();
-        if (in_array($login_type, ['shipping_code', 'otodoke_code'])) return;
-
         $htmlFileName               = "Mypage/exportOrderPdf.twig";
         $delivery_no                = MyCommon::getPara("delivery_no");
         $order_no_line_no           = MyCommon::getPara("order_no_line_no");
