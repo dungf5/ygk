@@ -1074,6 +1074,20 @@ class MailService
         return $this->mailer->send( $message );
     }
 
+    public function sendMailReturnProductComplete( $email )
+    {
+        if( !filter_var($email, FILTER_VALIDATE_EMAIL) ) return;
+
+        $body = $this->twig->render('Mail/return_product_complete.twig');
+        $message = (new \Swift_Message())
+            ->setSubject("[XBRAID JAPAN] 返品完了のお知らせ")
+            ->setFrom([ $this->BaseInfo->getEmail01()=>$this->BaseInfo->getShopName() ])
+            ->setTo([ $email ])
+            ->setBody( $body );
+
+        return $this->mailer->send( $message );
+    }
+
     /**
      * Send mail export order ws-eos.
      *

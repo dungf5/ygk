@@ -1487,6 +1487,74 @@ class MypageController extends AbstractController
     }
 
     /**
+     * 返品手続き完了
+     *
+     * @Route("/mypage/return/complete/{returns_no}", name="mypage_return_complete", methods={"GET"})
+     * @Template("Mypage/return_complete.twig")
+     */
+    public function returnComplete(Request $request, string $returns_no )
+    {
+        $commonService        = new MyCommonService($this->entityManager);
+        $product_returns_info = $this->mstProductReturnsInfoRepository->find( $returns_no );
+        $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode());
+        $product_name         = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode());
+
+        $returns_reson      = $commonService->getReturnsReson();
+        $returns_reson      = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
+        $returns_reson_text = $returns_reson[ $product_returns_info->getReasonReturnsCode() ];
+        
+        return [
+            'product_returns_info' => $product_returns_info,
+            'customer'             => $customer,
+            'product_name'         => $product_name,
+            'returns_reson_text'   => $returns_reson_text,
+        ];
+    }
+
+    /**
+     * 返品手続き完了完了
+     *
+     * @Route("/mypage/return/complete/{returns_no}/finish", name="mypage_return_complete_finish", methods={"GET", "POST"})
+     * @Template("Mypage/return_complete_finish.twig")
+     */
+    public function returnCompleteFinish(Request $request, string $returns_no )
+    {
+        $commonService        = new MyCommonService($this->entityManager);
+        $product_returns_info = $this->mstProductReturnsInfoRepository->find( $returns_no );
+        $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode());
+        $product_name         = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode());
+        
+        $xbj_reviews_flag = $request->get('xbj_reviews_flag');
+
+        if('POST' === $request->getMethod() ) {
+            $data = [
+                'xbj_reviews_flag'    => $xbj_reviews_flag,
+                'returns_status_flag' => 5,
+            ];
+            
+            try {
+                $product_returns_info = $this->mstProductReturnsInfoRepository->updadteData($returns_no, $data);
+
+                $email       = $customer['customer_email'] ?? $customer['email'];
+                $this->mailService->sendMailReturnProductComplete( $email );
+            } catch (\Exception $e) {
+                log_error( "/mypage/return/complete/{$returns_no}}/finish: " . $e->getMessage() );
+            }
+        }
+        
+        $returns_reson      = $commonService->getReturnsReson();
+        $returns_reson      = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
+        $returns_reson_text = $returns_reson[ $product_returns_info->getReasonReturnsCode() ];
+        
+        return [
+            'product_returns_info' => $product_returns_info,
+            'customer'             => $customer,
+            'product_name'         => $product_name,
+            'returns_reson_text'   => $returns_reson_text,
+        ];
+    }
+
+    /**
      * 返品履歴
      *
      * @Route("/mypage/return/history", name="mypage_return_history", methods={"GET"})

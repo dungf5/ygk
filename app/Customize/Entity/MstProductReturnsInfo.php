@@ -45,7 +45,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getCustomerCode(): string
+        public function getCustomerCode(): ?string
         {
             return $this->customer_code;
         }
@@ -66,7 +66,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getShippingCode(): string
+        public function getShippingCode(): ?string
         {
             return $this->shipping_code;
         }
@@ -87,7 +87,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getShippingName(): string
+        public function getShippingName(): ?string
         {
             return $this->shipping_name;
         }
@@ -107,7 +107,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getOtodokeCode(): string
+        public function getOtodokeCode(): ?string
         {
             return $this->otodoke_code;
         }
@@ -128,7 +128,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getOtodokeName(): string
+        public function getOtodokeName(): ?string
         {
             return $this->otodoke_name;
         }
@@ -149,7 +149,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getShippingNo(): string
+        public function getShippingNo(): ?string
         {
             return $this->shipping_no;
         }
@@ -170,7 +170,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getShippingDate(): string
+        public function getShippingDate(): ?string
         {
             return $this->shipping_date;
         }
@@ -191,7 +191,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getJanCode(): string
+        public function getJanCode(): ?string
         {
             return $this->jan_code;
         }
@@ -212,7 +212,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getProductCode(): string
+        public function getProductCode(): ?string
         {
             return $this->product_code;
         }
@@ -233,7 +233,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getShippingNum(): string
+        public function getShippingNum(): ?string
         {
             return $this->shipping_num;
         }
@@ -254,7 +254,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getReasonReturnsCode(): string
+        public function getReasonReturnsCode(): ?string
         {
             return $this->reason_returns_code;
         }
@@ -275,7 +275,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getCustomerComment(): string
+        public function getCustomerComment(): ?string
         {
             return $this->customer_comment;
         }
@@ -296,7 +296,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getCusReviewsFlag(): string
+        public function getCusReviewsFlag(): ?string
         {
             return $this->cus_reviews_flag;
         }
@@ -317,7 +317,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getReturnsNum(): string
+        public function getReturnsNum(): ?string
         {
             return $this->returns_num;
         }
@@ -464,7 +464,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getStockImageUrlPath1(): string
+        public function getStockImageUrlPath1(): ?string
         {
             return $this->stock_image_url_path1;
         }
@@ -485,7 +485,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getStockImageUrlPath2(): string
+        public function getStockImageUrlPath2(): ?string
         {
             return $this->stock_image_url_path2;
         }
@@ -506,7 +506,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getStockImageUrlPath3(): string
+        public function getStockImageUrlPath3(): ?string
         {
             return $this->stock_image_url_path3;
         }
@@ -527,7 +527,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getStockImageUrlPath4(): string
+        public function getStockImageUrlPath4(): ?string
         {
             return $this->stock_image_url_path4;
         }
@@ -548,7 +548,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getStockImageUrlPath5(): string
+        public function getStockImageUrlPath5(): ?string
         {
             return $this->stock_image_url_path5;
         }
@@ -569,7 +569,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getStockImageUrlPath6(): string
+        public function getStockImageUrlPath6(): ?string
         {
             return $this->stock_image_url_path6;
         }
@@ -590,7 +590,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getReturnsRequestDate(): string
+        public function getReturnsRequestDate(): ?string
         {
             return $this->returns_request_date;
         }
@@ -611,7 +611,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getReturnsStatusFlag(): string
+        public function getReturnsStatusFlag(): ?string
         {
             return $this->returns_status_flag;
         }
@@ -632,7 +632,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getStockReviewsFlag(): string
+        public function getStockReviewsFlag(): ?string
         {
             return $this->stock_reviews_flag;
         }
@@ -653,7 +653,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
        /**
          * @return string
          */
-        public function getReviewsComment(): string
+        public function getReviewsComment(): ?string
         {
             return $this->reviews_comment;
         }
@@ -674,7 +674,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getShippingFee(): string
+        public function getShippingFee(): ?string
         {
             return $this->shipping_fee;
         }
@@ -737,7 +737,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getAproveCommentNotYet(): string
+        public function getAproveCommentNotYet(): ?string
         {
             return $this->aprove_comment_not_yet;
         }
@@ -758,7 +758,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getProductReceiptDate(): string
+        public function getProductReceiptDate(): ?string
         {
             return $this->product_receipt_date;
         }
@@ -779,7 +779,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getReceiptComment(): string
+        public function getReceiptComment(): ?string
         {
             return $this->receipt_comment;
         }
@@ -800,7 +800,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getProductReceiptDateNotYet(): string
+        public function getProductReceiptDateNotYet(): ?string
         {
             return $this->product_receipt_date_not_yet;
         }
@@ -821,7 +821,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getReceiptNotYetComment(): string
+        public function getReceiptNotYetComment(): ?string
         {
             return $this->receipt_not_yet_comment;
         }
@@ -842,7 +842,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getReturnedDate(): string
+        public function getReturnedDate(): ?string
         {
             return $this->returned_date;
         }
@@ -863,7 +863,7 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         /**
          * @return string
          */
-        public function getXbjReviewsFlag(): string
+        public function getXbjReviewsFlag(): ?string
         {
             return $this->xbj_reviews_flag;
         }

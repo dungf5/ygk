@@ -122,6 +122,9 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             if( !empty( $data['stock_reviews_flag'] ) ) {
                 $object->setStockReviewsFlag($data['stock_reviews_flag']);
             }
+            if( !empty( $data['xbj_reviews_flag'] ) ) {
+                $object->setXbjReviewsFlag($data['xbj_reviews_flag']);
+            }
 
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();
