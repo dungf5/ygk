@@ -41,7 +41,7 @@ class DtOrderStatusRepository extends AbstractRepository
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = new DtOrderStatus();
             $object->setOrderNo('');
-            $object->setOrderLineNo('');
+            $object->setOrderLineNo('0');
             $object->setOrderStatus(1);
             $object->setCusOrderNo($data['order_no'] ?? '');
             $object->setCusOrderLineno($data['order_line_no'] ?? '');
