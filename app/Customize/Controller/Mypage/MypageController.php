@@ -1317,18 +1317,25 @@ class MypageController extends AbstractController
     {
         $commonService        = new MyCommonService($this->entityManager);
         $product_returns_info = $this->mstProductReturnsInfoRepository->find( $returns_no );
-        $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode());
-        $product_name         = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode());
+        $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode() );
+        $product_name         = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode() );
+        $delivered_num        = $commonService->getDeliveredNum( $product_returns_info->getShippingNo(), $product_returns_info->getProductCode() );
+        $returned_num         = $commonService->getReturnedNum( $product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
         
         $returns_reson      = $commonService->getReturnsReson();
         $returns_reson      = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
         $returns_reson_text = $returns_reson[ $product_returns_info->getReasonReturnsCode() ];
+        
+        $returns_num = $request->get( 'returns_num', $product_returns_info->getReturnsNum() );
+        $cond        = $delivered_num > $returned_num ? $delivered_num - $returned_num : $delivered_num;
+        $returns_num = $returns_num > $cond ? $product_returns_info->getReturnsNum() : $returns_num;
         
         return [
             'product_returns_info' => $product_returns_info,
             'customer'             => $customer,
             'product_name'         => $product_name,
             'returns_reson_text'   => $returns_reson_text,
+            'returns_num'          => $returns_num,
         ];
     }
 
@@ -1345,7 +1352,7 @@ class MypageController extends AbstractController
         $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode() );
         $product_name         = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode() );
         $delivered_num        = $commonService->getDeliveredNum( $product_returns_info->getShippingNo(), $product_returns_info->getProductCode() );
-        $returned_num         = $commonService->getReturnedNum( $product_returns_info->getShippingNo(), $product_returns_info->getProductCode() );
+        $returned_num         = $commonService->getReturnedNum( $product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
         
         $cus_reviews_flag       = $request->get('cus_reviews_flag');
         $shipping_fee           = $request->get('shipping_fee');
@@ -1356,6 +1363,10 @@ class MypageController extends AbstractController
         $returns_reson      = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
         $returns_reson_text = $returns_reson[ $product_returns_info->getReasonReturnsCode() ];
         
+        $returns_num = $request->get( 'returns_num', $product_returns_info->getReturnsNum() );
+        $cond        = $delivered_num > $returned_num ? $delivered_num - $returned_num : $delivered_num;
+        $returns_num = $returns_num > $cond ? $product_returns_info->getReturnsNum() : $returns_num;
+        
         $generator = new \Picqer\Barcode\BarcodeGeneratorJPG();
         $barcode = base64_encode( $generator->getBarcode($returns_no, $generator::TYPE_CODE_39) );
 
@@ -1364,6 +1375,7 @@ class MypageController extends AbstractController
                 'cus_reviews_flag'       => $cus_reviews_flag,
                 'shipping_fee'           => $shipping_fee,
                 'aprove_comment_not_yet' => $aprove_comment_not_yet,
+                'returns_num'            => $returns_num,
             ];
             if( $submit == 'aprove' ) {
                 $data["returns_status_flag"] = 1;
@@ -1411,16 +1423,23 @@ class MypageController extends AbstractController
         $product_returns_info = $this->mstProductReturnsInfoRepository->find( $returns_no );
         $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode());
         $product_name         = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode());
+        $delivered_num        = $commonService->getDeliveredNum( $product_returns_info->getShippingNo(), $product_returns_info->getProductCode() );
+        $returned_num         = $commonService->getReturnedNum( $product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
         
         $returns_reson      = $commonService->getReturnsReson();
         $returns_reson      = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
         $returns_reson_text = $returns_reson[ $product_returns_info->getReasonReturnsCode() ];
         
+        $returns_num = $request->get( 'returns_num', $product_returns_info->getReturnsNum() );
+        $cond        = $delivered_num > $returned_num ? $delivered_num - $returned_num : $delivered_num;
+        $returns_num = $returns_num > $cond ? $product_returns_info->getReturnsNum() : $returns_num;
+
         return [
             'product_returns_info' => $product_returns_info,
             'customer'             => $customer,
             'product_name'         => $product_name,
             'returns_reson_text'   => $returns_reson_text,
+            'returns_num'          => $returns_num,
         ];
     }
 
@@ -1436,12 +1455,18 @@ class MypageController extends AbstractController
         $product_returns_info = $this->mstProductReturnsInfoRepository->find( $returns_no );
         $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode());
         $product_name         = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode());
+        $delivered_num        = $commonService->getDeliveredNum( $product_returns_info->getShippingNo(), $product_returns_info->getProductCode() );
+        $returned_num         = $commonService->getReturnedNum( $product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
 
         $receipt                 = $request->get('receipt');
         $stock_reviews_flag      = $request->get('stock_reviews_flag');
         $receipt_comment         = $request->get('receipt_comment');
         $receipt_not_yet_comment = $request->get('receipt_not_yet_comment');
         $images                  = $request->files->get('images');
+
+        $returns_num = $request->get( 'returns_num', $product_returns_info->getReturnsNum() );
+        $cond        = $delivered_num > $returned_num ? $delivered_num - $returned_num : $delivered_num;
+        $returns_num = $returns_num > $cond ? $product_returns_info->getReturnsNum() : $returns_num;
 
         $stock_image_url_path = [];
         if( count($images) > 0 ) {
@@ -1462,6 +1487,7 @@ class MypageController extends AbstractController
 
         if('POST' === $request->getMethod() ) {
             $data = [
+                'returns_num'           => $returns_num,
                 'stock_image_url_path1' => @$stock_image_url_path[0],
                 'stock_image_url_path2' => @$stock_image_url_path[1],
                 'stock_image_url_path3' => @$stock_image_url_path[2],

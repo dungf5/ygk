@@ -66,11 +66,14 @@ class MstProductReturnsInfoRepository extends AbstractRepository
     public function updadteData($returns_no, $data = [])
     {
         if( empty($returns_no) || empty($data) ) return;
-
+        
         try {
             $object = $this->findOneBy([ 'returns_no' => $returns_no ]);
             if( !$object ) return;
             
+            if( !empty( $data['returns_num'] ) ) {
+                $object->setReturnsNum($data['returns_num']);
+            }
             if( !empty( $data['cus_reviews_flag'] ) ) {
                 $object->setCusReviewsFlag($data['cus_reviews_flag']);
             }
