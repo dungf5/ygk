@@ -263,12 +263,14 @@
 		$('#images').prop('files', _dt.files)
 		imagesPreview()
 	}
+	
 	function changeShippingNo() {
 		$("#jan_code").val( null );
 		$("#product_name").val( null );
 		$("#delivered_num").val( null );
 		$("#returned_num").val( null );
 	}
+	
 	function getProduct() {
 		let _shipping_no = $("#shipping_no").val()
 		let _jan_code = $("#jan_code").val()
