@@ -40,20 +40,20 @@
 				<form class="form-horizontal" action="{{ url('mypage_return_confirm') }}" method="POST" enctype="multipart/form-data" id="form_return_create">
 					<table class="table table-bordered">
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">お客様</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<div>
 									<input type="text" class="form-control" id="company_name" name="company_name" disabled value={{ company_name }} />
 								</div>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="shipping_code">出荷先</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<select class="form-control" name="shipping_code" id="shipping_code" onChange="changeShippingCode( this.value )">
 									{% for shipping in shippings %}
 										<option
@@ -66,10 +66,10 @@
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="otodoke_code">届け先</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<select class="form-control" name="otodoke_code" id="otodoke_code">
 									{% for otodoke in otodokes %}
 										<option
@@ -82,59 +82,60 @@
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="shipping_no">出荷指示№</label>
 							</td>
-							<td class="col-xs-10 text-left">
-								<input type="text" class="form-control" id="shipping_no" name="shipping_no" value="{{ param.shipping_no }}"/>
+							<td class="col-xs-9 text-left">
+								<input type="text" class="form-control" id="shipping_no" name="shipping_no" value="{{ param.shipping_no }}" onchange="changeShippingNo()"/>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="shipping_day">出荷日</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<input type="text" class="form-control" id="shipping_day" name="shipping_day" value="{{ param.shipping_day }}"/>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="jan_code">JANコード</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<input type="text" class="form-control" id="jan_code" name="jan_code" value="{{ param.jan_code }}" onchange="getProduct()" />
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="product_name">商品名</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<input type="text" class="form-control" id="product_name" name="product_name" value="{{ param.product_name }}" disabled/>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="delivered_num">出荷数</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<input type="text" class="form-control" id="delivered_num" name="delivered_num" value="" disabled/>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="returned_num">返品中</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<input type="text" class="form-control" id="returned_num" name="returned_num" value="" disabled/>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="return_reason">返品理由</label>
 							</td>
-							<td class="col-xs-10 text-left">
-								<select class="form-control" name="return_reason" id="return_reason" required>
+							<td class="col-xs-9 text-left">
+								<select class="form-control" name="return_reason" id="return_reason">
+									<option selected disabled hidden>返品理由</option>
 									{% for reson in returns_reson %}
 										<option value="{{ reson.returns_reson_id }}">{{ reson.returns_reson }}</option>
 									{% endfor %}
@@ -142,26 +143,26 @@
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_comment">顧客コメント</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<textarea class="form-control" id="customer_comment" name="customer_comment" rows="3"></textarea>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="rerurn_num">返品数</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<input type="number" class="form-control col-xs-2" id="rerurn_num" name="rerurn_num"/>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="product_status1">良品・不良品</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<label class="radio-inline">
 									<input type="radio" name="product_status" id="product_status1" value="1" required checked> 良品
 								</label>
@@ -171,23 +172,22 @@
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-center left_background" colspan="2">
-								<p for="images_input">商品画像</p>
+							<td class="text-center left_background" colspan="2">
+								<p>商品画像</p>
 								<input type="file" class="hidden" id="images_input" accept="image/*" multiple onchange="imagesInputChange()"/>
 								<input type="file" class="hidden" id="images" name="images[]" accept="image/*" multiple />
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right">
-								<label class="btn btn-primary" for="images_input">画像添付</label>
-							</td>
-							<td class="col-xs-10 text-left">
-								<div class="col-xs-6"></div>
-								<div class="col-xs-3 text-center">
-									<button type="submit" class="btn btn-warning">返品リクエスト送信</button>
-								</div>
-								<div class="col-xs-3 text-center">
-									<a href="{{ url('mypage_return') }}" class="btn btn-warning">返品手続きに戻る</a>
+							<td colspan="2">
+								<div class="row">
+									<div class="col-xs-6 text-left">
+										<label class="btn btn-primary" for="images_input">画像添付</label>
+									</div>
+									<div class="col-xs-6 text-right">
+										<button type="submit" class="btn btn-warning">返品リクエスト送信</button>
+										<a href="{{ url('mypage_return') }}" class="btn btn-warning">返品手続きに戻る</a>
+									</div>		
 								</div>
 							</td>
 						</tr>
@@ -226,7 +226,8 @@
 		if( _dt.files.length > 6 ) {
 			alert("最大6枚の画像")
 		} else {
-			$('#images').prop('files', _dt.files)
+			$('#images').prop('files', _dt.files);
+			$("#images-error").empty();
 			imagesPreview()
 		}
 		$('#images_input').val( null )
@@ -262,10 +263,17 @@
 		$('#images').prop('files', _dt.files)
 		imagesPreview()
 	}
-
+	function changeShippingNo() {
+		$("#jan_code").val( null );
+		$("#product_name").val( null );
+		$("#delivered_num").val( null );
+		$("#returned_num").val( null );
+	}
 	function getProduct() {
 		let _shipping_no = $("#shipping_no").val()
 		let _jan_code = $("#jan_code").val()
+		
+		if( !_shipping_no || !_jan_code ) return;
 
 		$.ajax({
 			url: "{{ url('mypage_product_name') }}",
@@ -328,18 +336,36 @@
 		})
 	}
 
+	$.validator.addMethod('minupload', function(value, element, param) {
+		return element.files.length >= param;
+	});
+	$.validator.addMethod('maxupload', function(value, element, param) {
+		return element.files.length <= param;
+	});
+	$.validator.addMethod('rerurn_num', function(value, element, param) {
+		let _delivered_num = parseInt( $("#delivered_num").val() );
+		let _returned_num = parseInt( $("#returned_num").val() );
+		let _cond = _delivered_num > _returned_num ? _delivered_num - _returned_num : _delivered_num;
+		return value <= _cond;
+	});
+
 	$( function() {
+		getProduct();
+
 		$("#shipping_code").select2();
 		$("#otodoke_code").select2();
 
 		$( "#shipping_day" ).datepicker({ dateFormat: 'dd/mm/yy' });
 
-		$.validator.addMethod('maxupload', function(value, element, param) {
-			return this.optional( element ) || ( element.files.length ) <= param;
-		});
 		$("#form_return_create").validate({
 			ignore: null,
 			rules: {
+				shipping_no: {
+					required: true,
+				},
+				jan_code: {
+					required: true,
+				},
 				return_reason: {
 					required: true,
 				},
@@ -347,29 +373,25 @@
 					required: true
 				},
 				rerurn_num: {
-					required : true,
-					min: 1,
-					max: {
-        				depends: function(e) {
-          					return $("#rerurn_num").val() - $("#returned_num").val();
-        				}
-      				}
+					required: true,
+					rerurn_num : true,
 				},
 				'images[]': {
-					required : true,
+					minupload: 1,
 					maxupload: 6,
 				},
 			},
 			messages: {
-				return_reason: "顧客コメントを入力してください。",
+				shipping_no     : "出荷指示№を入力してください。",
+				jan_code        : "JANコードを入力してください。",
+				return_reason   : "顧客コメントを入力してください。",
 				customer_comment: "顧客コメントを入力してください。",
-				rerurn_num: {
-					required: "返品数を入力してください。",
-					min     : "返品数を入力してください。",
-					max     : "出荷数以上の数量は入力できません。",
+				rerurn_num      : {
+					required  : "返品数を入力してください。",
+					rerurn_num: "出荷数以上の数量は入力できません。",
 				},
 				'images[]': {
-					required : "商品画像をファイル添付より選択してください。",
+					minupload: "商品画像をファイル添付より選択してください。",
 					maxupload: "最大6枚の画像",
 				},
 			},

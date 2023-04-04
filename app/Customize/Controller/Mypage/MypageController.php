@@ -1047,7 +1047,6 @@ class MypageController extends AbstractController
         $shipping_no        = $request->get('shipping_no');
         $shipping_day       = $request->get('shipping_day');
         $jan_code           = $request->get('jan_code');
-        $product_name       = $request->get('product_name');
         $shipping_num       = $request->get('shipping_num');
         $return_status      = $request->get('return_status');
         $return_reason      = $request->get('return_reason');
@@ -1055,12 +1054,12 @@ class MypageController extends AbstractController
         $rerurn_num         = $request->get('rerurn_num');
         $product_status     = $request->get('product_status');
         $cus_image_url_path = $request->get('cus_image_url_path', []);
-
+        
         $product_code  = $commonService->getJanCodeToProductCode( $jan_code );
 
         $returns_reson      = $commonService->getReturnsReson();
         $returns_reson      = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
-        $returns_reson_text = $returns_reson[ $return_reason ];
+        $returns_reson_text = @$returns_reson[ $return_reason ];
 
         $shippings = $commonService->getMstShippingCustomer($login_type, $customer_id);
         $shipping_name = '';
@@ -1076,6 +1075,9 @@ class MypageController extends AbstractController
                 $otodoke_name = "{$otodoke['name01']} 〒 {$otodoke['postal_code']} {$otodoke['addr01']} {$otodoke['addr03']} {$otodoke['addr03']}";
             }
         }
+        $product_name  = $commonService->getJanCodeToProductName( $jan_code );
+        $delivered_num = $commonService->getDeliveredNum(  $shipping_no, $product_code  );
+        $returned_num  = $commonService->getReturnedNum(  $shipping_no, $product_code  );
         
         $images = $request->files->get('images');
         if( count($images) > 0 ) {
@@ -1094,6 +1096,28 @@ class MypageController extends AbstractController
             }
         }
 
+        $errors = [];        
+        if( empty($return_reason) ) {
+            $errors['return_reason'] = '顧客コメントを入力してください。';
+        }
+        if( empty($customer_comment) ) {
+            $errors['customer_comment'] = '顧客コメントを入力してください。';
+        }
+        if( empty($rerurn_num) ) {
+            $errors['rerurn_num'] = '返品数を入力してください。';
+        } else {
+            $cond = $delivered_num > $returned_num ? $delivered_num - $returned_num : $delivered_num;
+            if( $rerurn_num > $cond ) {
+                $errors['rerurn_num'] = '出荷数以上の数量は入力できません。';
+            }
+        }
+        if( count($images) < 1 ) {
+            $errors['images'] = '商品画像をファイル添付より選択してください。';
+        }
+        if( count($images) > 6 ) {
+            $errors['images'] = '最大6枚の画像';
+        }
+        
         return [
             'customer_id'        => $customer_id,
             'company_name'       => $company_name,
@@ -1102,7 +1126,8 @@ class MypageController extends AbstractController
             'shipping_name'      => $shipping_name,
             'otodoke_code'       => $otodoke_code,
             'otodoke_name'       => $otodoke_name,
-            'shipping_no'        => $shipping_no,
+            'delivered_num'      => $delivered_num,
+            'returned_num'       => $returned_num,
             'shipping_no'        => $shipping_no,
             'shipping_day'       => $shipping_day,
             'jan_code'           => $jan_code,
@@ -1116,6 +1141,7 @@ class MypageController extends AbstractController
             'rerurn_num'         => $rerurn_num,
             'product_status'     => $product_status,
             'cus_image_url_path' => $cus_image_url_path,
+            'errors'             => $errors,
         ];
     }
     /**
@@ -1213,9 +1239,9 @@ class MypageController extends AbstractController
                 'save' => true,
             ];
         } catch (\Exception $e) {
-            dd($e);
             log_error( "mypage/return/save: " . $e->getMessage() );
         }
+
         return [
             'save' => false,
         ];
