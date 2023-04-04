@@ -526,7 +526,8 @@ class ValidateCsvDataCommand extends Command
 
             // Insert shipping_sent_flg
             if (empty($mstShippingWSEOS)) {
-                log_info('Import data shipping_sent_flg '.$data['order_no'].'-'.$data['order_line_no']);
+                log_info('Import data mst_shipping_ws_eos '.$data['order_no'].'-'.$data['order_line_no']);
+                log_info(json_encode($mstShipping));
                 $data['shipping_date'] = $mstShipping['shipping_date'] ?? null;
                 $data['product_maker_code'] = $mstShipping['product_code'] ?? null;
                 $data['shipping_no'] = $mstShipping['shipping_no'] ?? null;
