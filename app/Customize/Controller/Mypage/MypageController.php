@@ -1156,7 +1156,7 @@ class MypageController extends AbstractController
         $login_type             = $this->globalService->getLoginType();
         $customer_id            = $this->globalService->customerId();
         $customer               = $this->globalService->customer();
-
+        
         $returns_no         = $request->get('returns_no');
         $shipping_code      = $request->get('shipping_code');
         $otodoke_code       = $request->get('otodoke_code');
@@ -1164,8 +1164,6 @@ class MypageController extends AbstractController
         $shipping_day       = $request->get('shipping_day');
         $jan_code           = $request->get('jan_code');
         $product_code       = $request->get('product_code');
-        $shipping_num       = $request->get('shipping_num');
-        $return_status      = $request->get('return_status');
         $return_reason      = $request->get('return_reason');
         $customer_comment   = $request->get('customer_comment');
         $rerurn_num         = $request->get('rerurn_num');
@@ -1201,7 +1199,6 @@ class MypageController extends AbstractController
                 'shipping_date'        => $shipping_date,
                 'jan_code'             => $jan_code,
                 'product_code'         => $product_code,
-                'shipping_num'         => $shipping_num,
                 'reason_returns_code'  => $return_reason,
                 'customer_comment'     => $customer_comment,
                 'rerurn_num'           => $rerurn_num,
@@ -1345,8 +1342,10 @@ class MypageController extends AbstractController
     {
         $commonService        = new MyCommonService($this->entityManager);
         $product_returns_info = $this->mstProductReturnsInfoRepository->find( $returns_no );
-        $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode());
-        $product_name         = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode());
+        $customer             = $commonService->getMstCustomer( $product_returns_info->getCustomerCode() );
+        $product_name         = $commonService->getJanCodeToProductName( $product_returns_info->getJanCode() );
+        $delivered_num        = $commonService->getDeliveredNum( $product_returns_info->getShippingNo(), $product_returns_info->getProductCode() );
+        $returned_num         = $commonService->getReturnedNum( $product_returns_info->getShippingNo(), $product_returns_info->getProductCode() );
         
         $cus_reviews_flag       = $request->get('cus_reviews_flag');
         $shipping_fee           = $request->get('shipping_fee');
@@ -1393,6 +1392,8 @@ class MypageController extends AbstractController
             'product_returns_info' => $product_returns_info,
             'customer'             => $customer,
             'product_name'         => $product_name,
+            'delivered_num'        => $delivered_num,
+            'returned_num'         => $returned_num,
             'returns_reson_text'   => $returns_reson_text,
             'barcode'              => $barcode,
         ];

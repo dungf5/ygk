@@ -101,138 +101,143 @@
 					</div>
 				</div>
 			</div>
-
 			{% if pagination and pagination.totalItemCount > 0 %}
 				<p class="ec-para-normal">
 					{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}
 				</p>
 			{% endif %}
-
-			<table class="table myTable">
-				<thead>
-					<tr>
-						<th title="return_type">
-							<p class="text-nowrap">{{ "front.mypage.return.return_type" | trans | raw }}</p>
-						</th>
-						<th title="return_number">
-							<p class="text-nowrap">{{ "front.mypage.return.return_number" | trans | raw }}</p>
-						</th>
-						<th title="return_status">
-							<p class="text-nowrap">{{ "front.mypage.return.return_status" | trans | raw }}</p>
-						</th>
-						<th title="shipping_no">
-							<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
-						</th>
-						<th title="shipping_date">
-							<select class="hidden" id="search_shipping_date" name="search_shipping_date">
-								<option value="0" {% if param.search_shipping_date == 0 %} selected {% endif %}>全て</option>
-								{% for shipping_date in shipping_date_list %}
-									<option value="{{ shipping_date }}" {% if param.search_shipping_date == shipping_date %} selected {% endif %}>{{ shipping_date }}</option>
-								{% endfor %}
-							</select>
-							<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_shipping_date').select2('open')">
-                                {{ "front.mypage.return.shipping_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
-                            </a>
-						</th>
-						<th title="shiping_code otodoke_code">
-							<select class="hidden" id="search_shipping" name="search_shipping">
-								<option value="0" {% if param.search_shipping == 0 %} selected {% endif %}>全て</option>
-								{% for shipping in shippings %}
-									<option
-										value="{{ shipping.shipping_no }}"
-										{% if param.search_shipping == shipping.shipping_no %} selected {% endif %}
-									>
-										{{ shipping.name01 }} 〒 {{ shipping.postal_code }} {{ shipping.addr01 }} {{ shipping.addr02 }} {{ shipping.addr03 }}
-									</option>
-								{% endfor %}
-							</select>
-							<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_shipping').select2('open')">
-                                {{ "front.mypage.return.shiping_code" | trans | raw}} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
-                            </a>
-							<br/>
-							<select class="hidden" id="search_otodoke" name="search_otodoke">
-								<option value="0" {% if param.search_otodoke == 0 %} selected {% endif %}>全て</option>
-								{% for otodoke in otodokes %}
-									<option
-										value="{{ otodoke.otodoke_code }}"
-										{% if param.search_otodoke == otodoke.otodoke_code %} selected {% endif %}
-									>
-										{{ otodoke.name01 }} 〒 {{ otodoke.postal_code }} {{ otodoke.addr01 }} {{ otodoke.addr02 }} {{otodoke.addr03 }}
-									</option>
-								{% endfor %}
-							</select>
-							<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_otodoke').select2('open')">
-                                {{ "front.mypage.return.otodoke_code" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
-                            </a>
-						</th>
-						<th title="jan_code product_name">
-							<p class="text-nowrap">{{ "front.mypage.return.jan_code" | trans | raw }}</p>
-							<p class="text-nowrap">{{ "front.mypage.return.product_name" | trans | raw }}</p>
-						</th>
-						<th title="shipping_num">
-							<p class="text-nowrap">{{ "front.mypage.return.shipping_num" | trans | raw }}</p>
-						</th>
-					</tr>
-				</thead>
-				{% if pagination and pagination.totalItemCount > 0 %}
-					<tbody>
-						{% for item in pagination %}
-							<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_edit', { 'returns_no':item.returns_no } ) }}" method="GET">
-								<tr 
-									ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >
-									<td title="return_type">
-										<button type="submit" class="btn btn-warning" role="button">手続き</button> 
-									</td>
-									<td title="return_number">
-										<input type="number" id="returns_num" name="returns_num" class="form-control" value="{{ item.returns_num }}"/>
-									</td>
-									<td title="return_status">
-										{% if item.returns_status_flag == 1 %}
-											<p class="text-nowrap">承認</p>
-										{% elseif item.returns_status_flag == 2 %}
-											<p class="text-nowrap">未承認</p>
-										{% elseif item.returns_status_flag == 3 %}
-											<p class="text-nowrap">受取受理</p>
-										{% elseif item.returns_status_flag == 4 %}
-											<p class="text-nowrap">受取未受理</p>
-										{% elseif item.returns_status_flag == 5 %}
-											<p class="text-nowrap">返品完了</p>
-										{% else %}
-											<p class="text-nowrap">申請中</p>
-										{% endif %}
-									</td>
-									<td title="shipping_no">
-										<p class="text-nowrap">{{ item.shipping_no }}</p>
-									</td>
-									<td title="shipping_date">
-										<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
-									</td>
-									<td title="shiping_code otodoke_code">
-										<p class="text-nowrap">{{ item.shipping_name }}</p>
-										<p class="text-nowrap">{{ item.otodoke_name }}</p>
-									</td>
-									<td title="jan_code product_name">
-										<p class="text-nowrap">{{ item.jan_code }}</p>
-										<p class="text-nowrap">{{ item.product_name }}</p>
-									</td>
-									<td title="shipping_num">
-										<p class="text-nowrap">{{ item.shipping_num }}</p>
-									</td>
-								</tr>
-							</form>
-						{% endfor %}
-					</tbody>
-				{% else %}
-					<tbody>
+			<div class="table-responsive">
+				<table class="table myTable">
+					<thead>
 						<tr>
-							<td colspan="8">
-								<p>返品手続きの履歴がありません。</p>
-							</td>
+							<th title="return_type">
+								<p class="text-nowrap">{{ "front.mypage.return.return_type" | trans | raw }}</p>
+							</th>
+							<th title="return_number">
+								<p class="text-nowrap">{{ "front.mypage.return.return_number" | trans | raw }}</p>
+							</th>
+							<th title="return_status">
+								<p class="text-nowrap">{{ "front.mypage.return.return_status" | trans | raw }}</p>
+							</th>
+							<th title="shipping_no">
+								<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
+							</th>
+							<th title="shipping_date">
+								<select class="hidden" id="search_shipping_date" name="search_shipping_date">
+									<option value="0" {% if param.search_shipping_date == 0 %} selected {% endif %}>全て</option>
+									{% for shipping_date in shipping_date_list %}
+										<option value="{{ shipping_date }}" {% if param.search_shipping_date == shipping_date %} selected {% endif %}>{{ shipping_date }}</option>
+									{% endfor %}
+								</select>
+								<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_shipping_date').select2('open')">
+									{{ "front.mypage.return.shipping_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+								</a>
+							</th>
+							<th title="shiping_code otodoke_code">
+								<select class="hidden" id="search_shipping" name="search_shipping">
+									<option value="0" {% if param.search_shipping == 0 %} selected {% endif %}>全て</option>
+									{% for shipping in shippings %}
+										<option
+											value="{{ shipping.shipping_no }}"
+											{% if param.search_shipping == shipping.shipping_no %} selected {% endif %}
+										>
+											{{ shipping.name01 }} 〒 {{ shipping.postal_code }} {{ shipping.addr01 }} {{ shipping.addr02 }} {{ shipping.addr03 }}
+										</option>
+									{% endfor %}
+								</select>
+								<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_shipping').select2('open')">
+									{{ "front.mypage.return.shiping_code" | trans | raw}} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+								</a>
+								<br/>
+								<select class="hidden" id="search_otodoke" name="search_otodoke">
+									<option value="0" {% if param.search_otodoke == 0 %} selected {% endif %}>全て</option>
+									{% for otodoke in otodokes %}
+										<option
+											value="{{ otodoke.otodoke_code }}"
+											{% if param.search_otodoke == otodoke.otodoke_code %} selected {% endif %}
+										>
+											{{ otodoke.name01 }} 〒 {{ otodoke.postal_code }} {{ otodoke.addr01 }} {{ otodoke.addr02 }} {{otodoke.addr03 }}
+										</option>
+									{% endfor %}
+								</select>
+								<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_otodoke').select2('open')">
+									{{ "front.mypage.return.otodoke_code" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+								</a>
+							</th>
+							<th title="jan_code product_name">
+								<p class="text-nowrap">{{ "front.mypage.return.jan_code" | trans | raw }}</p>
+								<p class="text-nowrap">{{ "front.mypage.return.product_name" | trans | raw }}</p>
+							</th>
+							<th title="shipping_num">
+								<p class="text-nowrap">{{ "front.mypage.return.shipping_num" | trans | raw }}</p>
+							</th>
 						</tr>
-					</tbody>
-				{% endif %}
-			</table>
-
+					</thead>
+					{% if pagination and pagination.totalItemCount > 0 %}
+						<tbody>
+							{% for item in pagination %}
+								{% if item.returns_status_flag == 1 or item.returns_status_flag == 2 %}
+									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_receipt', { 'returns_no':item.returns_no } ) }}" method="GET">
+								{% elseif item.returns_status_flag == 3 or item.returns_status_flag == 4 %}
+									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_complete', { 'returns_no':item.returns_no } ) }}" method="GET">
+								{% else %}
+									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_approve', { 'returns_no':item.returns_no } ) }}" method="GET">
+								{% endif %}
+									<tr 
+										ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >
+										<td title="return_type">
+											<button type="submit" class="btn btn-warning" role="button">手続き</button> 
+										</td>
+										<td title="return_number">
+											<input type="number" id="returns_num" name="returns_num" class="form-control" value="{{ item.returns_num }}"/>
+										</td>
+										<td title="return_status">
+											{% if item.returns_status_flag == 1 %}
+												<p class="text-nowrap">承認</p>
+											{% elseif item.returns_status_flag == 2 %}
+												<p class="text-nowrap">未承認</p>
+											{% elseif item.returns_status_flag == 3 %}
+												<p class="text-nowrap">受取受理</p>
+											{% elseif item.returns_status_flag == 4 %}
+												<p class="text-nowrap">受取未受理</p>
+											{% elseif item.returns_status_flag == 5 %}
+												<p class="text-nowrap">返品完了</p>
+											{% else %}
+												<p class="text-nowrap">申請中</p>
+											{% endif %}
+										</td>
+										<td title="shipping_no">
+											<p class="text-nowrap">{{ item.shipping_no }}</p>
+										</td>
+										<td title="shipping_date">
+											<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
+										</td>
+										<td title="shiping_code otodoke_code">
+											<p class="text-nowrap">{{ item.shipping_name }}</p>
+											<p class="text-nowrap">{{ item.otodoke_name }}</p>
+										</td>
+										<td title="jan_code product_name">
+											<p class="text-nowrap">{{ item.jan_code }}</p>
+											<p class="text-nowrap">{{ item.product_name }}</p>
+										</td>
+										<td title="shipping_num">
+											<p class="text-nowrap">{{ item.shipping_num }}</p>
+										</td>
+									</tr>
+								</form>
+							{% endfor %}
+						</tbody>
+					{% else %}
+						<tbody>
+							<tr>
+								<td colspan="8">
+									<p>返品手続きの履歴がありません。</p>
+								</td>
+							</tr>
+						</tbody>
+					{% endif %}
+				</table>
+			</div>
 			{% if pagination and pagination.totalItemCount > 0 %}
 				<div class="ec-pagerRole">
 					{% include "pager.twig" with {'pages': pagination.paginationData} %}
