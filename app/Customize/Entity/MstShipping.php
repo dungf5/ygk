@@ -41,6 +41,7 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
          * @var string
          *
          * @ORM\Column(name="order_no", type="string", length=15)
+         * @ORM\Id
          */
         private $order_no;
 
@@ -72,6 +73,7 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
          * @var string
          *
          * @ORM\Column(name="order_lineno", type="string", length=8)
+         * @ORM\Id
          */
         private $order_lineno;
 

@@ -527,7 +527,6 @@ class ValidateCsvDataCommand extends Command
             // Insert shipping_sent_flg
             if (empty($mstShippingWSEOS)) {
                 log_info('Import data mst_shipping_ws_eos '.$data['order_no'].'-'.$data['order_line_no']);
-                log_info(json_encode($mstShipping));
                 $data['shipping_date'] = $mstShipping['shipping_date'] ?? null;
                 $data['product_maker_code'] = $mstShipping['product_code'] ?? null;
                 $data['shipping_no'] = $mstShipping['shipping_no'] ?? null;
@@ -539,6 +538,9 @@ class ValidateCsvDataCommand extends Command
                 $data['delivery_num'] = $mstDelivery['quanlity'] ?? 0;
                 $data['delivery_price'] = $mstDelivery['unit_price'] ?? 0;
                 $data['delivery_amount'] = $mstDelivery['amount'] ?? 0;
+
+                $mstShipping = null;
+                $mstDelivery = null;
 
                 return $this->entityManager->getRepository(MstShippingWSEOS::class)->insertData($data);
             }
