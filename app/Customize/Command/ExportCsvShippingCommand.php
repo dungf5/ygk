@@ -211,7 +211,7 @@ class ExportCsvShippingCommand extends Command
             'message' => null,
             'is_error' => 0,
             'is_send_mail' => 0,
-            'in_date' => new DateTime(),
+            'in_date' => new \DateTime(),
             'up_date' => null,
         ];
         $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
