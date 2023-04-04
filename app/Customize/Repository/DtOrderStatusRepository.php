@@ -45,8 +45,8 @@ class DtOrderStatusRepository extends AbstractRepository
             $object->setOrderStatus(1);
             $object->setCusOrderNo($data['order_no'] ?? '');
             $object->setCusOrderLineno($data['order_line_no'] ?? '');
-            $object->setEcOrderNo($data['order_no'] ?? '');
-            $object->setEcOrderLineno($data['order_line_no'] ?? '');
+            $object->setEcOrderNo($data['dtb_order_no'] ?? '');
+            $object->setEcOrderLineno($data['dtb_order_line_no'] ?? '');
             $object->setCustomerCode('7001');
             $object->setShippingCode($data['shipping_code'] ?? '');
             $object->setOtodokeCode($data['otodoke_code'] ?? '');

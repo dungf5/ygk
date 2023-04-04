@@ -42,8 +42,8 @@ class DtOrderRepository extends AbstractRepository
             $object = new DtOrder();
             $object->setCustomerCode($data['customer_code'] ?? '');
             $object->setSeikyuCode($data['customer_code'] ?? '');
-            $object->setOrderNo($data['dtb_order_no'] ?? '');
-            $object->setOrderLineno($data['dtb_order_line_no'] ?? '');
+            $object->setOrderNo($data['order_no'] ?? '');
+            $object->setOrderLineno($data['order_line_no'] ?? '');
             $object->setShippingCode($data['shipping_code'] ?? '');
             $object->setOtodokeCode($data['otodoke_code'] ?? '');
             $object->setOrderDate(new \DateTime());
@@ -60,8 +60,8 @@ class DtOrderRepository extends AbstractRepository
             $object->setProductCode($data['product_code'] ?? '');
             $object->setDynaModelSeg2($data['order_no'] ?? '');
             $object->setDynaModelSeg3('2');
-            $object->setDynaModelSeg4($data['order_no'] ?? '');
-            $object->setDynaModelSeg5($data['order_line_no'] ?? '');
+            $object->setDynaModelSeg4($data['dtb_order_no'] ?? '');
+            $object->setDynaModelSeg5($data['dtb_order_line_no'] ?? '');
             $object->setDynaModelSeg6($data['remarks_line_no'] ?? '');
             $object->setRequestFlg('Y');
 
