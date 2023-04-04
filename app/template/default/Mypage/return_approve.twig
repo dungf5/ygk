@@ -131,7 +131,8 @@
 								<label for="customer_code">返品数</label>
 							</td>
 							<td class="col-xs-10 text-left">
-								<p class="text-nowrap">{{ product_returns_info.returns_num }}</p>
+								<p class="text-nowrap">{{ returns_num }}</p>
+								<input type="hidden" name="returns_num" value="{{ returns_num}} " />
 							</td>
 						</tr>
 						<tr>

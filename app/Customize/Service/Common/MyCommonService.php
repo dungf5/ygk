@@ -2579,21 +2579,28 @@ SQL;
         return $result;
     }
 
-    public function getReturnedNum(  $shipping_no='', $product_code=''  ) {
+    public function getReturnedNum(  $shipping_no='', $product_code='', $returns_no=''  ) {
         $result = 0;
         if( !$shipping_no || !$product_code ) return $result;
 
-        $sql = "SELECT 
-                SUM( `returns_num` ) AS sum_returns_num
+        $param = [ 'shipping_no'=>$shipping_no, 'product_code'=>$product_code ];
+        $where = "";
+        if( !empty($returns_no) ) {
+            $where = "AND returns_no <> :returns_no";
+            $param['returns_no'] = $returns_no;
+        }
+
+        $sql = "SELECT SUM( `returns_num` ) AS sum_returns_num
             FROM `mst_product_returns_info`
             WHERE
                 `shipping_no` = :shipping_no
                 AND `product_code` = :product_code
+                {$where}
             GROUP BY shipping_no, product_code";
 
         try {
             $statement = $this->entityManager->getConnection()->prepare($sql);
-            $query     = $statement->executeQuery([ 'shipping_no'=>$shipping_no, 'product_code'=>$product_code ]);
+            $query     = $statement->executeQuery($param);
             $row       = $query->fetchAllAssociative();
 
             foreach($row as $dt) {
