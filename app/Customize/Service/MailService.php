@@ -1010,12 +1010,13 @@ class MailService
         return $this->mailer->send( $message );
     }
 
-    public function sendMailReturnProductApproveYes( $email, $url_approve_finish)
+    public function sendMailReturnProductApproveYes( $email, $url_approve_finish, $url_receipt)
     {
         if( !filter_var($email, FILTER_VALIDATE_EMAIL) ) return;
 
         $body = $this->twig->render('Mail/return_product_approve_yes.twig', [
             'url_approve_finish' => $url_approve_finish,
+            'url_receipt'        => $url_receipt,
         ]);
         $message = (new \Swift_Message())
             ->setSubject("[XBRAID JAPAN] 返品リクエスト承認のご案内")
@@ -1042,12 +1043,13 @@ class MailService
         return $this->mailer->send( $message );
     }
 
-    public function sendMailReturnProductReceiptYes( $email, $receipt_comment )
+    public function sendMailReturnProductReceiptYes( $email, $receipt_comment, $url_return_receipt_finish )
     {
         if( !filter_var($email, FILTER_VALIDATE_EMAIL) ) return;
 
         $body = $this->twig->render('Mail/return_product_receipt_yes.twig', [
             'receipt_comment' => $receipt_comment,
+            'url_return_receipt_finish' => $url_return_receipt_finish,
         ]);
         $message = (new \Swift_Message())
             ->setSubject("[XBRAID JAPAN] 返品商品受取受理のご案内")
