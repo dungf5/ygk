@@ -304,13 +304,12 @@ class ValidateCsvDataCommand extends Command
                 log_info('[WS-EOS] Send Mail Order Success. '.$key);
                 $this->mailService->sendMailOrderSuccessWSEOS($information);
 
-                return;
             } catch (\Exception $e) {
                 log_error($e->getMessage());
-
-                return;
             }
         }
+
+        return;
     }
 
     private function handleImportOrderWSEOS()
