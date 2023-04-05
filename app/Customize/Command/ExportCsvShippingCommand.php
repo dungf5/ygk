@@ -19,7 +19,6 @@ use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtExportCSV;
 use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstShippingWSEOS;
-use Customize\Repository\DtOrderWSEOSRepository;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\CSVService;
 use Customize\Service\FTPService;
@@ -138,83 +137,101 @@ class ExportCsvShippingCommand extends Command
 
         $fp = fopen(strtolower(trim($file)), 'w');
 
-        foreach ($mstShippingWSEOS as $item) {
-            $fields = [
-                $item['system_code'],
-                $item['sales_company_code'],
-                $item['sales_shop_code'],
-                $item['delivery_no'],
-                $item['delivery_type'],
-                $item['delivery_day'],
-                $item['delivery_flag_tmp'],
-                $item['order_company_code'],
-                $item['order_shop_code'],
-                $item['shipping_company_code'],
-                $item['shipping_shop_code'],
-                $item['shipping_name'],
-                $item['import_type'],
-                $item['system_code1'],
-                $item['sales_company_code1'],
-                $item['sales_ship_code1'],
-                $item['delivery_no1'],
-                $item['delivery_line_no'],
-                $item['delivery_type1'],
-                $item['order_type'],
-                $item['order_no'],
-                $item['order_line_no'],
-                $item['order_flag'],
-                $item['order_staff_name'],
-                $item['order_shop_name'],
-                $item['make_code'],
-                $item['maker_name'],
-                $item['product_name'],
-                $item['order_num'],
-                $item['order_price'],
-                $item['order_amount'],
-                $item['delivery_num'],
-                $item['delivery_price'],
-                $item['delivery_amount'],
-                $item['tax_type'],
-                $item['order_date'],
-                $item['shipping_date'],
-                $item['remarks_line_no'],
-                $item['jan_code'],
-                $item['unit_code'],
-                $item['shipping_num'],
-                $item['order_unit_num'],
-                $item['product_maker_code'],
-                $item['open_price_type'],
-                $item['price_basic'],
-                $item['price_list'],
-            ];
-            fputcsv($fp, $fields);
+        if ($fp) {
+            foreach ($mstShippingWSEOS as $item) {
+                try {
+                    $this->entityManager->getConfiguration()->setSQLLogger(null);
+                    $this->entityManager->getConnection()->beginTransaction();
 
-            $item->setShippingSentFlg(1);
-            $this->entityManager->getRepository(MstShippingWSEOS::class)->save($item);
+                    $fields = [
+                        $item['system_code'],
+                        $item['sales_company_code'],
+                        $item['sales_shop_code'],
+                        $item['delivery_no'],
+                        $item['delivery_type'],
+                        $item['delivery_day'],
+                        $item['delivery_flag_tmp'],
+                        $item['order_company_code'],
+                        $item['order_shop_code'],
+                        $item['shipping_company_code'],
+                        $item['shipping_shop_code'],
+                        $item['shipping_name'],
+                        $item['import_type'],
+                        $item['system_code1'],
+                        $item['sales_company_code1'],
+                        $item['sales_ship_code1'],
+                        $item['delivery_no1'],
+                        $item['delivery_line_no'],
+                        $item['delivery_type1'],
+                        $item['order_type'],
+                        $item['order_no'],
+                        $item['order_line_no'],
+                        $item['order_flag'],
+                        $item['order_staff_name'],
+                        $item['order_shop_name'],
+                        $item['make_code'],
+                        $item['maker_name'],
+                        $item['product_name'],
+                        $item['order_num'],
+                        $item['order_price'],
+                        $item['order_amount'],
+                        $item['delivery_num'],
+                        $item['delivery_price'],
+                        $item['delivery_amount'],
+                        $item['tax_type'],
+                        $item['order_date'],
+                        $item['shipping_date'],
+                        $item['remarks_line_no'],
+                        $item['jan_code'],
+                        $item['unit_code'],
+                        $item['shipping_num'],
+                        $item['order_unit_num'],
+                        $item['product_maker_code'],
+                        $item['open_price_type'],
+                        $item['price_basic'],
+                        $item['price_list'],
+                    ];
+                    fputcsv($fp, $fields);
 
-            $dtOrderWsEOS = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy(['order_no' => $item['order_no'], 'order_line_no' => $item['order_line_no']]);
-            if (!empty($dtOrderWsEOS)) {
-                $dtOrderWsEOS->setOrderRegistedFlg(0);
-                $dtOrderWsEOS->setShippingSentFlg(1);
-                $this->entityManager->getRepository(DtOrderWSEOS::class)->save($dtOrderWsEOS);
+                    $item->setShippingSendFlg(0);
+                    $item->setShippingSentFlg(1);
+                    $this->entityManager->getRepository(MstShippingWSEOS::class)->save($item);
+
+                    $dtOrderWsEOS = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy(['order_no' => $item['order_no'], 'order_line_no' => $item['order_line_no']]);
+                    if (!empty($dtOrderWsEOS)) {
+                        $dtOrderWsEOS->setOrderRegistedFlg(1);
+                        $dtOrderWsEOS->setShippingSentFlg(1);
+                        $this->entityManager->getRepository(DtOrderWSEOS::class)->save($dtOrderWsEOS);
+                    }
+
+                    $this->entityManager->flush();
+                    $this->entityManager->getConnection()->commit();
+                } catch (\Exception $e) {
+                    log_error($e->getMessage());
+                    $this->entityManager->getConnection()->rollBack();
+                }
+            }
+
+            fclose($fp);
+
+            try {
+                // Save file information to DB
+                Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                $insertDate = [
+                    'file_name' => strtolower(trim($file_name)),
+                    'increment' => $increment + 1,
+                    'directory' => $path,
+                    'message' => null,
+                    'is_error' => 0,
+                    'is_send_mail' => 0,
+                    'in_date' => new \DateTime(),
+                    'up_date' => null,
+                ];
+                $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
+            } catch (\Exception $e) {
+                log_error($e->getMessage());
             }
         }
-
-        fclose($fp);
-
-        // Save file information to DB
-        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-        $insertDate = [
-            'file_name' => strtolower(trim($file_name)),
-            'increment' => $increment + 1,
-            'directory' => $path,
-            'message' => null,
-            'is_error' => 0,
-            'is_send_mail' => 0,
-            'in_date' => new \DateTime(),
-            'up_date' => null,
-        ];
-        $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
 
         return;
     }
