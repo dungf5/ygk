@@ -1047,7 +1047,7 @@ class MypageController extends AbstractController
             $customer_id = $this->globalService->customerId();
             $company_name = $this->globalService->companyName();
 
-            $returns_no = $request->get('returns_no', '');
+            $returns_no = $request->get('returns_no');
             $shipping_code = $request->get('shipping_code', '');
             $otodoke_code = $request->get('otodoke_code', '');
             $shipping_no = $request->get('shipping_no', '');
@@ -1169,7 +1169,7 @@ class MypageController extends AbstractController
             $customer_id = $this->globalService->customerId();
             $customer = $this->globalService->customer();
 
-            $returns_no = $request->get('returns_no', '');
+            $returns_no = $request->get('returns_no');
             $shipping_code = $request->get('shipping_code', '');
             $otodoke_code = $request->get('otodoke_code', '');
             $shipping_no = $request->get('shipping_no', '');
@@ -1197,7 +1197,7 @@ class MypageController extends AbstractController
                 }
             }
 
-            $returns_no = $returns_no ?? $commonService->getReturnsNo();
+            $returns_no = !empty($returns_no) ? $returns_no : $commonService->getReturnsNo();
             $shipping_date = date('Y-m-d', strtotime(str_replace('/', '-', $shipping_day)));
             $mst_product_returns_info = $this->mstProductReturnsInfoRepository->insertData([
                 'returns_no' => $returns_no,
