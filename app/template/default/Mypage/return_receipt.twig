@@ -17,6 +17,10 @@
 		top: 0;
 		left: 0;
 	}
+	label.error {
+		color: #f00;
+		font-weight: inherit;
+	}
 </style>
 {% endblock stylesheet%}
 
@@ -29,137 +33,137 @@
 		</div>
 		<div class="ec-mypageRole">
 			<div class="col-xs-12">
-				<form class="form-horizontal"  action="{{ url('mypage_return_receipt_finish', { 'returns_no':product_returns_info.returns_no }) }}" method="POST" enctype="multipart/form-data">
+				<form class="form-horizontal"  action="{{ url('mypage_return_receipt_finish', { 'returns_no':product_returns_info.returns_no }) }}" method="POST" enctype="multipart/form-data" id="form_return_receipt">
 					<table class="table table-bordered">
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">返品番号</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<p class="text-nowrap">{{ product_returns_info.returns_no }}</p>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">お客様</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<p class="text-nowrap">{{ customer.company_name }}</p>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">出荷先</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<p class="text-nowrap">{{ product_returns_info.shipping_name }}</p>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">届け先</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<p class="text-nowrap">{{ product_returns_info.otodoke_name }}</p>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">出荷指示№</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<p class="text-nowrap">{{ product_returns_info.shipping_no }}</p>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">出荷日</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<p class="text-nowrap">{{ product_returns_info.shipping_date|date('d/m/Y') }}</p>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">JANコード</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<p class="text-nowrap">{{ product_returns_info.jan_code }}</p>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">商品名</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<p class="text-nowrap">{{ product_name }}</p>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">出荷数</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<p class="text-nowrap">{{ product_returns_info.shipping_num }}</p>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">返品理由</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<p class="text-nowrap">{{ returns_reson_text }}</p>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">顧客コメント</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<p class="text-nowrap">{{ product_returns_info.customer_comment }}</p>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">顧客からみた<br>良品・不良品</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								{% if product_returns_info.cus_reviews_flag == 1 %} <p class="text-nowrap">良品</p> {% endif %}
 								{% if product_returns_info.cus_reviews_flag == 2 %} <p class="text-nowrap">不良品</p> {% endif %}
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">返品数</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<p class="text-nowrap">{{ returns_num }}</p>
 								<input type="hidden" name="returns_num" value="{{ returns_num }}" />
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">返品依頼日</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								<p class="text-nowrap">{{ product_returns_info.returns_request_date|date('d/m/Y') }}</p>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">返品承認日</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								{% if product_returns_info.aprove_date is not empty %}
 									<p class="text-nowrap">{{ product_returns_info.aprove_date|date('d/m/Y') }}</p>
 								{% endif %}
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">返品ステータス</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								{% if product_returns_info.returns_status_flag == 1 %}
 									<p class="text-nowrap">承認</p>
 								{% elseif product_returns_info.returns_status_flag == 2 %}
@@ -176,10 +180,10 @@
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right left_background">
+							<td class="col-xs-3 text-right left_background">
 								<label for="customer_code">送料</label>
 							</td>
-							<td class="col-xs-10 text-left">
+							<td class="col-xs-9 text-left">
 								{% if product_returns_info.shipping_fee == 1 %} <p class="text-nowrap">元払い</p> {% endif %}
 								{% if product_returns_info.shipping_fee == 2 %} <p class="text-nowrap">着払い</p> {% endif %}
 							</td>
@@ -227,19 +231,23 @@
 						</tr>
 						<tr>
 							<td class="text-center left_background" colspan="2">
-								<label for="images">倉庫からの商品画像</label>
+								<p for="images">倉庫からの商品画像</p>
 								<input type="file" class="hidden" id="images_input" accept="image/*" multiple onchange="imagesInputChange()"/>
 								<input type="file" class="hidden" id="images" name="images[]" accept="image/*" multiple />
 							</td>
 						</tr>											
 						<tr>
-							<td class="col-xs-2 text-right">
-								<label class="btn btn-primary" for="images_input">画像添付</label>
-							</td>
-							<td class="col-xs-10 text-right">
-								<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#dialog_receipt_comment">商品受取受理</button>
-								<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#dialog_receipt_not_yet_comment">商品受取未受理</button>
-								<a href="{{ url('mypage_return') }}" class="btn btn-warning">閉じる</a>
+							<td colspan="2">
+								<div class="row">
+									<div class="col-xs-6 text-left">
+										<label class="btn btn-primary" for="images_input">画像添付</label>
+									</div>
+									<div class="col-xs-6 text-right">
+										<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#dialog_receipt_comment">商品受取受理</button>
+										<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#dialog_receipt_not_yet_comment">商品受取未受理</button>
+										<a href="{{ url('mypage_return') }}" class="btn btn-warning">閉じる</a>		
+									</div>
+								</div>
 							</td>
 						</tr>
 						<tr>
@@ -307,6 +315,7 @@
 {% endblock %}
 
 {% block javascript %}
+<script src="{{ asset('assets/jquery-validation/jquery.validate.min.js', 'user_data') }}"></script>
 <script>
 	function imagesInputChange() {
 		let _dt = new DataTransfer()
@@ -321,12 +330,21 @@
 		}
 
 		if( _dt.files.length > 6 ) {
-			alert("最大6枚の画像")
-		} else {
-			$('#images').prop('files', _dt.files)
-			imagesPreview()
+			alert("最大6枚の画像");
+			$('#images_input').val( null );
+			return;
 		}
-		$('#images_input').val( null )
+		for (let _i = 0; _i < _dt.files.length; _i++) {
+			if( _dt.files[_i].size/1024/1024 > 7 ) {
+				alert("7Mまでの画像");
+				$('#images_input').val( null );
+				return;
+			} 
+		}
+		
+		$('#images').prop('files', _dt.files);
+		$("#images-error").empty();
+		imagesPreview();
 	}
 
 	function imagesPreview() {
@@ -359,5 +377,44 @@
 		$('#images').prop('files', _dt.files)
 		imagesPreview()
 	}
+
+	$.validator.addMethod('maxsize', function(value, element, param) {
+		for (let _i = 0; _i < element.files.length; _i++) {
+			if( element.files[_i].size/1024/1024 <= param ) return true;
+		}
+		return false;
+	});
+	$.validator.addMethod('minupload', function(value, element, param) {
+		return element.files.length >= param;
+	});
+	$.validator.addMethod('maxupload', function(value, element, param) {
+		return element.files.length <= param;
+	});
+
+	$( function() {
+		$("#form_return_receipt").validate({
+			ignore: null,
+			rules: {
+				'images[]': {
+					minupload: 1,
+					maxupload: 6,
+					maxsize: 7,
+				},
+			},
+			messages: {
+				'images[]': {
+					minupload: "商品画像をファイル添付より選択してください。",
+					maxupload: "最大6枚の画像",
+					maxsize: "7Mまでの画像",
+				},
+			},
+			invalidHandler: function(event, validator) {
+				loadingOverlay("hide")
+			},
+			submitHandler: function(form) {
+				form.submit()
+			}
+		});
+	})
 </script>
 {% endblock javascript%}

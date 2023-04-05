@@ -225,13 +225,21 @@
 		}
 
 		if( _dt.files.length > 6 ) {
-			alert("最大6枚の画像")
-		} else {
-			$('#images').prop('files', _dt.files);
-			$("#images-error").empty();
-			imagesPreview()
+			alert("最大6枚の画像");
+			$('#images_input').val( null );
+			return;
 		}
-		$('#images_input').val( null )
+		for (let _i = 0; _i < _dt.files.length; _i++) {
+			if( _dt.files[_i].size/1024/1024 > 7 ) {
+				alert("7Mまでの画像");
+				$('#images_input').val( null );
+				return;
+			} 
+		}
+		
+		$('#images').prop('files', _dt.files);
+		$("#images-error").empty();
+		imagesPreview();
 	}
 
 	function imagesPreview() {
@@ -339,6 +347,12 @@
 		})
 	}
 
+	$.validator.addMethod('maxsize', function(value, element, param) {
+		for (let _i = 0; _i < element.files.length; _i++) {
+			if( element.files[_i].size/1024/1024 <= param ) return true;
+		}
+		return false;
+	});
 	$.validator.addMethod('minupload', function(value, element, param) {
 		return element.files.length >= param;
 	});
@@ -382,6 +396,7 @@
 				'images[]': {
 					minupload: 1,
 					maxupload: 6,
+					maxsize: 7,
 				},
 			},
 			messages: {
@@ -396,6 +411,7 @@
 				'images[]': {
 					minupload: "商品画像をファイル添付より選択してください。",
 					maxupload: "最大6枚の画像",
+					maxsize: "7Mまでの画像",
 				},
 			},
 			invalidHandler: function(event, validator) {

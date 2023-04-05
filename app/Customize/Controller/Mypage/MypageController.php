@@ -1089,12 +1089,13 @@ class MypageController extends AbstractController
             if (is_array($images) && count($images) > 0) {
                 foreach ($images as $image) {
                     $mimeType = $image->getMimeType();
-                    if (0 !== strpos($mimeType, 'image'))
-                        break;
+                    if (0 !== strpos($mimeType, 'image')) break;
 
                     $extension = $image->getClientOriginalExtension();
-                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png']))
-                        break;
+                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) break;
+                    
+                    $size = $image->getSize();
+                    if( $size/1024/1024 > 7 ) break;
 
                     $filename = date('ymdHis') . uniqid('_') . '.' . $extension;
                     $path = $this->getParameter('eccube_return_image_dir');
@@ -1497,12 +1498,13 @@ class MypageController extends AbstractController
             if (count($images) > 0) {
                 foreach ($images as $image) {
                     $mimeType = $image->getMimeType();
-                    if (0 !== strpos($mimeType, 'image'))
-                        break;
+                    if (0 !== strpos($mimeType, 'image')) break;
 
                     $extension = $image->getClientOriginalExtension();
-                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png']))
-                        break;
+                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) break;
+
+                    $size = $image->getSize();
+                    if( $size/1024/1024 > 7 ) break;
 
                     $filename = date('ymdHis') . uniqid('_') . '.' . $extension;
                     $path = $this->getParameter('eccube_return_image_dir');
