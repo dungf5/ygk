@@ -175,7 +175,7 @@
 						<tr>
 							<td class="text-center left_background" colspan="2">
 								<p>商品画像</p>
-								<input type="file" class="hidden" id="images_input" accept="image/*" multiple onchange="imagesInputChange()"/>
+								<input type="file" class="hidden" id="images_input" accept="image/*" multiple onchange="imagesInputChange()" />
 								<input type="file" class="hidden" id="images" name="images[]" accept="image/*" multiple />
 							</td>
 						</tr>
@@ -243,9 +243,9 @@
 	}
 
 	function imagesPreview() {
-		let _images_preview = $("#images_preview")
-		_images_preview.empty() 
-		let _files = $('#images').prop('files')
+		let _files = $('#images').prop('files');
+		let _images_preview = $("#images_preview");
+		_images_preview.empty();
 
 		for (var i = 0; i < 6 ; i++) {
 			let _i = i
@@ -363,10 +363,16 @@
 		let _delivered_num = parseInt( $("#delivered_num").val() );
 		let _returned_num = parseInt( $("#returned_num").val() );
 		let _cond = _delivered_num > _returned_num ? _delivered_num - _returned_num : _delivered_num;
-		return value <= _cond;
+		if( value <= 0 ) return false;
+		if( value > _cond ) return false;
+		return true;
 	});
 
 	$( function() {
+		$("#images").click(function(e) {
+			e.preventDefault();
+		});
+		
 		getProduct();
 
 		$("#shipping_code").select2();

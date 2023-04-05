@@ -182,8 +182,7 @@
 							<td class="col-xs-10 text-left">
 								<div class="col-xs-6"></div>
 								<div class="col-xs-3 text-center">
-									<button type="submit" class="btn btn-warning"
-										{% if errors|length > 0 %}disabled{% endif %}>
+									<button type="submit" class="btn btn-warning" >
 										返品リクエスト送信
 									</button>
 								</div>
@@ -202,35 +201,32 @@
 {% block javascript %}
 <script src="{{ asset('assets/jquery-validation/jquery.validate.min.js', 'user_data') }}"></script>
 <script>
-	$( function() {
-		getProduct();
-
-		$("#shipping_code").select2();
-		$("#otodoke_code").select2();
-
-		$( "#shipping_day" ).datepicker({ dateFormat: 'dd/mm/yy' });
-
+	$.validator.addMethod('rerurn_num', function(value, element, param) {
+		if( value <= 0 ) return false;
+		if( value > {{ delivered_num - returned_num }} ) return false;
+		return true;
+	});
+	$( function() {	
 		$("#form_return_confirm").validate({
 			ignore: null,
 			rules: {
 				rerurn_num: {
 					required: true,
-					min: 0,
-					max: {{ delivered_num > returned_num ? delivered_num - returned_num : delivered_num }}
-				}
+					rerurn_num : true,
+				},
 			},
 			messages: {
 				rerurn_num      : {
-					required: "返品数を入力してください。",
-					min     : "返品数を入力してください。",
-					max     : "出荷数以上の数量は入力できません。",
+					required  : "返品数を入力してください。",
+					rerurn_num: "出荷数以上の数量は入力できません。",
 				},
 			},
 			invalidHandler: function(event, validator) {
 				loadingOverlay("hide")
 			},
 			submitHandler: function(form) {
-				form.submit()
+				console.log('aaa');
+				// form.submit()
 			}
 		});
 	})

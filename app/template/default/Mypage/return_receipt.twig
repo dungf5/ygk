@@ -190,7 +190,7 @@
 						</tr>
 						<tr>
 							<td class="text-center left_background" colspan="2">
-								<label for="images">顧客からの商品画像</label>
+								<label>顧客からの商品画像</label>
 							</td>
 						</tr>
 						<tr>
@@ -392,6 +392,10 @@
 	});
 
 	$( function() {
+		$("#images").click(function(e) {
+			e.preventDefault();
+		});
+		
 		$("#form_return_receipt").validate({
 			ignore: null,
 			rules: {
