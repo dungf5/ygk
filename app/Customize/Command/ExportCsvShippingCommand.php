@@ -199,7 +199,6 @@ class ExportCsvShippingCommand extends Command
 
                     $dtOrderWsEOS = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy(['order_no' => $item['order_no'], 'order_line_no' => $item['order_line_no']]);
                     if (!empty($dtOrderWsEOS)) {
-                        $dtOrderWsEOS->setOrderRegistedFlg(1);
                         $dtOrderWsEOS->setShippingSentFlg(1);
                         $this->entityManager->getRepository(DtOrderWSEOS::class)->save($dtOrderWsEOS);
                     }
