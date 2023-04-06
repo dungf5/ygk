@@ -176,9 +176,9 @@
 					{% if pagination and pagination.totalItemCount > 0 %}
 						<tbody>
 							{% for item in pagination %}
-								{% if item.returns_status_flag == 1 or item.returns_status_flag == 2 %}
+								{% if item.returns_status_flag == 1 %}
 									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_receipt', { 'returns_no':item.returns_no } ) }}" method="GET">
-								{% elseif item.returns_status_flag == 3 or item.returns_status_flag == 4 %}
+								{% elseif item.returns_status_flag == 2 or item.returns_status_flag == 3 or item.returns_status_flag == 4 %}
 									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_complete', { 'returns_no':item.returns_no } ) }}" method="GET">
 								{% else %}
 									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_approve', { 'returns_no':item.returns_no } ) }}" method="GET">
