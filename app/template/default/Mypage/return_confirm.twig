@@ -122,7 +122,7 @@
 							<td class="col-xs-9 text-left">
 								<select class="form-control" name="return_reason" id="return_reason">
 									{% for reson in returns_reson %}
-										<option value="{{ reson.returns_reson_id }}">{{ reson.returns_reson }}</option>
+										<option value="{{ reson.returns_reson_id }}" {% if return_reason == reson.returns_reson_id %}selected{% endif %}>{{ reson.returns_reson }}</option>
 									{% endfor %}
 								</select>
 								{% if  errors.return_reason is defined %}
