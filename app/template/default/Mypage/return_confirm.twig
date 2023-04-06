@@ -9,6 +9,14 @@
 		color: #000;
 		font-weight: normal;
 	}
+	.preview {
+		position: relative;
+	}
+	.preview>button {
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
 	label.error {
 		color: #f00;
 		font-weight: inherit;
@@ -25,7 +33,7 @@
 		</div>
 		<div class="ec-mypageRole">
 			<div class="col-xs-12">
-				<form class="form-horizontal"  action="{{ url('mypage_return_save') }}" method="POST" id="form_return_confirm">
+				<form class="form-horizontal"  action="{{ url('mypage_return_save') }}" method="POST" enctype="multipart/form-data" id="form_return_confirm">
 					{% if returns_no is not empty %} <input type="hidden" name="returns_no" value={{ returns_no }} /> {% endif %}
 					<table class="table table-bordered">
 						<tr>
@@ -112,11 +120,14 @@
 								<label for="return_reason">返品理由</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ returns_reson_text }}</p>
+								<select class="form-control" name="return_reason" id="return_reason">
+									{% for reson in returns_reson %}
+										<option value="{{ reson.returns_reson_id }}">{{ reson.returns_reson }}</option>
+									{% endfor %}
+								</select>
 								{% if  errors.return_reason is defined %}
 									<label id="return_reason-error" class="error" for="return_reason">{{ errors.return_reason }}</label>
 								{% endif %}
-								<input type="hidden" id="return_reason" name="return_reason" value="{{ return_reason }}" />
 							</td>
 						</tr>
 						<tr>
@@ -124,11 +135,10 @@
 								<label for="customer_comment">顧客コメント</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ customer_comment }}</p>
+								<textarea class="form-control" id="customer_comment" name="customer_comment" rows="3">{{ customer_comment }}</textarea>
 								{% if  errors.customer_comment is defined %}
 									<label id="customer_comment-error" class="error" for="customer_comment">{{ errors.customer_comment }}</label>
 								{% endif %}
-								<input type="hidden" id="customer_comment" name="customer_comment" value="{{ customer_comment }}" />
 							</td>
 						</tr>
 						<tr>
@@ -147,18 +157,22 @@
 								<label for="product_status1">良品・不良品</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								{% if product_status == 1 %}
-									<p class="text-nowrap">良品</p>
+								<label class="radio-inline">
+									<input type="radio" name="product_status" id="product_status1" value="1" required {% if product_status == 1 %}checked{% endif %}> 良品
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="product_status" id="product_status2" value="2" required {% if product_status == 2 %}checked{% endif %}> 不良品
+								</label>
+								{% if  errors.product_status is defined %}
+									<label id="rerurn_num-error" class="error" for="rerurn_num">{{ errors.rerurn_num }}</label>
 								{% endif %}
-								{% if product_status == 2 %}
-									<p class="text-nowrap">不良品</p>
-								{% endif %}
-								<input type="hidden" id="product_status" name="product_status" value="{{ product_status }}" />
 							</td>
 						</tr>
 						<tr>
 							<td class="text-center left_background" colspan="2">
 								<p>商品画像</p>
+								<input type="file" class="hidden" id="images_input" accept="image/*" multiple onchange="imagesInputChange()"/>
+								<input type="file" class="hidden" id="images" name="images[]" accept="image/*" multiple />
 								{% if  errors.images is defined %}
 									<label id="images-error" class="error" for="images">{{ errors.images }}</label>
 								{% endif %}
@@ -166,28 +180,27 @@
 						</tr>
 						<tr>
 							<td colspan="2">
-								<div class="row" id="images_preview">
-									{% for image_url in cus_image_url_path %}
-										<div class="col-xs-2">
-											<img src="{{ url('homepage') }}{{ image_url }}" class="img-thumbnail" />
-											<input type="hidden" id="cus_image_url_path" name="cus_image_url_path[]" value="{{ image_url }}" />
-										</div>
-									{% endfor %}
+								<div class="row">
+									<div class="col-xs-6 text-left">
+										<label class="btn btn-primary" for="images_input">画像添付</label>
+									</div>
+									<div class="col-xs-6 text-right">
+										<button type="submit" class="btn btn-warning">返品リクエスト送信</button>
+										<a href="{{ url('mypage_return') }}" class="btn btn-warning">返品手続きに戻る</a>
+									</div>		
 								</div>
 							</td>
 						</tr>
 						<tr>
-							<td class="col-xs-2 text-right">
-							</td>
-							<td class="col-xs-10 text-left">
-								<div class="col-xs-6"></div>
-								<div class="col-xs-3 text-center">
-									<button type="submit" class="btn btn-warning" >
-										返品リクエスト送信
-									</button>
-								</div>
-								<div class="col-xs-3 text-center">
-									<a href="{{ url('mypage_return') }}" class="btn btn-warning">返品手続きに戻る</a>
+							<td colspan="2">
+								<div class="row" id="images_preview">
+									{% for image_url in cus_image_url_path %}
+										<div class="col-xs-2 preview">
+											<img src="{{ url('homepage') }}{{ image_url }}" class="img-thumbnail" />
+											<button type="button" class="btn btn-danger" onclick="imagePathClick( '{{ image_url }}' )"><i class="fas fa-times"></i></button>
+											<input type="hidden" id="cus_image_url_path" name="cus_image_url_path[]" value="{{ image_url }}" />
+										</div>
+									{% endfor %}
 								</div>
 							</td>
 						</tr>
@@ -201,24 +214,127 @@
 {% block javascript %}
 <script src="{{ asset('assets/jquery-validation/jquery.validate.min.js', 'user_data') }}"></script>
 <script>
+	var cus_image_url_path = [
+		{% for image_url in cus_image_url_path %}
+			"{{ image_url }}",
+		{% endfor %}
+	];
+
+	function imagesInputChange() {
+		let _dt = new DataTransfer()
+		let _images_files = $('#images').prop('files')
+		let _images_input_files = $('#images_input').prop('files')
+		
+		for (let i = 0; i < _images_files.length; i++) {
+			_dt.items.add( _images_files[i] )
+		}
+		for (let i = 0; i < _images_input_files.length; i++) {
+			_dt.items.add( _images_input_files[i] )
+		}
+
+		if( ( cus_image_url_path.length + _dt.files.length ) > 6 ) {
+			alert("最大6枚の画像")
+		} else {
+			$('#images').prop('files', _dt.files)
+			imagesPreview()
+		}
+		$('#images_input').val( null )
+	}
+
+	function imagesPreview() {
+		let _images_preview = $("#images_preview")
+		_images_preview.empty() 
+		$.each( cus_image_url_path, function( k, v ) {
+			_images_preview.append( `<div class="col-xs-2 preview">
+				<img src="{{ url('homepage') }}${v}" class="img-thumbnail" />
+				<button type="button" class="btn btn-danger" onclick="imagePathClick('${v}')"><i class="fas fa-times"></i></button>
+				<input type="hidden" name="cus_image_url_path[]" value="${v}">
+			</div>` );
+		});
+		let _files = $('#images').prop('files')
+		for (var i = 0; i < _files.length ; i++) {
+			let _i = i
+			let _f = _files[i]
+			let _fileReader = new FileReader();
+			_fileReader.onload = (e)=>{
+				_images_preview.append( `<div class="col-xs-2 preview">
+					<img src="${e.target.result}" class="img-thumbnail" />
+					<button type="button" class="btn btn-danger" onclick="imagesPreviewClick( ${_i} )"><i class="fas fa-times"></i></button>
+				</div>` );
+			}
+			_fileReader.readAsDataURL( _f )
+		}
+	}
+
+	function imagePathClick( value ) {
+		cus_image_url_path = cus_image_url_path.filter(item => item !== value)
+		imagesPreview()
+	}
+
+	function imagesPreviewClick( index ) {
+		let _dt = new DataTransfer()
+		let _images_files = $('#images').prop('files')
+
+		for (let i = 0; i < _images_files.length; i++) {
+			if( index !== i ) _dt.items.add( _images_files[i] )
+		}
+
+		$('#images').prop('files', _dt.files)
+		imagesPreview()
+	}
+
+	$.validator.addMethod('maxsize', function(value, element, param) {
+		for (let _i = 0; _i < element.files.length; _i++) {
+			if( element.files[_i].size/1024/1024 <= param ) return true;
+		}
+		return false;
+	});
+	$.validator.addMethod('minupload', function(value, element, param) {
+		return element.files.length >= param;
+	});
+	$.validator.addMethod('maxupload', function(value, element, param) {
+		return element.files.length <= param;
+	});
 	$.validator.addMethod('rerurn_num', function(value, element, param) {
 		if( value <= 0 ) return false;
 		if( value > {{ delivered_num - returned_num }} ) return false;
 		return true;
 	});
 	$( function() {	
+		$("#images").click(function(e) {
+			e.preventDefault();
+		});
+		
 		$("#form_return_confirm").validate({
 			ignore: null,
 			rules: {
+				return_reason: {
+					required: true,
+				},
+				customer_comment: {
+					required: true
+				},
 				rerurn_num: {
 					required: true,
 					rerurn_num : true,
 				},
+				'images[]': {
+					minupload: 1,
+					maxupload: 6,
+					maxsize: 7,
+				},
 			},
 			messages: {
+				return_reason   : "顧客コメントを入力してください。",
+				customer_comment: "顧客コメントを入力してください。",
 				rerurn_num      : {
 					required  : "返品数を入力してください。",
 					rerurn_num: "出荷数以上の数量は入力できません。",
+				},
+				'images[]': {
+					minupload: "商品画像をファイル添付より選択してください。",
+					maxupload: "最大6枚の画像",
+					maxsize: "7Mまでの画像",
 				},
 			},
 			invalidHandler: function(event, validator) {

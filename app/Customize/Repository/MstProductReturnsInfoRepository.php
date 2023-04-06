@@ -39,6 +39,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             $object->setShippingDate($data['shipping_date']);
             $object->setJanCode($data['jan_code']);
             $object->setProductCode($data['product_code']);
+            $object->setShippingNum($data['shipping_num']);
             $object->setReasonReturnsCode($data['reason_returns_code']);
             $object->setCustomerComment($data['customer_comment']);
             $object->setReturnsNum($data['rerurn_num']);
@@ -127,6 +128,9 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             }
             if( !empty( $data['xbj_reviews_flag'] ) ) {
                 $object->setXbjReviewsFlag($data['xbj_reviews_flag']);
+            }
+            if( !empty( $data['returned_date'] ) ) {
+                $object->setReturnedDate($data['returned_date']);
             }
 
             $this->getEntityManager()->persist($object);

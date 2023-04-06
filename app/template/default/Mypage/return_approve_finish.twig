@@ -79,7 +79,7 @@
 							<label for="customer_code">出荷日</label>
 						</td>
 						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ product_returns_info.shipping_date|date('d/m/Y') }}</p>
+							<p class="text-nowrap">{{ product_returns_info.shipping_date|date('Y/m/d') }}</p>
 						</td>
 					</tr>
 					<tr>
@@ -135,7 +135,7 @@
 							<label for="customer_code">返品依頼日</label>
 						</td>
 						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ product_returns_info.returns_request_date|date('d/m/Y') }}</p>
+							<p class="text-nowrap">{{ product_returns_info.returns_request_date|date('Y/d/m') }}</p>
 						</td>
 					</tr>
 					<tr>
@@ -144,7 +144,7 @@
 						</td>
 						<td class="col-xs-10 text-left">
 							{% if product_returns_info.aprove_date is not empty %}
-								<p class="text-nowrap">{{ product_returns_info.aprove_date|date('d/m/Y') }}</p>
+								<p class="text-nowrap">{{ product_returns_info.aprove_date|date('Y/d/m') }}</p>
 							{% endif %}
 						</td>
 					</tr>

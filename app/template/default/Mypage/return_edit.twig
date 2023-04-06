@@ -94,7 +94,7 @@
 								<label for="shipping_day">出荷日</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<input type="text" class="form-control" id="shipping_day" name="shipping_day" value="{{ product_returns_info.shipping_date is empty ? "" : product_returns_info.shipping_date|date('d/m/Y') }}"/>
+								<input type="text" class="form-control" id="shipping_day" name="shipping_day" value="{{ product_returns_info.shipping_date is empty ? "" : product_returns_info.shipping_date|date('Y/m/d') }}"/>
 							</td>
 						</tr>
 						<tr>
