@@ -1701,7 +1701,7 @@ class MypageController extends AbstractController
         $my_common     = new MyCommonService($this->entityManager);
         $customer_id   = $this->globalService->customerId();
         $login_type    = $this->globalService->getLoginType();
-        $customer_code = $this->globalService->getLoginCode();
+        $customer_code = $this->globalService->customerCode();
         $qb            = $this->mstProductReturnsInfoRepository->getReturnByCustomer($param, $customer_code);
 
         // Paginator
@@ -1711,7 +1711,7 @@ class MypageController extends AbstractController
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
-
+        
         /*create list order date*/
         $request_date_list = [];
         for ($i = 0; $i < 14; $i++) {
