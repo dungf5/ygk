@@ -60,7 +60,7 @@
 									{{ "front.mypage.history.reason_return" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
 								</a>
 							</th>
-							<th title="return_status">
+							<th title="returns_status_flag">
 								<p class="text-nowrap">{{ "front.mypage.history.return_status" | trans | raw }}</p>
 							</th>
 							<th title="shipping_no">
@@ -120,19 +120,19 @@
 										<p class="text-nowrap">{{ item.returns_no }}</p>
 									</td>
 									<td title="return_request_date">
-										<p class="text-nowrap">{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}</p>
+										<p class="text-nowrap">{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y/m/d') }}</p>
 									</td>
 									<td title="reason_return">
 										<p class="text-nowrap">{{ item.returns_reson }}</p>
 									</td>
-									<td title="return_status">
+									<td title="returns_status_flag">
 										<p class="text-nowrap">返品完了</p>
 									</td>
 									<td title="shipping_no">
 										<p class="text-nowrap">{{ item.shipping_no }}</p>
 									</td>
 									<td title="shipping_date">
-										<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
+										<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y/m/d') }}</p>
 									</td>
 									<td title="shiping_code | otodoke_code">
 										<p class="text-nowrap">{{ item.shipping_name }}</p>
