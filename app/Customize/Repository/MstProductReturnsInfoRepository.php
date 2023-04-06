@@ -155,25 +155,29 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             Join::WITH,
             "product.product_code = product_returns_info.product_code"
         );
-        $qb->leftJoin(
-            'Customize\Entity\MstShipping',
-            'shipping',
-            Join::WITH,
-            "shipping.shipping_no = product_returns_info.shipping_no AND shipping.product_code = product_returns_info.product_code"
-        );
+
         $qb->leftJoin(
             'Customize\Entity\DtReturnsReson',
             'returns_reson',
             Join::WITH,
             'returns_reson.returns_reson_id=product_returns_info.reason_returns_code'
         );
-
+        
         $qb->andWhere('product_returns_info.customer_code = :customer_code' )
             ->setParameter('customer_code', $customer_code);
         $qb->andWhere('product_returns_info.returns_request_date >= :returns_request_date')
             ->setParameter('returns_request_date', date("Y-m-d", strtotime("-24 MONTH")));
-        $qb->andWhere('shipping.shipping_status = :shipping_status' )
-            ->setParameter('shipping_status', 2);
+        $qb->andWhere(
+                $qb->expr()->exists(
+                    $this->getEntityManager()->createQueryBuilder()
+                        ->select('1')
+                        ->from('Customize\Entity\MstShipping', 'shipping')
+                        ->where('shipping.shipping_no = product_returns_info.shipping_no')
+                        ->andWhere('shipping.product_code = product_returns_info.product_code')
+                        ->andWhere('shipping.shipping_status = 2')
+                        ->getDql()
+                )
+            );
 
         $qb->addSelect(
             'product_returns_info.returns_num',
@@ -183,12 +187,20 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'product_returns_info.shipping_name',
             'product_returns_info.otodoke_name',
             'product_returns_info.jan_code',
-            'shipping.shipping_num',
             'product_returns_info.returns_request_date',
             'product.product_code',
             'product.product_name',
             'returns_reson.returns_reson',
         );
+        $qb->addSelect("(
+            SELECT SUM(shipping1.shipping_num)
+            FROM Customize\Entity\MstShipping AS shipping1
+            WHERE
+                shipping1.shipping_no = product_returns_info.shipping_no
+                AND shipping1.product_code = product_returns_info.product_code
+                AND shipping1.shipping_status = 2
+            GROUP BY shipping1.shipping_code, shipping1.product_code
+        ) AS shipping_num");
 
         if ( !empty($paramSearch['returns_status_flag']) ) {
             $qb->andWhere( 'product_returns_info.returns_status_flag IN (:returns_status_flag)' )
