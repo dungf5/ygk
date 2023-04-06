@@ -110,8 +110,9 @@ class ExportCsvShippingCommand extends Command
         }
 
         $dtExporCSv = $this->commonService->getDtExportCsv();
-        $increment = !empty($dtExporCSv) ? (int) $dtExporCSv['increment'] : 0;
-        $file_name = 'SYUKA-NEW'.date('Ymd_').($increment + 1).'.csv';
+        //$increment = !empty($dtExporCSv) ? (int) $dtExporCSv['increment'] : 0;
+        //$file_name = 'SYUKA-NEW'.date('Ymd_').($increment + 1).'.csv';
+        $file_name = 'SYUKA-NEW.csv';
         $file = $path.$file_name;
 
         // Create directory local if have'n
@@ -213,23 +214,23 @@ class ExportCsvShippingCommand extends Command
 
             fclose($fp);
 
-            try {
-                // Save file information to DB
-                Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-                $insertDate = [
-                    'file_name' => strtolower(trim($file_name)),
-                    'increment' => $increment + 1,
-                    'directory' => $path,
-                    'message' => null,
-                    'is_error' => 0,
-                    'is_send_mail' => 0,
-                    'in_date' => new \DateTime(),
-                    'up_date' => null,
-                ];
-                $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
-            } catch (\Exception $e) {
-                log_error($e->getMessage());
-            }
+            //try {
+            //    // Save file information to DB
+            //    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            //    $insertDate = [
+            //        'file_name' => strtolower(trim($file_name)),
+            //        'increment' => $increment + 1,
+            //        'directory' => $path,
+            //        'message' => null,
+            //        'is_error' => 0,
+            //        'is_send_mail' => 0,
+            //        'in_date' => new \DateTime(),
+            //        'up_date' => null,
+            //    ];
+            //    $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
+            //} catch (\Exception $e) {
+            //    log_error($e->getMessage());
+            //}
         }
 
         return;

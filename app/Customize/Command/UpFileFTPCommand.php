@@ -116,9 +116,9 @@ class UpFileFTPCommand extends Command
 
                     foreach ($file_list as $file) {
                         // Check file in dt_export_csv
-                        if (!$this->checkFileUpload($path_local, $file)) {
-                            continue;
-                        }
+                        //if (!$this->checkFileUpload($path_local, $file)) {
+                        //    continue;
+                        //}
 
                         $this->handleUploadFile($path, $file, $path_local);
                     }
