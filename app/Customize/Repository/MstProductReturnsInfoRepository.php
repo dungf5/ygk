@@ -156,6 +156,12 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             "product.product_code = product_returns_info.product_code"
         );
         $qb->leftJoin(
+            'Customize\Entity\MstShipping',
+            'shipping',
+            Join::WITH,
+            "shipping.shipping_no = product_returns_info.shipping_no AND shipping.product_code = product_returns_info.product_code"
+        );
+        $qb->leftJoin(
             'Customize\Entity\DtReturnsReson',
             'returns_reson',
             Join::WITH,
@@ -166,6 +172,8 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             ->setParameter('customer_code', $customer_code);
         $qb->andWhere('product_returns_info.returns_request_date >= :returns_request_date')
             ->setParameter('returns_request_date', date("Y-m-d", strtotime("-24 MONTH")));
+        $qb->andWhere('shipping.shipping_status = :shipping_status' )
+            ->setParameter('shipping_status', 2);
 
         $qb->addSelect(
             'product_returns_info.returns_num',
@@ -175,7 +183,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'product_returns_info.shipping_name',
             'product_returns_info.otodoke_name',
             'product_returns_info.jan_code',
-            'product_returns_info.shipping_num',
+            'shipping.shipping_num',
             'product_returns_info.returns_request_date',
             'product.product_code',
             'product.product_name',

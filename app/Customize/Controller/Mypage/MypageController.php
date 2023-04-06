@@ -1698,11 +1698,11 @@ class MypageController extends AbstractController
         ];
 
         // paginator
-        $my_common = new MyCommonService($this->entityManager);
-        $customer_id = $this->globalService->customerId();
-        $login_type = $this->globalService->getLoginType();
+        $my_common     = new MyCommonService($this->entityManager);
+        $customer_id   = $this->globalService->customerId();
+        $login_type    = $this->globalService->getLoginType();
         $customer_code = $this->globalService->getLoginCode();
-        $qb = $this->mstProductReturnsInfoRepository->getReturnByCustomer($param, $customer_id);
+        $qb            = $this->mstProductReturnsInfoRepository->getReturnByCustomer($param, $customer_code);
 
         // Paginator
         $pagination = $paginator->paginate(

@@ -293,15 +293,15 @@
 
 	$.validator.addMethod('maxsize', function(value, element, param) {
 		for (let _i = 0; _i < element.files.length; _i++) {
-			if( element.files[_i].size/1024/1024 <= param ) return true;
+			if( element.files[_i].size/1024/1024 > param ) return false;
 		}
-		return false;
+		return true;
 	});
 	$.validator.addMethod('minupload', function(value, element, param) {
-		return element.files.length >= param;
+		return ( cus_image_url_path.length + element.files.length ) >= param;
 	});
 	$.validator.addMethod('maxupload', function(value, element, param) {
-		return element.files.length <= param;
+		return ( cus_image_url_path.length + element.files.length ) <= param;
 	});
 	$.validator.addMethod('rerurn_num', function(value, element, param) {
 		if( value <= 0 ) return false;
