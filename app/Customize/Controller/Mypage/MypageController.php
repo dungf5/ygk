@@ -922,21 +922,21 @@ class MypageController extends AbstractController
 
         //Params
         $param = [
-            'returns_status_flag' => [0, 1, 2, 3, 4],
-            'pageno' => $request->get('pageno', 1),
-            'search_jan_code' => $request->get('search_jan_code', ''),
+            'returns_status_flag'  => [0, 1, 2, 3, 4],
+            'pageno'               => $request->get('pageno', 1),
+            'search_jan_code'      => $request->get('search_jan_code', ''),
             'search_shipping_date' => $request->get('search_shipping_date', 0),
-            'search_shipping' => $request->get('search_shipping', 0),
-            'search_otodoke' => $request->get('search_otodoke', 0),
+            'search_shipping'      => $request->get('search_shipping', 0),
+            'search_otodoke'       => $request->get('search_otodoke', 0),
         ];
 
         // paginator
-        $user_login = $this->twig->getGlobals()["app"]->getUser();
-        $customer_id = $this->globalService->customerId();
-        $login_type = $this->globalService->getLoginType();
-        $my_common = new MyCommonService($this->entityManager);
-        $customer_code = $user_login->getCustomerCode();
-
+        $my_common     = new MyCommonService($this->entityManager);
+        $user_login    = $this->twig->getGlobals()["app"]->getUser();
+        $customer_id   = $this->globalService->customerId();
+        $login_type    = $this->globalService->getLoginType();
+        $customer_code = $this->globalService->customerCode();
+        
         if (!empty($_SESSION["usc_" . $customer_id]) && !empty($_SESSION["usc_" . $customer_id]['login_code'])) {
             $represent_code = $_SESSION["usc_" . $customer_id]['login_code'];
             $temp_customer_code = $my_common->getCustomerRelation($represent_code);
@@ -946,7 +946,7 @@ class MypageController extends AbstractController
         }
         $order_status = $my_common->getOrderStatus($customer_code, $login_type);
 
-        $qb = $this->mstProductReturnsInfoRepository->getReturnByCustomer($param, $customer_id);
+        $qb = $this->mstProductReturnsInfoRepository->getReturnByCustomer($param, $customer_code);
 
         $pagination = $paginator->paginate(
             $qb,
@@ -968,12 +968,12 @@ class MypageController extends AbstractController
         }
 
         return [
-            'pagination' => $pagination,
-            'customer_id' => $customer_id,
-            'param' => $param,
+            'pagination'         => $pagination,
+            'customer_id'        => $customer_id,
+            'param'              => $param,
             'shipping_date_list' => $shipping_date_list,
-            'shippings' => $shippings,
-            'otodokes' => $otodokes,
+            'shippings'          => $shippings,
+            'otodokes'           => $otodokes,
         ];
     }
 
@@ -989,9 +989,11 @@ class MypageController extends AbstractController
             $commonService          = new MyCommonService($this->entityManager);
             $login_type             = $this->globalService->getLoginType();
             $customer_id            = $this->globalService->customerId();
+            $customer_code          = $this->globalService->customerCode();
             $company_name           = $this->globalService->companyName();
             $customer_shipping_code = $this->globalService->getShippingCode();
             $customer_otodoke_code  = $this->globalService->getOtodokeCode();
+
             //Params
             $param = [
                 'shipping_no' => $request->get('shipping_no', ''),
@@ -1019,14 +1021,15 @@ class MypageController extends AbstractController
             }
 
             return [
-                'customer_id' => $customer_id,
-                'company_name' => $company_name,
-                'returns_reson' => $returns_reson,
-                'shippings' => $shippings,
-                'otodokes' => $otodokes,
+                'customer_id'            => $customer_id,
+                'customer_code'          => $customer_code,
+                'company_name'           => $company_name,
+                'returns_reson'          => $returns_reson,
+                'shippings'              => $shippings,
+                'otodokes'               => $otodokes,
                 'customer_shipping_code' => $customer_shipping_code,
-                'customer_otodoke_code' => $customer_otodoke_code,
-                'param' => $param,
+                'customer_otodoke_code'  => $customer_otodoke_code,
+                'param'                  => $param,
             ];
         } catch (\Exception $e) {
             log_error("MypageController.php returnCreate(): " . $e->getMessage());
@@ -1045,6 +1048,7 @@ class MypageController extends AbstractController
             $commonService = new MyCommonService($this->entityManager);
             $login_type    = $this->globalService->getLoginType();
             $customer_id   = $this->globalService->customerId();
+            $customer_code = $this->globalService->customerCode();
             $company_name  = $this->globalService->companyName();
 
             $returns_no         = $request->get('returns_no');
@@ -1129,6 +1133,7 @@ class MypageController extends AbstractController
 
             return [
                 'customer_id'        => $customer_id,
+                'customer_code'      => $customer_code,
                 'company_name'       => $company_name,
                 'returns_no'         => $returns_no,
                 'shipping_code'      => $shipping_code,
@@ -1169,6 +1174,7 @@ class MypageController extends AbstractController
             $commonService = new MyCommonService($this->entityManager);
             $login_type    = $this->globalService->getLoginType();
             $customer_id   = $this->globalService->customerId();
+            $customer_code = $this->globalService->customerCode();
             $customer      = $this->globalService->customer();
 
             $returns_no         = $request->get('returns_no');
@@ -1225,7 +1231,7 @@ class MypageController extends AbstractController
             
             $mst_product_returns_info = $this->mstProductReturnsInfoRepository->insertData([
                 'returns_no'           => $returns_no,
-                'customer_code'        => $customer_id,
+                'customer_code'        => $customer_code,
                 'shipping_code'        => $shipping_code,
                 'shipping_name'        => $shipping_name,
                 'otodoke_code'         => $otodoke_code,

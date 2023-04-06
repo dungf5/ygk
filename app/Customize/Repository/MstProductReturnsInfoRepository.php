@@ -143,7 +143,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         return;
     }
 
-    public function getReturnByCustomer($paramSearch = [], $customer_id)
+    public function getReturnByCustomer($paramSearch = [], $customer_code)
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('product_returns_info.returns_no');
@@ -162,8 +162,8 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'returns_reson.returns_reson_id=product_returns_info.reason_returns_code'
         );
 
-        $qb->andWhere('product_returns_info.customer_code = :customer_id' )
-            ->setParameter('customer_id', $customer_id);
+        $qb->andWhere('product_returns_info.customer_code = :customer_code' )
+            ->setParameter('customer_code', $customer_code);
         $qb->andWhere('product_returns_info.returns_request_date >= :returns_request_date')
             ->setParameter('returns_request_date', date("Y-m-d", strtotime("-24 MONTH")));
 
