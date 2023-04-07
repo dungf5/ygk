@@ -2563,6 +2563,7 @@ SQL;
             WHERE
                 `shipping_no` = :shipping_no
                 AND `product_code` = :product_code
+                AND `shipping_status` = 2
             GROUP BY shipping_no, product_code";
 
         try {
