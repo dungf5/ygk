@@ -28,7 +28,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/* Run Batch: php bin/console get-file-ftp-command */
+/* Run Batch: php bin/console get-file-ftp-command [param] */
 
 class GetFileFTPCommand extends Command
 {

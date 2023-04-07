@@ -114,7 +114,6 @@ class UpFileFTPCommand extends Command
                     return;
                 }
 
-                //$file_list = array_diff(scandir($path_local), ['.', '..']);
                 $this->handleUploadFile($path, $file, $path_local);
                 log_info('End Up File Shipping');
 
@@ -122,36 +121,6 @@ class UpFileFTPCommand extends Command
 
             default:
                 break;
-        }
-    }
-
-    private function checkFileUpload($path, $file)
-    {
-        try {
-            $dtExport = $this->entityManager->getRepository(DtExportCSV::class)->findOneBy(['file_name' => strtolower(trim($file))]);
-
-            if (empty($dtExport)) {
-                // Save file information to DB
-                Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-                $insertDate = [
-                    'file_name' => strtolower(trim($file)),
-                    'directory' => $path,
-                    'message' => null,
-                    'is_error' => 0,
-                    'is_send_mail' => 0,
-                    'in_date' => new \DateTime(),
-                    'up_date' => null,
-                ];
-                $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
-
-                return 1;
-            } else {
-                return !((int) $dtExport->getIsSendMail());
-            }
-        } catch (\Exception $e) {
-            log_error($e->getMessage());
-
-            return 0;
         }
     }
 

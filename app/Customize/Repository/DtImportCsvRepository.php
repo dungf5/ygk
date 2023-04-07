@@ -67,7 +67,7 @@ class DtImportCsvRepository extends AbstractRepository
             }
 
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-            $object = $this->findOneBy(['file_name' => $data['file_name']]);
+            $object = $this->find($data['id']);
 
             if (!empty($object)) {
                 foreach ($data as $key => $value) {

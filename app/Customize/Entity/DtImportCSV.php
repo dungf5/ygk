@@ -77,6 +77,21 @@ if (!class_exists('\Customize\Entity\DtImportCSV', false)) {
          */
         private $up_date;
 
+        /**
+         * @return int
+         */
+        public function getId()
+        {
+            return $this->id;
+        }
+
+        /**
+         * @param $id
+         */
+        public function setId($id)
+        {
+            $this->id = $id;
+        }
 
         /**
          * @return string|null

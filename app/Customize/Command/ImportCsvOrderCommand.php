@@ -174,6 +174,7 @@ class ImportCsvOrderCommand extends Command
                 // Update information dt_import_csv
                 Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                 $data = [
+                    'id' => $fileExist['id'],
                     'file_name' => $file,
                     'message' => $result['message'] ?? '',
                     'is_sync' => 1,
@@ -351,6 +352,7 @@ class ImportCsvOrderCommand extends Command
 
             // Update information dt_import_csv
             $data = [
+                'id' => $data['id'],
                 'file_name' => $data['file_name'],
                 'is_send_mail' => 1,
             ];
