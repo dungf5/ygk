@@ -1033,6 +1033,7 @@ class MypageController extends AbstractController
             ];
         } catch (\Exception $e) {
             log_error("MypageController.php returnCreate(): " . $e->getMessage());
+            return $this->redirectToRoute('mypage_return');
         }
     }
 
@@ -1160,6 +1161,7 @@ class MypageController extends AbstractController
             ];
         } catch (\Exception $e) {
             log_error("MypageController.php returnConfirm(): " . $e->getMessage());
+            return $this->redirectToRoute('mypage_return');
         }
     }
     /**
@@ -1278,8 +1280,8 @@ class MypageController extends AbstractController
                 'save' => true,
             ];
         } catch (\Exception $e) {
-            dd($e->getMessage());
             log_error("MypageController.php returnSave(): " . $e->getMessage());
+            return $this->redirectToRoute('mypage_return');
         }
     }
 
@@ -1322,6 +1324,7 @@ class MypageController extends AbstractController
             ];
         } catch (\Exception $e) {
             log_error("MypageController.php returnEdit(): " . $e->getMessage());
+            return $this->redirectToRoute('mypage_return');
         }
     }
 
@@ -1351,6 +1354,7 @@ class MypageController extends AbstractController
             ];
         } catch (\Exception $e) {
             log_error("MypageController.php returnPreview(): " . $e->getMessage());
+            return $this->redirectToRoute('mypage_return');
         }
     }
 
@@ -1387,6 +1391,7 @@ class MypageController extends AbstractController
             ];
         } catch (\Exception $e) {
             log_error("MypageController.php returnApprove(): " . $e->getMessage());
+            return $this->redirectToRoute('mypage_return');
         }
     }
 
@@ -1460,6 +1465,7 @@ class MypageController extends AbstractController
             ];
         } catch (\Exception $e) {
             log_error("MypageController.php returnApproveFinish(): " . $e->getMessage());
+            return $this->redirectToRoute('mypage_return');
         }
     }
 
@@ -1496,6 +1502,7 @@ class MypageController extends AbstractController
             ];
         } catch (\Exception $e) {
             log_error("MypageController.php returnReceipt(): " . $e->getMessage());
+            return $this->redirectToRoute('mypage_return');
         }
     }
 
@@ -1599,6 +1606,7 @@ class MypageController extends AbstractController
             ];
         } catch (\Exception $e) {
             log_error("MypageController.php returnReceipt(): " . $e->getMessage());
+            return $this->redirectToRoute('mypage_return');
         }
     }
 
@@ -1628,6 +1636,7 @@ class MypageController extends AbstractController
             ];
         } catch (\Exception $e) {
             log_error("MypageController.php returnComplete(): " . $e->getMessage());
+            return $this->redirectToRoute('mypage_return');
         }
     }
 
@@ -1672,6 +1681,7 @@ class MypageController extends AbstractController
             ];
         } catch (\Exception $e) {
             log_error("MypageController.php returnCompleteFinish(): " . $e->getMessage());
+            return $this->redirectToRoute('mypage_return');
         }
     }
 
