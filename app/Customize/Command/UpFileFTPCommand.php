@@ -108,7 +108,7 @@ class UpFileFTPCommand extends Command
                 $file = getenv('FTP_UPLOAD_SHIPPING_FILE_NAME') ?? 'SYUKA-NEW.csv';
 
                 if (file_exists($path_local.'/'.$file) == false) {
-                    log_info("File ({$path_local}'/'{$file}) is empty");
+                    log_info("File ({$path_local}/{$file}) is empty");
 
                     return;
                 }
