@@ -71,38 +71,72 @@ class GetFileFTPCommand extends Command
         $io = new SymfonyStyle($input, $output);
         log_info('Start Process Get File FTP');
 
-        /* Get files from FTP server*/
-        $path = getenv('FTP_DOWNLOAD_DIRECTORY') ?? '';
-        $path_local = getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') ?? '/html/download/';
-        $path_local .= 'csv/order/';
+        $param = $input->getArgument('arg1') ?? null;
 
-        if (!empty($path)) {
-            $result = $this->ftpService->getFiles($path, $path_local);
-            log_info($result['message']);
-
-            // Send mail error
-            if ($result['status'] == -1) {
-                log_info('[WS-EOS] Send Mail FTP.');
-                $information = [
-                    'email' => getenv('EMAIL_WS_EOS') ?? '',
-                    'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
-                    'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
-                    'file_name' => 'Mail/ws_eos_ftp.twig',
-                    'status' => 0,
-                    'error_content' => $result['message'],
-                ];
-
-                try {
-                    $this->mailService->sendMailImportWSEOS($information);
-                } catch (\Exception $e) {
-                    log_error($e->getMessage());
-                }
-            }
-
+        if (!$param) {
+            log_error('No param. Process stopped.');
             log_info('End Process Get File FTP');
-            //$io->success('End Process Get File FTP');
 
             return 0;
+        }
+
+        log_info('Param: '.$param);
+        $this->processGetFile(trim($param));
+
+        log_info('End Process Get File FTP');
+
+        return 0;
+    }
+
+    private function processGetFile($param)
+    {
+        switch ($param) {
+            case 'ws-eos':
+                log_info('Start Get File Order WS-EOS');
+                /* Get files from FTP server*/
+                $path = getenv('FTP_DOWNLOAD_DIRECTORY') ?? '';
+                $path_local = getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') ?? '/html/download/';
+                $path_local .= 'csv/order/';
+                $file = getenv('FTP_DOWNLOAD_ORDER_FILE_NAME') ?? 'HACHU-NEW.csv';
+
+                if (!empty($path)) {
+                    $path = $path.'/'.$file;
+                } else {
+                    $path = $file;
+                }
+
+                if (!str_ends_with(trim($path), '.csv')) {
+                    log_error("{$path} is not a csv file");
+                    return;
+                }
+
+                $result = $this->ftpService->getFiles(trim($path), $path_local);
+                log_info($result['message']);
+
+                // Send mail error
+                if ($result['status'] == -1) {
+                    log_info('[WS-EOS] Send Mail FTP.');
+                    $information = [
+                        'email' => getenv('EMAIL_WS_EOS') ?? '',
+                        'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
+                        'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
+                        'file_name' => 'Mail/ws_eos_ftp.twig',
+                        'status' => 0,
+                        'error_content' => $result['message'],
+                    ];
+
+                    try {
+                        $this->mailService->sendMailImportWSEOS($information);
+                    } catch (\Exception $e) {
+                        log_error($e->getMessage());
+                    }
+                }
+
+                log_info('End Get File Order WS-EOS');
+                break;
+
+            default:
+                break;
         }
     }
 }

@@ -95,6 +95,7 @@ class UpFileFTPCommand extends Command
     {
         switch ($param) {
             case 'shipping':
+                log_info('Start Up File Shipping');
                 /* Up files to FTP server*/
                 $path = getenv('FTP_UPLOAD_DIRECTORY') ?? '';
                 $path_local = getenv('LOCAL_FTP_UPLOAD_DIRECTORY') ?? '/html/upload/';
@@ -115,6 +116,8 @@ class UpFileFTPCommand extends Command
 
                 //$file_list = array_diff(scandir($path_local), ['.', '..']);
                 $this->handleUploadFile($path, $file, $path_local);
+                log_info('End Up File Shipping');
+
                 break;
 
             default:
@@ -192,7 +195,7 @@ class UpFileFTPCommand extends Command
                 }
             } else {
                 // Rename file to not send again
-                rename("{$path_local}/{$file}", $path_local.'/SYUKA-NEW'.date('YmdHis').'.csv');
+                rename("{$path_local}/{$file}", $path_local.date('/YmdHis').'.csv');
 
                 log_info('[WS-EOS] Send Mail FTP.');
                 $information = [
