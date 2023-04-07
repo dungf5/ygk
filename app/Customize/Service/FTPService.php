@@ -127,7 +127,6 @@ class FTPService
                 // try to download $remote_file and save it to $handle
                 if (ftp_fget($conn, $handle, $file, FTP_ASCII, 0)) {
                     // Save file information to DB
-                    log_info($file."ftp_fget OKOK");
                     Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                     $insertDate = [
                         'file_name' => $local_file_name,
@@ -142,7 +141,8 @@ class FTPService
 
                     $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
 
-                    $message = "successfully written to $local_file";
+                    $message = "successfully written {$file} to {$local_file}";
+
                 } else {
                     $message = "There was a problem while downloading $file to $local_file";
                 }
