@@ -192,7 +192,7 @@ class UpFileFTPCommand extends Command
                 }
             } else {
                 // Rename file to not send again
-                rename("{$path_local}/{$file}", $path_local.'SYUKA-NEW'.date('YmdHis').'.csv');
+                rename("{$path_local}/{$file}", $path_local.'/SYUKA-NEW'.date('YmdHis').'.csv');
 
                 log_info('[WS-EOS] Send Mail FTP.');
                 $information = [
