@@ -38,14 +38,12 @@ class DtExportCsvRepository extends AbstractRepository
 
             $object = new DtExportCSV();
 
-            $object->setIncrement($data['increment']);
             $object->setFileName($data['file_name']);
             $object->setDirectory($data['directory']);
             $object->setMessage($data['message']);
             $object->setIsError($data['is_error']);
             $object->setIsSendMail($data['is_send_mail']);
             $object->setInDate($data['in_date']);
-            $object->setUpDate($data['up_date']);
 
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();

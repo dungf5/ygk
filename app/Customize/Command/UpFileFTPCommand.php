@@ -104,25 +104,17 @@ class UpFileFTPCommand extends Command
                     $path_local = '.'.$path_local;
                 }
 
-                if (!empty($path)) {
-                    $path_local .= date('Y/m/');
+                $path_local .= date('Y/m');
+                $file = getenv('FTP_UPLOAD_SHIPPING_FILE_NAME') ?? 'SYUKA-NEW.csv';
 
-                    if (file_exists($path_local) == false) {
-                        log_info("Local path ({$path_local}) is empty");
-                        return;
-                    }
+                if (file_exists($path_local.'/'.$file) == false) {
+                    log_info("File ({$path_local}'/'{$file}) is empty");
 
-                    $file_list = array_diff(scandir($path_local), ['.', '..']);
-
-                    foreach ($file_list as $file) {
-                        // Check file in dt_export_csv
-                        //if (!$this->checkFileUpload($path_local, $file)) {
-                        //    continue;
-                        //}
-
-                        $this->handleUploadFile($path, $file, $path_local);
-                    }
+                    return;
                 }
+
+                //$file_list = array_diff(scandir($path_local), ['.', '..']);
+                $this->handleUploadFile($path, $file, $path_local);
                 break;
 
             default:
@@ -137,12 +129,9 @@ class UpFileFTPCommand extends Command
 
             if (empty($dtExport)) {
                 // Save file information to DB
-                $dtExporCSv = $this->commonService->getDtExportCsv();
-                $increment = !empty($dtExporCSv) ? (int) $dtExporCSv['increment'] : 0;
                 Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                 $insertDate = [
                     'file_name' => strtolower(trim($file)),
-                    'increment' => $increment + 1,
                     'directory' => $path,
                     'message' => null,
                     'is_error' => 0,
@@ -166,27 +155,16 @@ class UpFileFTPCommand extends Command
     private function handleUploadFile($path, $file, $path_local)
     {
         try {
-            $remote_file = $path.'/'.$file;
-            $path_local .= $file;
+            if (!empty($path)) {
+                $remote_file = $path.'/'.$file;
+            } else {
+                $remote_file = $file;
+            }
 
-            $result = $this->ftpService->upFiles($path, $remote_file, $path_local);
-            $dtExport = $this->entityManager->getRepository(DtExportCSV::class)->findOneBy(['file_name' => strtolower(trim($file))]);
+            $result = $this->ftpService->upFiles($remote_file, $path_local.'/'.$file);
 
             // Send mail result
             if ($result['status'] == -1 || $result['status'] == 0) {
-                if (!empty($dtExport)) {
-                    // Update information dt_import_csv
-                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-                    $data = [
-                        'file_name' => strtolower(trim($file)),
-                        'message' => $result['message'],
-                        'is_error' => 1,
-                        'is_send_mail' => 0,
-                        'up_date' => new \DateTime(),
-                    ];
-                    $this->entityManager->getRepository(DtExportCSV::class)->updateData($data);
-                }
-
                 log_info('[WS-EOS] Send Mail FTP.');
                 $information = [
                     'email' => getenv('EMAIL_WS_EOS') ?? '',
@@ -196,19 +174,25 @@ class UpFileFTPCommand extends Command
                     'status' => 0,
                     'error_content' => $result['message'],
                 ];
-            } else {
-                if (!empty($dtExport)) {
-                    // Update information dt_import_csv
+
+                try {
+                    // Save file information to DB
                     Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-                    $data = [
-                        'file_name' => strtolower(trim($file)),
-                        'message' => 'successfully',
-                        'is_error' => 0,
-                        'is_send_mail' => 1,
-                        'up_date' => new \DateTime(),
+                    $insertDate = [
+                        'file_name' => trim($file),
+                        'directory' => $path,
+                        'message' => $result['message'],
+                        'is_error' => 1,
+                        'is_send_mail' => 0,
+                        'in_date' => new \DateTime(),
                     ];
-                    $this->entityManager->getRepository(DtExportCSV::class)->updateData($data);
+                    $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
+                } catch (\Exception $e) {
+                    log_error($e->getMessage());
                 }
+            } else {
+                // Rename file to not send again
+                rename("{$path_local}/{$file}", $path_local.'SYUKA-NEW'.date('YmdHis').'.csv');
 
                 log_info('[WS-EOS] Send Mail FTP.');
                 $information = [
@@ -219,6 +203,21 @@ class UpFileFTPCommand extends Command
                     'status' => 1,
                     'finish_time' => '('.$result['message'].') '.date('Y/m/d H:i:s'),
                 ];
+                try {
+                    // Save file information to DB
+                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                    $insertDate = [
+                        'file_name' => trim($file),
+                        'directory' => $path,
+                        'message' => 'successfully',
+                        'is_error' => 0,
+                        'is_send_mail' => 1,
+                        'in_date' => new \DateTime(),
+                    ];
+                    $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
+                } catch (\Exception $e) {
+                    log_error($e->getMessage());
+                }
             }
 
             $this->mailService->sendMailExportWSEOS($information);

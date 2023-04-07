@@ -192,47 +192,40 @@ class FTPService
         }
     }
 
-    public function upFiles($path, $remote_file, $path_local)
+    public function upFiles($remote_file, $path_local)
     {
         try {
             if ($conn = self::connect()) {
                 @ftp_set_option($conn, FTP_USEPASVADDRESS, false);
                 @ftp_pasv($conn, false);
 
-                if (@ftp_chdir($conn, $path)) {
-
-                    // upload a file
-                    if (ftp_put($conn, $remote_file, $path_local, FTP_ASCII)) {
-                        $result = [
+                // upload a file
+                if (ftp_put($conn, $remote_file, $path_local, FTP_ASCII)) {
+                    $result = [
                             'status' => 1,
                             'message' => $remote_file,
                         ];
-                        log_info("successfully uploaded {$remote_file}");
+                    log_info("successfully uploaded {$remote_file}");
 
-                    } else {
-                        $result = [
+                } else {
+                    $result = [
                             'status' => 0,
                             'message' => "There was a problem while uploading {$remote_file}",
                         ];
-                        log_error("There was a problem while uploading {$remote_file}");
-                    }
-
-                    //close
-                    @ftp_close($conn);
-
-                    return $result;
+                    log_error("There was a problem while uploading {$remote_file}");
                 }
 
-                return [
-                    'status' => -1,
-                    'message' => "Path ({$path}) is invalid",
-                ];
+                //close
+                @ftp_close($conn);
+
+                return $result;
             }
 
             return [
                 'status' => -1,
                 'message' => 'Connect FTP server error',
             ];
+
         } catch (\Exception $e) {
             return [
                 'status' => -1,

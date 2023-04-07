@@ -34,12 +34,6 @@ if (!class_exists('\Customize\Entity\DtExportCSV', false)) {
          */
         private $id;
         /**
-         * @var integer
-         *
-         * @ORM\Column(name="increment", type="integer", options={"unsigned":true})
-         */
-        private $increment;
-        /**
          * @var string
          *
          * @ORM\Column(name="file_name",nullable=true, type="string", length=255, options={"comment":""})
@@ -93,22 +87,6 @@ if (!class_exists('\Customize\Entity\DtExportCSV', false)) {
         public function setId(int $id)
         {
             $this->id = $id;
-        }
-
-        /**
-         * @return int
-         */
-        public function getIncrement()
-        {
-            return $this->increment;
-        }
-
-        /**
-         * @param int $increment
-         */
-        public function setIncrement($increment)
-        {
-            $this->increment = $increment;
         }
 
         /**
