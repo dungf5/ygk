@@ -195,7 +195,8 @@ class UpFileFTPCommand extends Command
                 }
             } else {
                 // Rename file to not send again
-                rename("{$path_local}/{$file}", $path_local.date('/YmdHis').'.csv');
+                $file_rename = date('YmdHis').'.csv';
+                rename("{$path_local}/{$file}", $path_local.'/'.$file_rename);
 
                 log_info('[WS-EOS] Send Mail FTP.');
                 $information = [
@@ -210,8 +211,8 @@ class UpFileFTPCommand extends Command
                     // Save file information to DB
                     Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                     $insertDate = [
-                        'file_name' => trim($file),
-                        'directory' => $path,
+                        'file_name' => trim($file_rename),
+                        'directory' => $path_local,
                         'message' => 'successfully',
                         'is_error' => 0,
                         'is_send_mail' => 1,
