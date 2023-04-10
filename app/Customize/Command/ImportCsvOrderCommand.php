@@ -163,8 +163,12 @@ class ImportCsvOrderCommand extends Command
                     continue;
                 }
 
-                $fileExist = $this->entityManager->getRepository(DtImportCSV::class)->findOneBy(['file_name' => strtolower(trim($file)), 'is_sync' => 1]);
-                if (!empty($fileExist)) {
+                $fileExist = $this->entityManager->getRepository(DtImportCSV::class)->findOneBy(['file_name' => $file]);
+                if (empty($fileExist)) {
+                    continue;
+                }
+
+                if ($fileExist['is_sync'] == 1) {
                     continue;
                 }
 
@@ -175,7 +179,6 @@ class ImportCsvOrderCommand extends Command
                 Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                 $data = [
                     'id' => $fileExist['id'],
-                    'file_name' => $file,
                     'message' => $result['message'] ?? '',
                     'is_sync' => 1,
                     'is_error' => $result['status'] ? 0 : 1,
@@ -353,7 +356,6 @@ class ImportCsvOrderCommand extends Command
             // Update information dt_import_csv
             $data = [
                 'id' => $data['id'],
-                'file_name' => $data['file_name'],
                 'is_send_mail' => 1,
             ];
             $this->entityManager->getRepository(DtImportCSV::class)->updateData($data);
