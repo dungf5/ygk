@@ -226,6 +226,16 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             $qb->andWhere( 'product_returns_info.otodoke_code = :search_otodoke' )
                 ->setParameter(':search_otodoke', $paramSearch['search_otodoke']);
         }
+        
+        if ( !empty($paramSearch['search_request_date']) && $paramSearch['search_request_date'] != 0 ) {
+            $qb->andWhere( 'product_returns_info.returns_request_date LIKE :search_request_date' )
+                ->setParameter(':search_request_date', "{$paramSearch['search_request_date']}-%");
+        }
+
+        if ( !empty($paramSearch['search_reason_return']) && $paramSearch['search_reason_return'] != '0' ) {
+            $qb->andWhere( 'product_returns_info.reason_returns_code = :search_reason_return' )
+                ->setParameter(':search_reason_return', $paramSearch['search_reason_return']);
+        }
 
         // //group
         $qb->addGroupBy('product_returns_info.returns_no');
