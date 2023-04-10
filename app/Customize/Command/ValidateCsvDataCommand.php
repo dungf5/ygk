@@ -233,13 +233,14 @@ class ValidateCsvDataCommand extends Command
             }
 
             // Validate price
-            if (!empty($product)) {
-                $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
+            // Pending. Comment
+            //if (!empty($product)) {
+            //    $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
 
-                if (empty($dtPrice) || $dtPrice['price_s01'] != $object['order_price']) {
-                    $error['error_content9'] = '発注単価が異なっています';
-                }
-            }
+            //    if (empty($dtPrice) || $dtPrice['price_s01'] != $object['order_price']) {
+            //        $error['error_content9'] = '発注単価が異なっています';
+            //    }
+            //}
 
             if (count($error)) {
                 $error['order_no'] = $order_no;
