@@ -179,6 +179,7 @@ class ImportCsvOrderCommand extends Command
                 Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                 $data = [
                     'id' => $fileExist['id'],
+                    'file_name' => $fileExist['file_name'],
                     'message' => $result['message'] ?? '',
                     'is_sync' => 1,
                     'is_error' => $result['status'] ? 0 : 1,
