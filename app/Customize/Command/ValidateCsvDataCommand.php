@@ -190,47 +190,55 @@ class ValidateCsvDataCommand extends Command
             log_info("Validate order ({$order_no}-{$order_line_no})");
 
             // validate order_date
-            if (empty($object['order_date']) || date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d')) {
-                $error['error_content1'] = '発注日付が過去日付になっています';
-            }
+            // Pending. Comment
+            //if (empty($object['order_date']) || date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d')) {
+            //    $error['error_content1'] = '発注日付が過去日付になっています';
+            //}
 
             // Validate customer
-            $dtCusRelation = $common->getDtCustomerRelation($this->customer_code, $this->shipping_code, $otodoke_code);
-            if (empty($dtCusRelation)) {
-                $error['error_content2'] = '出荷先支店コード(顧客関連)が登録されていません';
-            }
+            // Pending. Comment
+            //$dtCusRelation = $common->getDtCustomerRelation($this->customer_code, $this->shipping_code, $otodoke_code);
+            //if (empty($dtCusRelation)) {
+            //    $error['error_content2'] = '出荷先支店コード(顧客関連)が登録されていません';
+            //}
 
             // Validate shipping_shop_code
-            if (empty($object['shipping_shop_code']) || empty($this->customer)) {
-                $error['error_content3'] = '出荷先支店コード(顧客情報)が登録されていません';
-            }
+            // Pending. Comment
+            //if (empty($object['shipping_shop_code']) || empty($this->customer)) {
+            //    $error['error_content3'] = '出荷先支店コード(顧客情報)が登録されていません';
+            //}
 
             // validate delivery_date
-            if (empty($object['delivery_date']) || (date('Y-m-d', strtotime($object['delivery_date'])) < date('Y-m-d'))) {
-                $error['error_content4'] = '納入希望日が過去日付になっています';
-            }
+            // Pending. Comment
+            //if (empty($object['delivery_date']) || (date('Y-m-d', strtotime($object['delivery_date'])) < date('Y-m-d'))) {
+            //    $error['error_content4'] = '納入希望日が過去日付になっています';
+            //}
 
             // Validate jan_code
-            if (empty($object['jan_code']) || empty($product)) {
-                $error['error_content5'] = 'JANコードが存在しません';
-            }
+            // Pending. Comment
+            //if (empty($object['jan_code']) || empty($product)) {
+            //    $error['error_content5'] = 'JANコードが存在しません';
+            //}
 
             // Validate discontinued_date
-            if (!empty($product) && !empty($product['discontinued_date']) && date('Y-m-d') > date('Y-m-d', strtotime($product['discontinued_date']))) {
-                $error['error_content6'] = '対象商品は廃番品となっております';
-            }
+            // Pending. Comment
+            //if (!empty($product) && !empty($product['discontinued_date']) && date('Y-m-d') > date('Y-m-d', strtotime($product['discontinued_date']))) {
+            //    $error['error_content6'] = '対象商品は廃番品となっております';
+            //}
 
             // Validdate special_order_flg
-            if (!empty($this->customer) && $this->customer['special_order_flg'] == 0 && !empty($product) && !empty($product['special_order_flg']) && strtolower($product['special_order_flg']) == 'y') {
-                $error['error_content7'] = '取り扱い対象商品ではありません';
-            }
+            // Pending. Comment
+            //if (!empty($this->customer) && $this->customer['special_order_flg'] == 0 && !empty($product) && !empty($product['special_order_flg']) && strtolower($product['special_order_flg']) == 'y') {
+            //    $error['error_content7'] = '取り扱い対象商品ではありません';
+            //}
 
             // Validate order_num
-            if (!empty($product)) {
-                if ((int) $object['order_num'] % (int) $product['quantity']) {
-                    $error['error_content8'] = '発注数量の販売単位に誤りがあります';
-                }
-            }
+            // Pending. Comment
+            //if (!empty($product)) {
+            //    if ((int) $object['order_num'] % (int) $product['quantity']) {
+            //        $error['error_content8'] = '発注数量の販売単位に誤りがあります';
+            //    }
+            //}
 
             // Validate price
             // Pending. Comment
