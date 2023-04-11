@@ -71,8 +71,8 @@ class FTPService
     {
         try {
             if ($conn = self::connect()) {
-                @ftp_set_option($conn, FTP_USEPASVADDRESS, false);
-                @ftp_pasv($conn, true);
+                //@ftp_set_option($conn, FTP_USEPASVADDRESS, false);
+                //@ftp_pasv($conn, true);
 
                 if (empty($file)) {
                     return [
