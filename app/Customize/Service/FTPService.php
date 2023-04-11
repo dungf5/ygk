@@ -125,39 +125,48 @@ class FTPService
                 }
 
                 // try to download $remote_file and save it to $handle
-                if (ftp_fget($conn, $handle, $file, FTP_BINARY, 0)) {
-                    // Save file information to DB
-                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-                    $insertDate = [
-                        'file_name' => $local_file_name,
-                        'directory' => $monthDir,
-                        'message' => null,
-                        'is_sync' => 0,
-                        'is_error' => 0,
-                        'is_send_mail' => 0,
-                        'in_date' => new \DateTime(),
-                        'up_date' => null,
+                try {
+                    if (ftp_fget($conn, $handle, $file, FTP_BINARY, 0)) {
+                        // Save file information to DB
+                        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                        $insertDate = [
+                            'file_name' => $local_file_name,
+                            'directory' => $monthDir,
+                            'message' => null,
+                            'is_sync' => 0,
+                            'is_error' => 0,
+                            'is_send_mail' => 0,
+                            'in_date' => new \DateTime(),
+                            'up_date' => null,
+                        ];
+
+                        $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
+
+                        $message = "successfully written {$file} to {$local_file}";
+                        fclose($handle);
+
+                    } else {
+                        $message = "There was a problem while downloading $file to $local_file";
+                        fclose($handle);
+                        unlink($local_file);
+                    }
+
+                    //close
+                    @ftp_close($conn);
+
+                } catch (\Exception $e) {
+                    unlink($local_file);
+
+                    return [
+                        'status' => -1,
+                        'message' => $e->getMessage(),
                     ];
-
-                    $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
-
-                    $message = "successfully written {$file} to {$local_file}";
-
-                } else {
-                    $message = "There was a problem while downloading $file to $local_file";
                 }
-
-                //close
-                fclose($handle);
-                @ftp_close($conn);
 
                 return [
                     'status' => 1,
                     'message' => $message,
                 ];
-
-                //close
-                @ftp_close($conn);
             }
 
             return [
