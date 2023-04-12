@@ -17,6 +17,7 @@ namespace Customize\Command;
 
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\CSVService;
+use Customize\Service\CurlPost;
 use Customize\Service\FTPService;
 use Customize\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,6 +34,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class GetFileFTPCommand extends Command
 {
     use PluginCommandTrait;
+    use CurlPost;
 
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -107,6 +109,7 @@ class GetFileFTPCommand extends Command
 
                 if (!str_ends_with(trim($path), '.csv')) {
                     log_error("{$path} is not a csv file");
+
                     return;
                 }
 
@@ -129,6 +132,7 @@ class GetFileFTPCommand extends Command
                         $this->mailService->sendMailImportWSEOS($information);
                     } catch (\Exception $e) {
                         log_error($e->getMessage());
+                        $this->pushGoogleChat($e->getMessage());
                     }
                 }
 

@@ -15,6 +15,8 @@ namespace Customize\Service;
 
 class CSVService
 {
+    use CurlPost;
+
     /***
      * @param string $path
      * @return array
@@ -45,6 +47,8 @@ class CSVService
                 'message' => $data,
             ];
         } catch (\Exception $e) {
+            $this->pushGoogleChat("File {$path} ".$e->getMessage());
+
             return [
                 'status' => 0,
                 'message' => "File {$path} ".$e->getMessage(),

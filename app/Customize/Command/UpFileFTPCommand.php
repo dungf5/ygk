@@ -30,12 +30,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Customize\Service\CurlPost;
 
 /* Run Batch: php bin/console up-file-ftp-command [param] */
 
 class UpFileFTPCommand extends Command
 {
     use PluginCommandTrait;
+    use CurlPost;
 
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -149,7 +151,6 @@ class UpFileFTPCommand extends Command
 
                 try {
                     // Save file information to DB
-                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                     $insertDate = [
                         'file_name' => trim($file),
                         'directory' => $path,
@@ -161,6 +162,7 @@ class UpFileFTPCommand extends Command
                     $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
                 } catch (\Exception $e) {
                     log_error($e->getMessage());
+                    $this->pushGoogleChat($e->getMessage());
                 }
             } else {
                 // Rename file to not send again
@@ -178,7 +180,6 @@ class UpFileFTPCommand extends Command
                 ];
                 try {
                     // Save file information to DB
-                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                     $insertDate = [
                         'file_name' => trim($file_rename),
                         'directory' => $path_local,
@@ -190,6 +191,7 @@ class UpFileFTPCommand extends Command
                     $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
                 } catch (\Exception $e) {
                     log_error($e->getMessage());
+                    $this->pushGoogleChat($e->getMessage());
                 }
             }
 
@@ -198,6 +200,7 @@ class UpFileFTPCommand extends Command
             return;
         } catch (\Exception $e) {
             log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
 
             return;
         }

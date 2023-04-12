@@ -13,14 +13,14 @@
 
 namespace Customize\Service;
 
-use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtImportCSV;
 use Customize\Service\Common\MyCommonService;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 
 class FTPService
 {
+    use CurlPost;
+
     private $host;
     private $port;
     private $userName;
@@ -62,6 +62,7 @@ class FTPService
         } catch (\Exception $e) {
             log_error('Connect ftp fail');
             log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
 
             return null;
         }
@@ -128,7 +129,6 @@ class FTPService
                 try {
                     if (ftp_fget($conn, $handle, $file, FTP_BINARY, 0)) {
                         // Save file information to DB
-                        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                         $insertDate = [
                             'file_name' => $local_file_name,
                             'directory' => $monthDir,
@@ -144,7 +144,6 @@ class FTPService
 
                         $message = "successfully written {$file} to {$local_file}";
                         fclose($handle);
-
                     } else {
                         $message = "There was a problem while downloading $file to $local_file";
                         fclose($handle);
@@ -153,9 +152,9 @@ class FTPService
 
                     //close
                     @ftp_close($conn);
-
                 } catch (\Exception $e) {
                     unlink($local_file);
+                    $this->pushGoogleChat($e->getMessage());
 
                     return [
                         'status' => -1,
@@ -174,6 +173,8 @@ class FTPService
                 'message' => 'Connect FTP server error',
             ];
         } catch (\Exception $e) {
+            $this->pushGoogleChat($e->getMessage());
+
             return [
                 'status' => -1,
                 'message' => $e->getMessage(),
@@ -214,6 +215,8 @@ class FTPService
                 'message' => 'Connect FTP server error',
             ];
         } catch (\Exception $e) {
+            $this->pushGoogleChat($e->getMessage());
+
             return [
                 'status' => -1,
                 'message' => $e->getMessage(),

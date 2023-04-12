@@ -31,11 +31,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Customize\Service\CurlPost;
 
 /* Run Batch: php bin/console import-csv-order-command */
 class ImportCsvOrderCommand extends Command
 {
     use PluginCommandTrait;
+    use CurlPost;
 
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -154,6 +156,7 @@ class ImportCsvOrderCommand extends Command
             $file_list = scandir($path);
         } catch (\Exception $e) {
             log_error("Path {$path} is not existed.");
+            $this->pushGoogleChat($e->getMessage());
             $file_list = [];
         }
 
@@ -176,7 +179,6 @@ class ImportCsvOrderCommand extends Command
                 $result = $this->LoadFileReadData($path, $file);
 
                 // Update information dt_import_csv
-                Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                 $data = [
                     'id' => $fileExist['id'],
                     'file_name' => $fileExist['file_name'],
@@ -364,6 +366,7 @@ class ImportCsvOrderCommand extends Command
             return;
         } catch (\Exception $e) {
             log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
 
             return;
         }

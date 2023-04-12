@@ -31,11 +31,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Customize\Service\CurlPost;
 
 /* Run Batch: php bin/console export-csv-shipping-command */
 class ExportCsvShippingCommand extends Command
 {
     use PluginCommandTrait;
+    use CurlPost;
 
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -205,6 +207,7 @@ class ExportCsvShippingCommand extends Command
                 } catch (\Exception $e) {
                     log_error($e->getMessage());
                     $this->entityManager->getConnection()->rollBack();
+                    $this->pushGoogleChat($e->getMessage());
                 }
             }
 

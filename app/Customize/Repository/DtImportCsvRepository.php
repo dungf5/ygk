@@ -38,7 +38,6 @@ class DtImportCsvRepository extends AbstractRepository
                 return;
             }
 
-            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = new DtImportCSV();
 
             $object->setFileName($data['file_name']);
@@ -66,7 +65,6 @@ class DtImportCsvRepository extends AbstractRepository
                 return;
             }
 
-            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = $this->find($data['id']);
 
             if (!empty($object)) {

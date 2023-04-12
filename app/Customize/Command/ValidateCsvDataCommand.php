@@ -35,11 +35,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Customize\Service\CurlPost;
 
 /* Run Batch: php bin/console validate-csv-data-command [param] */
 class ValidateCsvDataCommand extends Command
 {
     use PluginCommandTrait;
+    use CurlPost;
 
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -150,6 +152,7 @@ class ValidateCsvDataCommand extends Command
             log_info('End Handle Validate WS EOS DATA');
         } catch (\Exception $e) {
             log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
 
             return;
         }
@@ -262,6 +265,7 @@ class ValidateCsvDataCommand extends Command
             return;
         } catch (\Exception $e) {
             log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
 
             return;
         }
@@ -288,6 +292,7 @@ class ValidateCsvDataCommand extends Command
             return;
         } catch (\Exception $e) {
             log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
 
             return;
         }
@@ -315,6 +320,7 @@ class ValidateCsvDataCommand extends Command
 
             } catch (\Exception $e) {
                 log_error($e->getMessage());
+                $this->pushGoogleChat($e->getMessage());
             }
         }
 
@@ -400,6 +406,7 @@ class ValidateCsvDataCommand extends Command
             return;
         } catch (\Exception $e) {
             log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
 
             return;
         }
@@ -434,6 +441,7 @@ class ValidateCsvDataCommand extends Command
             return 0;
         } catch (\Exception $e) {
             log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
 
             return 0;
         }
@@ -457,6 +465,7 @@ class ValidateCsvDataCommand extends Command
             return 0;
         } catch (\Exception $e) {
             log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
 
             return 0;
         }
@@ -493,6 +502,7 @@ class ValidateCsvDataCommand extends Command
             return;
         } catch (\Exception $e) {
             log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
 
             return;
         }
@@ -546,6 +556,7 @@ class ValidateCsvDataCommand extends Command
             return 0;
         } catch (\Exception $e) {
             log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
 
             return 0;
         }
