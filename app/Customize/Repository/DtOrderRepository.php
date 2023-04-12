@@ -46,7 +46,7 @@ class DtOrderRepository extends AbstractRepository
             $object->setOrderLineno($data['order_line_no'] ?? '');
             $object->setShippingCode($data['shipping_code'] ?? '');
             $object->setOtodokeCode($data['otodoke_code'] ?? '');
-            $object->setOrderDate(new \DateTime());
+            $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
             $object->setDeliPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
             $object->setShipingPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
             $object->setItemNo($data['jan_code'] ?? '');
