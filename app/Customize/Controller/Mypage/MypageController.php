@@ -1268,11 +1268,12 @@ class MypageController extends AbstractController
                 ]);
             }
 
-            $email = $customer['customer_email'] ?? $customer['email'];
+            $customer = $commonService->getMstCustomerCode($customer_code);
+            $email = $customer['email'];
             $url_preview = $this->generateUrl('mypage_return_preview', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
             $this->mailService->sendMailReturnProductPreview($email, $url_preview);
 
-            $email = $customer['customer_email'] ?? $customer['email'];
+            $email = $customer['email'];
             $url_approve = $this->generateUrl('mypage_return_approve', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
             $this->mailService->sendMailReturnProductApprove($email, $url_approve);
 
@@ -1296,7 +1297,7 @@ class MypageController extends AbstractController
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
-            $customer = $commonService->getMstCustomer($product_returns_info->getCustomerCode());
+            $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
             $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
             $login_type = $this->globalService->getLoginType();
             $customer_id = $this->globalService->customerId();
@@ -1339,7 +1340,7 @@ class MypageController extends AbstractController
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
-            $customer = $commonService->getMstCustomer($product_returns_info->getCustomerCode());
+            $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
             $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
 
             $returns_reson = $commonService->getReturnsReson();
@@ -1369,7 +1370,7 @@ class MypageController extends AbstractController
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
-            $customer = $commonService->getMstCustomer($product_returns_info->getCustomerCode());
+            $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
             $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
             $delivered_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
             $returned_num = $commonService->getReturnedNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
@@ -1406,7 +1407,7 @@ class MypageController extends AbstractController
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
-            $customer = $commonService->getMstCustomer($product_returns_info->getCustomerCode());
+            $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
             $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
             $delivered_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
             $returned_num = $commonService->getReturnedNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
@@ -1480,7 +1481,7 @@ class MypageController extends AbstractController
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
-            $customer = $commonService->getMstCustomer($product_returns_info->getCustomerCode());
+            $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
             $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
             $delivered_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
             $returned_num = $commonService->getReturnedNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
@@ -1517,7 +1518,7 @@ class MypageController extends AbstractController
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
-            $customer = $commonService->getMstCustomer($product_returns_info->getCustomerCode());
+            $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
             $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
             $delivered_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
             $returned_num = $commonService->getReturnedNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
@@ -1621,7 +1622,7 @@ class MypageController extends AbstractController
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
-            $customer = $commonService->getMstCustomer($product_returns_info->getCustomerCode());
+            $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
             $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
 
             $returns_reson = $commonService->getReturnsReson();
@@ -1651,7 +1652,7 @@ class MypageController extends AbstractController
         try {
             $commonService        = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
-            $customer             = $commonService->getMstCustomer($product_returns_info->getCustomerCode());
+            $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
             $product_name         = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
 
             $xbj_reviews_flag = $request->get('xbj_reviews_flag', 0);
