@@ -38,7 +38,7 @@ trait CurlPost
             $appEnv = getenv('APP_ENV') ?? 'local';
             $curl = curl_init();
 
-            if (!in_array($appEnv, ['dev', 'prod'])) {
+            if (getenv('APP_IS_LOCAL') == 1) {
                 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             }
 

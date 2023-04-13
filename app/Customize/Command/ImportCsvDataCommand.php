@@ -15,16 +15,19 @@ declare(strict_types=1);
 
 namespace Customize\Command;
 
+use Customize\Config\WSEOS;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\DtImportCSV;
 use Customize\Entity\DtOrder;
 use Customize\Entity\DtOrderStatus;
 use Customize\Entity\DtOrderWSEOS;
+use Customize\Entity\DtOrderWSEOSCopy;
 use Customize\Entity\MstCustomer;
 use Customize\Entity\MstProduct;
-use Customize\Entity\MstShipping;
-use Customize\Entity\MstShippingWSEOS;
 use Customize\Service\Common\MyCommonService;
+use Customize\Service\CSVService;
 use Customize\Service\CurlPost;
+use Customize\Service\FTPService;
 use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,12 +40,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/* Run Batch: php bin/console validate-csv-data-command [param] [option] */
-/* Ex: php bin/console validate-csv-data-command ws-eos --check=true */
-class ValidateCsvDataCommand extends Command
+/* Run Batch: php bin/console import-csv-data-command [param] {option} */
+class ImportCsvDataCommand extends Command
 {
     use PluginCommandTrait;
     use CurlPost;
+    use WSEOS;
 
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -54,6 +57,8 @@ class ValidateCsvDataCommand extends Command
      * @var MyCommonService
      */
     private $commonService;
+    private $csvService;
+    private $ftpService;
     private $errors = [];
     private $success = [];
     private $rate = 0;
@@ -62,13 +67,15 @@ class ValidateCsvDataCommand extends Command
     private $customer = null;
     private $check_validate = false;
 
-    protected static $defaultName = 'validate-csv-data-command';
-    protected static $defaultDescription = 'Process Validate Csv Data Command';
+    protected static $defaultName = 'import-csv-data-command';
+    protected static $defaultDescription = 'Process Import Csv Data Command';
 
     public function __construct(EntityManagerInterface $entityManager, MailService $mailService)
     {
         parent::__construct();
         $this->entityManager = $entityManager;
+        $this->csvService = new CSVService($entityManager);
+        $this->ftpService = new FTPService($entityManager);
         $this->mailService = $mailService;
         $this->commonService = new MyCommonService($entityManager);
     }
@@ -86,7 +93,7 @@ class ValidateCsvDataCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         log_info('---------------------------------------');
-        log_info('Start Process Validate Csv Data Command');
+        log_info('Start Process Import Csv Data');
         $param = $input->getArgument('arg1') ?? null;
         $option = $input->getOption('check');
 
@@ -97,37 +104,51 @@ class ValidateCsvDataCommand extends Command
         if (!$param) {
             log_error('No param. Process stopped.');
 
+            $message = 'Process Import Csv Data. No param. Process stopped.';
+            $this->pushGoogleChat($message);
+
             return 0;
         }
 
-        /* Initial data */
-        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-        $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
-            'customer_code' => $this->shipping_code,
-        ]);
-        $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
-        /* End - Initial data */
+        $this->handleProcess($param);
 
-        log_info('Param: '.$param);
-        //if ($input->getOption('option1')) {}
-
-        $this->handleValidateCsvData(trim($param));
-
-        log_info('End Process Validate Csv Data Command');
-        //$io->success('End Process Validate Csv Data Command');
+        log_info('End Process Import Csv Data');
+        //$io->success('End Process Import Csv Data');
 
         return 0;
     }
 
-    private function handleValidateCsvData($param)
+    public function handleProcess($param)
     {
+        /* The local path to load csv file */
+        $path = getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') ?? '/html/download/';
+
         switch (trim($param)) {
             case 'ws-eos':
-                    $this->handleValidateWSEOS();
-                    $this->handleImportOrderWSEOS();
-                    $this->sendMailErrorWSEOS();
-                    $this->sendMailOrderSuccess();
-                    $this->handleImportShippingWSEOS();
+                $path .= 'csv/order/';
+
+                if (getenv('APP_IS_LOCAL') == 1) {
+                    $path = '.'.$path;
+                }
+
+                /* Initial data */
+                Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
+                    'customer_code' => $this->shipping_code,
+                ]);
+                $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
+                /* End - Initial data */
+
+                $this->handleImportCsvOrderWSEOS($path.date('Y/m'));
+                sleep(1);
+                $this->handleValidateWSEOS();
+                sleep(1);
+                $this->sendMailWSEOSValidateError();
+                sleep(1);
+                $this->handleImportOrderWSEOS();
+                sleep(1);
+                $this->sendMailOrderSuccess();
+
                 break;
 
             default:
@@ -135,10 +156,235 @@ class ValidateCsvDataCommand extends Command
         }
     }
 
+    private function handleImportCsvOrderWSEOS($path)
+    {
+        log_info('Start Process Import Order WS-EOS CSV for month '.date('m'));
+
+        if (empty($path)) {
+            log_error('Path is empty ');
+
+            $message = 'Process Import Order WS-EOS CSV for month '.date('m');
+            $message .= "\n".'Path is empty ';
+            $this->pushGoogleChat($message);
+
+            return;
+        }
+
+        try {
+            $file_list = scandir($path);
+        } catch (\Exception $e) {
+            log_error("Path {$path} is not existed.");
+
+            $message = 'Process Import Order WS-EOS CSV for month '.date('m');
+            $message .= "\n".$e->getMessage();
+            $this->pushGoogleChat($message);
+            $file_list = [];
+        }
+
+        if (!empty($file_list) && is_array($file_list) && count($file_list)) {
+            foreach ($file_list as $file) {
+                if (!str_ends_with($file, '.csv')) {
+                    continue;
+                }
+
+                $fileExist = $this->entityManager->getRepository(DtImportCSV::class)->findOneBy(['file_name' => $file]);
+                if (empty($fileExist)) {
+                    continue;
+                }
+
+                if ($fileExist['is_sync'] == 1) {
+                    continue;
+                }
+
+                // Load file read data
+                $colNumber = getenv('NUMBER_COLUMN_WS_EOS') ?? 42;
+                $csvData = $this->LoadFileReadData($path, $file, $colNumber);
+                $result = $this->SaveDataFromFileToDB($csvData);
+
+                // Update information dt_import_csv
+                $data = [
+                    'id' => $fileExist['id'],
+                    'file_name' => $fileExist['file_name'],
+                    'message' => $result['message'] ?? '',
+                    'is_sync' => 1,
+                    'is_error' => $result['status'] ? 0 : 1,
+                    'up_date' => new \DateTime(),
+                ];
+                $this->entityManager->getRepository(DtImportCSV::class)->updateData($data);
+
+                // Send mail
+                $this->SendMailWSEOSImport($result['status'], $data);
+            }
+        }
+
+        log_info('End Process Import Order WS-EOS CSV for month '.date('m'));
+    }
+
+    private function LoadFileReadData($path, $file, $colNumber)
+    {
+        $path = $path.'/'.$file;
+
+        log_info("Start load file {$path} and save data");
+
+        $result = $this->csvService->readFile($path, $colNumber);
+
+        if ($result['status'] == 1) {
+            return $result['message'];
+        } else {
+            //Log error
+            log_error($result['message']);
+            $this->pushGoogleChat("Read File {$path} ".$result['message']);
+
+            return [];
+        }
+    }
+
+    private function SaveDataFromFileToDB($data)
+    {
+        if (empty($data) || !is_array($data)) {
+            return [
+                'status' => 0,
+                'message' => 'data empty',
+            ];
+        }
+
+        log_info('Start save/update data Order WS EOS');
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
+        // Insert cache file to validation data
+        $cache_file = getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') ?? '/html/download/';
+        $cache_file .= 'csv/order/';
+
+        if (getenv('APP_IS_LOCAL') == 1) {
+            $cache_file = '.'.$cache_file;
+        }
+
+        $cache_file .= 'ws_eos_cache_file'.date('Ymd').'.txt';
+        // open file to write to
+        if (!$handle = fopen($cache_file, 'a')) {
+            log_error("Cannot open file ({$cache_file})");
+        }
+
+        // Foreach row
+        foreach ($data as $x => $row) {
+            // Foreach column
+            $objData = [];
+            foreach ($this->getWSEOSCsvOrderHeader() as $y => $col) {
+                $objData["{$col}"] = trim($data[$x][$y]);
+            }
+
+            $objectExist = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy([
+                'order_no' => $objData['order_no'] ?? '',
+                'order_line_no' => $objData['order_line_no'] ?? '',
+            ]);
+
+            // Write to cache file
+            if ($handle) {
+                $cache_data = $objData['order_no'].'-'.$objData['order_line_no']."\n";
+                if (fwrite($handle, $cache_data) === false) {
+                    log_error("Cannot write ({$cache_data}) to file ({$cache_file})");
+                }
+            }
+
+            // Insert dt_order_ws_eos
+            if (empty($objectExist)) {
+                log_info('Insert dt_order_ws_eos '.$objData['order_no'].'-'.$objData['order_line_no']);
+
+                $this->entityManager->getRepository(DtOrderWSEOS::class)->insertData($objData);
+            }
+
+            // Update
+            else {
+                $orderRegistedFlg = $objectExist['order_registed_flg'];
+
+                switch ((int) $orderRegistedFlg) {
+                    case 1:
+                        $objectCopyExist = $this->entityManager->getRepository(DtOrderWSEOSCopy::class)->findOneBy([
+                            'order_no' => $objData['order_no'] ?? '',
+                            'order_line_no' => $objData['order_line_no'] ?? '',
+                        ]);
+
+                        // Insert dt_order_ws_eos_copy
+                        if (empty($objectCopyExist)) {
+                            log_info('Insert dt_order_ws_eos_copy '.$objData['order_no'].'-'.$objData['order_line_no']);
+                            $this->entityManager->getRepository(DtOrderWSEOSCopy::class)->insertData($objData);
+                        }
+
+                        // Update dt_order_ws_eos_copy
+                        else {
+                            log_info('Update dt_order_ws_eos_copy '.$objData['order_no'].'-'.$objData['order_line_no']);
+                            $this->entityManager->getRepository(DtOrderWSEOSCopy::class)->updateData($objData);
+                        }
+                        break;
+
+                    default:
+                        // Update dt_order_ws_eos
+                        log_info('Update dt_order_ws_eos '.$objData['order_no'].'-'.$objData['order_line_no']);
+                        $this->entityManager->getRepository(DtOrderWSEOS::class)->updateData($objData);
+                        break;
+                }
+            }
+        }
+
+        //close
+        if ($handle) {
+            fclose($handle);
+        }
+
+        log_info('End save/update data Order WS EOS');
+
+        return [
+            'status' => 1,
+            'message' => 'successfully',
+        ];
+    }
+
+    private function SendMailWSEOSImport($status = 1, $data)
+    {
+        $information = [
+            'email' => getenv('EMAIL_WS_EOS') ?? '',
+            'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
+            'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
+            'file_name' => 'Mail/ws_eos_ftp.twig',
+        ];
+
+        // Send mail successfully
+        if ($status == 1) {
+            $information['status'] = 1;
+            $information['finish_time'] = '('.$data['file_name'].') '.($data['up_date'])->format('Y/m/d H:i:s');
+        }
+
+        // Send mail error
+        if ($status == 0) {
+            $information['status'] = 0;
+            $information['error_content'] = '('.$data['file_name'].') '.$data['message'];
+        }
+
+        try {
+            log_info('[WS-EOS] 注文メールの送信を行います.');
+
+            $this->mailService->sendMailImportWSEOS($information);
+
+            // Update information dt_import_csv
+            $data = [
+                'id' => $data['id'],
+                'is_send_mail' => 1,
+            ];
+            $this->entityManager->getRepository(DtImportCSV::class)->updateData($data);
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
+
+            return;
+        }
+    }
+
     private function handleValidateWSEOS()
     {
         try {
-            log_info('Start Handle Validate WS EOS DATA');
+            log_info('Start Handle Validate WS EOS DATA '.($this->check_validate ? 'With Check' : 'Without Check'));
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             // Get data to validate ws eos
             $data = $this->entityManager->getRepository(DtOrderWSEOS::class)->findBy([
@@ -156,7 +402,7 @@ class ValidateCsvDataCommand extends Command
                 }
             }
 
-            log_info('End Handle Validate WS EOS DATA');
+            log_info('End Handle Validate WS EOS DATA '.($this->check_validate ? 'With Check' : 'Without Check'));
         } catch (\Exception $e) {
             log_error($e->getMessage());
             $this->pushGoogleChat($e->getMessage());
@@ -272,7 +518,7 @@ class ValidateCsvDataCommand extends Command
         }
     }
 
-    private function sendMailErrorWSEOS()
+    private function sendMailWSEOSValidateError()
     {
         if (!count($this->errors)) {
             return;
@@ -299,34 +545,6 @@ class ValidateCsvDataCommand extends Command
         }
     }
 
-    private function sendMailOrderSuccess()
-    {
-        if (!count($this->success)) {
-            return;
-        }
-
-        $information = [
-            'email' => getenv('EMAIL_WS_EOS') ?? '',
-            'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
-            'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
-            'file_name' => 'Mail/ws_eos_order_success.twig',
-        ];
-
-        foreach ($this->success as $key => $success) {
-            $information['success_data'] = $success;
-
-            try {
-                log_info('[WS-EOS] Send Mail Order Success. '.$key);
-                $this->mailService->sendMailOrderSuccessWSEOS($information);
-            } catch (\Exception $e) {
-                log_error($e->getMessage());
-                $this->pushGoogleChat($e->getMessage());
-            }
-        }
-
-        return;
-    }
-
     private function handleImportOrderWSEOS()
     {
         try {
@@ -351,6 +569,8 @@ class ValidateCsvDataCommand extends Command
                     $item = $value->toArray();
 
                     // Create dtb_order
+                    $this->entityManager->getConfiguration()->setSQLLogger(null);
+                    $this->entityManager->getConnection()->beginTransaction();
                     if (!isset($order_id[$item['order_no']])) {
                         $dtbOrderData = [
                             'customer' => null,
@@ -372,6 +592,9 @@ class ValidateCsvDataCommand extends Command
                     $result1 = $this->importDtOrderStatus($item);
 
                     if ($result && $result1) {
+                        $this->entityManager->flush();
+                        $this->entityManager->getConnection()->commit();
+
                         // Save to success array to send mail
                         $this->success["{$item['order_no']}"]['detail'][] = [
                             'jan_code' => $item['jan_code'],
@@ -397,6 +620,9 @@ class ValidateCsvDataCommand extends Command
 
                         $value->setOrderRegistedFlg(1);
                         $this->entityManager->getRepository(DtOrderWSEOS::class)->save($value);
+
+                    } else {
+                        $this->entityManager->getConnection()->rollBack();
                     }
                 }
             }
@@ -471,96 +697,31 @@ class ValidateCsvDataCommand extends Command
         }
     }
 
-    private function handleImportShippingWSEOS()
+    private function sendMailOrderSuccess()
     {
-        try {
-            log_info('Start Handle Import Data To mst_shipping_ws_eos');
-            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-
-            // Get data to import
-            $data = $this->entityManager->getRepository(DtOrderWSEOS::class)->findBy([
-                'order_registed_flg' => 1,
-                'shipping_sent_flg' => 0,
-            ], [
-                'shipping_shop_code' => 'ASC',
-                'order_shop_code' => 'ASC',
-                'order_no' => 'ASC',
-                'order_line_no' => 'ASC',
-            ]);
-
-            foreach ($data as $item) {
-                $result = $this->importShippingWSEOS($item->toArray());
-
-                if ($result) {
-                    $item->setShippingSentFlg(1);
-                    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
-                }
-            }
-
-            log_info('End Handle Import Data To mst_shipping_ws_eos');
-
-            return;
-        } catch (\Exception $e) {
-            log_error($e->getMessage());
-            $this->pushGoogleChat($e->getMessage());
-
+        if (!count($this->success)) {
             return;
         }
-    }
 
-    private function importShippingWSEOS($data)
-    {
-        try {
-            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $information = [
+            'email' => getenv('EMAIL_WS_EOS') ?? '',
+            'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
+            'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
+            'file_name' => 'Mail/ws_eos_order_success.twig',
+        ];
 
-            $mstShipping = $this->entityManager->getRepository(MstShipping::class)->findOneBy([
-                'cus_order_no' => $data['order_no'],
-                'cus_order_lineno' => $data['order_line_no'],
-                'shipping_status' => 2,
-            ]);
+        foreach ($this->success as $key => $success) {
+            $information['success_data'] = $success;
 
-            if (empty($mstShipping)) {
-                return 0;
+            try {
+                log_info('[WS-EOS] Send Mail Order Success. '.$key);
+                $this->mailService->sendMailOrderSuccessWSEOS($information);
+            } catch (\Exception $e) {
+                log_error($e->getMessage());
+                $this->pushGoogleChat($e->getMessage());
             }
-
-            $mstShippingWSEOS = $this->entityManager->getRepository(MstShippingWSEOS::class)->findOneBy([
-                'order_no' => $data['order_no'],
-                'order_line_no' => $data['order_line_no'],
-            ]);
-
-            if (!empty($mstShippingWSEOS)) {
-                return 1;
-            }
-
-            // Insert mst_shipping_ws_eos
-            if (empty($mstShippingWSEOS)) {
-                log_info('Import data mst_shipping_ws_eos '.$data['order_no'].'-'.$data['order_line_no']);
-                $data['shipping_date'] = $mstShipping['shipping_date'] ?? null;
-                $data['product_maker_code'] = $mstShipping['product_code'] ?? null;
-                $data['shipping_no'] = $mstShipping['shipping_no'] ?? null;
-
-                // Commnet by task #1406
-                //$mstDelivery = $this->commonService->getMstDelivery($mstShipping['shipping_no'], $data['order_no'], $data['order_line_no']);
-                //$data['delivery_no'] = $mstDelivery['delivery_no'] ?? null;
-                //$data['delivery_line_no'] = $mstDelivery['delivery_lineno'] ?? null;
-                //$data['delivery_day'] = $mstDelivery['delivery_date'] ?? null;
-                //$data['delivery_num'] = $mstDelivery['quanlity'] ?? 0;
-                //$data['delivery_price'] = $mstDelivery['unit_price'] ?? 0;
-                //$data['delivery_amount'] = $mstDelivery['amount'] ?? 0;
-
-                $data['delivery_no'] = null;
-                $data['delivery_line_no'] = null;
-                $data['delivery_day'] = null;
-
-                return $this->entityManager->getRepository(MstShippingWSEOS::class)->insertData($data);
-            }
-
-            return 0;
-        } catch (\Exception $e) {
-            log_error($e->getMessage());
-            $this->pushGoogleChat($e->getMessage());
-
-            return 0;
         }
+
+        return;
     }
 }

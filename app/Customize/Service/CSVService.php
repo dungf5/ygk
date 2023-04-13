@@ -47,8 +47,6 @@ class CSVService
                 'message' => $data,
             ];
         } catch (\Exception $e) {
-            $this->pushGoogleChat("File {$path} ".$e->getMessage());
-
             return [
                 'status' => 0,
                 'message' => "File {$path} ".$e->getMessage(),
