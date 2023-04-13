@@ -24,6 +24,7 @@ use Customize\Entity\MstProduct;
 use Customize\Entity\MstShipping;
 use Customize\Entity\MstShippingWSEOS;
 use Customize\Service\Common\MyCommonService;
+use Customize\Service\CurlPost;
 use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
@@ -35,7 +36,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Customize\Service\CurlPost;
 
 /* Run Batch: php bin/console validate-csv-data-command [param] */
 class ValidateCsvDataCommand extends Command
@@ -539,16 +539,18 @@ class ValidateCsvDataCommand extends Command
                 $data['product_maker_code'] = $mstShipping['product_code'] ?? null;
                 $data['shipping_no'] = $mstShipping['shipping_no'] ?? null;
 
-                $mstDelivery = $this->commonService->getMstDelivery($mstShipping['shipping_no'], $data['order_no'], $data['order_line_no']);
-                $data['delivery_no'] = $mstDelivery['delivery_no'] ?? null;
-                $data['delivery_line_no'] = $mstDelivery['delivery_lineno'] ?? null;
-                $data['delivery_day'] = $mstDelivery['delivery_date'] ?? null;
-                $data['delivery_num'] = $mstDelivery['quanlity'] ?? 0;
-                $data['delivery_price'] = $mstDelivery['unit_price'] ?? 0;
-                $data['delivery_amount'] = $mstDelivery['amount'] ?? 0;
+                // Commnet by task #1406
+                //$mstDelivery = $this->commonService->getMstDelivery($mstShipping['shipping_no'], $data['order_no'], $data['order_line_no']);
+                //$data['delivery_no'] = $mstDelivery['delivery_no'] ?? null;
+                //$data['delivery_line_no'] = $mstDelivery['delivery_lineno'] ?? null;
+                //$data['delivery_day'] = $mstDelivery['delivery_date'] ?? null;
+                //$data['delivery_num'] = $mstDelivery['quanlity'] ?? 0;
+                //$data['delivery_price'] = $mstDelivery['unit_price'] ?? 0;
+                //$data['delivery_amount'] = $mstDelivery['amount'] ?? 0;
 
-                $mstShipping = null;
-                $mstDelivery = null;
+                $data['delivery_no'] = null;
+                $data['delivery_line_no'] = null;
+                $data['delivery_day'] = null;
 
                 return $this->entityManager->getRepository(MstShippingWSEOS::class)->insertData($data);
             }

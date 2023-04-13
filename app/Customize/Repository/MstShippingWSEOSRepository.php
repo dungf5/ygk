@@ -14,7 +14,6 @@
 namespace Customize\Repository;
 
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
-use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstShippingWSEOS;
 use Doctrine\DBAL\Types\Type;
 use Eccube\Repository\AbstractRepository;
@@ -82,9 +81,11 @@ class MstShippingWSEOSRepository extends AbstractRepository
             $object->setDeliveryNo1($data['delivery_no']);
             $object->setDeliveryLineNo($data['delivery_line_no']);
             $object->setDeliveryDay($data['delivery_day'] ? date('Y-m-d H:i:s', strtotime($data['delivery_day'])) : null);
-            $object->setDeliveryNum((int) $data['delivery_num']);
-            $object->setDeliveryPrice((int) $data['delivery_price']);
-            $object->setDeliveryAmount((int) $data['delivery_amount']);
+
+            // Commnet by task #1406
+            //$object->setDeliveryNum((int) $data['delivery_num']);
+            //$object->setDeliveryPrice((int) $data['delivery_price']);
+            //$object->setDeliveryAmount((int) $data['delivery_amount']);
 
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();
