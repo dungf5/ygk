@@ -90,7 +90,7 @@ class ValidateCsvDataCommand extends Command
         $param = $input->getArgument('arg1') ?? null;
         $option = $input->getOption('check');
 
-        if (!empty($option) && $option == 'true') {
+        if (!empty($option) && ($option == 'true' || $option == '1')) {
             $this->check_validate = true;
         }
 
