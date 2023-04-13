@@ -37,7 +37,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/* Run Batch: php bin/console validate-csv-data-command [param] */
+/* Run Batch: php bin/console validate-csv-data-command [param] [option] */
+/* Ex: php bin/console validate-csv-data-command ws-eos --check=true */
 class ValidateCsvDataCommand extends Command
 {
     use PluginCommandTrait;
@@ -59,6 +60,7 @@ class ValidateCsvDataCommand extends Command
     private $customer_code = '7001';
     private $shipping_code = '7001001000';
     private $customer = null;
+    private $check_validate = false;
 
     protected static $defaultName = 'validate-csv-data-command';
     protected static $defaultDescription = 'Process Validate Csv Data Command';
@@ -76,7 +78,7 @@ class ValidateCsvDataCommand extends Command
         $this
             ->setDescription(self::$defaultDescription)
             ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
+            ->addOption('check', null, InputOption::VALUE_OPTIONAL, 'Option check validate')
         ;
     }
 
@@ -86,6 +88,11 @@ class ValidateCsvDataCommand extends Command
         log_info('---------------------------------------');
         log_info('Start Process Validate Csv Data Command');
         $param = $input->getArgument('arg1') ?? null;
+        $option = $input->getOption('check');
+
+        if (!empty($option) && $option == 'true') {
+            $this->check_validate = true;
+        }
 
         if (!$param) {
             log_error('No param. Process stopped.');
@@ -192,66 +199,60 @@ class ValidateCsvDataCommand extends Command
 
             log_info("Validate order ({$order_no}-{$order_line_no})");
 
-            // validate order_date
-            // Pending. Comment
-            //if (empty($object['order_date']) || date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d')) {
-            //    $error['error_content1'] = '発注日付が過去日付になっています';
-            //}
+            // Check flag of check validate
+            if ($this->check_validate) {
+                // validate order_date
+                if (empty($object['order_date']) || date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d')) {
+                    $error['error_content1'] = '発注日付が過去日付になっています';
+                }
 
-            // Validate customer
-            // Pending. Comment
-            //$dtCusRelation = $common->getDtCustomerRelation($this->customer_code, $this->shipping_code, $otodoke_code);
-            //if (empty($dtCusRelation)) {
-            //    $error['error_content2'] = '出荷先支店コード(顧客関連)が登録されていません';
-            //}
+                // Validate customer
+                $dtCusRelation = $common->getDtCustomerRelation($this->customer_code, $this->shipping_code, $otodoke_code);
+                if (empty($dtCusRelation)) {
+                    $error['error_content2'] = '出荷先支店コード(顧客関連)が登録されていません';
+                }
 
-            // Validate shipping_shop_code
-            // Pending. Comment
-            //if (empty($object['shipping_shop_code']) || empty($this->customer)) {
-            //    $error['error_content3'] = '出荷先支店コード(顧客情報)が登録されていません';
-            //}
+                // Validate shipping_shop_code
+                if (empty($object['shipping_shop_code']) || empty($this->customer)) {
+                    $error['error_content3'] = '出荷先支店コード(顧客情報)が登録されていません';
+                }
 
-            // validate delivery_date
-            // Pending. Comment
-            //if (empty($object['delivery_date']) || (date('Y-m-d', strtotime($object['delivery_date'])) < date('Y-m-d'))) {
-            //    $error['error_content4'] = '納入希望日が過去日付になっています';
-            //}
+                // validate delivery_date
+                if (empty($object['delivery_date']) || (date('Y-m-d', strtotime($object['delivery_date'])) < date('Y-m-d'))) {
+                    $error['error_content4'] = '納入希望日が過去日付になっています';
+                }
 
-            // Validate jan_code
-            // Pending. Comment
-            //if (empty($object['jan_code']) || empty($product)) {
-            //    $error['error_content5'] = 'JANコードが存在しません';
-            //}
+                // Validate jan_code
+                if (empty($object['jan_code']) || empty($product)) {
+                    $error['error_content5'] = 'JANコードが存在しません';
+                }
 
-            // Validate discontinued_date
-            // Pending. Comment
-            //if (!empty($product) && !empty($product['discontinued_date']) && date('Y-m-d') > date('Y-m-d', strtotime($product['discontinued_date']))) {
-            //    $error['error_content6'] = '対象商品は廃番品となっております';
-            //}
+                // Validate discontinued_date
+                if (!empty($product) && !empty($product['discontinued_date']) && date('Y-m-d') > date('Y-m-d', strtotime($product['discontinued_date']))) {
+                    $error['error_content6'] = '対象商品は廃番品となっております';
+                }
 
-            // Validdate special_order_flg
-            // Pending. Comment
-            //if (!empty($this->customer) && $this->customer['special_order_flg'] == 0 && !empty($product) && !empty($product['special_order_flg']) && strtolower($product['special_order_flg']) == 'y') {
-            //    $error['error_content7'] = '取り扱い対象商品ではありません';
-            //}
+                // Validdate special_order_flg
+                if (!empty($this->customer) && $this->customer['special_order_flg'] == 0 && !empty($product) && !empty($product['special_order_flg']) && strtolower($product['special_order_flg']) == 'y') {
+                    $error['error_content7'] = '取り扱い対象商品ではありません';
+                }
 
-            // Validate order_num
-            // Pending. Comment
-            //if (!empty($product)) {
-            //    if ((int) $object['order_num'] % (int) $product['quantity']) {
-            //        $error['error_content8'] = '発注数量の販売単位に誤りがあります';
-            //    }
-            //}
+                // Validate order_num
+                if (!empty($product)) {
+                    if ((int) $object['order_num'] % (int) $product['quantity']) {
+                        $error['error_content8'] = '発注数量の販売単位に誤りがあります';
+                    }
+                }
 
-            // Validate price
-            // Pending. Comment
-            //if (!empty($product)) {
-            //    $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
+                // Validate price
+                if (!empty($product)) {
+                    $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
 
-            //    if (empty($dtPrice) || (int) $dtPrice['price_s01'] != (int) ($object['order_price'] / (!empty($product['quantity']) ? $product['quantity'] : 1))) {
-            //        $error['error_content9'] = '発注単価が異なっています';
-            //    }
-            //}
+                    if (empty($dtPrice) || (int) $dtPrice['price_s01'] != (int) ($object['order_price'] / (!empty($product['quantity']) ? $product['quantity'] : 1))) {
+                        $error['error_content9'] = '発注単価が異なっています';
+                    }
+                }
+            }
 
             if (count($error)) {
                 $error['order_no'] = $order_no;
@@ -317,7 +318,6 @@ class ValidateCsvDataCommand extends Command
             try {
                 log_info('[WS-EOS] Send Mail Order Success. '.$key);
                 $this->mailService->sendMailOrderSuccessWSEOS($information);
-
             } catch (\Exception $e) {
                 log_error($e->getMessage());
                 $this->pushGoogleChat($e->getMessage());
