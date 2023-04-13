@@ -245,13 +245,13 @@ class ValidateCsvDataCommand extends Command
 
             // Validate price
             // Pending. Comment
-            if (!empty($product)) {
-                $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
+            //if (!empty($product)) {
+            //    $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
 
-                if (empty($dtPrice) || (int) $dtPrice['price_s01'] != (int) ($object['order_price'] / (!empty($product['quantity']) ? $product['quantity'] : 1))) {
-                    $error['error_content9'] = '発注単価が異なっています';
-                }
-            }
+            //    if (empty($dtPrice) || (int) $dtPrice['price_s01'] != (int) ($object['order_price'] / (!empty($product['quantity']) ? $product['quantity'] : 1))) {
+            //        $error['error_content9'] = '発注単価が異なっています';
+            //    }
+            //}
 
             if (count($error)) {
                 $error['order_no'] = $order_no;
