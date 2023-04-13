@@ -20,6 +20,7 @@ use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstShippingWSEOS;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\CSVService;
+use Customize\Service\CurlPost;
 use Customize\Service\FTPService;
 use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
@@ -31,7 +32,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Customize\Service\CurlPost;
 
 /* Run Batch: php bin/console export-csv-shipping-command */
 class ExportCsvShippingCommand extends Command
@@ -139,6 +139,14 @@ class ExportCsvShippingCommand extends Command
         if ($fp) {
             foreach ($mstShippingWSEOS as $item) {
                 try {
+                    $mstDelivery = $this->commonService->getMstDelivery($item['shipping_no'], $item['order_no'], $item['order_line_no']);
+                    $delivery_no = $mstDelivery['delivery_no'] ?? null;
+                    $delivery_line_no = $mstDelivery['delivery_lineno'] ?? null;
+                    $delivery_day = $mstDelivery['delivery_date'] ?? null;
+                    $delivery_num = $mstDelivery['quanlity'] ?? 0;
+                    $delivery_price = $mstDelivery['unit_price'] ?? 0;
+                    $delivery_amount = $mstDelivery['amount'] ?? 0;
+
                     $this->entityManager->getConfiguration()->setSQLLogger(null);
                     $this->entityManager->getConnection()->beginTransaction();
 
@@ -146,9 +154,11 @@ class ExportCsvShippingCommand extends Command
                         mb_convert_encoding($item['system_code'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['sales_company_code'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['sales_shop_code'], 'Shift-JIS', 'UTF-8'),
-                        mb_convert_encoding($item['delivery_no'], 'Shift-JIS', 'UTF-8'),
+                        //mb_convert_encoding($item['delivery_no'], 'Shift-JIS', 'UTF-8'),
+                        mb_convert_encoding($delivery_no, 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['delivery_type'], 'Shift-JIS', 'UTF-8'),
-                        mb_convert_encoding(!empty($item['delivery_day']) ? date('Ymd', strtotime($item['delivery_day'])) : '', 'Shift-JIS', 'UTF-8'),
+                        //mb_convert_encoding(!empty($item['delivery_day']) ? date('Ymd', strtotime($item['delivery_day'])) : '', 'Shift-JIS', 'UTF-8'),
+                        mb_convert_encoding(!empty($delivery_day) ? date('Ymd', strtotime($delivery_day)) : '', 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['delivery_flag_tmp'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['order_company_code'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['order_shop_code'], 'Shift-JIS', 'UTF-8'),
@@ -159,8 +169,10 @@ class ExportCsvShippingCommand extends Command
                         mb_convert_encoding($item['system_code1'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['sales_company_code1'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['sales_ship_code1'], 'Shift-JIS', 'UTF-8'),
-                        mb_convert_encoding($item['delivery_no1'], 'Shift-JIS', 'UTF-8'),
-                        mb_convert_encoding($item['delivery_line_no'], 'Shift-JIS', 'UTF-8'),
+                        //mb_convert_encoding($item['delivery_no1'], 'Shift-JIS', 'UTF-8'),
+                        //mb_convert_encoding($item['delivery_line_no'], 'Shift-JIS', 'UTF-8'),
+                        mb_convert_encoding($delivery_no, 'Shift-JIS', 'UTF-8'),
+                        mb_convert_encoding($delivery_line_no, 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['delivery_type1'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['order_type'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['order_no'], 'Shift-JIS', 'UTF-8'),
@@ -174,9 +186,12 @@ class ExportCsvShippingCommand extends Command
                         mb_convert_encoding($item['order_num'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['order_price'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['order_amount'], 'Shift-JIS', 'UTF-8'),
-                        mb_convert_encoding($item['delivery_num'], 'Shift-JIS', 'UTF-8'),
-                        mb_convert_encoding($item['delivery_price'], 'Shift-JIS', 'UTF-8'),
-                        mb_convert_encoding($item['delivery_amount'], 'Shift-JIS', 'UTF-8'),
+                        //mb_convert_encoding($item['delivery_num'], 'Shift-JIS', 'UTF-8'),
+                        //mb_convert_encoding($item['delivery_price'], 'Shift-JIS', 'UTF-8'),
+                        //mb_convert_encoding($item['delivery_amount'], 'Shift-JIS', 'UTF-8'),
+                        mb_convert_encoding($delivery_num, 'Shift-JIS', 'UTF-8'),
+                        mb_convert_encoding($delivery_price, 'Shift-JIS', 'UTF-8'),
+                        mb_convert_encoding($delivery_amount, 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['tax_type'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding(!empty($item['order_date']) ? date('Ymd', strtotime($item['order_date'])) : '', 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding(!empty($item['shipping_date']) ? date('Ymd', strtotime($item['shipping_date'])) : '', 'Shift-JIS', 'UTF-8'),
@@ -190,7 +205,6 @@ class ExportCsvShippingCommand extends Command
                         mb_convert_encoding($item['price_basic'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['price_list'], 'Shift-JIS', 'UTF-8'),
                     ];
-                    fputcsv($fp, $fields);
 
                     $item->setShippingSendFlg(0);
                     $item->setShippingSentFlg(1);
@@ -201,6 +215,8 @@ class ExportCsvShippingCommand extends Command
                         $dtOrderWsEOS->setShippingSentFlg(1);
                         $this->entityManager->getRepository(DtOrderWSEOS::class)->save($dtOrderWsEOS);
                     }
+
+                    fputcsv($fp, $fields);
 
                     $this->entityManager->flush();
                     $this->entityManager->getConnection()->commit();
