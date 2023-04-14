@@ -14,6 +14,7 @@
 namespace Eccube\Repository;
 
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Service\CurlPost;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
@@ -33,6 +34,8 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class OrderRepository extends AbstractRepository
 {
+    use CurlPost;
+
     /**
      * @var Queries
      */
@@ -466,6 +469,10 @@ class OrderRepository extends AbstractRepository
         } catch (\Exception $e) {
             log_info('Insert dtb_order error');
             log_info($e->getMessage());
+
+            $message = 'Insert dtb_order error';
+            $message .= "\n".$e->getMessage();
+            $this->pushGoogleChat($message);
 
             return 0;
         }
