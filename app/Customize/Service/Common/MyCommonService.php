@@ -2618,4 +2618,89 @@ SQL;
             return [];
         }
     }
+
+    /**
+     * Get dt_price
+     *
+     * @param $product
+     * @param $customer_code
+     * @param $shipping_code
+     *
+     * @return array|mixed
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getDtPrice($product_code, $customer_code, $shipping_code)
+    {
+        $sql = "
+            SELECT dp.*
+            FROM dt_price dp
+            WHERE dp.product_code = ?
+            AND dp.customer_code = ?
+            AND dp.shipping_no = ?
+            AND DATE_FORMAT(NOW(),'%Y-%m-%d') >= dp.valid_date
+            AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(dp.expire_date, INTERVAL 1 DAY)
+            ORDER BY dp.tanka_number DESC
+            LIMIT 1
+        ";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$product_code, $customer_code, $shipping_code]);
+            $rows = $result->fetchAllAssociative();
+
+            return $rows[0] ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get dt_customer_relation
+     *
+     * @param $customer_code
+     * @param $shipping_code
+     * @param $otodoke_code
+     *
+     * @return array|mixed
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getDtCustomerRelation($customer_code, $shipping_code, $otodoke_code)
+    {
+        $sql = '
+            SELECT dcr.*
+            FROM dt_customer_relation dcr
+            WHERE dcr.customer_code = ?
+            AND dcr.shipping_code = ?
+            AND dcr.otodoke_code = ?
+            LIMIT 1
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$customer_code, $shipping_code, $otodoke_code]);
+            $rows = $result->fetchAllAssociative();
+
+            return $rows[0] ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getReturnsReson()
+    {
+        $sql = 'SELECT `returns_reson_id`, `returns_reson` FROM `dt_returns_reson`';
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result = $statement->executeQuery();
+            $rows = $result->fetchAllAssociative();
+
+            return $rows;
+        } catch (Exception $e) {
+            return [];
+        }
+    }
 }
