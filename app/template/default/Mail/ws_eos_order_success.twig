@@ -1,0 +1,53 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+MyShoppingController.php 643 order.twig
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% autoescape 'safe_textmail' %}
+{{ information.title_mail }}
+
+
+{{ information['content'] }}
+{{ information['content2'] }}
+
+====================================================
+ご注文商品明細
+====================================================
+JANコード：
+商品名：
+単価：
+数量：
+----------------------------------------------------
+小　計：
+消費税：
+....................................................
+お支払い合計：(税込)
+
+====================================================
+ご注文者情報
+====================================================
+会社名：
+担当者：
+郵便番号：
+住所：
+電話番号：
+メールアドレス：
+
+====================================================
+配送情報
+====================================================
+◎お届け先
+
+会社名：
+担当者：
+郵便番号：
+住所：
+電話番号：
+
+お届け希望日：
+{% endautoescape %}

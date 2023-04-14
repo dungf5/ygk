@@ -13,6 +13,9 @@
 
 namespace Eccube\Repository;
 
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Service\CurlPost;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Eccube\Doctrine\Query\Queries;
@@ -31,23 +34,15 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class OrderRepository extends AbstractRepository
 {
+    use CurlPost;
+
     /**
      * @var Queries
      */
     protected $queries;
 
     public const COLUMNS = [
-        'order' => 'o.name01'
-        ,'orderer'=> 'o.id'
-        ,'shipping_id'=> 's.id'
-        ,'purchase_product' => 'oi.product_name'
-        ,'quantity' => 'oi.quantity'
-        ,'payment_method' => 'o.payment_method'
-        ,'order_status' => 'o.OrderStatus'
-        ,'purchase_price' => 'o.total'
-        ,'shipping_status' => 's.shipping_date'
-        ,'tracking_number' => 's.tracking_number'
-        ,'delivery'  => 's.name01'
+        'order' => 'o.name01', 'orderer' => 'o.id', 'shipping_id' => 's.id', 'purchase_product' => 'oi.product_name', 'quantity' => 'oi.quantity', 'payment_method' => 'o.payment_method', 'order_status' => 'o.OrderStatus', 'purchase_price' => 'o.total', 'shipping_status' => 's.shipping_date', 'tracking_number' => 's.tracking_number', 'delivery' => 's.name01',
     ];
 
     /**
@@ -452,5 +447,34 @@ class OrderRepository extends AbstractRepository
         $Customer->setBuyTotal($result['buy_total']);
         $Customer->setFirstBuyDate($FirstOrder->getOrderDate());
         $Customer->setLastBuyDate($LastOrder->getOrderDate());
+    }
+
+    public function insertData($data = [])
+    {
+        try {
+            if (empty($data)) {
+                return 0;
+            }
+
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            $object = new Order();
+            $object->setCustomer($data['customer']);
+            $object->setName01($data['name01']);
+            $object->setName02($data['name02']);
+
+            $this->getEntityManager()->persist($object);
+            $this->getEntityManager()->flush();
+
+            return $object->getId();
+        } catch (\Exception $e) {
+            log_info('Insert dtb_order error');
+            log_info($e->getMessage());
+
+            $message = 'Insert dtb_order error';
+            $message .= "\n".$e->getMessage();
+            $this->pushGoogleChat($message);
+
+            return 0;
+        }
     }
 }

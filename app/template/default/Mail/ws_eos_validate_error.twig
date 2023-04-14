@@ -1,0 +1,32 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+MyShoppingController.php 643 order.twig
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% autoescape 'safe_textmail' %}
+{{ information.title_mail }}
+
+{{ information.subject_mail }}
+{{ information.error_title }}
+{% if information['error_data'] %}
+{% for error in information['error_data'] %}
+====================================================
+注文伝票番号 ＝ {{ error['order_no'] }}     注文伝票行番号 ＝ {{ error['order_line_no'] }}
+====================================================
+{% for i in 1..10 %}
+{% if error["error_content#{i}"]  is defined %}
+エラー内容：{{ error["error_content#{i}"] }}
+{% endif %}
+{% endfor %}
+
+
+{% endfor %}
+{% endif %}
+{{ information['content'] }}
+{{ information['content2'] }}
+{% endautoescape %}

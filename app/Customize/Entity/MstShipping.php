@@ -41,6 +41,7 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
          * @var string
          *
          * @ORM\Column(name="order_no", type="string", length=15)
+         * @ORM\Id
          */
         private $order_no;
 
@@ -55,15 +56,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getCusOrderNo(): string
+        public function getCusOrderNo()
         {
             return $this->cus_order_no;
         }
 
         /**
-         * @param string $cus_order_no
+         * @param $cus_order_no
          */
-        public function setCusOrderNo(string $cus_order_no): void
+        public function setCusOrderNo($cus_order_no)
         {
             $this->cus_order_no = $cus_order_no;
         }
@@ -72,6 +73,7 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
          * @var string
          *
          * @ORM\Column(name="order_lineno", type="string", length=8)
+         * @ORM\Id
          */
         private $order_lineno;
 
@@ -85,15 +87,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getCusOrderLineno(): string
+        public function getCusOrderLineno()
         {
             return $this->cus_order_lineno;
         }
 
         /**
-         * @param string $cus_order_lineno
+         * @param $cus_order_lineno
          */
-        public function setCusOrderLineno(string $cus_order_lineno): void
+        public function setCusOrderLineno($cus_order_lineno)
         {
             $this->cus_order_lineno = $cus_order_lineno;
         }
@@ -108,15 +110,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getCustomerCode(): string
+        public function getCustomerCode()
         {
             return $this->customer_code;
         }
 
         /**
-         * @param string $customer_code
+         * @param $customer_code
          */
-        public function setCustomerCode(string $customer_code): void
+        public function setCustomerCode($customer_code)
         {
             $this->customer_code = $customer_code;
         }
@@ -124,15 +126,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getShippingCode(): string
+        public function getShippingCode()
         {
             return $this->shipping_code;
         }
 
         /**
-         * @param string $shipping_code
+         * @param $shipping_code
          */
-        public function setShippingCode(string $shipping_code): void
+        public function setShippingCode($shipping_code)
         {
             $this->shipping_code = $shipping_code;
         }
@@ -145,6 +147,29 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         private $shipping_code;
 
         /**
+         * @return string
+         */
+        public function getOtodokeCode()
+        {
+            return $this->otodoke_code;
+        }
+
+        /**
+         * @param $otodoke_code
+         */
+        public function setOtodokeCode($otodoke_code)
+        {
+            $this->otodoke_code = $otodoke_code;
+        }
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="otodoke_code", type="string", length=25)
+         */
+        private $otodoke_code;
+
+        /**
          * @var string
          *
          * @ORM\Column(name="product_code", type="string", length=25)
@@ -154,15 +179,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getProductCode(): string
+        public function getProductCode()
         {
             return $this->product_code;
         }
 
         /**
-         * @param string $product_code
+         * @param $product_code
          */
-        public function setProductCode(string $product_code): void
+        public function setProductCode($product_code)
         {
             $this->product_code = $product_code;
         }
@@ -249,15 +274,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getShippingNo(): string
+        public function getShippingNo()
         {
             return $this->shipping_no;
         }
 
         /**
-         * @param string $shipping_no
+         * @param $shipping_no
          */
-        public function setShippingNo(string $shipping_no): void
+        public function setShippingNo($shipping_no)
         {
             $this->shipping_no = $shipping_no;
         }
@@ -265,15 +290,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getOrderNo(): string
+        public function getOrderNo()
         {
             return $this->order_no;
         }
 
         /**
-         * @param string $order_no
+         * @param $order_no
          */
-        public function setOrderNo(string $order_no): void
+        public function setOrderNo($order_no)
         {
             $this->order_no = $order_no;
         }
@@ -283,15 +308,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getOrderLineno(): string
+        public function getOrderLineno()
         {
             return $this->order_lineno;
         }
 
         /**
-         * @param string $order_lineno
+         * @param $order_lineno
          */
-        public function setOrderLineno(string $order_lineno): void
+        public function setOrderLineno($order_lineno)
         {
             $this->order_lineno = $order_lineno;
         }
@@ -299,15 +324,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return int
          */
-        public function getShippingStatus(): int
+        public function getShippingStatus()
         {
             return $this->shipping_status;
         }
 
         /**
-         * @param int $shipping_status
+         * @param $shipping_status
          */
-        public function setShippingStatus(int $shipping_status): void
+        public function setShippingStatus($shipping_status)
         {
             $this->shipping_status = $shipping_status;
         }
@@ -315,15 +340,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getEcOrderNo(): string
+        public function getEcOrderNo()
         {
             return $this->ec_order_no;
         }
 
         /**
-         * @param string $ec_order_no
+         * @param $ec_order_no
          */
-        public function setEcOrderNo(string $ec_order_no): void
+        public function setEcOrderNo($ec_order_no)
         {
             $this->ec_order_no = $ec_order_no;
         }
@@ -331,15 +356,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getEcOrderLineno(): string
+        public function getEcOrderLineno()
         {
             return $this->ec_order_lineno;
         }
 
         /**
-         * @param string $ec_order_lineno
+         * @param $ec_order_lineno
          */
-        public function setEcOrderLineno(string $ec_order_lineno): void
+        public function setEcOrderLineno($ec_order_lineno)
         {
             $this->ec_order_lineno = $ec_order_lineno;
         }
@@ -347,15 +372,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return int
          */
-        public function getShippingNum(): int
+        public function getShippingNum()
         {
             return $this->shipping_num;
         }
 
         /**
-         * @param int $shipping_num
+         * @param $shipping_num
          */
-        public function setShippingNum(int $shipping_num): void
+        public function setShippingNum($shipping_num)
         {
             $this->shipping_num = $shipping_num;
         }
@@ -369,9 +394,9 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         }
 
         /**
-         * @param string $shipping_plan_date
+         * @param $shipping_plan_date
          */
-        public function setShippingPlanDate(string $shipping_plan_date): void
+        public function setShippingPlanDate($shipping_plan_date)
         {
             $this->shipping_plan_date = $shipping_plan_date;
         }
@@ -379,15 +404,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getShippingDate(): string
+        public function getShippingDate()
         {
             return $this->shipping_date;
         }
 
         /**
-         * @param string $shipping_date
+         * @param $shipping_date
          */
-        public function setShippingDate(string $shipping_date): void
+        public function setShippingDate($shipping_date)
         {
             $this->shipping_date = $shipping_date;
         }
@@ -395,15 +420,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getInquiryNo(): string
+        public function getInquiryNo()
         {
             return $this->inquiry_no;
         }
 
         /**
-         * @param string $inquiry_no
+         * @param $inquiry_no
          */
-        public function setInquiryNo(string $inquiry_no): void
+        public function setInquiryNo($inquiry_no)
         {
             $this->inquiry_no = $inquiry_no;
         }
@@ -411,15 +436,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return string
          */
-        public function getShippingCompanyCode(): string
+        public function getShippingCompanyCode()
         {
             return $this->shipping_company_code;
         }
 
         /**
-         * @param string $shipping_company_code
+         * @param $shipping_company_code
          */
-        public function setShippingCompanyCode(string $shipping_company_code): void
+        public function setShippingCompanyCode($shipping_company_code)
         {
             $this->shipping_company_code = $shipping_company_code;
         }
@@ -435,7 +460,7 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @param \DateTime $create_date
          */
-        public function setCreateDate(\DateTime $create_date): void
+        public function setCreateDate(\DateTime $create_date)
         {
             $this->create_date = $create_date;
         }
@@ -451,7 +476,7 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @param  $update_date
          */
-        public function setUpdateDate( $update_date): void
+        public function setUpdateDate( $update_date)
         {
             $this->update_date = $update_date;
         }
@@ -459,15 +484,15 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @return int
          */
-        public function getDeleteFlg(): int
+        public function getDeleteFlg()
         {
             return $this->delete_flg;
         }
 
         /**
-         * @param int $delete_flg
+         * @param $delete_flg
          */
-        public function setDeleteFlg(int $delete_flg): void
+        public function setDeleteFlg($delete_flg)
         {
             $this->delete_flg = $delete_flg;
         }

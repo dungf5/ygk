@@ -42,6 +42,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
     public function save($entity)
     {
         $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
     }
 
     protected function getCacheLifetime()
