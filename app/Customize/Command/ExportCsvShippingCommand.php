@@ -139,6 +139,12 @@ class ExportCsvShippingCommand extends Command
         if ($fp) {
             foreach ($mstShippingWSEOS as $item) {
                 try {
+                    $dtOrderWsEOS = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy(['order_no' => $item['order_no'], 'order_line_no' => $item['order_line_no']]);
+
+                    if (empty($dtOrderWsEOS) || $dtOrderWsEOS['shipping_sent_flg'] != 1) {
+                        continue;
+                    }
+
                     $mstDelivery = $this->commonService->getMstDelivery($item['shipping_no'], $item['order_no'], $item['order_line_no']);
                     $delivery_no = $mstDelivery['delivery_no'] ?? null;
                     $delivery_line_no = $mstDelivery['delivery_lineno'] ?? null;
@@ -210,7 +216,6 @@ class ExportCsvShippingCommand extends Command
                     $item->setShippingSentFlg(1);
                     $this->entityManager->getRepository(MstShippingWSEOS::class)->save($item);
 
-                    $dtOrderWsEOS = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy(['order_no' => $item['order_no'], 'order_line_no' => $item['order_line_no']]);
                     if (!empty($dtOrderWsEOS)) {
                         $dtOrderWsEOS->setShippingSentFlg(1);
                         $this->entityManager->getRepository(DtOrderWSEOS::class)->save($dtOrderWsEOS);
