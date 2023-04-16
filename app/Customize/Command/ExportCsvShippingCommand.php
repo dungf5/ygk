@@ -212,6 +212,8 @@ class ExportCsvShippingCommand extends Command
                         mb_convert_encoding($item['price_list'], 'Shift-JIS', 'UTF-8'),
                     ];
 
+                    fputcsv($fp, $fields);
+
                     $item->setShippingSendFlg(0);
                     $item->setShippingSentFlg(1);
                     $this->entityManager->getRepository(MstShippingWSEOS::class)->save($item);
@@ -220,8 +222,6 @@ class ExportCsvShippingCommand extends Command
                         $dtOrderWsEOS->setShippingSentFlg(1);
                         $this->entityManager->getRepository(DtOrderWSEOS::class)->save($dtOrderWsEOS);
                     }
-
-                    fputcsv($fp, $fields);
 
                     $this->entityManager->flush();
                     $this->entityManager->getConnection()->commit();
