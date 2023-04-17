@@ -101,7 +101,7 @@ class ExportCsvShippingCommand extends Command
 
         $mstShippingWSEOS = $this->entityManager->getRepository(MstShippingWSEOS::class)->findBy([
             'shipping_send_flg' => 1,
-            'shipping_sent_flg' => 0,
+            //'shipping_sent_flg' => 0,
         ]);
 
         if (!count($mstShippingWSEOS)) {
