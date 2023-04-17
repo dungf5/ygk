@@ -218,10 +218,10 @@ class ExportCsvShippingCommand extends Command
                     $item->setShippingSentFlg(1);
                     $this->entityManager->getRepository(MstShippingWSEOS::class)->save($item);
 
-                    if (!empty($dtOrderWsEOS)) {
-                        $dtOrderWsEOS->setShippingSentFlg(1);
-                        $this->entityManager->getRepository(DtOrderWSEOS::class)->save($dtOrderWsEOS);
-                    }
+                    //if (!empty($dtOrderWsEOS)) {
+                    //    $dtOrderWsEOS->setShippingSentFlg(1);
+                    //    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($dtOrderWsEOS);
+                    //}
 
                     $this->entityManager->flush();
                     $this->entityManager->getConnection()->commit();
