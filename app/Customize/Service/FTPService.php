@@ -193,16 +193,17 @@ class FTPService
                 // upload a file
                 if (ftp_put($conn, $remote_file, $path_local, FTP_ASCII)) {
                     $result = [
-                            'status' => 1,
-                            'message' => $remote_file,
-                        ];
+                        'status' => 1,
+                        'message' => $remote_file,
+                    ];
                     log_info("successfully uploaded {$remote_file}");
                 } else {
                     $result = [
-                            'status' => 0,
-                            'message' => "There was a problem while uploading {$remote_file}",
-                        ];
+                        'status' => 0,
+                        'message' => "There was a problem while uploading {$remote_file}",
+                    ];
                     log_error("There was a problem while uploading {$remote_file}");
+                    $this->pushGoogleChat("There was a problem while uploading {$remote_file}");
                 }
 
                 //close
