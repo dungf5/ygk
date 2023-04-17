@@ -215,7 +215,7 @@ class ExportCsvShippingCommand extends Command
                     fputcsv($fp, $fields);
 
                     $item->setShippingSendFlg(0);
-                    //$item->setShippingSentFlg(1);
+                    $item->setShippingSentFlg(1);
                     $this->entityManager->getRepository(MstShippingWSEOS::class)->save($item);
 
                     if (!empty($dtOrderWsEOS)) {
