@@ -101,7 +101,7 @@ class ExportCsvShippingCommand extends Command
 
         $mstShippingWSEOS = $this->entityManager->getRepository(MstShippingWSEOS::class)->findBy([
             'shipping_send_flg' => 1,
-            'shipping_sent_flg' => 0,
+            //'shipping_sent_flg' => 0,
         ]);
 
         if (!count($mstShippingWSEOS)) {
@@ -139,6 +139,8 @@ class ExportCsvShippingCommand extends Command
         if ($fp) {
             foreach ($mstShippingWSEOS as $item) {
                 try {
+                    $dtOrderWsEOS = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy(['order_no' => $item['order_no'], 'order_line_no' => $item['order_line_no']]);
+
                     $mstDelivery = $this->commonService->getMstDelivery($item['shipping_no'], $item['order_no'], $item['order_line_no']);
                     $delivery_no = $mstDelivery['delivery_no'] ?? null;
                     $delivery_line_no = $mstDelivery['delivery_lineno'] ?? null;
@@ -206,17 +208,16 @@ class ExportCsvShippingCommand extends Command
                         mb_convert_encoding($item['price_list'], 'Shift-JIS', 'UTF-8'),
                     ];
 
+                    fputcsv($fp, $fields);
+
                     $item->setShippingSendFlg(0);
                     $item->setShippingSentFlg(1);
                     $this->entityManager->getRepository(MstShippingWSEOS::class)->save($item);
 
-                    $dtOrderWsEOS = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy(['order_no' => $item['order_no'], 'order_line_no' => $item['order_line_no']]);
                     if (!empty($dtOrderWsEOS)) {
                         $dtOrderWsEOS->setShippingSentFlg(1);
                         $this->entityManager->getRepository(DtOrderWSEOS::class)->save($dtOrderWsEOS);
                     }
-
-                    fputcsv($fp, $fields);
 
                     $this->entityManager->flush();
                     $this->entityManager->getConnection()->commit();
