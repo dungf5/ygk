@@ -145,9 +145,10 @@ class FTPService
                         $message = "successfully written {$file} to {$local_file}";
                         fclose($handle);
                     } else {
-                        $message = "There was a problem while downloading $file to $local_file";
+                        $message = "There was a problem while downloading {$file} to {$local_file}";
                         fclose($handle);
                         unlink($local_file);
+                        $this->pushGoogleChat("There was a problem while downloading {$file} to {$local_file}");
                     }
 
                     //close
