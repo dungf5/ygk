@@ -114,10 +114,10 @@ class ImportCsvShippingCommand extends Command
             foreach ($data as $item) {
                 $result = $this->importShippingWSEOS($item->toArray());
 
-                //if ($result) {
-                //    $item->setShippingSentFlg(1);
-                //    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
-                //}
+                if ($result) {
+                    $item->setShippingSentFlg(1);
+                    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
+                }
             }
 
             log_info('End Handle Import Data To mst_shipping_ws_eos');
