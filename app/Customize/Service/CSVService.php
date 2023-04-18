@@ -122,7 +122,7 @@ class CSVService
             $local_file = $monthDir.'/'.$local_file_name;
 
             // try to copy file from path_from to path_to
-            if (copy($path_from.$file, $local_file_name)) {
+            if (copy($path_from.$file, $local_file)) {
                 // Save file information to DB
                 $insertDate = [
                     'file_name' => $local_file_name,
