@@ -154,7 +154,10 @@ class FTPService
                     //close
                     @ftp_close($conn);
                 } catch (\Exception $e) {
+                    fclose($handle);
                     unlink($local_file);
+                    @ftp_close($conn);
+
                     $this->pushGoogleChat($e->getMessage());
 
                     return [
