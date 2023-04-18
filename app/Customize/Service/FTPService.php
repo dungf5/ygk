@@ -145,7 +145,7 @@ class FTPService
                         $message = "successfully written {$file} to {$local_file}";
                         fclose($handle);
                         //close
-                        @ftp_close($conn);
+                        ftp_close($conn);
                         log_info('ftp_close');
 
                     } else {
@@ -153,7 +153,7 @@ class FTPService
                         fclose($handle);
                         unlink($local_file);
                         //close
-                        @ftp_close($conn);
+                        ftp_close($conn);
                         log_info('ftp_close');
 
                         $this->pushGoogleChat("There was a problem while downloading {$file} to {$local_file}");
@@ -162,7 +162,7 @@ class FTPService
                 } catch (\Exception $e) {
                     fclose($handle);
                     unlink($local_file);
-                    @ftp_close($conn);
+                    ftp_close($conn);
                     log_info('ftp_close');
 
 
