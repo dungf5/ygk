@@ -101,22 +101,19 @@ class GetFileFTPCommand extends Command
                 $path_local .= 'csv/order/';
                 $file = getenv('FTP_DOWNLOAD_ORDER_FILE_NAME') ?? 'HACHU-NEW.csv';
 
-                //if (!empty($path)) {
-                //    $path = $path.'/'.$file;
-                //} else {
-                //    $path = $file;
-                //}
+                if (!empty($path)) {
+                    $path = $path.'/'.$file;
+                } else {
+                    $path = $file;
+                }
 
-                //if (!str_ends_with(trim($path), '.csv')) {
-                //    log_error("{$path} is not a csv file");
+                if (!str_ends_with(trim($path), '.csv')) {
+                    log_error("{$path} is not a csv file");
 
-                //    return;
-                //}
+                    return;
+                }
 
-                $path_from = getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') ?? '/html/download/';
-                $path_from .= 'csv/hachu/';
-                $path_to = $path_local;
-                $result = $this->csvService->transferFile($path_from, $path_to, $file);
+                $result = $this->ftpService->getFiles(trim($path), $path_local);
                 log_info($result['message']);
 
                 // Send mail error
