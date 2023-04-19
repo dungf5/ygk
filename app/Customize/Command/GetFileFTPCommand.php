@@ -96,24 +96,19 @@ class GetFileFTPCommand extends Command
             case 'ws-eos':
                 log_info('Start Get File Order WS-EOS');
                 /* Get files from FTP server*/
-                $path = getenv('FTP_DOWNLOAD_DIRECTORY') ?? '';
-                $path_local = getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') ?? '/html/download/';
-                $path_local .= 'csv/order/';
-                $file = getenv('FTP_DOWNLOAD_ORDER_FILE_NAME') ?? 'HACHU-NEW.csv';
+                $file = !empty(getenv('FTP_DOWNLOAD_ORDER_FILE_NAME')) ? getenv('FTP_DOWNLOAD_ORDER_FILE_NAME') : 'HACHU-NEW.csv';
 
-                if (!empty($path)) {
-                    $path = $path.'/'.$file;
-                } else {
-                    $path = $file;
-                }
-
-                if (!str_ends_with(trim($path), '.csv')) {
-                    log_error("{$path} is not a csv file");
+                if (!str_ends_with(trim($file), '.csv')) {
+                    log_error("{$file} is not a csv file");
 
                     return;
                 }
 
-                $result = $this->ftpService->getFiles(trim($path), $path_local);
+                $path_local = !empty(getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY')) ? getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') : '/html/download/';
+                $path_from = $path_local.'csv/hachu/';
+                $path_to = $path_local.'csv/order/';
+
+                $result = $this->csvService->transferFile($path_from, $path_to, $file);
                 log_info($result['message']);
 
                 // Send mail error
