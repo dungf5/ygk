@@ -69,6 +69,10 @@ class CSVService
     {
         try {
             if (empty($file)) {
+                $message = "copy file FROM {$path_from} TO {$path_to}";
+                $message .= "\nFile is empty";
+                $this->pushGoogleChat($message);
+
                 return [
                     'status' => 0,
                     'message' => 'File is empty',
@@ -87,8 +91,8 @@ class CSVService
                 $this->pushGoogleChat('path: '.$path_from.$file.' is invalid');
 
                 return [
-                    'status' => 0,
-                    'message' => 'path: '.$path_from.$file.' is invalid',
+                    'status' => -1,
+                    'message' => 'File '.$file.' is not existed',
                 ];
             }
 
@@ -137,18 +141,20 @@ class CSVService
 
                 $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
 
+                $status = 1;
                 $message = "successfully written {$file} to {$local_file}";
                 unlink($path_from.$file);
                 $this->pushGoogleChat("successfully written {$file} to {$local_file}");
 
             } else {
+                $status = 0;
                 $message = "There was a problem while downloading {$file} to {$local_file}";
 
                 $this->pushGoogleChat("There was a problem while downloading {$file} to {$local_file}");
             }
 
             return [
-                'status' => 1,
+                'status' => $status,
                 'message' => $message,
             ];
 
