@@ -46,8 +46,6 @@ class DtImportCsvRepository extends AbstractRepository
             $object->setIsSync($data['is_sync']);
             $object->setIsError($data['is_error']);
             $object->setIsSendMail($data['is_send_mail']);
-            $object->setInDate($data['in_date']);
-            $object->setUpDate($data['up_date']);
 
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();

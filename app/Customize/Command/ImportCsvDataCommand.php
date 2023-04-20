@@ -175,7 +175,6 @@ class ImportCsvDataCommand extends Command
                     'message' => $result['message'] ?? '',
                     'is_sync' => 1,
                     'is_error' => $result['status'] ? 0 : 1,
-                    'up_date' => new \DateTime(date('Y-m-d H:i:s')),
                 ];
                 $this->entityManager->getRepository(DtImportCSV::class)->updateData($data);
 
@@ -320,7 +319,7 @@ class ImportCsvDataCommand extends Command
         // Send mail successfully
         if ($status == 1) {
             $information['status'] = 1;
-            $information['finish_time'] = '('.$data['file_name'].') '.($data['up_date'])->format('Y/m/d H:i:s');
+            $information['finish_time'] = '('.$data['file_name'].') '.date('Y-m-d H:i:s');
         }
 
         // Send mail error
