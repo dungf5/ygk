@@ -175,7 +175,7 @@ class CSVService
 
                 $status = 1;
                 $message = "successfully written {$file} to {$local_file}";
-                unlink($path_from.$file);
+                //unlink($path_from.$file);
                 $this->pushGoogleChat("successfully written {$file} to {$local_file}");
             } else {
                 $status = 0;
