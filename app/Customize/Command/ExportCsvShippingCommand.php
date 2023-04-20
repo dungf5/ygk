@@ -231,6 +231,16 @@ class ExportCsvShippingCommand extends Command
             fclose($fp);
         }
 
+        // Check file after put data
+        if (($fp = fopen(trim($file), 'r')) !== false) {
+            $str = fread($fp, 100);
+            fclose($fp);
+
+            if (empty($str)) {
+                unlink(trim($file));
+            }
+        }
+
         return;
     }
 }
