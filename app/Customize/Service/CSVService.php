@@ -65,7 +65,7 @@ class CSVService
         }
     }
 
-    public function transferFile($path_from, $path_to, $file)
+    public function transferFile($path_from, $path_to, $file, $error_file)
     {
         try {
             if (empty($file)) {
@@ -85,6 +85,35 @@ class CSVService
                 $temp_path_local = '.';
                 $path_from = '.'.$path_from;
                 $path_to = '.'.$path_to;
+            }
+
+            if (!empty($error_file) && file_exists($path_from.$error_file) == true) {
+                if (($fp = fopen($path_from.$error_file, 'r')) !== false) {
+                    $error_str = fread($fp, 2096);
+                    fclose($fp);
+
+                    if (str_contains($error_str, "File don't make DATA 0!->logout")) {
+                        $message = 'Get file FTP';
+                        $message .= "0532 File don't make DATA 0!->logout.";
+                        $this->pushGoogleChat($message);
+
+                        return [
+                            'status' => -1,
+                            'message' => "0532 File don't make DATA 0!->logout.",
+                        ];
+                    }
+
+                    if (str_contains($error_str, 'Login failed') || str_contains($error_str, 'Login incorrect')) {
+                        $message = 'Get file FTP';
+                        $message .= '530 0508 Login incorrect.';
+                        $this->pushGoogleChat($message);
+
+                        return [
+                            'status' => -1,
+                            'message' => '530 0508 Login incorrect.',
+                        ];
+                    }
+                }
             }
 
             if (file_exists($path_from.$file) == false) {
@@ -145,7 +174,6 @@ class CSVService
                 $message = "successfully written {$file} to {$local_file}";
                 //unlink($path_from.$file);
                 $this->pushGoogleChat("successfully written {$file} to {$local_file}");
-
             } else {
                 $status = 0;
                 $message = "There was a problem while downloading {$file} to {$local_file}";
@@ -157,7 +185,6 @@ class CSVService
                 'status' => $status,
                 'message' => $message,
             ];
-
         } catch (\Exception $e) {
             $this->pushGoogleChat($e->getMessage());
 
