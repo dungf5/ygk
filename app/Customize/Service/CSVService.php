@@ -13,7 +13,9 @@
 
 namespace Customize\Service;
 
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtImportCSV;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CSVService
@@ -157,6 +159,7 @@ class CSVService
             // try to copy file from path_from to path_to
             if (copy($path_from.$file, $local_file)) {
                 // Save file information to DB
+                Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                 $insertDate = [
                     'file_name' => $local_file_name,
                     'directory' => $monthDir,
