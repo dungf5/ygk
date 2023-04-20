@@ -78,7 +78,7 @@ class ExportCsvShippingCommand extends Command
 
         /* The local path to load csv file */
         $path = getenv('LOCAL_FTP_UPLOAD_DIRECTORY') ?? '/html/upload/';
-        $path .= 'csv/shipping/';
+        $path .= 'csv/shipping/unso/';
 
         if (getenv('APP_IS_LOCAL') == 1) {
             $path = '.'.$path;
@@ -87,7 +87,7 @@ class ExportCsvShippingCommand extends Command
         log_info('----------------------------------');
 
         log_info('Start Process Export Shipping Csv for month '.date('m'));
-        $this->handleExportShippingCsv($path.date('/Y/m'));
+        $this->handleExportShippingCsv($path);
         log_info('End Process Export Shipping Csv for month '.date('m'));
 
         return 0;
@@ -111,7 +111,7 @@ class ExportCsvShippingCommand extends Command
         }
 
         $file_name = getenv('FTP_UPLOAD_SHIPPING_FILE_NAME') ?? 'SYUKA-NEW.csv';
-        $file = $path.'/'.$file_name;
+        $file = $path.$file_name;
 
         // Create directory local if have'n
         $arr_path_local = array_diff(explode('/', $path), ['.', '..']);
