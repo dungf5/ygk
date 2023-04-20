@@ -67,10 +67,10 @@ class CSVService
         }
     }
 
-    public function transferFile($path_from, $path_to, $file, $error_file)
+    public function transferFile($path_from, $path_to, $file_from, $file_to, $error_file)
     {
         try {
-            if (empty($file)) {
+            if (empty($file_from)) {
                 $message = "copy file FROM {$path_from} TO {$path_to}";
                 $message .= "\nFile is empty";
                 $this->pushGoogleChat($message);
@@ -118,12 +118,12 @@ class CSVService
                 }
             }
 
-            if (file_exists($path_from.$file) == false) {
-                $this->pushGoogleChat('path: '.$path_from.$file.' is invalid');
+            if (file_exists($path_from.$file_from) == false) {
+                $this->pushGoogleChat('path: '.$path_from.$file_from.' is invalid');
 
                 return [
                     'status' => -1,
-                    'message' => 'File '.$file.' is not existed',
+                    'message' => 'File '.$file_from.' is not existed',
                 ];
             }
 
@@ -153,35 +153,19 @@ class CSVService
                 mkdir($monthDir);
             }
 
-            $local_file_name = date('YmdHis').'.csv';
-            $local_file = $monthDir.'/'.$local_file_name;
+            $local_file = $monthDir.'/'.$file_to;
 
             // try to copy file from path_from to path_to
-            if (copy($path_from.$file, $local_file)) {
-                // Save file information to DB
-                Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-                $insertDate = [
-                    'file_name' => $local_file_name,
-                    'directory' => $monthDir,
-                    'message' => null,
-                    'is_sync' => 0,
-                    'is_error' => 0,
-                    'is_send_mail' => 0,
-                    'in_date' => new \DateTime(date('Y-m-d H:i:s')),
-                    'up_date' => null,
-                ];
-
-                $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
-
+            if (copy($path_from.$file_from, $local_file)) {
                 $status = 1;
-                $message = "successfully written {$file} to {$local_file}";
-                //unlink($path_from.$file);
-                $this->pushGoogleChat("successfully written {$file} to {$local_file}");
+                $message = "successfully written {$file_from} to {$local_file}";
+                $this->pushGoogleChat("successfully written {$file_from} to {$local_file}");
+            //unlink($path_from.$file_from);
             } else {
                 $status = 0;
-                $message = "There was a problem while downloading {$file} to {$local_file}";
+                $message = "There was a problem while downloading {$file_from} to {$local_file}";
 
-                $this->pushGoogleChat("There was a problem while downloading {$file} to {$local_file}");
+                $this->pushGoogleChat("There was a problem while downloading {$file_from} to {$local_file}");
             }
 
             return [

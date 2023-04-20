@@ -19,6 +19,7 @@ use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtExportCSV;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\CSVService;
+use Customize\Service\CurlPost;
 use Customize\Service\FTPService;
 use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
@@ -30,7 +31,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Customize\Service\CurlPost;
 
 /* Run Batch: php bin/console put-file-ftp-command [param] */
 
@@ -99,26 +99,7 @@ class PutFileFTPCommand extends Command
             case 'shipping':
                 log_info('Start Put File Shipping');
                 /* Put files to FTP server*/
-                $path = getenv('FTP_UPLOAD_DIRECTORY') ?? '';
-                $path_local = getenv('LOCAL_FTP_UPLOAD_DIRECTORY') ?? '/html/upload/';
-                $path_local .= 'csv/shipping/';
-
-                if (getenv('APP_IS_LOCAL') == 1) {
-                    $path_local = '.'.$path_local;
-                }
-
-                $path_local .= date('Y/m');
-                $file = getenv('FTP_UPLOAD_SHIPPING_FILE_NAME') ?? 'SYUKA-NEW.csv';
-
-                if (file_exists($path_local.'/'.$file) == false) {
-                    log_info("File ({$path_local}/{$file}) is empty");
-
-                    return;
-                }
-
-                $this->handleUploadFile($path, $file, $path_local);
-                log_info('End Put File Shipping');
-
+                $this->handleUploadFileShipping();
                 break;
 
             default:
@@ -126,16 +107,27 @@ class PutFileFTPCommand extends Command
         }
     }
 
-    private function handleUploadFile($path, $file, $path_local)
+    private function handleUploadFileShipping()
     {
         try {
-            if (!empty($path)) {
-                $remote_file = $path.'/'.$file;
-            } else {
-                $remote_file = $file;
+            $file_from = !empty(getenv('FTP_UPLOAD_SHIPPING_FILE_NAME')) ? getenv('FTP_UPLOAD_SHIPPING_FILE_NAME') : 'SYUKA-NEW.csv';
+
+            if (!str_ends_with(trim($file_from), '.csv')) {
+                log_error("{$file_from} is not a csv file");
+
+                $this->pushGoogleChat("Put file FTP: {$file_from} is not a csv file");
+
+                return;
             }
 
-            $result = $this->ftpService->upFiles($remote_file, $path_local.'/'.$file);
+            $path_local = !empty(getenv('LOCAL_FTP_UPLOAD_DIRECTORY')) ? getenv('LOCAL_FTP_UPLOAD_DIRECTORY') : '/html/upload/';
+            $path_from = $path_local.'csv/unso/';
+            $path_to = $path_local.'csv/shipping/';
+            $error_file = 'error.txt';
+            $file_to = date('YmdHis').'.csv';
+
+            $result = $this->csvService->transferFile($path_from, $path_to, $file_from, $file_to, $error_file);
+            log_info($result['message']);
 
             // Send mail result
             if ($result['status'] == -1 || $result['status'] == 0) {
@@ -153,8 +145,8 @@ class PutFileFTPCommand extends Command
                     // Save file information to DB
                     Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                     $insertDate = [
-                        'file_name' => trim($file),
-                        'directory' => $path,
+                        'file_name' => $file_to,
+                        'directory' => $path_to.date('Y/m'),
                         'message' => $result['message'],
                         'is_error' => 1,
                         'is_send_mail' => 0,
@@ -166,25 +158,23 @@ class PutFileFTPCommand extends Command
                     $this->pushGoogleChat($e->getMessage());
                 }
             } else {
-                // Rename file to not send again
-                $file_rename = date('YmdHis').'.csv';
-                rename("{$path_local}/{$file}", $path_local.'/'.$file_rename);
-
                 log_info('[WS-EOS] Send Mail FTP.');
+
                 $information = [
                     'email' => getenv('EMAIL_WS_EOS') ?? '',
                     'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
                     'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
                     'file_name' => 'Mail/ws_eos_ftp.twig',
                     'status' => 1,
-                    'finish_time' => '('.$result['message'].') '.date('Y/m/d H:i:s'),
+                    'finish_time' => '('.$file_from.') '.date('Y/m/d H:i:s'),
                 ];
+
                 try {
                     // Save file information to DB
                     Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                     $insertDate = [
-                        'file_name' => trim($file_rename),
-                        'directory' => $path_local,
+                        'file_name' => $file_to,
+                        'directory' => $path_to.date('Y/m'),
                         'message' => 'successfully',
                         'is_error' => 0,
                         'is_send_mail' => 1,
