@@ -168,6 +168,7 @@ class ImportCsvDataCommand extends Command
                 $result = $this->SaveDataFromFileToDB($csvData);
 
                 // Update information dt_import_csv
+                Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                 $data = [
                     'id' => $fileExist['id'],
                     'file_name' => $fileExist['file_name'],

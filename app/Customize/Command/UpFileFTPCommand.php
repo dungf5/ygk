@@ -151,6 +151,7 @@ class UpFileFTPCommand extends Command
 
                 try {
                     // Save file information to DB
+                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                     $insertDate = [
                         'file_name' => trim($file),
                         'directory' => $path,
@@ -180,6 +181,7 @@ class UpFileFTPCommand extends Command
                 ];
                 try {
                     // Save file information to DB
+                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                     $insertDate = [
                         'file_name' => trim($file_rename),
                         'directory' => $path_local,
