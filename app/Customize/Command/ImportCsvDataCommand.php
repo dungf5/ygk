@@ -174,7 +174,7 @@ class ImportCsvDataCommand extends Command
                     'message' => $result['message'] ?? '',
                     'is_sync' => 1,
                     'is_error' => $result['status'] ? 0 : 1,
-                    'up_date' => new \DateTime(),
+                    'up_date' => new \DateTime(date('Y-m-d H:i:s')),
                 ];
                 $this->entityManager->getRepository(DtImportCSV::class)->updateData($data);
 

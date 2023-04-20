@@ -157,7 +157,7 @@ class UpFileFTPCommand extends Command
                         'message' => $result['message'],
                         'is_error' => 1,
                         'is_send_mail' => 0,
-                        'in_date' => new \DateTime(),
+                        'in_date' => new \DateTime(date('Y-m-d H:i:s')),
                     ];
                     $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
                 } catch (\Exception $e) {
@@ -186,7 +186,7 @@ class UpFileFTPCommand extends Command
                         'message' => 'successfully',
                         'is_error' => 0,
                         'is_send_mail' => 1,
-                        'in_date' => new \DateTime(),
+                        'in_date' => new \DateTime(date('Y-m-d H:i:s')),
                     ];
                     $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
                 } catch (\Exception $e) {

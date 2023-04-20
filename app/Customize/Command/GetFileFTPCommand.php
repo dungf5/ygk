@@ -107,7 +107,7 @@ class GetFileFTPCommand extends Command
                 $path_local = !empty(getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY')) ? getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') : '/html/download/';
                 $path_from = $path_local.'csv/hachu/';
                 $path_to = $path_local.'csv/order/';
-                $error_file = 'error.bat';
+                $error_file = 'error.txt';
 
                 $result = $this->csvService->transferFile($path_from, $path_to, $file, $error_file);
                 log_info($result['message']);
