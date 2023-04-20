@@ -15,11 +15,14 @@ declare(strict_types=1);
 
 namespace Customize\Command;
 
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\DtImportCSV;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\CSVService;
 use Customize\Service\CurlPost;
 use Customize\Service\FTPService;
 use Customize\Service\MailService;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Command\PluginCommandTrait;
 use Symfony\Component\Console\Command\Command;
@@ -96,10 +99,12 @@ class GetFileFTPCommand extends Command
             case 'ws-eos':
                 log_info('Start Get File Order WS-EOS');
                 /* Get files from FTP server*/
-                $file = !empty(getenv('FTP_DOWNLOAD_ORDER_FILE_NAME')) ? getenv('FTP_DOWNLOAD_ORDER_FILE_NAME') : 'HACHU-NEW.csv';
+                $file_from = !empty(getenv('FTP_DOWNLOAD_ORDER_FILE_NAME')) ? getenv('FTP_DOWNLOAD_ORDER_FILE_NAME') : 'HACHU-NEW.csv';
 
-                if (!str_ends_with(trim($file), '.csv')) {
-                    log_error("{$file} is not a csv file");
+                if (!str_ends_with(trim($file_from), '.csv')) {
+                    log_error("{$file_from} is not a csv file");
+
+                    $this->pushGoogleChat("Get file FTP: {$file_from} is not a csv file");
 
                     return;
                 }
@@ -108,8 +113,9 @@ class GetFileFTPCommand extends Command
                 $path_from = $path_local.'csv/hachu/';
                 $path_to = $path_local.'csv/order/';
                 $error_file = 'error.txt';
+                $file_to = date('YmdHis').'.csv';
 
-                $result = $this->csvService->transferFile($path_from, $path_to, $file, $error_file);
+                $result = $this->csvService->transferFile($path_from, $path_to, $file_from, $file_to, $error_file);
                 log_info($result['message']);
 
                 // Send mail error
@@ -130,6 +136,24 @@ class GetFileFTPCommand extends Command
                         log_error($e->getMessage());
                         $this->pushGoogleChat($e->getMessage());
                     }
+                }
+
+                // Success
+                if ($result['status'] == 1) {
+                    // Save file information to DB
+                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                    $insertDate = [
+                        'file_name' => $file_to,
+                        'directory' => $path_to.date('Y/m'),
+                        'message' => null,
+                        'is_sync' => 0,
+                        'is_error' => 0,
+                        'is_send_mail' => 0,
+                        'in_date' => new \DateTime(date('Y-m-d H:i:s')),
+                        'up_date' => null,
+                    ];
+
+                    $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
                 }
 
                 log_info('End Get File Order WS-EOS');

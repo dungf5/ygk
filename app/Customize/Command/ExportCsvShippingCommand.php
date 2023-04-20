@@ -110,7 +110,7 @@ class ExportCsvShippingCommand extends Command
             return;
         }
 
-        $file_name = getenv('FTP_UPLOAD_SHIPPING_FILE_NAME') ?? 'SYUKA-NEW.csv';
+        $file_name = !empty(getenv('FTP_UPLOAD_SHIPPING_FILE_NAME')) ? getenv('FTP_UPLOAD_SHIPPING_FILE_NAME') : 'SYUKA-NEW.csv';
         $file = $path.$file_name;
 
         // Create directory local if have'n
