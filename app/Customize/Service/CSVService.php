@@ -13,9 +13,6 @@
 
 namespace Customize\Service;
 
-use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
-use Customize\Entity\DtImportCSV;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CSVService
@@ -160,7 +157,7 @@ class CSVService
                 $status = 1;
                 $message = "successfully written {$file_from} to {$local_file}";
                 $this->pushGoogleChat("successfully written {$file_from} to {$local_file}");
-            //unlink($path_from.$file_from);
+                unlink($path_from.$file_from);
             } else {
                 $status = 0;
                 $message = "There was a problem while downloading {$file_from} to {$local_file}";
