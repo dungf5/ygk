@@ -78,7 +78,7 @@ class ExportCsvShippingCommand extends Command
 
         /* The local path to load csv file */
         $path = getenv('LOCAL_FTP_UPLOAD_DIRECTORY') ?? '/html/upload/';
-        $path .= 'csv/shipping/unso/';
+        $path .= 'csv/unso/';
 
         if (getenv('APP_IS_LOCAL') == 1) {
             $path = '.'.$path;
