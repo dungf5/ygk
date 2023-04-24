@@ -121,8 +121,8 @@ class OrderItemRepository extends AbstractRepository
         }
 
         //group
-        $qb->addGroupBy('order_status.order_no');
-        $qb->addGroupBy('order_status.order_line_no');
+        $qb->addGroupBy('order_status.cus_order_no');
+        $qb->addGroupBy('order_status.cus_order_lineno');
 
         // Order By
         $qb->addOrderBy('order_status.order_date', 'DESC');
