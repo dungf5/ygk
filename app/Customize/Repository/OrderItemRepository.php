@@ -175,7 +175,7 @@ class OrderItemRepository extends AbstractRepository
             'Customize\Entity\MstDelivery',
             'delivery',
             Join::WITH,
-            "delivery.shipping_no = shipping.shipping_no AND TRIM(delivery.order_no) = CONCAT(TRIM(shipping.ec_order_no),'-',TRIM(shipping.ec_order_lineno))"
+            "delivery.shipping_no = shipping.shipping_no AND TRIM(delivery.order_no) = CONCAT(TRIM(shipping.cus_order_no),'-',TRIM(shipping.cus_order_lineno))"
         );
 
         $qb->addSelect(
