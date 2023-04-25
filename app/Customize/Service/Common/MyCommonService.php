@@ -2440,7 +2440,7 @@ SQL;
     /**
      * Get dt_price
      *
-     * @param $product
+     * @param $product_code
      * @param $customer_code
      * @param $shipping_code
      *

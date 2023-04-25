@@ -17,11 +17,9 @@ namespace Customize\Command;
 
 use Customize\Config\WSEOS;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
-use Customize\Entity\DtImportCSV;
 use Customize\Entity\DtOrder;
 use Customize\Entity\DtOrderStatus;
 use Customize\Entity\DtOrderWSEOS;
-use Customize\Entity\DtOrderWSEOSCopy;
 use Customize\Entity\MstCustomer;
 use Customize\Entity\MstProduct;
 use Customize\Service\Common\MyCommonService;
@@ -393,7 +391,6 @@ class ValidateCsvDataCommand extends Command
 
                         $value->setOrderRegistedFlg(1);
                         $this->entityManager->getRepository(DtOrderWSEOS::class)->save($value);
-
                     } else {
                         $this->entityManager->getConnection()->rollBack();
                     }
@@ -415,6 +412,7 @@ class ValidateCsvDataCommand extends Command
     {
         try {
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            $common = new MyCommonService($this->entityManager);
 
             $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findOneBy([
                 'order_no' => $data['order_no'],
@@ -428,8 +426,17 @@ class ValidateCsvDataCommand extends Command
                 $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy([
                     'jan_code' => $data['jan_code'] ?? '',
                 ]);
+
                 $data['demand_unit'] = (!empty($product) && $product['quantity'] > 1) ? 'CS' : 'PC';
-                $data['order_price'] = (!empty($product) && $product['quantity'] > 1) ? ($data['order_price'] * $product['quantity']) : $data['order_price'];
+                //$data['order_price'] = (!empty($product) && $product['quantity'] > 1) ? ($data['order_price'] * $product['quantity']) : $data['order_price'];
+
+                $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
+
+                if (!empty($dtPrice)) {
+                    $data['order_price'] = $dtPrice['price_s01'] ?? 0;
+                } else {
+                    $data['order_price'] = $product['unit_price'] ?? 0;
+                }
 
                 $location = $this->commonService->getCustomerLocation($data['customer_code']);
                 $data['location'] = $location ?? 'XB0201001';
