@@ -466,8 +466,12 @@ class ValidateCsvDataCommand extends Command
 
             return 0;
         } catch (\Exception $e) {
+            log_error('Insert dt_order error');
             log_error($e->getMessage());
-            $this->pushGoogleChat($e->getMessage());
+
+            $message = 'Import data dt_order '.$data['order_no'].'-'.$data['order_line_no'].' error';
+            $message .= "\n".$e->getMessage();
+            $this->pushGoogleChat($message);
 
             return 0;
         }
@@ -490,8 +494,12 @@ class ValidateCsvDataCommand extends Command
 
             return 0;
         } catch (\Exception $e) {
+            log_error('Insert dt_order_status error');
             log_error($e->getMessage());
-            $this->pushGoogleChat($e->getMessage());
+
+            $message = 'Import data dt_order_status '.$data['order_no'].'-'.$data['order_line_no'].' error';
+            $message .= "\n".$e->getMessage();
+            $this->pushGoogleChat($message);
 
             return 0;
         }
