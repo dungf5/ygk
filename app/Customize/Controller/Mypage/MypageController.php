@@ -807,7 +807,7 @@ class MypageController extends AbstractController
             $qb,
             $request->get('pageno', 1),
             $this->eccubeConfig['eccube_search_pmax'],
-            ['distinct' => false]
+            ['distinct' => true]
         );
 
         /*create list order date*/
