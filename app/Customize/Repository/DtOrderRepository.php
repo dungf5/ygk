@@ -64,6 +64,8 @@ class DtOrderRepository extends AbstractRepository
             $object->setDynaModelSeg5($data['dtb_order_line_no'] ?? '');
             $object->setDynaModelSeg6($data['remarks_line_no'] ?? '');
             $object->setRequestFlg('Y');
+            $object->setFvehicleno($data['fvehicleno']);
+            $object->setFtrnsportcd('87001');
 
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();

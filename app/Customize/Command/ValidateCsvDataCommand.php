@@ -17,6 +17,7 @@ namespace Customize\Command;
 
 use Customize\Config\WSEOS;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\DtBreakKey;
 use Customize\Entity\DtOrder;
 use Customize\Entity\DtOrderStatus;
 use Customize\Entity\DtOrderWSEOS;
@@ -63,6 +64,7 @@ class ValidateCsvDataCommand extends Command
     private $customer_code = '7001';
     private $shipping_code = '7001001000';
     private $customer = null;
+    private $customer_7001 = null;
     private $check_validate = false;
 
     protected static $defaultName = 'validate-csv-data-command';
@@ -131,9 +133,14 @@ class ValidateCsvDataCommand extends Command
 
                 /* Initial data */
                 Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                $this->customer_7001 = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
+                    'customer_code' => $this->customer_code,
+                ]);
+
                 $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
                     'customer_code' => $this->shipping_code,
                 ]);
+
                 $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
                 /* End - Initial data */
 
@@ -319,7 +326,7 @@ class ValidateCsvDataCommand extends Command
     private function handleImportOrderWSEOS()
     {
         try {
-            log_info('Start Handle Validate Data To dtb_order, dt_order, dt_order_status');
+            log_info('Start Handle Import Data To dtb_order, dt_order, dt_order_status');
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
             // Get data to import
@@ -336,8 +343,17 @@ class ValidateCsvDataCommand extends Command
 
             if (count($data)) {
                 $order_id = [];
+                $order_error = [];
+
                 foreach ($data as $value) {
                     $item = $value->toArray();
+
+                    // Check not exists order error_type = 1
+                    if (isset($order_error[$item['order_no']]) || $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy(['order_no' => $item['order_no'], 'error_type' => '1'])) {
+                        $order_error[$item['order_no']] = 1;
+
+                        continue;
+                    }
 
                     // Create dtb_order
                     $this->entityManager->getConfiguration()->setSQLLogger(null);
@@ -397,7 +413,7 @@ class ValidateCsvDataCommand extends Command
                 }
             }
 
-            log_info('End Handle Validate Data To dtb_order, dt_order, dt_order_status');
+            log_info('End Handle Import Data To dtb_order, dt_order, dt_order_status');
 
             return;
         } catch (\Exception $e) {
@@ -440,6 +456,10 @@ class ValidateCsvDataCommand extends Command
 
                 $location = $this->commonService->getCustomerLocation($data['customer_code']);
                 $data['location'] = $location ?? 'XB0201001';
+
+                $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
+                $sum_order_amout = $common->getSumOrderAmoutWSEOS($data['order_no']);
+                $data['fvehicleno'] = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
 
                 return $this->entityManager->getRepository(DtOrder::class)->insertData($data);
             }
@@ -501,6 +521,15 @@ class ValidateCsvDataCommand extends Command
                 $this->pushGoogleChat($e->getMessage());
             }
         }
+
+        // Update total order success to dt_break_key
+        $total_order_success = str_pad((string) count($this->success), 3, '0', STR_PAD_LEFT);
+        $break_key_data = [
+            'customer_code' => $this->customer_code,
+            'break_key' => $total_order_success,
+        ];
+
+        $this->entityManager->getRepository(DtBreakKey::class)->insertOrUpdate($break_key_data);
 
         return;
     }

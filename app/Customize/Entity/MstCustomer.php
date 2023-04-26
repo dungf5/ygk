@@ -104,6 +104,12 @@ if (!class_exists('\Customize\Entity\MstCustomer', false)) {
          * @ORM\Column(name="special_order_flg", type="integer", nullable=true)
          */
         private $special_order_flg;
+        /**
+         * @var int
+         *
+         * @ORM\Column(name="fusrdec1", type="integer", nullable=true)
+         */
+        private $fusrdec1;
 
         /**
          * @return string
@@ -345,5 +351,20 @@ if (!class_exists('\Customize\Entity\MstCustomer', false)) {
             $this->special_order_flg = $special_order_flg;
         }
 
+        /**
+         * @return int
+         */
+        public function getFusrdec1()
+        {
+            return (int) $this->fusrdec1;
+        }
+
+        /**
+         * @param $fusrdec1
+         */
+        public function setFusrdec1($fusrdec1)
+        {
+            $this->fusrdec1 = $fusrdec1;
+        }
     }
 }
