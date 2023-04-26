@@ -264,13 +264,13 @@ class ValidateCsvDataCommand extends Command
                 }
 
                 // Validate price
-                if (!empty($product)) {
-                    $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
+                //if (!empty($product)) {
+                //    $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
 
-                    if (empty($dtPrice) || (int) $dtPrice['price_s01'] != (int) ($object['order_price'] / (!empty($product['quantity']) ? $product['quantity'] : 1))) {
-                        $error['error_content9'] = '発注単価が異なっています';
-                    }
-                }
+                //    if (empty($dtPrice) || (int) $dtPrice['price_s01'] != (int) ($object['order_price'] / (!empty($product['quantity']) ? $product['quantity'] : 1))) {
+                //        $error['error_content9'] = '発注単価が異なっています';
+                //    }
+                //}
             }
 
             if (count($error)) {
@@ -415,6 +415,7 @@ class ValidateCsvDataCommand extends Command
     {
         try {
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            $common = new MyCommonService($this->entityManager);
 
             $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findOneBy([
                 'order_no' => $data['order_no'],
@@ -429,7 +430,15 @@ class ValidateCsvDataCommand extends Command
                     'jan_code' => $data['jan_code'] ?? '',
                 ]);
                 $data['demand_unit'] = (!empty($product) && $product['quantity'] > 1) ? 'CS' : 'PC';
-                $data['order_price'] = (!empty($product) && $product['quantity'] > 1) ? ($data['order_price'] * $product['quantity']) : $data['order_price'];
+                //$data['order_price'] = (!empty($product) && $product['quantity'] > 1) ? ($data['order_price'] * $product['quantity']) : $data['order_price'];
+
+                $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
+
+                if (!empty($dtPrice)) {
+                    $data['order_price'] = $dtPrice['price_s01'] ?? 0;
+                } else {
+                    $data['order_price'] = $product['unit_price'] ?? 0;
+                }
 
                 $location = $this->commonService->getCustomerLocation($data['customer_code']);
                 $data['location'] = $location ?? 'XB0201001';

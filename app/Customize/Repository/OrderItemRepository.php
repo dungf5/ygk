@@ -121,8 +121,8 @@ class OrderItemRepository extends AbstractRepository
         }
 
         //group
-        $qb->addGroupBy('order_status.order_no');
-        $qb->addGroupBy('order_status.order_line_no');
+        $qb->addGroupBy('order_status.cus_order_no');
+        $qb->addGroupBy('order_status.cus_order_lineno');
 
         // Order By
         $qb->addOrderBy('order_status.order_date', 'DESC');
@@ -175,7 +175,7 @@ class OrderItemRepository extends AbstractRepository
             'Customize\Entity\MstDelivery',
             'delivery',
             Join::WITH,
-            "delivery.shipping_no = shipping.shipping_no AND TRIM(delivery.order_no) = CONCAT(TRIM(shipping.ec_order_no),'-',TRIM(shipping.ec_order_lineno))"
+            "delivery.shipping_no = shipping.shipping_no AND TRIM(delivery.order_no) = CONCAT(TRIM(shipping.cus_order_no),'-',TRIM(shipping.cus_order_lineno))"
         );
 
         $qb->addSelect(
