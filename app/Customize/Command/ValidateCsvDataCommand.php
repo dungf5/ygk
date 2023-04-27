@@ -542,13 +542,11 @@ class ValidateCsvDataCommand extends Command
         ];
 
         $break_key = $this->entityManager->getRepository(DtBreakKey::class)->insertOrUpdate($break_key_data);
-
         if ($break_key) {
-            for ($i = 0; $i < $break_key; $i++) {
-                // first time
-                if ($break_key == count($this->success) && isset($order_success[$i])) {
+            for ($i = 1; $i <= $break_key; $i++) {
+                if ($i > ($break_key - count($this->success)) && isset($order_success[$i - ($break_key - count($this->success)) - 1])) {
                     $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findBy([
-                        'order_no' => $order_success[$i],
+                        'order_no' => $order_success[$i - ($break_key - count($this->success)) - 1],
                     ]);
 
                     foreach ($dtOrder as $order) {

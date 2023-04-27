@@ -82,5 +82,37 @@ if (!class_exists('\Customize\Entity\DtBreakKey', false)) {
         {
             $this->break_key = $break_key;
         }
+
+        /**
+         * @return \DateTime
+         */
+        public function getCreateDate(): \DateTime
+        {
+            return $this->create_date;
+        }
+
+        /**
+         * @param \DateTime $create_date
+         */
+        public function setCreateDate(\DateTime $create_date): void
+        {
+            $this->create_date = $create_date;
+        }
+
+        /**
+         * @return \DateTime
+         */
+        public function getUpdateDate(): \DateTime
+        {
+            return $this->update_date;
+        }
+
+        /**
+         * @param \DateTime $update_date
+         */
+        public function setUpdateDate(\DateTime $update_date): void
+        {
+            $this->update_date = $update_date;
+        }
     }
 }
