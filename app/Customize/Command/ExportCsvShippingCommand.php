@@ -78,6 +78,13 @@ class ExportCsvShippingCommand extends Command
         $io = new SymfonyStyle($input, $output);
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
+        // Set dt_break_key.break_key = 0 when run batch
+        $break_key = $this->entityManager->getRepository(DtBreakKey::class)->findOneBy(['customer_code' => $this->customer_code]);
+        if (!empty($break_key)) {
+            $break_key->setBreakKey(0);
+            $this->entityManager->getRepository(DtBreakKey::class)->save($break_key);
+        }
+
         /* The local path to load csv file */
         $path = getenv('LOCAL_FTP_UPLOAD_DIRECTORY') ?? '/html/upload/';
         $path .= 'csv/unso/';
@@ -240,15 +247,6 @@ class ExportCsvShippingCommand extends Command
 
             if (empty($str)) {
                 unlink(trim($file));
-            }
-
-            // Update dt_break_key.break_key = 0 after export shipping csv file successfully.
-            else {
-                $break_key = $this->entityManager->getRepository(DtBreakKey::class)->findOneBy(['customer_code' => $this->customer_code]);
-                if (!empty($break_key)) {
-                    $break_key->setBreakKey(0);
-                    $this->entityManager->getRepository(DtBreakKey::class)->save($break_key);
-                }
             }
         }
 
