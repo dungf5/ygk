@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Customize\Command;
 
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\DtBreakKey;
 use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstShippingWSEOS;
 use Customize\Service\Common\MyCommonService;
@@ -48,6 +49,7 @@ class ExportCsvShippingCommand extends Command
      * @var MailService
      */
     private $mailService;
+    private $customer_code = '7001';
 
     protected static $defaultName = 'export-csv-shipping-command';
     protected static $defaultDescription = 'Process Export Shipping Csv Command';
@@ -238,6 +240,15 @@ class ExportCsvShippingCommand extends Command
 
             if (empty($str)) {
                 unlink(trim($file));
+            }
+
+            // Update dt_break_key.break_key = 0 after export shipping csv file successfully.
+            else {
+                $break_key = $this->entityManager->getRepository(DtBreakKey::class)->findOneBy(['customer_code' => $this->customer_code]);
+                if (!empty($break_key)) {
+                    $break_key->setBreakKey(0);
+                    $this->entityManager->getRepository(DtBreakKey::class)->save($break_key);
+                }
             }
         }
 
