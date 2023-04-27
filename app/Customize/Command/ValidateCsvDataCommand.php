@@ -511,6 +511,8 @@ class ValidateCsvDataCommand extends Command
             return;
         }
 
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
         $information = [
             'email' => getenv('EMAIL_WS_EOS') ?? '',
             'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
@@ -518,12 +520,14 @@ class ValidateCsvDataCommand extends Command
             'file_name' => 'Mail/ws_eos_order_success.twig',
         ];
 
+        $order_success = [];
         foreach ($this->success as $key => $success) {
             $information['success_data'] = $success;
 
             try {
                 log_info('[WS-EOS] Send Mail Order Success. '.$key);
                 $this->mailService->sendMailOrderSuccessWSEOS($information);
+                $order_success[] = $key;
             } catch (\Exception $e) {
                 log_error($e->getMessage());
                 $this->pushGoogleChat($e->getMessage());
@@ -531,13 +535,32 @@ class ValidateCsvDataCommand extends Command
         }
 
         // Update total order success to dt_break_key
-        $total_order_success = str_pad((string) count($this->success), 3, '0', STR_PAD_LEFT);
+        //$total_order_success = str_pad((string) count($this->success), 3, '0', STR_PAD_LEFT);
         $break_key_data = [
             'customer_code' => $this->customer_code,
-            'break_key' => $total_order_success,
+            'break_key' => count($this->success),
         ];
 
-        $this->entityManager->getRepository(DtBreakKey::class)->insertOrUpdate($break_key_data);
+        $break_key = $this->entityManager->getRepository(DtBreakKey::class)->insertOrUpdate($break_key_data);
+
+        if ($break_key) {
+            for ($i = 0; $i < $break_key; $i++) {
+                // first time
+                if ($break_key == count($this->success) && isset($order_success[$i])) {
+                    $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findBy([
+                        'order_no' => $order_success[$i],
+                    ]);
+
+                    foreach ($dtOrder as $order) {
+                        $fvehicleno = $order->getFvehicleno();
+                        $fvehicleno2 = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+
+                        $order->setFvehicleno($fvehicleno.$fvehicleno2);
+                        $this->entityManager->getRepository(DtOrder::class)->save($order);
+                    }
+                }
+            }
+        }
 
         return;
     }

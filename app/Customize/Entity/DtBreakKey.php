@@ -33,9 +33,9 @@ if (!class_exists('\Customize\Entity\DtBreakKey', false)) {
          */
         private $customer_code;
         /**
-         * @var string
+         * @var integer
          *
-         * @ORM\Column(name="break_key",nullable=false, type="string", length=3, options={"comment":"ブレイクキー"})
+         * @ORM\Column(name="break_key",nullable=false, type="integer", length=3, options={"comment":"ブレイクキー"})
          */
         private $break_key;
         /**
@@ -68,7 +68,7 @@ if (!class_exists('\Customize\Entity\DtBreakKey', false)) {
         }
 
         /**
-         * @return string
+         * @return integer
          */
         public function getBreakKey()
         {

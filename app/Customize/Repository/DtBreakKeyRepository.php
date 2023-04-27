@@ -42,17 +42,19 @@ class DtBreakKeyRepository extends AbstractRepository
             $object = $this->findOneBy(['customer_code' => $data['customer_code']]);
 
             if (!empty($object)) {
-                $object->setBreakKey($data['break_key']);
+                $break_key = (int) $object->getBreakKey() + (int) $data['break_key'];
+                $object->setBreakKey($break_key);
             } else {
                 $object = new DtBreakKey();
+                $break_key = $data['break_key'];
                 $object->setCustomerCode($data['customer_code']);
-                $object->setBreakKey($data['break_key']);
+                $object->setBreakKey($break_key);
             }
 
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();
 
-            return 1;
+            return $break_key;
         } catch (\Exception $e) {
             log_info('Insert or update dt_break_key error');
             log_info($e->getMessage());
