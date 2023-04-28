@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Customize\Command;
 
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\DtBreakKey;
 use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstShippingWSEOS;
 use Customize\Service\Common\MyCommonService;
@@ -48,6 +49,7 @@ class ExportCsvShippingCommand extends Command
      * @var MailService
      */
     private $mailService;
+    private $customer_code = '7001';
 
     protected static $defaultName = 'export-csv-shipping-command';
     protected static $defaultDescription = 'Process Export Shipping Csv Command';
@@ -75,6 +77,20 @@ class ExportCsvShippingCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
+        try {
+            // Set dt_break_key.break_key = 0 when run batch
+            $break_key = $this->entityManager->getRepository(DtBreakKey::class)->findOneBy(['customer_code' => $this->customer_code]);
+            if (!empty($break_key)) {
+                $break_key->setBreakKey(0);
+                $this->entityManager->getRepository(DtBreakKey::class)->save($break_key);
+            }
+        } catch (\Exception $e) {
+            $message = 'Update dt_break_key.break_key = 0';
+            $message .= "\n".$e->getMessage();
+            $this->pushGoogleChat($e->getMessage());
+            log_error($message);
+        }
 
         /* The local path to load csv file */
         $path = getenv('LOCAL_FTP_UPLOAD_DIRECTORY') ?? '/html/upload/';

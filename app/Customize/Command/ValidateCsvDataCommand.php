@@ -17,11 +17,10 @@ namespace Customize\Command;
 
 use Customize\Config\WSEOS;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
-use Customize\Entity\DtImportCSV;
+use Customize\Entity\DtBreakKey;
 use Customize\Entity\DtOrder;
 use Customize\Entity\DtOrderStatus;
 use Customize\Entity\DtOrderWSEOS;
-use Customize\Entity\DtOrderWSEOSCopy;
 use Customize\Entity\MstCustomer;
 use Customize\Entity\MstProduct;
 use Customize\Service\Common\MyCommonService;
@@ -65,6 +64,7 @@ class ValidateCsvDataCommand extends Command
     private $customer_code = '7001';
     private $shipping_code = '7001001000';
     private $customer = null;
+    private $customer_7001 = null;
     private $check_validate = false;
 
     protected static $defaultName = 'validate-csv-data-command';
@@ -133,9 +133,14 @@ class ValidateCsvDataCommand extends Command
 
                 /* Initial data */
                 Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                $this->customer_7001 = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
+                    'customer_code' => $this->customer_code,
+                ]);
+
                 $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
                     'customer_code' => $this->shipping_code,
                 ]);
+
                 $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
                 /* End - Initial data */
 
@@ -264,13 +269,13 @@ class ValidateCsvDataCommand extends Command
                 }
 
                 // Validate price
-                if (!empty($product)) {
-                    $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
+                //if (!empty($product)) {
+                //    $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
 
-                    if (empty($dtPrice) || (int) $dtPrice['price_s01'] != (int) ($object['order_price'] / (!empty($product['quantity']) ? $product['quantity'] : 1))) {
-                        $error['error_content9'] = '発注単価が異なっています';
-                    }
-                }
+                //    if (empty($dtPrice) || (int) $dtPrice['price_s01'] != (int) ($object['order_price'] / (!empty($product['quantity']) ? $product['quantity'] : 1))) {
+                //        $error['error_content9'] = '発注単価が異なっています';
+                //    }
+                //}
             }
 
             if (count($error)) {
@@ -321,7 +326,7 @@ class ValidateCsvDataCommand extends Command
     private function handleImportOrderWSEOS()
     {
         try {
-            log_info('Start Handle Validate Data To dtb_order, dt_order, dt_order_status');
+            log_info('Start Handle Import Data To dtb_order, dt_order, dt_order_status');
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
             // Get data to import
@@ -338,8 +343,17 @@ class ValidateCsvDataCommand extends Command
 
             if (count($data)) {
                 $order_id = [];
+                $order_error = [];
+
                 foreach ($data as $value) {
                     $item = $value->toArray();
+
+                    // Check not exists order error_type = 1
+                    if (isset($order_error[$item['order_no']]) || $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy(['order_no' => $item['order_no'], 'error_type' => '1'])) {
+                        $order_error[$item['order_no']] = 1;
+
+                        continue;
+                    }
 
                     // Create dtb_order
                     $this->entityManager->getConfiguration()->setSQLLogger(null);
@@ -393,14 +407,13 @@ class ValidateCsvDataCommand extends Command
 
                         $value->setOrderRegistedFlg(1);
                         $this->entityManager->getRepository(DtOrderWSEOS::class)->save($value);
-
                     } else {
                         $this->entityManager->getConnection()->rollBack();
                     }
                 }
             }
 
-            log_info('End Handle Validate Data To dtb_order, dt_order, dt_order_status');
+            log_info('End Handle Import Data To dtb_order, dt_order, dt_order_status');
 
             return;
         } catch (\Exception $e) {
@@ -415,6 +428,7 @@ class ValidateCsvDataCommand extends Command
     {
         try {
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            $common = new MyCommonService($this->entityManager);
 
             $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findOneBy([
                 'order_no' => $data['order_no'],
@@ -428,19 +442,36 @@ class ValidateCsvDataCommand extends Command
                 $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy([
                     'jan_code' => $data['jan_code'] ?? '',
                 ]);
+
                 $data['demand_unit'] = (!empty($product) && $product['quantity'] > 1) ? 'CS' : 'PC';
-                $data['order_price'] = (!empty($product) && $product['quantity'] > 1) ? ($data['order_price'] * $product['quantity']) : $data['order_price'];
+                //$data['order_price'] = (!empty($product) && $product['quantity'] > 1) ? ($data['order_price'] * $product['quantity']) : $data['order_price'];
+
+                $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
+
+                if (!empty($dtPrice)) {
+                    $data['order_price'] = $dtPrice['price_s01'] ?? 0;
+                } else {
+                    $data['order_price'] = $product['unit_price'] ?? 0;
+                }
 
                 $location = $this->commonService->getCustomerLocation($data['customer_code']);
                 $data['location'] = $location ?? 'XB0201001';
+
+                $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
+                $sum_order_amout = $common->getSumOrderAmoutWSEOS($data['order_no']);
+                $data['fvehicleno'] = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
 
                 return $this->entityManager->getRepository(DtOrder::class)->insertData($data);
             }
 
             return 0;
         } catch (\Exception $e) {
+            log_error('Insert dt_order error');
             log_error($e->getMessage());
-            $this->pushGoogleChat($e->getMessage());
+
+            $message = 'Import data dt_order '.$data['order_no'].'-'.$data['order_line_no'].' error';
+            $message .= "\n".$e->getMessage();
+            $this->pushGoogleChat($message);
 
             return 0;
         }
@@ -463,8 +494,12 @@ class ValidateCsvDataCommand extends Command
 
             return 0;
         } catch (\Exception $e) {
+            log_error('Insert dt_order_status error');
             log_error($e->getMessage());
-            $this->pushGoogleChat($e->getMessage());
+
+            $message = 'Import data dt_order_status '.$data['order_no'].'-'.$data['order_line_no'].' error';
+            $message .= "\n".$e->getMessage();
+            $this->pushGoogleChat($message);
 
             return 0;
         }
@@ -476,6 +511,8 @@ class ValidateCsvDataCommand extends Command
             return;
         }
 
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
         $information = [
             'email' => getenv('EMAIL_WS_EOS') ?? '',
             'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
@@ -483,15 +520,43 @@ class ValidateCsvDataCommand extends Command
             'file_name' => 'Mail/ws_eos_order_success.twig',
         ];
 
+        $order_success = [];
         foreach ($this->success as $key => $success) {
             $information['success_data'] = $success;
 
             try {
                 log_info('[WS-EOS] Send Mail Order Success. '.$key);
                 $this->mailService->sendMailOrderSuccessWSEOS($information);
+                $order_success[] = $key;
             } catch (\Exception $e) {
                 log_error($e->getMessage());
                 $this->pushGoogleChat($e->getMessage());
+            }
+        }
+
+        // Update total order success to dt_break_key
+        //$total_order_success = str_pad((string) count($this->success), 3, '0', STR_PAD_LEFT);
+        $break_key_data = [
+            'customer_code' => $this->customer_code,
+            'break_key' => count($this->success),
+        ];
+
+        $break_key = $this->entityManager->getRepository(DtBreakKey::class)->insertOrUpdate($break_key_data);
+        if ($break_key) {
+            for ($i = 1; $i <= $break_key; $i++) {
+                if ($i > ($break_key - count($this->success)) && isset($order_success[$i - ($break_key - count($this->success)) - 1])) {
+                    $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findBy([
+                        'order_no' => $order_success[$i - ($break_key - count($this->success)) - 1],
+                    ]);
+
+                    foreach ($dtOrder as $order) {
+                        $fvehicleno = $order->getFvehicleno();
+                        $fvehicleno2 = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+
+                        $order->setFvehicleno($fvehicleno.$fvehicleno2);
+                        $this->entityManager->getRepository(DtOrder::class)->save($order);
+                    }
+                }
             }
         }
 

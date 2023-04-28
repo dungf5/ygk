@@ -33,47 +33,42 @@ class DtOrderRepository extends AbstractRepository
 
     public function insertData($data = [])
     {
-        try {
-            if (empty($data)) {
-                return 0;
-            }
-
-            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-            $object = new DtOrder();
-            $object->setCustomerCode($data['customer_code'] ?? '');
-            $object->setSeikyuCode($data['customer_code'] ?? '');
-            $object->setOrderNo($data['order_no'] ?? '');
-            $object->setOrderLineno($data['order_line_no'] ?? '');
-            $object->setShippingCode($data['shipping_code'] ?? '');
-            $object->setOtodokeCode($data['otodoke_code'] ?? '');
-            $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
-            $object->setDeliPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
-            $object->setShipingPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
-            $object->setItemNo($data['jan_code'] ?? '');
-            $object->setDemandQuantity((int) $data['order_num']);
-            $object->setDemandUnit($data['demand_unit']);
-            $object->setOrderPrice((float) $data['order_price']);
-            $object->setUnitPriceStatus('FOR');
-            $object->setShipingDepositCode($data['location']);
-            $object->setDeploy('XB');
-            $object->setCompanyId('XB');
-            $object->setProductCode($data['product_code'] ?? '');
-            $object->setDynaModelSeg2($data['order_no'] ?? '');
-            $object->setDynaModelSeg3('2');
-            $object->setDynaModelSeg4($data['dtb_order_no'] ?? '');
-            $object->setDynaModelSeg5($data['dtb_order_line_no'] ?? '');
-            $object->setDynaModelSeg6($data['remarks_line_no'] ?? '');
-            $object->setRequestFlg('Y');
-
-            $this->getEntityManager()->persist($object);
-            $this->getEntityManager()->flush();
-
-            return 1;
-        } catch (\Exception $e) {
-            log_info('Insert dt_order error');
-            log_info($e->getMessage());
-
+        if (empty($data)) {
             return 0;
         }
+
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $object = new DtOrder();
+        $object->setCustomerCode($data['customer_code'] ?? '');
+        $object->setSeikyuCode($data['customer_code'] ?? '');
+        $object->setOrderNo($data['order_no'] ?? '');
+        $object->setOrderLineno($data['order_line_no'] ?? '');
+        $object->setShippingCode($data['shipping_code'] ?? '');
+        $object->setOtodokeCode($data['otodoke_code'] ?? '');
+        $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
+        $object->setDeliPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
+        $object->setShipingPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
+        $object->setItemNo($data['jan_code'] ?? '');
+        $object->setDemandQuantity((int) $data['order_num']);
+        $object->setDemandUnit($data['demand_unit']);
+        $object->setOrderPrice((float) $data['order_price']);
+        $object->setUnitPriceStatus('FOR');
+        $object->setShipingDepositCode($data['location']);
+        $object->setDeploy('XB');
+        $object->setCompanyId('XB');
+        $object->setProductCode($data['product_code'] ?? '');
+        $object->setDynaModelSeg2($data['order_no'] ?? '');
+        $object->setDynaModelSeg3('2');
+        $object->setDynaModelSeg4($data['dtb_order_no'] ?? '');
+        $object->setDynaModelSeg5($data['dtb_order_line_no'] ?? '');
+        $object->setDynaModelSeg6($data['remarks_line_no'] ?? '');
+        $object->setRequestFlg('Y');
+        $object->setFvehicleno($data['fvehicleno']);
+        $object->setFtrnsportcd('87001');
+
+        $this->getEntityManager()->persist($object);
+        $this->getEntityManager()->flush();
+
+        return 1;
     }
 }

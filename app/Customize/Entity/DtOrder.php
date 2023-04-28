@@ -187,32 +187,37 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
          * @ORM\Column(name="request_flg",type="string",nullable=false, options={"comment":"申請フラグ,固定（1:Y,0:No）" ,"default":1 })
          */
         private $request_flg;
-
         /**
          * @var string
          *
          * @ORM\Column(name="shiping_deposit_code",type="string",nullable=false, options={"comment":"出荷在庫場所", "default":"XB0101001" })
          */
         private $shiping_deposit_code;
-
         /**
          * @var string
-         * @ORM\Column(name="fvehicleno",type="string",nullable=true, options={"comment":"便No. 0:送料なし、１：送料あり"  })
+         *
+         * @ORM\Column(name="fvehicleno", type="string", nullable=true, options={"comment":"便No. 0:送料なし、１：送料あり"})
          */
         private $fvehicleno;
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="ftrnsportcd", type="string", nullable=true, options={"comment":"輸送便コード"})
+         */
+        private $ftrnsportcd;
 
         /**
          * @return string
          */
-        public function getCustomerCode(): string
+        public function getCustomerCode()
         {
             return $this->customer_code;
         }
 
         /**
-         * @param string $customer_code
+         * @param $customer_code
          */
-        public function setCustomerCode(string $customer_code): void
+        public function setCustomerCode($customer_code)
         {
             $this->customer_code = $customer_code;
         }
@@ -220,15 +225,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getSeikyuCode(): string
+        public function getSeikyuCode()
         {
             return $this->seikyu_code;
         }
 
         /**
-         * @param string $seikyu_code
+         * @param $seikyu_code
          */
-        public function setSeikyuCode(string $seikyu_code): void
+        public function setSeikyuCode($seikyu_code)
         {
             $this->seikyu_code = $seikyu_code;
         }
@@ -236,15 +241,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getOrderNo(): string
+        public function getOrderNo()
         {
             return $this->order_no;
         }
 
         /**
-         * @param string $order_no
+         * @param $order_no
          */
-        public function setOrderNo(string $order_no): void
+        public function setOrderNo($order_no)
         {
             $this->order_no = $order_no;
         }
@@ -252,15 +257,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getOrderLineno(): string
+        public function getOrderLineno()
         {
             return $this->order_lineno;
         }
 
         /**
-         * @param string $order_lineno
+         * @param $order_lineno
          */
-        public function setOrderLineno(string $order_lineno): void
+        public function setOrderLineno($order_lineno)
         {
             $this->order_lineno = $order_lineno;
         }
@@ -268,15 +273,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getShippingCode(): string
+        public function getShippingCode()
         {
             return $this->shipping_code;
         }
 
         /**
-         * @param string $shipping_code
+         * @param $shipping_code
          */
-        public function setShippingCode(string $shipping_code): void
+        public function setShippingCode($shipping_code)
         {
             $this->shipping_code = $shipping_code;
         }
@@ -284,15 +289,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getOtodokeCode(): string
+        public function getOtodokeCode()
         {
             return $this->otodoke_code;
         }
 
         /**
-         * @param string $otodoke_code
+         * @param $otodoke_code
          */
-        public function setOtodokeCode(string $otodoke_code): void
+        public function setOtodokeCode($otodoke_code)
         {
             $this->otodoke_code = $otodoke_code;
         }
@@ -300,15 +305,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return \DateTime
          */
-        public function getOrderDate(): \DateTime
+        public function getOrderDate()
         {
             return $this->order_date;
         }
 
         /**
-         * @param \DateTime $order_date
+         * @param $order_date
          */
-        public function setOrderDate(\DateTime $order_date): void
+        public function setOrderDate($order_date)
         {
             $this->order_date = $order_date;
         }
@@ -316,15 +321,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDeliPlanDate(): string
+        public function getDeliPlanDate()
         {
             return $this->deli_plan_date;
         }
 
         /**
-         * @param string $deli_plan_date
+         * @param $deli_plan_date
          */
-        public function setDeliPlanDate(string $deli_plan_date): void
+        public function setDeliPlanDate($deli_plan_date)
         {
             $this->deli_plan_date = $deli_plan_date;
         }
@@ -332,15 +337,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getShipingPlanDate(): string
+        public function getShipingPlanDate()
         {
             return $this->shiping_plan_date;
         }
 
         /**
-         * @param string $shiping_plan_date
+         * @param $shiping_plan_date
          */
-        public function setShipingPlanDate(string $shiping_plan_date): void
+        public function setShipingPlanDate($shiping_plan_date)
         {
             $this->shiping_plan_date = $shiping_plan_date;
         }
@@ -348,15 +353,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getItemNo(): string
+        public function getItemNo()
         {
             return $this->item_no;
         }
 
         /**
-         * @param string $item_no
+         * @param $item_no
          */
-        public function setItemNo(string $item_no): void
+        public function setItemNo($item_no)
         {
             $this->item_no = $item_no;
         }
@@ -372,7 +377,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @param mixed $demand_quantity
          */
-        public function setDemandQuantity($demand_quantity): void
+        public function setDemandQuantity($demand_quantity)
         {
             $this->demand_quantity = $demand_quantity;
         }
@@ -380,15 +385,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDemandUnit(): string
+        public function getDemandUnit()
         {
             return $this->demand_unit;
         }
 
         /**
-         * @param string $demand_unit
+         * @param $demand_unit
          */
-        public function setDemandUnit(string $demand_unit): void
+        public function setDemandUnit($demand_unit)
         {
             $this->demand_unit = $demand_unit;
         }
@@ -404,7 +409,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @param mixed $order_price
          */
-        public function setOrderPrice($order_price): void
+        public function setOrderPrice($order_price)
         {
             $this->order_price = $order_price;
         }
@@ -418,9 +423,9 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         }
 
         /**
-         * @param string $unit_price_status
+         * @param $unit_price_status
          */
-        public function setUnitPriceStatus($unit_price_status): void
+        public function setUnitPriceStatus($unit_price_status)
         {
             $this->unit_price_status = $unit_price_status;
         }
@@ -428,15 +433,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDeploy(): string
+        public function getDeploy()
         {
             return $this->deploy;
         }
 
         /**
-         * @param string $deploy
+         * @param $deploy
          */
-        public function setDeploy(string $deploy): void
+        public function setDeploy($deploy)
         {
             $this->deploy = $deploy;
         }
@@ -444,15 +449,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getCompanyId(): string
+        public function getCompanyId()
         {
             return $this->company_id;
         }
 
         /**
-         * @param string $company_id
+         * @param $company_id
          */
-        public function setCompanyId(string $company_id): void
+        public function setCompanyId($company_id)
         {
             $this->company_id = $company_id;
         }
@@ -460,15 +465,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getProductCode(): string
+        public function getProductCode()
         {
             return $this->product_code;
         }
 
         /**
-         * @param string $product_code
+         * @param $product_code
          */
-        public function setProductCode(string $product_code): void
+        public function setProductCode($product_code)
         {
             $this->product_code = $product_code;
         }
@@ -476,15 +481,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDynaModelSeg1(): string
+        public function getDynaModelSeg1()
         {
             return $this->dyna_model_seg1;
         }
 
         /**
-         * @param string $dyna_model_seg1
+         * @param $dyna_model_seg1
          */
-        public function setDynaModelSeg1(string $dyna_model_seg1): void
+        public function setDynaModelSeg1($dyna_model_seg1)
         {
             $this->dyna_model_seg1 = $dyna_model_seg1;
         }
@@ -492,15 +497,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDynaModelSeg2(): string
+        public function getDynaModelSeg2()
         {
             return $this->dyna_model_seg2;
         }
 
         /**
-         * @param string $dyna_model_seg2
+         * @param $dyna_model_seg2
          */
-        public function setDynaModelSeg2(string $dyna_model_seg2): void
+        public function setDynaModelSeg2($dyna_model_seg2)
         {
             $this->dyna_model_seg2 = $dyna_model_seg2;
         }
@@ -508,15 +513,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDynaModelSeg3(): string
+        public function getDynaModelSeg3()
         {
             return $this->dyna_model_seg3;
         }
 
         /**
-         * @param string $dyna_model_seg3
+         * @param $dyna_model_seg3
          */
-        public function setDynaModelSeg3(string $dyna_model_seg3): void
+        public function setDynaModelSeg3($dyna_model_seg3)
         {
             $this->dyna_model_seg3 = $dyna_model_seg3;
         }
@@ -524,15 +529,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDynaModelSeg4(): string
+        public function getDynaModelSeg4()
         {
             return $this->dyna_model_seg4;
         }
 
         /**
-         * @param string $dyna_model_seg4
+         * @param $dyna_model_seg4
          */
-        public function setDynaModelSeg4(string $dyna_model_seg4): void
+        public function setDynaModelSeg4($dyna_model_seg4)
         {
             $this->dyna_model_seg4 = $dyna_model_seg4;
         }
@@ -540,15 +545,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDynaModelSeg5(): string
+        public function getDynaModelSeg5()
         {
             return $this->dyna_model_seg5;
         }
 
         /**
-         * @param string $dyna_model_seg5
+         * @param $dyna_model_seg5
          */
-        public function setDynaModelSeg5(string $dyna_model_seg5): void
+        public function setDynaModelSeg5($dyna_model_seg5)
         {
             $this->dyna_model_seg5 = $dyna_model_seg5;
         }
@@ -556,7 +561,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDynaModelSeg6(): string
+        public function getDynaModelSeg6()
         {
             return $this->dyna_model_seg6;
         }
@@ -564,7 +569,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @param string|null $dyna_model_seg6
          */
-        public function setDynaModelSeg6($dyna_model_seg6 = null): void
+        public function setDynaModelSeg6($dyna_model_seg6 = null)
         {
             $this->dyna_model_seg6 = $dyna_model_seg6;
         }
@@ -572,7 +577,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDynaModelSeg7(): string
+        public function getDynaModelSeg7()
         {
             return $this->dyna_model_seg7;
         }
@@ -580,7 +585,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @param string|null $dyna_model_seg7
          */
-        public function setDynaModelSeg7($dyna_model_seg7 = null): void
+        public function setDynaModelSeg7($dyna_model_seg7 = null)
         {
             $this->dyna_model_seg7 = $dyna_model_seg7;
         }
@@ -588,7 +593,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDynaModelSeg8(): string
+        public function getDynaModelSeg8()
         {
             return $this->dyna_model_seg8;
         }
@@ -596,7 +601,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @param string|null $dyna_model_seg8
          */
-        public function setDynaModelSeg8($dyna_model_seg8 = null): void
+        public function setDynaModelSeg8($dyna_model_seg8 = null)
         {
             $this->dyna_model_seg8 = $dyna_model_seg8;
         }
@@ -604,7 +609,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDynaModelSeg9(): string
+        public function getDynaModelSeg9()
         {
             return $this->dyna_model_seg9;
         }
@@ -612,7 +617,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @param string|null $dyna_model_seg9
          */
-        public function setDynaModelSeg9($dyna_model_seg9 = null): void
+        public function setDynaModelSeg9($dyna_model_seg9 = null)
         {
             $this->dyna_model_seg9 = $dyna_model_seg9;
         }
@@ -620,15 +625,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDynaModelSeg10(): string
+        public function getDynaModelSeg10()
         {
             return $this->dyna_model_seg10;
         }
 
         /**
-         * @param string $dyna_model_seg10
+         * @param $dyna_model_seg10
          */
-        public function setDynaModelSeg10(string $dyna_model_seg10): void
+        public function setDynaModelSeg10($dyna_model_seg10)
         {
             $this->dyna_model_seg10 = $dyna_model_seg10;
         }
@@ -636,15 +641,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDynaModelSeg11(): string
+        public function getDynaModelSeg11()
         {
             return $this->dyna_model_seg11;
         }
 
         /**
-         * @param string $dyna_model_seg11
+         * @param $dyna_model_seg11
          */
-        public function setDynaModelSeg11(string $dyna_model_seg11): void
+        public function setDynaModelSeg11($dyna_model_seg11)
         {
             $this->dyna_model_seg11 = $dyna_model_seg11;
         }
@@ -652,15 +657,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return string
          */
-        public function getDynaModelSeg12(): string
+        public function getDynaModelSeg12()
         {
             return $this->dyna_model_seg12;
         }
 
         /**
-         * @param string $dyna_model_seg12
+         * @param $dyna_model_seg12
          */
-        public function setDynaModelSeg12(string $dyna_model_seg12): void
+        public function setDynaModelSeg12($dyna_model_seg12)
         {
             $this->dyna_model_seg12 = $dyna_model_seg12;
         }
@@ -674,9 +679,9 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         }
 
         /**
-         * @param string $request_flg
+         * @param $request_flg
          */
-        public function setRequestFlg($request_flg): void
+        public function setRequestFlg($request_flg)
         {
             $this->request_flg = $request_flg;
         }
@@ -684,15 +689,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return \DateTime
          */
-        public function getCreateDate(): \DateTime
+        public function getCreateDate()
         {
             return $this->create_date;
         }
 
         /**
-         * @param \DateTime $create_date
+         * @param $create_date
          */
-        public function setCreateDate(\DateTime $create_date): void
+        public function setCreateDate($create_date)
         {
             $this->create_date = $create_date;
         }
@@ -700,15 +705,15 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         /**
          * @return \DateTime
          */
-        public function getUpdateDate(): \DateTime
+        public function getUpdateDate()
         {
             return $this->update_date;
         }
 
         /**
-         * @param \DateTime $update_date
+         * @param $update_date
          */
-        public function setUpdateDate(\DateTime $update_date): void
+        public function setUpdateDate($update_date)
         {
             $this->update_date = $update_date;
         }
@@ -734,9 +739,9 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         }
 
         /**
-         * @param string $shiping_deposit_code
+         * @param $shiping_deposit_code
          */
-        public function setShipingDepositCode($shiping_deposit_code): void
+        public function setShipingDepositCode($shiping_deposit_code)
         {
             $this->shiping_deposit_code = $shiping_deposit_code;
         }
@@ -750,11 +755,27 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         }
 
         /**
-         * @param string $fvehicleno
+         * @param $fvehicleno
          */
-        public function setFvehicleno($fvehicleno): void
+        public function setFvehicleno($fvehicleno)
         {
             $this->fvehicleno = $fvehicleno;
+        }
+
+        /**
+         * @return string
+         */
+        public function getFtrnsportcd()
+        {
+            return $this->ftrnsportcd;
+        }
+
+        /**
+         * @param $ftrnsportcd
+         */
+        public function setFtrnsportcd($ftrnsportcd)
+        {
+            $this->ftrnsportcd = $ftrnsportcd;
         }
     }
 }
