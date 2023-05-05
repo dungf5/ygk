@@ -444,6 +444,8 @@ class ValidateCsvDataCommand extends Command
                 ]);
 
                 $data['demand_unit'] = (!empty($product) && $product['quantity'] > 1) ? 'CS' : 'PC';
+                $data['demand_quantity'] = (!empty($product) && $product['quantity'] > 1) ? (int) ($data['order_num'] / $product['quantity']) : (int) $data['order_num'];
+
                 //$data['order_price'] = (!empty($product) && $product['quantity'] > 1) ? ($data['order_price'] * $product['quantity']) : $data['order_price'];
 
                 $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
