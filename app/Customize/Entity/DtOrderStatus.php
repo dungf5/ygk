@@ -73,6 +73,7 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
          * @var string
          *
          * @ORM\Column(name="cus_order_lineno", type="string", length=2,options={"comment":"客先発注No"}, nullable=false)
+         * @ORM\Id
          */
         private $cus_order_lineno;
 
