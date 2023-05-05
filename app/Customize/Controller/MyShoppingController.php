@@ -451,18 +451,14 @@ class MyShoppingController extends AbstractShoppingController
             $customer_id = $this->globalService->customerId();
             $mstShip = $commonService->getMstShippingCustomer($login_type, $customer_id, $moreOrder);
             $Customer = $commonService->getMstCustomer($customer_id);
-            $dtBillSeikyuCode = $commonService->getCustomerBillSeikyuCode($Customer['customer_code'] ?? '', $login_type, $login_code);
+            $dtBillSeikyuCode = $commonService->getCustomerBillSeikyuCode($Customer['customer_code'] ?? '', $login_type, $login_code, $moreOrder->getShippingCode());
 
             // Update more_order.seikyu_code
-            // Task #1639
-            if ($login_code == 'c1018') {
-                $moreOrder->setSeikyuCode($moreOrder->getShippingCode());
-            } elseif (!empty($dtBillSeikyuCode)) {
+            if (!empty($dtBillSeikyuCode)) {
                 $moreOrder->setSeikyuCode($dtBillSeikyuCode[0]['seikyu_code'] ?? '');
+                $this->entityManager->persist($moreOrder);
+                $this->entityManager->flush();
             }
-
-            $this->entityManager->persist($moreOrder);
-            $this->entityManager->flush();
 
             $arCusLogin = $commonService->getMstCustomer($customer_id);
             $Order->arCusLogin = $arCusLogin;

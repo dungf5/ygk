@@ -921,13 +921,17 @@ SQL;
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCustomerBillSeikyuCode($customer_code, $login_type = '', $login_code = '')
+    public function getCustomerBillSeikyuCode($customer_code, $login_type = '', $login_code = '', $shipping_code = '')
     {
         $newComs = new MyCommonService($this->entityManager);
         $relationCus = $newComs->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
 
         if ($relationCus) {
             $seikyu_code = $relationCus['seikyu_code'];
+        }
+
+        if ($login_code == 'c1018' && !empty($shipping_code)) {
+            $seikyu_code = $shipping_code;
         }
 
         if (empty($seikyu_code)) {
