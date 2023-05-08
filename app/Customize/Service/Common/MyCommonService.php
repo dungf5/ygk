@@ -711,7 +711,7 @@ SQL;
         }
     }
 
-    public function getPriceFromDtPriceOfCusV2($customer_code = '', $arProductCode = [])
+    public function getPriceFromDtPriceOfCusV2($customer_code = '', $shippingCode = '', $arProductCode = [])
     {
         $arR = [];
         $arRTana = [];
@@ -721,6 +721,12 @@ SQL;
         }
 
         $param = [$customer_code];
+
+        $queryShippingNo = '';
+        if (!empty($shippingCode)) {
+            $param[] = $shippingCode;
+            $queryShippingNo = ' and pri.shipping_no = ?';
+        }
 
         $subWhere = '';
         $c = count($arProductCode);
@@ -747,7 +753,8 @@ SQL;
                 FROM
                     dt_price pri
                 WHERE
-                    pri.customer_code=?
+                    pri.customer_code = ?
+                {$queryShippingNo}    
                 AND
                     DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date
                 AND
