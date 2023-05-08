@@ -70,9 +70,9 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         private $cus_order_no;
 
         /**
-         * @var string
+         * @var integer
          *
-         * @ORM\Column(name="cus_order_lineno", type="string", length=2,options={"comment":"客先発注No"}, nullable=false)
+         * @ORM\Column(name="cus_order_lineno", type="integer",options={"comment":"客先発注No"}, nullable=false)
          * @ORM\Id
          */
         private $cus_order_lineno;
@@ -233,19 +233,19 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         }
 
         /**
-         * @return mixed
+         * @return integer
          */
         public function getCusOrderLineno()
         {
-            return $this->cus_order_lineno;
+            return (int) $this->cus_order_lineno;
         }
 
         /**
-         * @param mixed $cus_order_lineno
+         * @param integer $cus_order_lineno
          */
-        public function setCusOrderLineno($cus_order_lineno): void
+        public function setCusOrderLineno($cus_order_lineno)
         {
-            $this->cus_order_lineno = $cus_order_lineno;
+            $this->cus_order_lineno = (int) $cus_order_lineno;
         }
 
         /**
