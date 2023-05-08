@@ -2372,7 +2372,7 @@ SQL;
                         {$condition}
                     ORDER BY
                         os.cus_order_no ASC,
-                        os.order_line_no ASC;
+                        os.cus_order_lineno ASC;
                 ";
 
         try {
