@@ -2709,4 +2709,44 @@ SQL;
             return 0;
         }
     }
+
+    public function getDataImportNatStockList($product_code, $customer_code, $shipping_code)
+    {
+        $sql = "
+            SELECT 
+                mp.jan_code,
+                mp.unit_price,
+                mp.quantity
+            FROM 
+                mst_product mp 
+            JOIN
+                dt_price dp
+            ON
+                mp.product_code = dp.product_code
+            WHERE 
+                mp.product_code = ?
+            AND
+                (mp.discontinued_date > NOW() OR mp.discontinued_date IS NULL)
+            AND 
+                (UPPER(mp.special_order_flg) <> 'Y' OR mp.special_order_flg IS NULL)
+            AND 
+                dp.customer_code = ?
+            AND
+                dp.shipping_no = ?
+            AND
+                dp.price_s01 > 0
+            GROUP BY 
+                mp.product_code
+        ";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$product_code, $customer_code, $shipping_code]);
+            $rows = $result->fetchAllAssociative();
+
+            return $rows[0] ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
 }

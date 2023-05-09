@@ -15,10 +15,14 @@ declare(strict_types=1);
 
 namespace Customize\Command;
 
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\MstShippingRoute;
 use Customize\Entity\NatStockList;
+use Customize\Entity\StockList;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\CurlPost;
 use Customize\Service\MailService;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Command\PluginCommandTrait;
 use Symfony\Component\Console\Command\Command;
@@ -45,6 +49,7 @@ class ImportNatStockCommand extends Command
      */
     private $commonService;
     private $customer_code = '7015';
+    private $shipping_code = '7015001000';
 
     protected static $defaultName = 'import-nat-stock-command';
     protected static $defaultDescription = 'Process Import Nat Stock List Data';
@@ -86,7 +91,7 @@ class ImportNatStockCommand extends Command
         }
 
         $data = $this->handleGetData();
-
+        $this->handleImportData($data);
     }
 
     private function handleDelete()
@@ -105,6 +110,71 @@ class ImportNatStockCommand extends Command
     private function handleGetData()
     {
         log_info('Start Get Data');
-        //$stock_location = $this->entityManager->getRepository()
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $mstShippingRoute = $this->entityManager->getRepository(MstShippingRoute::class)->findOneBy(['customer_code' => $this->customer_code]);
+
+        if (empty($mstShippingRoute)) {
+            log_info('End Get Data');
+
+            return [];
+        }
+
+        $stock_location = $mstShippingRoute->getStockLocation();
+        $stockList = $this->entityManager->getRepository(StockList::class)->findBy(['customer_code' => $this->customer_code, 'stock_location' => $stock_location]);
+
+        if (empty($stockList)) {
+            log_info('End Get Data');
+
+            return [];
+        }
+
+        $data = [];
+        foreach ($stockList as $item) {
+            $value = $this->commonService->getDataImportNatStockList($item['product_code'], $this->customer_code, $this->shipping_code);
+
+            if (!empty($value)) {
+                $data[] = [
+                  'stock_num' => $item['stock_num'],
+                  'product_code' => $item['product_code'],
+                  'jan_code' => $value['jan_code'],
+                  'quantity' => $value['quantity'],
+                  'unit_price' => $value['unit_price'],
+                ];
+            }
+        }
+
+        log_info('End Get Data');
+
+        return $data;
+    }
+
+    private function handleImportData($data)
+    {
+        log_info('Start Insert Data to nat_stock_list');
+
+        if (empty($data)) {
+            log_info('No data');
+        }
+
+        foreach ($data as $item) {
+            try {
+                $insertData = [
+                    'jan' => (string) $item['jan_code'],
+                    'nat_stock_num' => (int) $item['stock_num'] == 0 ? '×' : ((int) $item['stock_num'] >= 31 ? '〇' : '△'),
+                    'order_lot' => (string) $item['quantity'],
+                    'unit_price' => (int) $item['unit_price'],
+                ];
+                $this->entityManager->getRepository(NatStockList::class)->insertData($insertData);
+            } catch (\Exception $e) {
+                $message = 'Insert nat_stock_list error';
+                $message .= "\n".$e->getMessage();
+                log_error($message);
+                $this->pushGoogleChat($message);
+            }
+        }
+
+        log_info('End Insert Data to nat_stock_list');
+
+        return;
     }
 }
