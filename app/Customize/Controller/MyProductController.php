@@ -561,13 +561,14 @@ class MyProductController extends AbstractController
         if ($relationCus) {
             $customerCode           = $relationCus['customer_code'];
             $shippingCode           = $relationCus['shipping_code'];
-            $arPriceAndTanaka       = $commonService->getPriceFromDtPriceOfCusV2($customerCode);
-            $arProductCodeInDtPrice = $arPriceAndTanaka[0];
-            $arTanakaNumber         = $arPriceAndTanaka[1];
 
             if (empty($shippingCode)) {
                 $shippingCode       = $this->globalService->getShippingCode();
             }
+
+            $arPriceAndTanaka       = $commonService->getPriceFromDtPriceOfCusV2($customerCode, $shippingCode);
+            $arProductCodeInDtPrice = $arPriceAndTanaka[0];
+            $arTanakaNumber         = $arPriceAndTanaka[1];
         }
 
         $qb                         = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customerCode, $shippingCode, $arProductCodeInDtPrice, $arTanakaNumber);
