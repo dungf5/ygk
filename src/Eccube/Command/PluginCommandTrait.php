@@ -18,6 +18,7 @@ use Eccube\Service\PluginService;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
+use Doctrine\ORM\EntityManagerInterface;
 
 trait PluginCommandTrait
 {
@@ -60,5 +61,35 @@ trait PluginCommandTrait
         } catch (ProcessFailedException $e) {
             $io->error($e->getMessage());
         }
+    }
+
+    /**
+     * Cleanup any needed table abroad TRUNCATE SQL function
+     *
+     * @param string $className (example: App\Entity\User)
+     * @param EntityManagerInterface $em
+     *
+     * @return bool
+     */
+    protected function truncateTable(string $className, EntityManagerInterface $em): bool
+    {
+        $cmd = $em->getClassMetadata($className);
+        $connection = $em->getConnection();
+        $connection->beginTransaction();
+
+        try {
+            $connection->query('SET FOREIGN_KEY_CHECKS=0');
+            $connection->query('TRUNCATE TABLE '.$cmd->getTableName());
+            $connection->query('SET FOREIGN_KEY_CHECKS=1');
+            $connection->commit();
+            $em->flush();
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+            $connection->rollback();
+
+            return false;
+        }
+
+        return true;
     }
 }
