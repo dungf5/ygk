@@ -161,12 +161,27 @@ class MyShoppingController extends AbstractShoppingController
         $arCusLogin = $commonService->getMstCustomer($customer_id);
         $is_update_cart = $this->session->get('is_update_cart', '');
 
+        $login_type = $this->globalService->getLoginType();
+        $login_code = $this->globalService->getLoginCode();
+        $relationCus = $commonService->getCustomerRelationFromUser($arCusLogin['customer_code'], $login_type, $login_code);
+        $customerCode = '';
+        $shippingCode = '';
+
+        if ($relationCus) {
+            $customerCode = $relationCus['customer_code'];
+            $shippingCode = $relationCus['shipping_code'];
+
+            if (empty($shippingCode)) {
+                $shippingCode = $this->globalService->getShippingCode();
+            }
+        }
+
         //************** update cart when login
         $arCarItemId = [];
         if ($is_update_cart == 1) {
             $cartId = $Cart->getId();
             $productCart = $commonService->getdtPriceFromCart([$cartId], $arCusLogin['customer_code']);
-            $arPCodeTankaNumber = $commonService->getPriceFromDtPriceOfCusV2($arCusLogin['customer_code']);
+            $arPCodeTankaNumber = $commonService->getPriceFromDtPriceOfCusV2($customerCode, $shippingCode);
             $arPCode = $arPCodeTankaNumber[0];
             $arTanaka = $arPCodeTankaNumber[1];
             $hsHsProductCodeIndtPrice = [];

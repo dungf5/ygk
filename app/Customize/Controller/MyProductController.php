@@ -15,8 +15,8 @@ namespace Customize\Controller;
 
 use Customize\Common\MyCommon;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
-use Customize\Repository\MstProductRepository;
 use Customize\Repository\MstDeliveryPlanRepository;
+use Customize\Repository\MstProductRepository;
 use Customize\Repository\PriceRepository;
 use Customize\Repository\ProductRepository as ProductCustomizeRepository;
 use Customize\Repository\StockListRepository;
@@ -38,7 +38,6 @@ use Eccube\Repository\Master\ProductListMaxRepository;
 use Eccube\Repository\ProductClassRepository;
 use Eccube\Repository\ProductRepository;
 use Eccube\Service\CartService;
-use Eccube\Service\PurchaseFlow\PurchaseContext;
 use Eccube\Service\PurchaseFlow\PurchaseFlow;
 use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
 use Knp\Component\Pager\PaginatorInterface;
@@ -110,8 +109,8 @@ class MyProductController extends AbstractController
      */
     protected $mstProductRepository;
 
-        /**
-     * @var $mstDeliveryPlanRepository
+    /**
+     * @var
      */
     protected $mstDeliveryPlanRepository;
 
@@ -190,59 +189,59 @@ class MyProductController extends AbstractController
      */
     public function detail(Request $request, Product $Product)
     {
-        $referer        = $request->headers->get('referer', '/products/list');
+        $referer = $request->headers->get('referer', '/products/list');
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         if (!$this->checkVisibility($Product)) {
             throw new NotFoundHttpException();
         }
 
-        $builder        = $this->formFactory->createNamedBuilder(
+        $builder = $this->formFactory->createNamedBuilder(
             '',
             AddCartType::class,
             null,
             [
-                'product'                   => $Product,
-                'id_add_product_id'         => false,
+                'product' => $Product,
+                'id_add_product_id' => false,
             ]
         );
 
         $event = new EventArgs(
             [
-                'builder'                   => $builder,
-                'Product'                   => $Product,
+                'builder' => $builder,
+                'Product' => $Product,
             ],
             $request
         );
 
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_DETAIL_INITIALIZE, $event);
 
-        $is_favorite     = false;
-        $price           = null;
-        $stock           = null;
+        $is_favorite = false;
+        $price = null;
+        $stock = null;
         $mstDeliveryPlan = null;
-        $mstProduct      = $this->mstProductRepository->getData($Product->getId());
+        $mstProduct = $this->mstProductRepository->getData($Product->getId());
 
         if (
             empty($mstProduct) ||
-            (!$this->globalService->getSpecialOrderFlg() && strtoupper($mstProduct->getSpecialOrderFlg())  == 'Y')
+            (!$this->globalService->getSpecialOrderFlg() && strtoupper($mstProduct->getSpecialOrderFlg()) == 'Y')
         ) {
             return $this->redirect($referer);
         }
 
-        $cmS                = new MyCommonService($this->entityManager);
-        $login_type         = $this->globalService->getLoginType();
-        $login_code         = $this->globalService->getLoginCode();
+        $cmS = new MyCommonService($this->entityManager);
+        $login_type = $this->globalService->getLoginType();
+        $login_code = $this->globalService->getLoginCode();
 
         if ($this->isGranted('ROLE_USER')) {
-            $Customer       = $this->getUser();
-            $customer_code  = $this->globalService->customerCode();
-            $is_favorite    = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
-            $dtPrice        = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProduct->getProductCode(), $login_type, $login_code);
-            $location       = $cmS->getCustomerLocation($customer_code);
-            $stock          = $this->stockListRepository->getData($mstProduct->getProductCode(), $location);
+            $Customer = $this->getUser();
+            $customer_code = $this->globalService->customerCode();
+            $is_favorite = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
+            $dtPrice = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProduct->getProductCode(), $login_type, $login_code);
+            $location = $cmS->getCustomerLocation($customer_code);
+            $stock = $this->stockListRepository->getData($mstProduct->getProductCode(), $location);
 
-            if ( $stock ) {
+            if ($stock) {
                 $mstDeliveryPlan = $this->mstDeliveryPlanRepository->getData($mstProduct->getProductCode(), $stock);
             }
         }
@@ -253,31 +252,31 @@ class MyProductController extends AbstractController
         }
 
         //check in cart
-        $ecProductId        = $Product->getId();
-        $product_in_cart    = $cmS->isProductEcIncart(MyCommon::getCarSession(), $ecProductId);
-        $productClassId     = '';
-        $oneCartId          = '';
+        $ecProductId = $Product->getId();
+        $product_in_cart = $cmS->isProductEcIncart(MyCommon::getCarSession(), $ecProductId);
+        $productClassId = '';
+        $oneCartId = '';
 
         if ($product_in_cart == 1) {
-            $cartInfoData   = $cmS->getCartInfo(MyCommon::getCarSession(), $ecProductId);
+            $cartInfoData = $cmS->getCartInfo(MyCommon::getCarSession(), $ecProductId);
             $productClassId = $cartInfoData[0]['productClassId'];
-            $oneCartId      = $cartInfoData[0]['cart_id'];
+            $oneCartId = $cartInfoData[0]['cart_id'];
         }
 
         return [
-            'title'           => $this->title,
-            'subtitle'        => $Product->getName(),
-            'form'            => $builder->getForm()->createView(),
+            'title' => $this->title,
+            'subtitle' => $Product->getName(),
+            'form' => $builder->getForm()->createView(),
             'product_in_cart' => $product_in_cart,
-            'Product'         => $Product,
-            'is_favorite'     => $is_favorite,
-            'productClassId'  => $productClassId,
-            'oneCartId'       => $oneCartId,
-            'Price'           => $dtPrice,
-            'Stock'           => $stock,
-            'MstProduct'      => $mstProduct,
+            'Product' => $Product,
+            'is_favorite' => $is_favorite,
+            'productClassId' => $productClassId,
+            'oneCartId' => $oneCartId,
+            'Price' => $dtPrice,
+            'Stock' => $stock,
+            'MstProduct' => $mstProduct,
             'MstDeliveryPlan' => $mstDeliveryPlan,
-            'url_referer'     => $referer,
+            'url_referer' => $referer,
         ];
     }
 
@@ -339,25 +338,25 @@ class MyProductController extends AbstractController
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // エラーメッセージの配列
-        $errorMessages      = [];
+        $errorMessages = [];
         if (!$this->checkVisibility($Product)) {
             throw new NotFoundHttpException();
         }
 
-        $builder            = $this->formFactory->createNamedBuilder(
+        $builder = $this->formFactory->createNamedBuilder(
             '',
             AddCartType::class,
             null,
             [
-                'product'           => $Product,
+                'product' => $Product,
                 'id_add_product_id' => false,
             ]
         );
 
-        $event              = new EventArgs(
+        $event = new EventArgs(
             [
-                'builder'           => $builder,
-                'Product'           => $Product,
+                'builder' => $builder,
+                'Product' => $Product,
             ],
             $request
         );
@@ -377,25 +376,25 @@ class MyProductController extends AbstractController
         log_info(
             'カート追加処理開始',
             [
-                'product_id'        => $Product->getId(),
-                'product_class_id'  => $addCartData['product_class_id'],
-                'quantity'          => $addCartData['quantity'],
+                'product_id' => $Product->getId(),
+                'product_class_id' => $addCartData['product_class_id'],
+                'quantity' => $addCartData['quantity'],
             ]
         );
-        $carSession                 = MyCommon::getCarSession();
+        $carSession = MyCommon::getCarSession();
 
         //////////////////////////////check in cart
-        $cmS                        = new MyCommonService($this->entityManager);
-        $ecProductId                = $Product->getId();
-        $product_in_cart            = $cmS->isProductEcIncart(MyCommon::getCarSession(), $ecProductId);
+        $cmS = new MyCommonService($this->entityManager);
+        $ecProductId = $Product->getId();
+        $product_in_cart = $cmS->isProductEcIncart(MyCommon::getCarSession(), $ecProductId);
 
         if ($product_in_cart == 1) {
             //productClassId,b.cart_id,a.product_id
-            $cartInfoData           = $cmS->getCartInfo(MyCommon::getCarSession(), $ecProductId);
-            $productClassId         = $cartInfoData[0]['productClassId'];
-            $oneCartId              = $cartInfoData[0]['cart_id'];
-            $ProductClass           = $this->productClassRepository->find($productClassId);
-            $msg                    = $this->cartService->updateProductCustomize($ProductClass, $addCartData['quantity'], $oneCartId, $productClassId);
+            $cartInfoData = $cmS->getCartInfo(MyCommon::getCarSession(), $ecProductId);
+            $productClassId = $cartInfoData[0]['productClassId'];
+            $oneCartId = $cartInfoData[0]['cart_id'];
+            $ProductClass = $this->productClassRepository->find($productClassId);
+            $msg = $this->cartService->updateProductCustomize($ProductClass, $addCartData['quantity'], $oneCartId, $productClassId);
         }
 
         // カートへ追加
@@ -404,13 +403,13 @@ class MyProductController extends AbstractController
         }
 
         // 明細の正規化
-        $Carts                      = $this->cartService->getCarts();
-        $mstProduct                 = $this->mstProductRepository->getData($Product->getId());
+        $Carts = $this->cartService->getCarts();
+        $mstProduct = $this->mstProductRepository->getData($Product->getId());
 
         // set total price
         foreach ($Carts as $Cart) {
             if ($Cart['key_eccube'] == $carSession) {
-                $totalPrice         = 0;
+                $totalPrice = 0;
                 foreach ($Cart['CartItems'] as $CartItem) {
                     $totalPrice += $CartItem['price'] * $CartItem['quantity'];
                 }
@@ -435,16 +434,16 @@ class MyProductController extends AbstractController
         log_info(
             'カート追加処理完了',
             [
-                'product_id'        => $Product->getId(),
-                'product_class_id'  => $addCartData['product_class_id'],
-                'quantity'          => $addCartData['quantity'],
+                'product_id' => $Product->getId(),
+                'product_class_id' => $addCartData['product_class_id'],
+                'quantity' => $addCartData['quantity'],
             ]
         );
 
-        $event                      = new EventArgs(
+        $event = new EventArgs(
             [
-                'form'              => $form,
-                'Product'           => $Product,
+                'form' => $form,
+                'Product' => $Product,
             ],
             $request
         );
@@ -457,35 +456,30 @@ class MyProductController extends AbstractController
 
         if ($request->isXmlHttpRequest()) {
             // ajaxでのリクエストの場合は結果をjson形式で返す。
-            $myComS         = new MyCommonService($this->entityManager);
-            $cartId         = $Carts[0]->getId();
-            $totalNew       = $myComS->getTotalItemCart($cartId);
+            $myComS = new MyCommonService($this->entityManager);
+            $cartId = $Carts[0]->getId();
+            $totalNew = $myComS->getTotalItemCart($cartId);
 
             // 初期化
-            $done           = null;
-            $messages       = [];
+            $done = null;
+            $messages = [];
 
             if (empty($errorMessages)) {
                 // エラーが発生していない場合
-                $done       = true;
+                $done = true;
                 array_push($messages, trans('front.product.add_cart_complete'));
-            }
-
-            else {
+            } else {
                 // エラーが発生している場合
-                $done       = false;
-                $messages   = $errorMessages;
+                $done = false;
+                $messages = $errorMessages;
             }
 
             return $this->json([
-                'done'      => $done,
-                'messages'  => $messages,
-                'totalNew'  => $totalNew
+                'done' => $done,
+                'messages' => $messages,
+                'totalNew' => $totalNew,
             ]);
-
-        }
-
-        else {
+        } else {
             // ajax以外でのリクエストの場合はカート画面へリダイレクト
             foreach ($errorMessages as $errorMessage) {
                 $this->addRequestError($errorMessage);
@@ -517,7 +511,7 @@ class MyProductController extends AbstractController
 
         // searchForm
         /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
-        $builder        = $this->formFactory->createNamedBuilder('', \Customize\Form\Type\SearchProductType::class);
+        $builder = $this->formFactory->createNamedBuilder('', \Customize\Form\Type\SearchProductType::class);
 
         if ($request->getMethod() === 'GET') {
             $builder->setMethod('GET');
@@ -532,70 +526,70 @@ class MyProductController extends AbstractController
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_INITIALIZE, $event);
 
         /* @var $searchForm \Symfony\Component\Form\FormInterface */
-        $searchForm         = $builder->getForm();
+        $searchForm = $builder->getForm();
 
         $searchForm->handleRequest($request);
-        $commonService      = new MyCommonService($this->entityManager);
-        $user               = false;
-        $customer_code      = '';
-        $login_type         = '';
-        $login_code         = '';
+        $commonService = new MyCommonService($this->entityManager);
+        $user = false;
+        $customer_code = '';
+        $login_type = '';
+        $login_code = '';
 
         if ($this->isGranted('ROLE_USER')) {
-            $user           = true;
-            $myC            = new MyCommonService($this->entityManager);
-            $login_type     = $this->globalService->getLoginType();
-            $login_code     = $this->globalService->getLoginCode();
-            $Customer_id    = $this->globalService->customerId();
-            $customer_code  = $myC->getMstCustomer($Customer_id)['customer_code'] ?? "";
+            $user = true;
+            $myC = new MyCommonService($this->entityManager);
+            $login_type = $this->globalService->getLoginType();
+            $login_code = $this->globalService->getLoginCode();
+            $Customer_id = $this->globalService->customerId();
+            $customer_code = $myC->getMstCustomer($Customer_id)['customer_code'] ?? '';
         }
 
         // paginator
-        $searchData                 = $searchForm->getData();
-        $customerCode               = '';
-        $shippingCode               = '';
-        $arProductCodeInDtPrice     = [];
-        $arTanakaNumber             = [];
-        $relationCus                = $commonService->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
+        $searchData = $searchForm->getData();
+        $customerCode = '';
+        $shippingCode = '';
+        $arProductCodeInDtPrice = [];
+        $arTanakaNumber = [];
+        $relationCus = $commonService->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
 
         if ($relationCus) {
-            $customerCode           = $relationCus['customer_code'];
-            $shippingCode           = $relationCus['shipping_code'];
+            $customerCode = $relationCus['customer_code'];
+            $shippingCode = $relationCus['shipping_code'];
 
             if (empty($shippingCode)) {
-                $shippingCode       = $this->globalService->getShippingCode();
+                $shippingCode = $this->globalService->getShippingCode();
             }
 
-            $arPriceAndTanaka       = $commonService->getPriceFromDtPriceOfCusV2($customerCode, $shippingCode);
+            $arPriceAndTanaka = $commonService->getPriceFromDtPriceOfCusV2($customerCode, $shippingCode);
             $arProductCodeInDtPrice = $arPriceAndTanaka[0];
-            $arTanakaNumber         = $arPriceAndTanaka[1];
+            $arTanakaNumber = $arPriceAndTanaka[1];
         }
 
-        $qb                         = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customerCode, $shippingCode, $arProductCodeInDtPrice, $arTanakaNumber);
+        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customerCode, $shippingCode, $arProductCodeInDtPrice, $arTanakaNumber);
 
         $event = new EventArgs(
             [
-                'searchData'        => $searchData,
-                'qb'                => $qb,
+                'searchData' => $searchData,
+                'qb' => $qb,
             ],
             $request
         );
 
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_SEARCH, $event);
-        $searchData             = $event->getArgument('searchData');
-        $query                  = $qb->getQuery()->useResultCache(true, $this->eccubeConfig['eccube_result_cache_lifetime_short']);
+        $searchData = $event->getArgument('searchData');
+        $query = $qb->getQuery()->useResultCache(true, $this->eccubeConfig['eccube_result_cache_lifetime_short']);
 
         /** @var SlidingPagination $pagination */
-        $pagination             = $paginator->paginate(
+        $pagination = $paginator->paginate(
             $query,
             !empty($searchData['pageno']) ? $searchData['pageno'] : 1,
             !empty($searchData['disp_number']) ? $searchData['disp_number']->getId() : $this->productListMaxRepository->findOneBy([], ['sort_no' => 'ASC'])->getId()
         );
 
-        $ids                    = [];
+        $ids = [];
 
         foreach ($pagination as $key => $Product) {
-            $ids[]                      = $Product['id'];
+            $ids[] = $Product['id'];
 
             //Get dt_price.price_s01
 //            $temp                       = $pagination[$key];
@@ -609,15 +603,15 @@ class MyProductController extends AbstractController
         }
 
         $ProductsAndClassCategories = $this->productRepository->findProductsWithSortedClassCategories($ids, 'p.id');
-        $listImgs                   = $commonService->getImageFromEcProductId($ids);
-        $hsKeyImg                   = [];
+        $listImgs = $commonService->getImageFromEcProductId($ids);
+        $hsKeyImg = [];
 
         foreach ($listImgs as $itemImg) {
             $hsKeyImg[$itemImg['product_id']] = $itemImg['file_name'];
         }
 
         // addCart form
-        $forms          = [];
+        $forms = [];
 
         foreach ($pagination as $Product) {
             if (!isset($ProductsAndClassCategories[$Product['id']])) {
@@ -625,29 +619,29 @@ class MyProductController extends AbstractController
             }
 
             /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
-            $builder    = $this->formFactory->createNamedBuilder(
+            $builder = $this->formFactory->createNamedBuilder(
                 '',
                 AddCartType::class,
                 null,
                 [
-                    'product'               => $ProductsAndClassCategories[$Product['id']],
-                    'allow_extra_fields'    => true,
+                    'product' => $ProductsAndClassCategories[$Product['id']],
+                    'allow_extra_fields' => true,
                 ]
             );
 
-            $addCartForm            = $builder->getForm();
-            $forms[$Product['id']]  = $addCartForm->createView();
+            $addCartForm = $builder->getForm();
+            $forms[$Product['id']] = $addCartForm->createView();
         }
 
         // 表示件数
-        $builder        = $this->formFactory->createNamedBuilder(
+        $builder = $this->formFactory->createNamedBuilder(
             'disp_number',
             ProductListMaxType::class,
             null,
             [
-                'required'              => false,
-                'allow_extra_fields'    => true,
-                'choice_value'          => 'sort_no',
+                'required' => false,
+                'allow_extra_fields' => true,
+                'choice_value' => 'sort_no',
             ]
         );
 
@@ -655,7 +649,7 @@ class MyProductController extends AbstractController
             $builder->setMethod('GET');
         }
 
-        $event          = new EventArgs(
+        $event = new EventArgs(
             [
                 'builder' => $builder,
             ],
@@ -667,13 +661,13 @@ class MyProductController extends AbstractController
         $dispNumberForm->handleRequest($request);
 
         // ソート順
-        $builder        = $this->formFactory->createNamedBuilder(
+        $builder = $this->formFactory->createNamedBuilder(
             'orderby',
             ProductListOrderByType::class,
             null,
             [
-                'required'              => false, 'choice_value' => 'sort_no',
-                'allow_extra_fields'    => true,
+                'required' => false, 'choice_value' => 'sort_no',
+                'allow_extra_fields' => true,
             ]
         );
 
@@ -681,7 +675,7 @@ class MyProductController extends AbstractController
             $builder->setMethod('GET');
         }
 
-        $event      = new EventArgs(
+        $event = new EventArgs(
             [
                 'builder' => $builder,
             ],
@@ -690,19 +684,19 @@ class MyProductController extends AbstractController
 
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_ORDER, $event);
 
-        $orderByForm    = $builder->getForm();
+        $orderByForm = $builder->getForm();
         $orderByForm->handleRequest($request);
-        $Category       = $searchForm->get('category_id')->getData();
+        $Category = $searchForm->get('category_id')->getData();
 
         return [
-            'subtitle'          => $this->getPageTitle($searchData),
-            'pagination'        => $pagination,
-            'search_form'       => $searchForm->createView(),
-            'disp_number_form'  => $dispNumberForm->createView(),
-            'order_by_form'     => $orderByForm->createView(),
-            'forms'             => $forms,
-            'hsKeyImg'          => $hsKeyImg,
-            'Category'          => $Category,
+            'subtitle' => $this->getPageTitle($searchData),
+            'pagination' => $pagination,
+            'search_form' => $searchForm->createView(),
+            'disp_number_form' => $dispNumberForm->createView(),
+            'order_by_form' => $orderByForm->createView(),
+            'forms' => $forms,
+            'hsKeyImg' => $hsKeyImg,
+            'Category' => $Category,
         ];
     }
 
