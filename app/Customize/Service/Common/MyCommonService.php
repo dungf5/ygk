@@ -14,7 +14,7 @@
 namespace Customize\Service\Common;
 
 use Customize\Entity\DtOrder;
-use Customize\Entity\DtOrderStatus;
+use Customize\Entity\DtOrderStatus2;
 use Customize\Entity\MoreOrder;
 use Customize\Entity\MstShipping;
 use Customize\Entity\Order;
@@ -1293,8 +1293,8 @@ SQL;
             $ec_order = $itemSave['ec_order_no'];
             $ec_order_lineno = $cusOrderLineno; //$itemSave['ec_order_lineno'];
             $keyFind = ['ec_order_no' => $ec_order, 'ec_order_lineno' => $ec_order_lineno];
-            $objRep = $this->entityManager->getRepository(DtOrderStatus::class)->findOneBy($keyFind);
-            $orderItem = new DtOrderStatus();
+            $objRep = $this->entityManager->getRepository(DtOrderStatus2::class)->findOneBy($keyFind);
+            $orderItem = new DtOrderStatus2();
 
             if ($objRep !== null) {
                 $orderItem = $objRep;
