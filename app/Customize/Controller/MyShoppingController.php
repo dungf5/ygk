@@ -451,7 +451,7 @@ class MyShoppingController extends AbstractShoppingController
             $customer_id = $this->globalService->customerId();
             $mstShip = $commonService->getMstShippingCustomer($login_type, $customer_id, $moreOrder);
             $Customer = $commonService->getMstCustomer($customer_id);
-            $dtBillSeikyuCode = $commonService->getCustomerBillSeikyuCode($Customer['customer_code'] ?? '', $login_type, $login_code);
+            $dtBillSeikyuCode = $commonService->getCustomerBillSeikyuCode($Customer['customer_code'] ?? '', $login_type, $login_code, $moreOrder->getShippingCode());
 
             // Update more_order.seikyu_code
             if (!empty($dtBillSeikyuCode)) {
