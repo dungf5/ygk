@@ -32,7 +32,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/* Run Batch: php bin/console import-nat-stock-command */
+/* Run Batch: php bin/console import-nat-stock-list-command */
 class ImportNatStockCommand extends Command
 {
     use PluginCommandTrait;
@@ -51,7 +51,7 @@ class ImportNatStockCommand extends Command
     private $customer_code = '7015';
     private $shipping_code = '7015001000';
 
-    protected static $defaultName = 'import-nat-stock-command';
+    protected static $defaultName = 'import-nat-stock-list-command';
     protected static $defaultDescription = 'Process Import Nat Stock List Data';
 
     public function __construct(EntityManagerInterface $entityManager, MailService $mailService)
