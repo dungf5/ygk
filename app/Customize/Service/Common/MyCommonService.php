@@ -1292,26 +1292,23 @@ SQL;
 
     public function saveOrderStatus($arEcLData)
     {
-        //dt_order_status
-        //$arEcLData[] = ['ec_order_no'=>$orderNo,'ec_order_lineno'=>$itemOr->getId()];
-        $cusOrderLineno = 0;
         $total = count($arEcLData);
         foreach ($arEcLData as $itemSave) {
             $cusOrderLineno = $total;
             $total--;
             $ec_order = $itemSave['ec_order_no'];
-            $ec_order_lineno = $cusOrderLineno; //$itemSave['ec_order_lineno'];
-            $keyFind = ['ec_order_no' => $ec_order, 'ec_order_lineno' => $ec_order_lineno];
+            $ec_order_lineno = $cusOrderLineno;
+            $keyFind = ['cus_order_no' => $ec_order, 'cus_order_lineno' => $ec_order_lineno];
             $objRep = $this->entityManager->getRepository(DtOrderStatus::class)->findOneBy($keyFind);
             $orderItem = new DtOrderStatus();
 
             if ($objRep !== null) {
-                $orderItem = $objRep;
-            } else {
-                $orderItem->setOrderStatus('1');
+                log_error("Order {$ec_order}-{$ec_order_lineno} is existed");
+                continue;
             }
-            // $orderItem->setPropertiesFromArray($keyFind,['create_date']);
+
             $time = new \DateTime();
+            $orderItem->setOrderStatus('1');
             $orderItem->setOrderDate($time);
             $orderItem->setEcOrderLineno($ec_order_lineno);
             $orderItem->setEcOrderNo($ec_order);
