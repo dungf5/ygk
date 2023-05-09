@@ -14,7 +14,7 @@
 namespace Customize\Service\Common;
 
 use Customize\Entity\DtOrder;
-use Customize\Entity\DtOrderStatus2;
+use Customize\Entity\DtOrderStatus;
 use Customize\Entity\MoreOrder;
 use Customize\Entity\MstShipping;
 use Customize\Entity\Order;
