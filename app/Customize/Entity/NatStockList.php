@@ -132,7 +132,7 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
          */
         public function getMkrcd(): string
         {
-            return $this->mkrcd;
+            return (string) $this->mkrcd;
         }
 
         /**
@@ -148,7 +148,7 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
          */
         public function getGrade(): string
         {
-            return $this->grade;
+            return (string) $this->grade;
         }
 
         /**
@@ -164,7 +164,7 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
          */
         public function getNatStockNum(): string
         {
-            return $this->nat_stock_num;
+            return (string) $this->nat_stock_num;
         }
 
         /**
@@ -180,7 +180,7 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
          */
         public function getDeliveryDate(): string
         {
-            return $this->delivery_date;
+            return (string) $this->delivery_date;
         }
 
         /**
@@ -212,7 +212,7 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
          */
         public function getOrderLot(): string
         {
-            return $this->order_lot;
+            return (string) $this->order_lot;
         }
 
         /**
@@ -244,7 +244,7 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
          */
         public function getProductCode(): string
         {
-            return $this->product_code;
+            return (string) $this->product_code;
         }
 
         /**
@@ -260,7 +260,7 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
          */
         public function getCatalogCode(): string
         {
-            return $this->catalog_code;
+            return (string) $this->catalog_code;
         }
 
         /**
@@ -276,7 +276,7 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
          */
         public function getColor(): string
         {
-            return $this->color;
+            return (string) $this->color;
         }
 
         /**
@@ -292,7 +292,7 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
          */
         public function getSize(): string
         {
-            return $this->size;
+            return (string) $this->size;
         }
 
         /**
