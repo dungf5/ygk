@@ -85,10 +85,10 @@ class DtExportCsvRepository extends AbstractRepository
                         $object->setIsSendMail($value);
                     }
                     if ($key == 'in_date') {
-                        $object->setInDate($value);
+                        $object->setCreateDate($value);
                     }
                     if ($key == 'up_date') {
-                        $object->setUpDate($value);
+                        $object->setUpdateDate($value);
                     }
                 }
 
