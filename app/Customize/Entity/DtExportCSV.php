@@ -62,16 +62,15 @@ if (!class_exists('\Customize\Entity\DtExportCSV', false)) {
         /**
          * @var \DateTime
          *
-         * @ORM\Column(name="in_date", type="datetimetz", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP() COMMENT ''")
+         * @ORM\Column(name="create_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT ''")
          */
-        private $in_date;
-
+        private $create_date;
         /**
          * @var \DateTime
          *
-         * @ORM\Column(name="up_date", type="datetimetz", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP() COMMENT ''")
+         * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT ''")
          */
-        private $up_date;
+        private $update_date;
 
         /**
          * @return int
@@ -172,34 +171,33 @@ if (!class_exists('\Customize\Entity\DtExportCSV', false)) {
         /**
          * @return \DateTime
          */
-        public function getInDate()
+        public function getCreateDate()
         {
-            return $this->in_date;
+            return $this->create_date;
         }
 
         /**
-         * @param $in_date
+         * @param $create_date
          */
-        public function setInDate($in_date)
+        public function setCreateDate($create_date)
         {
-            $this->in_date = $in_date;
+            $this->create_date = $create_date;
         }
 
         /**
          * @return \DateTime
          */
-        public function getUpDate()
+        public function getUpdateDate()
         {
-            return $this->up_date;
+            return $this->update_date;
         }
 
         /**
-         * @param $up_date
+         * @param $update_date
          */
-        public function setUpDate($up_date)
+        public function setUpdateDate($update_date)
         {
-            $this->up_date = $up_date;
+            $this->update_date = $update_date;
         }
-        
     }
 }
