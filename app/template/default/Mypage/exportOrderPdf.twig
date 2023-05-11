@@ -252,6 +252,7 @@
                         <div class="header_left"><span>{{ myDatas[0][0].deli_post_code }}</span></div>
                         <div class="title">納品書 <br/>{{ myDatas[0][0].delivery_date }} </div>
                         <div class="delivery_no_right"><span>納品書№ </span> <span>{{ myDatas[0][0].delivery_no }}</span></div>
+                        <div style="position: absolute; right: 0; top: 50px;"><span>出荷指示№ </span> <span>{{ myDatas[0][0].shipping_no }}</span></div>
                         <div class="clear-float"></div>
                     </header>
 
@@ -262,6 +263,7 @@
                         <div>{{ myDatas[0][0].deli_addr03 }}</div>
                         <div>{{ myDatas[0][0].deli_company_name }}  御中</div>
                         <div>{{ myDatas[0][0].deli_department_name }}</div>
+                        <div style="margin-top: 40px;">届け先: {{ myDatas[0][0].otodoke_code }}</div>
                     </div>
                         <div class="header1_right">
                             <div class="text_right_header">
@@ -269,12 +271,6 @@
                                 <div>〒550-0005</div>
                                 <div>大阪市西区西本町1-7-21 ニシモトビル303</div>
                                 <div>TEL:(050)-5526-8046&emsp;FAX:(050)-3385-5614</div>
-    {#                        <div>{{ myDatas[0][0].postal_code }}</div>#}
-    {#                        <div>{{ myDatas[0][0].addr01 }}</div>#}
-    {#                        <div>{{ myDatas[0][0].addr02 }}</div>#}
-    {#                        <div>{{ myDatas[0][0].addr03 }}</div>#}
-    {#                        <div>{{ myDatas[0][0].company_name }}</div>#}
-    {#                        <div>{{ myDatas[0][0].department }}</div>#}
                             </div>
                         </div>
                     </div>
@@ -282,18 +278,18 @@
                     <div class="product-info">
                         <table style="width: 100%;">
                             <tr class="tr-header" style="">
-                                <td style="text-align: right;">
+                                <td style="text-align: center;">
                                     No.
                                 </td>
                                 <td class="" style="" >
                                    売上
                                 </td>
                                 <td class="" style="">JAN コード<br />商品名</td>
-                                <td class="" title="soluong" style="text-align: right;">数量</td>
+                                <td class="" title="soluong" style="text-align: center;">数量</td>
                                 <td class="" style="">単位</td>
-                                <td class="" title="dongia" style="text-align: right;">単価</td>
-                                <td class="" title="thanhtien" style="text-align: right;">金額</td>
-                                <td class=""  title="order_orderlineo" style="">注文番号<br/>出荷指示№</td>
+                                <td class="" title="dongia" style="text-align: center;">単価</td>
+                                <td class="" title="thanhtien" style="text-align: center;">金額</td>
+                                <td class=""  title="order_orderlineo" style="">注文番号</td>
                                 <td style="" title="item_remark" >備考</td>
                             </tr>
 
@@ -311,7 +307,7 @@
                                         <td class="" style="">{{ deli.unit }}</td>
                                         <td class="" title="price" style="text-align: right;">{{ roundPrice(deli.unit_price) }}</td>
                                         <td class="" title="amount" style="text-align: right;">{{ roundPrice(deli.amount) }}</td>
-                                        <td class=""  title="order_orderlineo" style="">{{ deli.order_no }}<br/>{{ deli.shipping_no }}</td>
+                                        <td class=""  title="order_orderlineo" style="">{{ deli.order_no }}</td>
                                         <td style="" title="item_remark" >{{ deli.item_remark }}</td>
                                     </tr>
                                 {% endif %}
@@ -357,7 +353,6 @@
                                     </tr>
                                     <tr>
                                         <td style="width: 32.0866%;">出荷先: {{ myDatas[0][0].shiping_code }}</td>
-                                        <td style="width: 29.3307%;">届け先: {{ myDatas[0][0].otodoke_code }}</td>
                                         <td style="width: 21.6535%;">&nbsp;</td>
                                     </tr>
                                     </tbody>
