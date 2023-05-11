@@ -74,6 +74,7 @@ class PutFileFTPCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+        log_info('---------------------------------------');
         log_info('Start Process Put File FTP');
 
         $param = $input->getArgument('arg1') ?? null;
