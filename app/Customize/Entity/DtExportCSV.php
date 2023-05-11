@@ -62,14 +62,14 @@ if (!class_exists('\Customize\Entity\DtExportCSV', false)) {
         /**
          * @var \DateTime
          *
-         * @ORM\Column(name="in_date", type="datetimetz", nullable=false, options={"comment":""})
+         * @ORM\Column(name="in_date", type="datetimetz", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP() COMMENT ''")
          */
         private $in_date;
 
         /**
          * @var \DateTime
          *
-         * @ORM\Column(name="up_date", type="datetimetz", nullable=false, options={"comment":""})
+         * @ORM\Column(name="up_date", type="datetimetz", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP() COMMENT ''")
          */
         private $up_date;
 
@@ -172,15 +172,15 @@ if (!class_exists('\Customize\Entity\DtExportCSV', false)) {
         /**
          * @return \DateTime
          */
-        public function getInDate(): \DateTime
+        public function getInDate()
         {
             return $this->in_date;
         }
 
         /**
-         * @param \DateTime $in_date
+         * @param $in_date
          */
-        public function setInDate(\DateTime $in_date): void
+        public function setInDate($in_date)
         {
             $this->in_date = $in_date;
         }
@@ -188,15 +188,15 @@ if (!class_exists('\Customize\Entity\DtExportCSV', false)) {
         /**
          * @return \DateTime
          */
-        public function getUpDate(): \DateTime
+        public function getUpDate()
         {
             return $this->up_date;
         }
 
         /**
-         * @param \DateTime $up_date
+         * @param $up_date
          */
-        public function setUpDate(\DateTime $up_date): void
+        public function setUpDate($up_date)
         {
             $this->up_date = $up_date;
         }
