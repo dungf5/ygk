@@ -102,6 +102,12 @@ class PutFileFTPCommand extends Command
                 $this->handleUploadFileShipping();
                 break;
 
+            case 'nat-stock':
+                log_info('Start Put File Nat Stock List');
+                /* Put files to FTP server*/
+                $this->handleUploadFileNatStockList();
+                break;
+
             default:
                 break;
         }
@@ -133,9 +139,9 @@ class PutFileFTPCommand extends Command
             if ($result['status'] == -1 || $result['status'] == 0) {
                 log_info('[WS-EOS] Send Mail FTP.');
                 $information = [
-                    'email' => getenv('EMAIL_WS_EOS') ?? '',
-                    'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
-                    'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
+                    'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                    'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                    'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
                     'file_name' => 'Mail/ws_eos_ftp.twig',
                     'status' => 0,
                     'error_content' => $result['message'],
@@ -160,9 +166,9 @@ class PutFileFTPCommand extends Command
                 log_info('[WS-EOS] Send Mail FTP.');
 
                 $information = [
-                    'email' => getenv('EMAIL_WS_EOS') ?? '',
-                    'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
-                    'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
+                    'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                    'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                    'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
                     'file_name' => 'Mail/ws_eos_ftp.twig',
                     'status' => 1,
                     'finish_time' => '('.$file_from.') '.date('Y/m/d H:i:s'),
@@ -195,4 +201,94 @@ class PutFileFTPCommand extends Command
             return;
         }
     }
+
+    private function handleUploadFileNatStockList()
+    {
+        try {
+            $file_from = 'zaiko_'.date('Ymd').'.csv';
+
+            if (!str_ends_with(trim($file_from), '.csv')) {
+                log_error("{$file_from} is not a csv file");
+
+                $this->pushGoogleChat("Put file FTP: {$file_from} is not a csv file");
+
+                return;
+            }
+
+            $path_local = !empty(getenv('LOCAL_FTP_UPLOAD_DIRECTORY')) ? getenv('LOCAL_FTP_UPLOAD_DIRECTORY') : '/html/upload/';
+            $path_from = $path_local.'csv/nat/';
+            $path_to = $path_local.'csv/nat/';
+            $error_file = 'error.txt';
+            $file_to = date('YmdHis').'.csv';
+
+            $result = $this->csvService->transferFile($path_from, $path_to, $file_from, $file_to, $error_file);
+            log_info($result['message']);
+
+            // Send mail result
+            if ($result['status'] == -1 || $result['status'] == 0) {
+                log_info('[WS-EOS] Send Mail FTP.');
+                $information = [
+                    'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                    'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                    'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
+                    'file_name' => 'Mail/ws_eos_ftp.twig',
+                    'status' => 0,
+                    'error_content' => $result['message'],
+                ];
+
+                try {
+                    // Save file information to DB
+                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                    $insertDate = [
+                        'file_name' => $file_to,
+                        'directory' => $path_to.date('Y/m'),
+                        'message' => $result['message'],
+                        'is_error' => 1,
+                        'is_send_mail' => 0,
+                    ];
+                    $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
+                } catch (\Exception $e) {
+                    log_error($e->getMessage());
+                    $this->pushGoogleChat($e->getMessage());
+                }
+            } else {
+                log_info('[WS-EOS] Send Mail FTP.');
+
+                $information = [
+                    'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                    'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                    'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
+                    'file_name' => 'Mail/nat_stock_ftp.twig',
+                    'status' => 1,
+                    'finish_time' => '('.$file_from.') '.date('Y/m/d H:i:s'),
+                ];
+
+                try {
+                    // Save file information to DB
+                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                    $insertDate = [
+                        'file_name' => $file_to,
+                        'directory' => $path_to.date('Y/m'),
+                        'message' => 'successfully',
+                        'is_error' => 0,
+                        'is_send_mail' => 1,
+                    ];
+                    $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
+                } catch (\Exception $e) {
+                    log_error($e->getMessage());
+                    $this->pushGoogleChat($e->getMessage());
+                }
+            }
+
+            $this->mailService->sendMailExportNatStock($information);
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
+
+            return;
+        }
+    }
+
 }

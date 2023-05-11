@@ -1233,4 +1233,86 @@ class MailService
 
         return $message;
     }
+
+    /**
+     * Send mail export order ws-eos.
+     *
+     * @param array $information
+     *
+     * @return \Swift_Message
+     *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function sendMailExportNatStock($information = [])
+    {
+        if (empty($information)) {
+            return;
+        }
+
+        if (empty($information['email'])) {
+            return;
+        }
+
+        log_info('[WS-EOS] Start Send Mail FTP');
+
+        // Information successfully
+        if ($information['status'] == 1) {
+            $information['subject_mail'] = '在庫データの送信が完了しました';
+            $information['title_mail'] = '※本メールは自動配信メールです。';
+            $information['title_time'] = '送信完了日時';
+            $information['content1'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+            $information['content2'] = '　ご連絡くださいますようお願いいたします。';
+        }
+
+        // Information error
+        if ($information['status'] == 0) {
+            $information['subject_mail'] = '在庫データ送信にエラーが発生しました';
+            $information['title_mail'] = '※本メールは自動配信メールです。';
+            $information['content1'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
+            $information['content2'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+            $information['content3'] = '　ご連絡くださいますようお願いいたします。';
+            $information['error_title'] = 'エラー内容';
+        }
+
+        $body = $this->twig->render($information['file_name'], [
+            'information' => $information,
+        ]);
+
+        $message = (new \Swift_Message())
+            ->setSubject('['.$this->BaseInfo->getShopName().'] '.$information['subject_mail'])
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$information['email']])
+            ->setReplyTo($this->BaseInfo->getEmail03())
+            ->setReturnPath($this->BaseInfo->getEmail04());
+
+        if (!empty($information['email_cc'])) {
+            $message->setCc($information['email_cc']);
+        }
+
+        if (!empty($information['email_bcc'])) {
+            $message->setBcc($information['email_bcc']);
+        }
+
+        // HTMLテンプレートが存在する場合
+        $htmlFileName = $this->getHtmlTemplate($information['file_name']);
+        if (!is_null($htmlFileName)) {
+            $htmlBody = $this->twig->render($htmlFileName, [
+                'information' => $information,
+            ]);
+
+            $message
+                ->setContentType('text/plain; charset=UTF-8')
+                ->setBody($body, 'text/plain')
+                ->addPart($htmlBody, 'text/html');
+        } else {
+            $message->setBody($body);
+        }
+
+        $count = $this->mailer->send($message);
+        log_info('[WS-EOS] End Send Mail FTP', ['count' => $count]);
+
+        return $message;
+    }
 }
