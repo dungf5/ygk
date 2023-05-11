@@ -239,6 +239,7 @@ class PutFileFTPCommand extends Command
 
                 try {
                     // Save file information to DB
+                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                     $insertDate = [
                         'file_name' => $file_to,
                         'directory' => $path_to.date('Y/m'),
@@ -265,6 +266,7 @@ class PutFileFTPCommand extends Command
 
                 try {
                     // Save file information to DB
+                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
                     $insertDate = [
                         'file_name' => $file_to,
                         'directory' => $path_to.date('Y/m'),
