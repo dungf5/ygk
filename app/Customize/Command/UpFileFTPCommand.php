@@ -121,30 +121,6 @@ class UpFileFTPCommand extends Command
 
                 break;
 
-            case 'nat-stock':
-                log_info('Start Up File Nat Stock List');
-                /* Up files to FTP server*/
-                $path = getenv('FTP_UPLOAD_DIRECTORY') ?? '';
-                $path_local = getenv('LOCAL_FTP_UPLOAD_DIRECTORY') ?? '/html/upload/';
-                $path_local .= 'csv/nat';
-
-                if (getenv('APP_IS_LOCAL') == 1) {
-                    $path_local = '.'.$path_local;
-                }
-
-                $file_name = 'zaiko_'.date('Ymd').'.csv';
-
-                if (file_exists($path_local.'/'.$file_name) == false) {
-                    log_info("File ({$path_local}/{$file_name}) is empty");
-
-                    return;
-                }
-
-                $this->handleUploadFile($path, $file_name, $path_local);
-                log_info('End Up File Nat Stock List');
-
-                break;
-
             default:
                 break;
         }
