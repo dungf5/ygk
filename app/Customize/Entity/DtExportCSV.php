@@ -170,27 +170,36 @@ if (!class_exists('\Customize\Entity\DtExportCSV', false)) {
         }
 
         /**
-         * @param \DateTime|null $in_date
+         * @return \DateTime
          */
-        public function setInDate($in_date = null)
+        public function getInDate(): \DateTime
+        {
+            return $this->in_date;
+        }
+
+        /**
+         * @param \DateTime $in_date
+         */
+        public function setInDate(\DateTime $in_date): void
         {
             $this->in_date = $in_date;
         }
 
         /**
-         * @return \DateTime|null
+         * @return \DateTime
          */
-        public function getUpDate()
+        public function getUpDate(): \DateTime
         {
             return $this->up_date;
         }
 
         /**
-         * @param \DateTime|null $up_date
+         * @param \DateTime $up_date
          */
-        public function setUpDate($up_date = null)
+        public function setUpDate(\DateTime $up_date): void
         {
             $this->up_date = $up_date;
         }
+        
     }
 }
