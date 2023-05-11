@@ -63,7 +63,7 @@ class DtExportCsvRepository extends AbstractRepository
             if (empty($data)) {
                 return;
             }
-            
+
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = $this->findOneBy(['file_name' => $data['file_name']]);
 
