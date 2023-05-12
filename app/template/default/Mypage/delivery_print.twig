@@ -634,10 +634,13 @@ file that was distributed with this source code.
 
             $.each(arr_print_pdf_value, function( index, value ) {
                 if (value && !handled[value]) {
-                    console.log(1);
                     handled[value] = true;
+
                     let url = '/mypage/exportOrderPdf?delivery_no=' + value;
-                    window.location.href = url;
+                    let a = document.createElement('a');
+                    a.target = '_blank';
+                    a.href = url;
+                    a.click();
                 }
             });
         }
