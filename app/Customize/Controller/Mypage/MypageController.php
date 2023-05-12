@@ -760,6 +760,7 @@ class MypageController extends AbstractController
             'search_shipping_date' => $request->get('shipping_date', 0),
             'search_order_shipping' => $request->get('order_shipping', '0'),
             'search_order_otodoke' => $request->get('order_otodoke', '0'),
+            'search_sale_type' => $request->get('sale_type', '0'),
         ];
 
         // paginator
@@ -835,6 +836,7 @@ class MypageController extends AbstractController
             'search_shipping_date' => $param['search_shipping_date'],
             'search_order_shipping' => $param['search_order_shipping'],
             'search_order_otodoke' => $param['search_order_otodoke'],
+            'search_sale_type' => $param['search_sale_type'],
         ];
     }
 
