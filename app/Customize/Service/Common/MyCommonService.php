@@ -1283,6 +1283,8 @@ SQL;
             $orderItem->setDeploy('XB');
             $orderItem->setCompanyId('XB');
             $orderItem->setShipingDepositCode($itemSave['location']);
+            $orderItem->setFvehicleno($itemSave['fvehicleno']);
+            $orderItem->setFtrnsportcd('87001');
 
             // No41 注文情報送信I/F end
             $this->entityManager->persist($orderItem);
