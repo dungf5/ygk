@@ -127,7 +127,7 @@ file that was distributed with this source code.
             {% endif %}
 
             <div class="row">
-                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDF()">Preview & Print</button>
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePreviewPDF()">Preview & Print</button>
                 <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDF()">Download</button>
                 <input type="hidden" id="check-box-value-print-pdf" value=""/>
             </div>
@@ -626,6 +626,23 @@ file that was distributed with this source code.
                     $(".btn-print-pdf").prop('disabled', true);
                 }
             }
+        }
+
+        function handlePreviewPDF() {
+            let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+            let handled = {};
+
+            $.each(arr_print_pdf_value, function( index, value ) {
+                if (value && !handled[value]) {
+                    handled[value] = true;
+
+                    let url = '/mypage/exportOrderPdf?preview=1delivery_no=' + value;
+                    let a = document.createElement('a');
+                    a.target = '_blank';
+                    a.href = url;
+                    a.click();
+                }
+            });
         }
 
         function handlePrintPDF() {
