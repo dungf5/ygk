@@ -636,7 +636,7 @@ file that was distributed with this source code.
                 if (value && !handled[value]) {
                     handled[value] = true;
 
-                    let url = '/mypage/exportOrderPdf?preview=1delivery_no=' + value;
+                    let url = '/mypage/exportOrderPdf?preview=1&delivery_no=' + value;
                     let a = document.createElement('a');
                     a.target = '_blank';
                     a.href = url;
