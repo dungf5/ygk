@@ -183,6 +183,7 @@ class OrderItemRepository extends AbstractRepository
             'delivery.delivery_lineno',
             'delivery.shiping_name',
             'delivery.otodoke_name',
+            'delivery.sale_type',
             'shipping.shipping_date',
             'shipping.shipping_no',
             'shipping.ec_order_no',

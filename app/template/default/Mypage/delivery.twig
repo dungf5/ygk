@@ -96,6 +96,7 @@ file that was distributed with this source code.
                 <thead>
                 <tr>
                     <th title="delivery_no">{{ 'front.mypage.shipping.note_no'|trans| raw }}</th>
+                    <th title="delivery_no">{{ 'front.mypage.shipping.sale_type'|trans| raw }}</th>
                     <th title="shipping_date" style="max-width:100px">
                         {{ 'front.mypage.shipping.date'|trans| raw }}
                         <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_shipping_date">
@@ -151,6 +152,7 @@ file that was distributed with this source code.
                                     {{ Order.delivery_no }}
                                 {% endif %}
                             </td>
+                            <td>{{Order.sale_type}}</td>
                             <td>{{Order.shipping_date}}</td>
                             <td>
                                 {{Order.shiping_name}}<br/>
@@ -168,7 +170,7 @@ file that was distributed with this source code.
                 {% else %}
                     <tbody>
                     <tr>
-                        <td colspan="4">
+                        <td colspan="5">
                             <p>納品書はありません。</p>
                         </td>
                     </tr>
