@@ -200,6 +200,12 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
          * @ORM\Column(name="fvehicleno",type="string",nullable=true, options={"comment":"便No. 0:送料なし、１：送料あり"  })
          */
         private $fvehicleno;
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="ftrnsportcd", type="string", nullable=true, options={"comment":"輸送便コード"})
+         */
+        private $ftrnsportcd;
 
         /**
          * @return string
@@ -755,6 +761,22 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
         public function setFvehicleno($fvehicleno): void
         {
             $this->fvehicleno = $fvehicleno;
+        }
+
+        /**
+         * @return string
+         */
+        public function getFtrnsportcd()
+        {
+            return $this->ftrnsportcd;
+        }
+
+        /**
+         * @param $ftrnsportcd
+         */
+        public function setFtrnsportcd($ftrnsportcd)
+        {
+            $this->ftrnsportcd = $ftrnsportcd;
         }
     }
 }
