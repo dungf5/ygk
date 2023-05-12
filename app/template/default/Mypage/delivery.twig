@@ -96,6 +96,18 @@ file that was distributed with this source code.
                 <thead>
                 <tr>
                     <th title="delivery_no">{{ 'front.mypage.shipping.note_no'|trans| raw }}</th>
+                    <th title="delivery_no">
+                        {{ 'front.mypage.shipping.sale_type'|trans| raw }}
+                        <a href="javascript:void(0)" style="color: red; {% if orderOtodokeOpt|length < 2 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_sale_type">
+                            <span class="glyphicon glyphicon-triangle-bottom"></span>
+                        </a>
+                        <br/>
+                        <select id="search_sale_type" name="search_sale_type" onchange="handleSearch(this)">
+                            <option value="0" {% if search_sale_type == '0' %} selected {% endif %}>すべて</option>
+                            <option value="1" {% if search_sale_type == '1' %} selected {% endif %}>通常</option>
+                            <option value="2" {% if search_sale_type == '2' %} selected {% endif %}>返品</option>
+                        </select>
+                    </th>
                     <th title="shipping_date" style="max-width:100px">
                         {{ 'front.mypage.shipping.date'|trans| raw }}
                         <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_shipping_date">
@@ -142,7 +154,7 @@ file that was distributed with this source code.
                     <tbody>
                     {% for Order in pagination %}
                         <tr>
-                            <td>
+                            <td title="{{ Order.delivery_no }}-{{ Order.delivery_lineno }} ({{ Order.order_no }})">
                                 {% if global_service.getPdfExportFlg %}
                                     <a target="_blank" href="/mypage/exportOrderPdf?delivery_no={{Order.delivery_no}}">
                                         {{ Order.delivery_no }}
@@ -151,6 +163,7 @@ file that was distributed with this source code.
                                     {{ Order.delivery_no }}
                                 {% endif %}
                             </td>
+                            <td>{{Order.sale_type}}</td>
                             <td>{{Order.shipping_date}}</td>
                             <td>
                                 {{Order.shiping_name}}<br/>
@@ -168,7 +181,7 @@ file that was distributed with this source code.
                 {% else %}
                     <tbody>
                     <tr>
-                        <td colspan="4">
+                        <td colspan="5">
                             <p>納品書はありません。</p>
                         </td>
                     </tr>
@@ -361,6 +374,63 @@ file that was distributed with this source code.
             nonSelectedText: '注文日検索',
         });
 
+        $('#search_sale_type').multiselect({
+            includeSelectAllOption: true,
+            selectAllText: 'すべて',
+            enableFiltering: true,
+            filterPlaceholder: '検索',
+            disableIfEmpty: true,
+            checkboxName: function(option) {
+                return 'multiselect[]';
+            },
+            buttonWidth: '150px',
+            buttonHeight: '34px',
+            buttonText: function(options, select) {
+                if (options.length === 0) {
+                    return '未選択';
+                }
+                else if (options.length == 14) {
+                    return 'すべて';
+                }
+                else if (options.length > 2) {
+                    return options.length + 'ヶ月選択済み';
+                }
+                else {
+                     var labels = [];
+                     options.each(function() {
+                         if ($(this).attr('label') !== undefined) {
+                             labels.push($(this).attr('label'));
+                         }
+                         else {
+                             labels.push($(this).html());
+                         }
+                     });
+                     labels.reverse();
+                     return labels.join(', ') + '';
+                }
+            },
+            buttonTitle: function(options, select) {
+                if (options.length === 0) {
+                    return '未選択';
+                }
+                else {
+                     var labels = [];
+                     options.each(function() {
+                         if ($(this).attr('label') !== undefined) {
+                             labels.push($(this).attr('label'));
+                         }
+                         else {
+                             labels.push($(this).html());
+                         }
+                     });
+                     labels.reverse();
+                     return labels.join(', ') + '';
+                }
+            },
+            buttonClass:'search_sale_type',
+            nonSelectedText: '注文日検索',
+        });
+
         var typingTimer;
         var doneTypingInterval      = 2000;
 
@@ -403,6 +473,11 @@ file that was distributed with this source code.
                 loadingOverlay();
                 handelChangeOtodoke(origin, pathname, search);
             }
+
+            if (name == 'search_sale_type') {
+                loadingOverlay();
+                handelChangeSaleType(origin, pathname, search);
+            }
         }
 
         function handleGetLastSelected() {
@@ -432,6 +507,11 @@ file that was distributed with this source code.
             window.location.href = origin + pathname;
         }
 
+        function handelChangeSaleType(origin, pathname, search) {
+            pathname += "&sale_type=" + $("#search_sale_type").val();
+            window.location.href = origin + pathname;
+        }
+
         $("a.multiselect.dropdown-toggle.search_shipping_date").on("click", function() {
             let button          = $("button.search_shipping_date");
             let aria_expanded   = button.attr("aria-expanded");
@@ -454,6 +534,16 @@ file that was distributed with this source code.
 
         $("a.multiselect.dropdown-toggle.search_order_otodoke").on("click", function() {
             let button          = $("button.search_order_otodoke");
+            let aria_expanded   = button.attr("aria-expanded");
+            if (!aria_expanded || aria_expanded == 'false') {
+                setTimeout(function() {
+                    button.click();
+                }, 100);
+            }
+        })
+
+        $("a.multiselect.dropdown-toggle.search_sale_type").on("click", function() {
+            let button          = $("button.search_sale_type");
             let aria_expanded   = button.attr("aria-expanded");
             if (!aria_expanded || aria_expanded == 'false') {
                 setTimeout(function() {

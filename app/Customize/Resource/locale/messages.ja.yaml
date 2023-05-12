@@ -71,6 +71,7 @@ front.mypage.shipping.plan_date: 出荷指示日
 front.mypage.shipping.date: 出荷日
 front.mypage.shipping.num: 出荷数
 front.mypage.shipping.note_no: 納品書№
+front.mypage.shipping.sale_type: 伝票
 front.mypage.shipping.packing_slip: お問い合わせ番号
 front.mypage.shipping.order_number: 注文番号
 front.mypage.shipping.detail: 明細
