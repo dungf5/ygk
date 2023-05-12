@@ -232,6 +232,16 @@ class OrderItemRepository extends AbstractRepository
             }
         }
 
+        if (!empty($paramSearch['search_shipping_date_from'])) {
+            $qb->andWhere('shipping.shipping_date >= :shipping_date_from')
+                ->setParameter(':shipping_date_from', $paramSearch['search_shipping_date_from']);
+        }
+
+        if (!empty($paramSearch['search_shipping_date_to'])) {
+            $qb->andWhere('shipping.shipping_date <= :shipping_date_to')
+                ->setParameter(':shipping_date_to', $paramSearch['search_shipping_date_to']);
+        }
+
         $qb->addGroupBy('delivery.delivery_no');
         $qb->addGroupBy('delivery.delivery_lineno');
         $qb->addGroupBy('delivery.order_no');
