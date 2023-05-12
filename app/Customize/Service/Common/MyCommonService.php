@@ -274,7 +274,7 @@ SQL;
 
     public function getMstCustomerCode($customer_code)
     {
-        $column = 'customer_code as shipping_no,customer_code, ec_customer_id,customer_name, company_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date';
+        $column = 'customer_code as shipping_no,customer_code, ec_customer_id,customer_name, company_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date, fusrdec1';
         $sql = " SELECT $column   FROM mst_customer a WHERE customer_code=?";
         $param = [];
         $param[] = $customer_code;

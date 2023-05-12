@@ -652,6 +652,7 @@ class MyShoppingController extends AbstractShoppingController
                 //save more nvtrong
                 $comS = new MyCommonService($this->entityManager);
                 $orderNo = $Order->getOrderNo();
+                $subTotal = $Order->getSubtotal();
                 $itemList = $Order->getItems()->toArray();
                 $arEcLData = [];
                 $hsArrEcProductCusProduct = [];
@@ -687,6 +688,7 @@ class MyShoppingController extends AbstractShoppingController
                 $remarks4 = $moreOrder->getRemarks4();
                 $location = $comS->getCustomerLocation($customerCode);
                 $reCustomer = $comS->getCustomerRelationFromUser($customerCode, $login_type, $login_code);
+                $fusrdec1 = ($comS->getMstCustomerCode($reCustomer['customer_code'] ?? ''))['fusrdec1'] ?? 0;
 
                 foreach ($itemList as $itemOr) {
                     if ($itemOr->isProduct()) {
