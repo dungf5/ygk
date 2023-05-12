@@ -169,6 +169,7 @@ class MypageController extends AbstractController
     public function exportOrderPdf(Request $request)
     {
         $htmlFileName = 'Mypage/exportOrderPdf.twig';
+        $preview = MyCommon::getPara('preview');
         $delivery_no = MyCommon::getPara('delivery_no');
         $order_no_line_no = MyCommon::getPara('order_no_line_no');
 
@@ -204,20 +205,23 @@ class MypageController extends AbstractController
             'totalTaxRe' => $totalTaxRe,
             'totalaAmountTax' => $totalaAmountTax,
         ];
-        $namePdf = 'ship_'.$delivery_no.'.pdf';
-        $file = $dirPdf.'/'.$namePdf;
 
-        if (getenv('APP_IS_LOCAL') == 0) {
-            $htmlBody = $this->twig->render($htmlFileName, $arReturn);
-            MyCommon::converHtmlToPdf($dirPdf, $namePdf, $htmlBody);
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="'.basename($file).'"');
+        if (!$preview) {
+            $namePdf = 'ship_'.$delivery_no.'.pdf';
+            $file = $dirPdf.'/'.$namePdf;
 
-            readfile($file);
-            exit();
-        } else {
-            exec('"C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe" c:/wamp/www/test/pdf.html c:/wamp/www/test/pdf.pdf');
+            if (getenv('APP_IS_LOCAL') == 0) {
+                $htmlBody = $this->twig->render($htmlFileName, $arReturn);
+                MyCommon::converHtmlToPdf($dirPdf, $namePdf, $htmlBody);
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="'.basename($file).'"');
+
+                readfile($file);
+                exit();
+            } else {
+                exec('"C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe" c:/wamp/www/test/pdf.html c:/wamp/www/test/pdf.pdf');
+            }
         }
 
         return $arReturn;
