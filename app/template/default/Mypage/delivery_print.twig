@@ -127,8 +127,9 @@ file that was distributed with this source code.
             {% endif %}
 
             <div class="row">
-                <button class="btn btn-danger" {% if global_service.getPdfExportFlg == 0 %} disabled {% endif %}>Preview & Print</button>
-                <button class="btn btn-danger" {% if global_service.getPdfExportFlg == 0 %} disabled {% endif %}>Download</button>
+                <button class="btn btn-danger btn-print-pdf" disabled >Preview & Print</button>
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDF()">Download</button>
+                <input type="hidden" id="check-box-value-print-pdf" value=""/>
             </div>
 
             <table class="table myTable">
@@ -195,16 +196,12 @@ file that was distributed with this source code.
                     {% for Order in pagination %}
                         <tr>
                             <td>
-                                <input type="checkbox" class="check-box-print-pdf" value="{{Order.delivery_no}}"/>
+                                {% if global_service.getPdfExportFlg %}
+                                    <input type="checkbox" class="check-box-print-pdf" name="check-box-print-pdf" value="{{Order.delivery_no}}" onchange="handleCheckBox(this)"/>
+                                {% endif %}
                             </td>
                             <td title="納品書№ {{ Order.delivery_no }}-{{ Order.delivery_lineno }}, 御社注文№ {{ Order.order_no }}">
-                                {% if global_service.getPdfExportFlg %}
-                                    <a target="_blank" href="/mypage/exportOrderPdf?delivery_no={{Order.delivery_no}}">
-                                        {{ Order.delivery_no }}
-                                    </a>
-                                {% else %}
-                                    {{ Order.delivery_no }}
-                                {% endif %}
+                                {{ Order.delivery_no }}
                             </td>
                             <td>{{Order.sale_type}}</td>
                             <td>{{Order.shipping_date}}</td>
@@ -599,7 +596,7 @@ file that was distributed with this source code.
             }
         })
 
-        $(document).ready(function(){
+        $(document).ready(function() {
             $("#search_shipping_date_from").datepicker({
                 dateFormat: "yy-mm-dd",
                 appendText: " ~ "
@@ -608,5 +605,41 @@ file that was distributed with this source code.
                 dateFormat: "yy-mm-dd",
             });
         });
+
+        function handleCheckBox(target) {
+            let name                = target.name;
+
+            if (name == 'check-box-print-pdf') {
+                let temp_value = '';
+                let count = 0
+                $(".check-box-print-pdf").each(function () {
+                    if (this.checked) {
+                       temp_value += ',' + $(this).val();
+                       count++;
+                    }
+                });
+
+                if (count > 0) {
+                    $("#check-box-value-print-pdf").val(temp_value);
+                    $(".btn-print-pdf").prop('disabled', false);
+                } else {
+                    $(".btn-print-pdf").prop('disabled', true);
+                }
+            }
+        }
+
+        function handlePrintPDF() {
+            let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+            let handled = {};
+
+            $.each(arr_print_pdf_value, function( index, value ) {
+                if (value && !handled[value]) {
+                    console.log(1);
+                    handled[value] = true;
+                    let url = '/mypage/exportOrderPdf?delivery_no=' + value;
+                    window.location.href = url;
+                }
+            });
+        }
     </script>
 {% endblock %}
