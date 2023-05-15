@@ -101,7 +101,7 @@ class GetFileFTPCommand extends Command
                 $this->WSEOS();
                 break;
 
-            case 'nat-stock':
+            case 'nat-eos':
                 $this->NatStock();
                 break;
 
