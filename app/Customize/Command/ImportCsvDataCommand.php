@@ -114,7 +114,16 @@ class ImportCsvDataCommand extends Command
                 }
 
                 $this->handleImportCsvOrderWSEOS($path.date('Y/m'));
+                break;
 
+            case 'nat-eos':
+                $path .= 'csv/order/';
+
+                if (getenv('APP_IS_LOCAL') == 1) {
+                    $path = '.'.$path;
+                }
+
+                $this->handleImportCsvOrderWSEOS($path.date('Y/m'));
                 break;
 
             default:
