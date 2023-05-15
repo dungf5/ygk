@@ -74,6 +74,7 @@ class GetFileFTPCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+        log_info('---------------------------------------');
         log_info('Start Process Get File FTP');
 
         $param = $input->getArgument('arg1') ?? null;
@@ -122,9 +123,9 @@ class GetFileFTPCommand extends Command
                 if ($result['status'] == -1) {
                     log_info('[WS-EOS] Send Mail FTP.');
                     $information = [
-                        'email' => getenv('EMAIL_WS_EOS') ?? '',
-                        'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
-                        'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
+                        'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                        'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                        'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
                         'file_name' => 'Mail/ws_eos_ftp.twig',
                         'status' => 0,
                         'error_content' => $result['message'],
@@ -183,16 +184,16 @@ class GetFileFTPCommand extends Command
                 if ($result['status'] == -1) {
                     log_info('[NAT-STOCK] Send Mail FTP.');
                     $information = [
-                        'email' => getenv('EMAIL_WS_EOS') ?? '',
-                        'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
-                        'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
-                        'file_name' => 'Mail/ws_eos_ftp.twig',
+                        'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                        'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                        'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
+                        'file_name' => 'Mail/nat_stock_ftp.twig',
                         'status' => 0,
                         'error_content' => $result['message'],
                     ];
 
                     try {
-                        $this->mailService->sendMailImportWSEOS($information);
+                        $this->mailService->sendMailImportNatStock($information);
                     } catch (\Exception $e) {
                         log_error($e->getMessage());
                         $this->pushGoogleChat($e->getMessage());
@@ -213,6 +214,23 @@ class GetFileFTPCommand extends Command
                     ];
 
                     $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
+
+                    log_info('[NAT-STOCK] Send Mail FTP.');
+                    $information = [
+                        'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                        'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                        'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
+                        'file_name' => 'Mail/nat_stock_ftp.twig',
+                        'status' => 1,
+                        'finish_time' => '('.$file_from.') '.date('Y/m/d H:i:s'),
+                    ];
+
+                    try {
+                        $this->mailService->sendMailImportNatStock($information);
+                    } catch (\Exception $e) {
+                        log_error($e->getMessage());
+                        $this->pushGoogleChat($e->getMessage());
+                    }
                 }
 
                 log_info('End Get File Nat Stock List');
