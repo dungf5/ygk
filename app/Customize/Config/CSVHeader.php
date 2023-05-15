@@ -81,4 +81,17 @@ trait CSVHeader
             'メーカー在庫数',
         ];
     }
+
+    public function getNatEOSCsvOrderHeader()
+    {
+        return [
+            'reqcd',
+            'jan',
+            'mkrcd',
+            'natcd',
+            'qty',
+            'cost',
+            'delivery_day',
+        ];
+    }
 }
