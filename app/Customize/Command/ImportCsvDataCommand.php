@@ -18,6 +18,8 @@ namespace Customize\Command;
 use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtImportCSV;
+use Customize\Entity\DtOrderNatEOS;
+use Customize\Entity\DtOrderNatEOSCopy;
 use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\DtOrderWSEOSCopy;
 use Customize\Service\Common\MyCommonService;
@@ -188,7 +190,7 @@ class ImportCsvDataCommand extends Command
                 ];
                 $this->entityManager->getRepository(DtImportCSV::class)->updateData($data);
 
-                $this->pushGoogleChat('Import data to dt_order_ws_eos: '.$result['message']);
+                $this->pushGoogleChat('Import data to dt_order_ws_eos / dt_order_ws_eos_copy: '.$result['message']);
 
                 // Send mail
                 $this->SendMailWSEOSImport($result['status'], $data);
@@ -230,18 +232,18 @@ class ImportCsvDataCommand extends Command
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // Insert cache file to validation data
-        $cache_file = getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') ?? '/html/download/';
-        $cache_file .= 'csv/order/';
+        //$cache_file = getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') ?? '/html/download/';
+        //$cache_file .= 'csv/order/';
 
-        if (getenv('APP_IS_LOCAL') == 1) {
-            $cache_file = '.'.$cache_file;
-        }
+        //if (getenv('APP_IS_LOCAL') == 1) {
+        //    $cache_file = '.'.$cache_file;
+        //}
 
-        $cache_file .= 'ws_eos_cache_file'.date('Ymd').'.txt';
-        // open file to write to
-        if (!$handle = fopen($cache_file, 'a')) {
-            log_error("Cannot open file ({$cache_file})");
-        }
+        //$cache_file .= 'ws_eos_cache_file'.date('Ymd').'.txt';
+        //// open file to write to
+        //if (!$handle = fopen($cache_file, 'a')) {
+        //    log_error("Cannot open file ({$cache_file})");
+        //}
 
         // Foreach row
         foreach ($data as $x => $row) {
@@ -257,12 +259,12 @@ class ImportCsvDataCommand extends Command
             ]);
 
             // Write to cache file
-            if ($handle) {
-                $cache_data = $objData['order_no'].'-'.$objData['order_line_no']."\n";
-                if (fwrite($handle, $cache_data) === false) {
-                    log_error("Cannot write ({$cache_data}) to file ({$cache_file})");
-                }
-            }
+            //if ($handle) {
+            //    $cache_data = $objData['order_no'].'-'.$objData['order_line_no']."\n";
+            //    if (fwrite($handle, $cache_data) === false) {
+            //        log_error("Cannot write ({$cache_data}) to file ({$cache_file})");
+            //    }
+            //}
 
             // Insert dt_order_ws_eos
             if (empty($objectExist)) {
@@ -305,9 +307,9 @@ class ImportCsvDataCommand extends Command
         }
 
         //close
-        if ($handle) {
-            fclose($handle);
-        }
+        //if ($handle) {
+        //    fclose($handle);
+        //}
 
         log_info('End save/update data Order WS EOS');
 
@@ -403,7 +405,6 @@ class ImportCsvDataCommand extends Command
                 // Load file read data
                 $colNumber = !empty(getenv('NUMBER_COLUMN_NAT_EOS')) ? getenv('NUMBER_COLUMN_NAT_EOS') : 7;
                 $csvData = $this->LoadFileReadData($path, $file, $colNumber);
-                var_dump($csvData);die();
                 $result = $this->SaveDataNatEOS($csvData);
 
                 // Update information dt_import_csv
@@ -417,10 +418,7 @@ class ImportCsvDataCommand extends Command
                 ];
                 $this->entityManager->getRepository(DtImportCSV::class)->updateData($data);
 
-                $this->pushGoogleChat('Import data to dt_order_ws_eos: '.$result['message']);
-
-                // Send mail
-                $this->SendMailWSEOSImport($result['status'], $data);
+                $this->pushGoogleChat('Import data to dt_order_nat_eos / dt_order_nat_eos_copy: '.$result['message']);
             }
         }
 
@@ -436,49 +434,44 @@ class ImportCsvDataCommand extends Command
             ];
         }
 
-        log_info('Start save/update data Order WS EOS');
+        log_info('Start save/update data Order NAT EOS');
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
-        // Insert cache file to validation data
-        $cache_file = getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') ?? '/html/download/';
-        $cache_file .= 'csv/order/';
-
-        if (getenv('APP_IS_LOCAL') == 1) {
-            $cache_file = '.'.$cache_file;
-        }
-
-        $cache_file .= 'ws_eos_cache_file'.date('Ymd').'.txt';
-        // open file to write to
-        if (!$handle = fopen($cache_file, 'a')) {
-            log_error("Cannot open file ({$cache_file})");
-        }
-
+        $reqcd_arr = [];
+        $line_no = 1;
         // Foreach row
         foreach ($data as $x => $row) {
+            // Exclude title
+            if ($x == 0) {
+                continue;
+            }
+
             // Foreach column
             $objData = [];
+
             foreach ($this->getNatEOSCsvOrderHeader() as $y => $col) {
                 $objData["{$col}"] = trim($data[$x][$y]);
             }
 
-            $objectExist = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy([
-                'order_no' => $objData['order_no'] ?? '',
-                'order_line_no' => $objData['order_line_no'] ?? '',
-            ]);
-
-            // Write to cache file
-            if ($handle) {
-                $cache_data = $objData['order_no'].'-'.$objData['order_line_no']."\n";
-                if (fwrite($handle, $cache_data) === false) {
-                    log_error("Cannot write ({$cache_data}) to file ({$cache_file})");
-                }
+            if (!in_array($objData['reqcd'], $reqcd_arr)) {
+                $line_no = 1;
+                array_push($reqcd_arr, $objData['reqcd']);
+            } else {
+                $line_no++;
             }
 
-            // Insert dt_order_ws_eos
-            if (empty($objectExist)) {
-                log_info('Insert dt_order_ws_eos '.$objData['order_no'].'-'.$objData['order_line_no']);
+            $objData['order_lineno'] = $line_no;
 
-                $this->entityManager->getRepository(DtOrderWSEOS::class)->insertData($objData);
+            $objectExist = $this->entityManager->getRepository(DtOrderNatEOS::class)->findOneBy([
+                'reqcd' => $objData['reqcd'] ?? '',
+                'jan' => $objData['jan'] ?? '',
+            ]);
+
+            // Insert dt_order_nat_eos
+            if (empty($objectExist)) {
+                log_info('Insert dt_order_nat_eos '.$objData['reqcd'].'-'.$objData['jan']);
+
+                $this->entityManager->getRepository(DtOrderNatEOS::class)->insertData($objData);
             }
 
             // Update
@@ -487,39 +480,34 @@ class ImportCsvDataCommand extends Command
 
                 switch ((int) $orderRegistedFlg) {
                     case 1:
-                        $objectCopyExist = $this->entityManager->getRepository(DtOrderWSEOSCopy::class)->findOneBy([
-                            'order_no' => $objData['order_no'] ?? '',
-                            'order_line_no' => $objData['order_line_no'] ?? '',
+                        $objectCopyExist = $this->entityManager->getRepository(DtOrderNatEOSCopy::class)->findOneBy([
+                            'reqcd' => $objData['reqcd'] ?? '',
+                            'jan' => $objData['jan'] ?? '',
                         ]);
 
-                        // Insert dt_order_ws_eos_copy
+                        // Insert dt_order_nat_eos_copy
                         if (empty($objectCopyExist)) {
-                            log_info('Insert dt_order_ws_eos_copy '.$objData['order_no'].'-'.$objData['order_line_no']);
-                            $this->entityManager->getRepository(DtOrderWSEOSCopy::class)->insertData($objData);
+                            log_info('Insert dt_order_nat_eos_copy '.$objData['reqcd'].'-'.$objData['jan']);
+                            $this->entityManager->getRepository(DtOrderNatEOSCopy::class)->insertData($objData);
                         }
 
-                        // Update dt_order_ws_eos_copy
+                        // Update dt_order_nat_eos_copy
                         else {
-                            log_info('Update dt_order_ws_eos_copy '.$objData['order_no'].'-'.$objData['order_line_no']);
-                            $this->entityManager->getRepository(DtOrderWSEOSCopy::class)->updateData($objData);
+                            log_info('Update dt_order_nat_eos_copy '.$objData['reqcd'].'-'.$objData['jan']);
+                            $this->entityManager->getRepository(DtOrderNatEOSCopy::class)->updateData($objData);
                         }
                         break;
 
                     default:
-                        // Update dt_order_ws_eos
-                        log_info('Update dt_order_ws_eos '.$objData['order_no'].'-'.$objData['order_line_no']);
-                        $this->entityManager->getRepository(DtOrderWSEOS::class)->updateData($objData);
+                        // Update dt_order_nat_eos
+                        log_info('Update dt_order_nat_eos '.$objData['reqcd'].'-'.$objData['jan']);
+                        $this->entityManager->getRepository(DtOrderNatEOS::class)->updateData($objData);
                         break;
                 }
             }
         }
 
-        //close
-        if ($handle) {
-            fclose($handle);
-        }
-
-        log_info('End save/update data Order WS EOS');
+        log_info('End save/update data Order NAT EOS');
 
         return [
             'status' => 1,
