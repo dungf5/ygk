@@ -227,7 +227,7 @@ class PutFileFTPCommand extends Command
 
             // Send mail result
             if ($result['status'] == -1 || $result['status'] == 0) {
-                log_info('[WS-EOS] Send Mail FTP.');
+                log_info('[NAT-STOCK] Send Mail FTP.');
                 $information = [
                     'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
                     'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
@@ -253,7 +253,7 @@ class PutFileFTPCommand extends Command
                     $this->pushGoogleChat($e->getMessage());
                 }
             } else {
-                log_info('[WS-EOS] Send Mail FTP.');
+                log_info('[NAT-STOCK] Send Mail FTP.');
 
                 $information = [
                     'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',

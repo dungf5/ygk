@@ -157,6 +157,67 @@ class GetFileFTPCommand extends Command
                 log_info('End Get File Order WS-EOS');
                 break;
 
+            case 'nat-stock':
+                log_info('Start Get File Nat Stock List');
+                /* Get files from FTP server*/
+                $file_from = 'requestD_'.date('Ymd').'.csv';
+
+                if (!str_ends_with(trim($file_from), '.csv')) {
+                    log_error("{$file_from} is not a csv file");
+
+                    $this->pushGoogleChat("Get file FTP: {$file_from} is not a csv file");
+
+                    return;
+                }
+
+                $path_local = !empty(getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY')) ? getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') : '/html/download/';
+                $path_from = $path_local.'csv/nat/';
+                $path_to = $path_local.'csv/nat/';
+                $error_file = 'error.txt';
+                $file_to = date('YmdHis').'.csv';
+
+                $result = $this->csvService->transferFile($path_from, $path_to, $file_from, $file_to, $error_file);
+                log_info($result['message']);
+
+                // Send mail error
+                if ($result['status'] == -1) {
+                    log_info('[NAT-STOCK] Send Mail FTP.');
+                    $information = [
+                        'email' => getenv('EMAIL_WS_EOS') ?? '',
+                        'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
+                        'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
+                        'file_name' => 'Mail/ws_eos_ftp.twig',
+                        'status' => 0,
+                        'error_content' => $result['message'],
+                    ];
+
+                    try {
+                        $this->mailService->sendMailImportWSEOS($information);
+                    } catch (\Exception $e) {
+                        log_error($e->getMessage());
+                        $this->pushGoogleChat($e->getMessage());
+                    }
+                }
+
+                // Success
+                if ($result['status'] == 1) {
+                    // Save file information to DB
+                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                    $insertDate = [
+                        'file_name' => $file_to,
+                        'directory' => $path_to.date('Y/m'),
+                        'message' => null,
+                        'is_sync' => 0,
+                        'is_error' => 0,
+                        'is_send_mail' => 0,
+                    ];
+
+                    $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
+                }
+
+                log_info('End Get File Nat Stock List');
+                break;
+
             default:
                 break;
         }
