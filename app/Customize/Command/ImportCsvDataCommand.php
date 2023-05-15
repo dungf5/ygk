@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 namespace Customize\Command;
 
-use Customize\Config\WSEOS;
+use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtImportCSV;
 use Customize\Entity\DtOrderWSEOS;
@@ -40,7 +40,7 @@ class ImportCsvDataCommand extends Command
 {
     use PluginCommandTrait;
     use CurlPost;
-    use WSEOS;
+    use CSVHeader;
 
     /** @var EntityManagerInterface */
     private $entityManager;
