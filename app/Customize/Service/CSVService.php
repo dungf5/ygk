@@ -109,7 +109,7 @@ class CSVService
 
                         return [
                             'status' => -1,
-                            'message' => "0532 File don't make DATA 0!->logout.",
+                            'message' => '0526 This file is unacquirable.',
                         ];
                     }
 
