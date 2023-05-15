@@ -125,6 +125,7 @@ class ImportCsvDataCommand extends Command
     private function handleImportCsvOrderWSEOS($path)
     {
         log_info('Start Process Import Order WS-EOS CSV for month '.date('m'));
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         if (empty($path)) {
             log_error('Path is empty ');
