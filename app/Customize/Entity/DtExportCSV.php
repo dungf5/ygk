@@ -62,16 +62,15 @@ if (!class_exists('\Customize\Entity\DtExportCSV', false)) {
         /**
          * @var \DateTime
          *
-         * @ORM\Column(name="in_date", type="datetimetz", nullable=false, options={"comment":""})
+         * @ORM\Column(name="create_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT ''")
          */
-        private $in_date;
-
+        private $create_date;
         /**
          * @var \DateTime
          *
-         * @ORM\Column(name="up_date", type="datetimetz", nullable=false, options={"comment":""})
+         * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT ''")
          */
-        private $up_date;
+        private $update_date;
 
         /**
          * @return int
@@ -170,27 +169,35 @@ if (!class_exists('\Customize\Entity\DtExportCSV', false)) {
         }
 
         /**
-         * @param \DateTime|null $in_date
+         * @return \DateTime
          */
-        public function setInDate($in_date = null)
+        public function getCreateDate()
         {
-            $this->in_date = $in_date;
+            return $this->create_date;
         }
 
         /**
-         * @return \DateTime|null
+         * @param $create_date
          */
-        public function getUpDate()
+        public function setCreateDate($create_date)
         {
-            return $this->up_date;
+            $this->create_date = $create_date;
         }
 
         /**
-         * @param \DateTime|null $up_date
+         * @return \DateTime
          */
-        public function setUpDate($up_date = null)
+        public function getUpdateDate()
         {
-            $this->up_date = $up_date;
+            return $this->update_date;
+        }
+
+        /**
+         * @param $update_date
+         */
+        public function setUpdateDate($update_date)
+        {
+            $this->update_date = $update_date;
         }
     }
 }
