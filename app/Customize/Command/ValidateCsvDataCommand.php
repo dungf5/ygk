@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 namespace Customize\Command;
 
-use Customize\Config\WSEOS;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtBreakKey;
 use Customize\Entity\DtOrder;
@@ -44,7 +43,6 @@ class ValidateCsvDataCommand extends Command
 {
     use PluginCommandTrait;
     use CurlPost;
-    use WSEOS;
 
     /** @var EntityManagerInterface */
     private $entityManager;
