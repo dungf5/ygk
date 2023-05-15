@@ -13,7 +13,7 @@
 
 namespace Customize\Config;
 
-trait WSEOS
+trait CSVHeader
 {
     public function getWSEOSCsvOrderHeader()
     {
@@ -60,6 +60,25 @@ trait WSEOS
             'cash_type_code',
             'order_create_day',
             'order_update_day',
+        ];
+    }
+
+    public function getNatExportCsvHeader()
+    {
+        return [
+            'JANコード',
+            '品番(メーカー品番)',
+            'グレード',
+            '在庫数',
+            '次回入荷日',
+            '次回入荷数',
+            '発注ロット',
+            '発注',
+            '仕入先品番',
+            'メーカーコード',
+            'カラーコード',
+            'サイズコード',
+            'メーカー在庫数',
         ];
     }
 }
