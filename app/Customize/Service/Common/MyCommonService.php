@@ -959,6 +959,7 @@ SQL;
      * @param $customer_code
      * @param string $login_type
      * @param string $login_code
+     * @param string $shipping_code
      * @return array
      * @throws Exception
      */
