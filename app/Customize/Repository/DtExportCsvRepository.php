@@ -13,7 +13,9 @@
 
 namespace Customize\Repository;
 
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtExportCSV;
+use Doctrine\DBAL\Types\Type;
 use Eccube\Repository\AbstractRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -35,7 +37,7 @@ class DtExportCsvRepository extends AbstractRepository
             if (empty($data)) {
                 return;
             }
-
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = new DtExportCSV();
 
             $object->setFileName($data['file_name']);
@@ -62,6 +64,7 @@ class DtExportCsvRepository extends AbstractRepository
                 return;
             }
 
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = $this->findOneBy(['file_name' => $data['file_name']]);
 
             if (!empty($object)) {
@@ -82,10 +85,10 @@ class DtExportCsvRepository extends AbstractRepository
                         $object->setIsSendMail($value);
                     }
                     if ($key == 'in_date') {
-                        $object->setInDate($value);
+                        $object->setCreateDate($value);
                     }
                     if ($key == 'up_date') {
-                        $object->setUpDate($value);
+                        $object->setUpdateDate($value);
                     }
                 }
 
