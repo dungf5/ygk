@@ -701,7 +701,7 @@ class MyShoppingController extends AbstractShoppingController
                             'remarks3' => $remarks3,
                             'remarks4' => $remarks4,
                             'location' => !empty($location) ? $location : 'XB0201001',
-                            'fvehicleno' => (int) $subTotal > (int) $fusrdec1 ? 0 : 1,
+                            'fvehicleno' => (int) $subTotal > (int) $fusrdec1 ? '0001' : '1001',
                             ];
                     }
                 }
