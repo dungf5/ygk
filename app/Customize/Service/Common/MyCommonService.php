@@ -434,7 +434,11 @@ SQL;
     }
 
     /**
+     * @param $loginType
+     * @param $customerId
      * @param MoreOrder $moreOrder
+     * @return array
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getMstShippingCustomer($loginType, $customerId, MoreOrder $moreOrder = null)
     {
@@ -654,7 +658,10 @@ SQL;
     }
 
     /**
-     * @param
+     * @param $myCart
+     * @param $customer_code
+     * @return array|null
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getdtPriceFromCart($myCart, $customer_code)
     {
@@ -949,10 +956,11 @@ SQL;
 
     /***
      * seikyu_code  noi nhan hoa don
-     * @param $customer_id
+     * @param $customer_code
+     * @param string $login_type
+     * @param string $login_code
      * @return array
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function getCustomerBillSeikyuCode($customer_code, $login_type = '', $login_code = '', $shipping_code = '')
     {
@@ -1010,9 +1018,12 @@ SQL;
 
     /***
      * Otodoke  nhan hang hoa
+     * @param $loginType
      * @param $customer_id
+     * @param $shipping_code
+     * @param null $moreOrder
      * @return array
-     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
     public function getCustomerOtodoke($loginType, $customer_id, $shipping_code, $moreOrder = null)
@@ -1300,6 +1311,7 @@ SQL;
             $orderItem->setCompanyId('XB');
             $orderItem->setShipingDepositCode($itemSave['location']);
             $orderItem->setFvehicleno($itemSave['fvehicleno']);
+            $orderItem->setFtrnsportcd('87001');
 
             // No41 注文情報送信I/F end
             $this->entityManager->persist($orderItem);
@@ -1397,10 +1409,8 @@ SQL;
     }
 
     /***
-     * @param $shipping_code
+     * @param $bill_code
      * @param $pre_order_id
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
      */
     public function saveTempCartBillSeiky($bill_code, $pre_order_id)
     {
@@ -1443,7 +1453,10 @@ SQL;
     }
 
     /**
-     * @param
+     * @param $customerId
+     * @param $pre_order_id
+     * @return mixed|null
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getMstShippingOrder($customerId, $pre_order_id)
     {
@@ -1547,6 +1560,7 @@ SQL;
 
     /**
      * @param $order_id
+     * @param $paymentTotal
      */
     public function updateOrderNo($order_id, $paymentTotal)
     {
@@ -1936,10 +1950,12 @@ SQL;
     }
 
     /***
-     * @param array $arProductCode
      * @param array $hsMstProductCodeCheckShow
-     * @var MyCommonService $commonS
-     * @var string $customer_code
+     * @param $commonS
+     * @param $customer_code
+     * @param string $login_type
+     * @param string $login_code
+     * @return array
      */
     public function setCartIndtPrice($hsMstProductCodeCheckShow, $commonS, $customer_code, $login_type = '', $login_code = '')
     {
@@ -1955,10 +1971,9 @@ SQL;
     }
 
     /***
-     * @param $shipping_code
      * @param $pre_order_id
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @param string $name
+     * @param string $value
      */
     public function saveTempCartRemarks($pre_order_id, $name = '', $value = '')
     {
@@ -2395,7 +2410,7 @@ SQL;
                         {$condition}
                     ORDER BY
                         os.cus_order_no ASC,
-                        os.order_line_no ASC;
+                        os.cus_order_lineno ASC;
                 ";
 
         try {
@@ -2630,7 +2645,7 @@ SQL;
     /**
      * Get dt_price
      *
-     * @param $product
+     * @param $product_code
      * @param $customer_code
      * @param $shipping_code
      *

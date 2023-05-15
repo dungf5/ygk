@@ -33,38 +33,31 @@ class DtOrderStatusRepository extends AbstractRepository
 
     public function insertData($data = [])
     {
-        try {
-            if (empty($data)) {
-                return 0;
-            }
-
-            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-            $object = new DtOrderStatus();
-            $object->setOrderNo('');
-            $object->setOrderLineNo('0');
-            $object->setOrderStatus(1);
-            $object->setCusOrderNo($data['order_no'] ?? '');
-            $object->setCusOrderLineno($data['order_line_no'] ?? '');
-            $object->setEcOrderNo($data['dtb_order_no'] ?? '');
-            $object->setEcOrderLineno($data['dtb_order_line_no'] ?? '');
-            $object->setCustomerCode('7001');
-            $object->setShippingCode($data['shipping_code'] ?? '');
-            $object->setOtodokeCode($data['otodoke_code'] ?? '');
-            $object->setProductCode($data['product_code'] ?? '');
-            $object->setOrderRemainNum((int) $data['order_num']);
-            $object->setFlowType('2');
-            $object->setEcType('2');
-            $object->setOrderDate(new \DateTime());
-
-            $this->getEntityManager()->persist($object);
-            $this->getEntityManager()->flush();
-
-            return 1;
-        } catch (\Exception $e) {
-            log_info('Insert dt_order_status error');
-            log_info($e->getMessage());
-
+        if (empty($data)) {
             return 0;
         }
+
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $object = new DtOrderStatus();
+        $object->setOrderNo('');
+        $object->setOrderLineNo('0');
+        $object->setOrderStatus(1);
+        $object->setCusOrderNo($data['order_no'] ?? '');
+        $object->setCusOrderLineno($data['order_line_no'] ?? '');
+        $object->setEcOrderNo($data['dtb_order_no'] ?? '');
+        $object->setEcOrderLineno($data['dtb_order_line_no'] ?? '');
+        $object->setCustomerCode('7001');
+        $object->setShippingCode($data['shipping_code'] ?? '');
+        $object->setOtodokeCode($data['otodoke_code'] ?? '');
+        $object->setProductCode($data['product_code'] ?? '');
+        $object->setOrderRemainNum((int) $data['order_num']);
+        $object->setFlowType('2');
+        $object->setEcType('2');
+        $object->setOrderDate(new \DateTime());
+
+        $this->getEntityManager()->persist($object);
+        $this->getEntityManager()->flush();
+
+        return 1;
     }
 }

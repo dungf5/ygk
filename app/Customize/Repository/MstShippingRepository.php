@@ -1,14 +1,22 @@
 <?php
 
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Repository;
 
-
 use Customize\Entity\MstShipping;
-use Eccube\Repository\AbstractRepository;
-use Customize\Entity\MstProduct;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Doctrine\ORM\Query\Expr\Join;
-use Customize\Service\Common\MyCommonService;
+use Eccube\Repository\AbstractRepository;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class MstShippingRepository extends AbstractRepository
 {
@@ -23,7 +31,9 @@ class MstShippingRepository extends AbstractRepository
     }
 
     /**
-     * @return QueryBuilder
+     * @param array $search_parameter
+     * @param array $order_status
+     * @return \Doctrine\ORM\QueryBuilder
      */
     public function getQueryBuilderByCustomer($search_parameter = [], $order_status = [])
     {
@@ -34,19 +44,19 @@ class MstShippingRepository extends AbstractRepository
             'Customize\Entity\MstProduct',
             'product',
             Join::WITH,
-            "product.product_code = order_status.product_code"
+            'product.product_code = order_status.product_code'
         );
         $qb->innerJoin(
             'Customize\Entity\MstShipping',
             'shipping',
             Join::WITH,
-            "shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno"
+            'shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno'
         );
         $qb->leftJoin(
             'Customize\Entity\MstDelivery',
             'delivery',
             Join::WITH,
-            "delivery.shipping_no = shipping.shipping_no AND TRIM(delivery.order_no) = CONCAT(TRIM(shipping.ec_order_no),'-',TRIM(shipping.ec_order_lineno))"
+            "delivery.shipping_no = shipping.shipping_no AND TRIM(delivery.order_no) = CONCAT(TRIM(shipping.cus_order_no),'-',TRIM(shipping.cus_order_lineno))"
         );
 
         $qb->addSelect(
@@ -70,24 +80,26 @@ class MstShippingRepository extends AbstractRepository
         $qb->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = order_status.otodoke_code) otodoke_name');
         $qb->where('shipping.delete_flg IS NOT NULL AND shipping.delete_flg <> 0')
             ->andWhere('order_status.order_date >= :order_date')
-            ->setParameter('order_date', date("Y-m-d", strtotime("-14 MONTH")));
+            ->setParameter('order_date', date('Y-m-d', strtotime('-14 MONTH')));
 
-        if( count($order_status) > 0 ) {
+        if (count($order_status) > 0) {
             $where = '';
-            foreach($order_status as $k=>$os ) {
-                if( ! empty($where) ) $where .= ' OR ';
+            foreach ($order_status as $k => $os) {
+                if (!empty($where)) {
+                    $where .= ' OR ';
+                }
                 $where .= " ( shipping.cus_order_no = :shipping_cus_order_no_{$k} AND shipping.cus_order_lineno = :shipping_cus_order_lineno_{$k} ) ";
                 $qb->setParameter("shipping_cus_order_no_{$k}", $os['cus_order_no']);
                 $qb->setParameter("shipping_cus_order_lineno_{$k}", $os['cus_order_lineno']);
             }
-            $qb->andWhere( $where );
+            $qb->andWhere($where);
         }
 
-        if( $search_parameter['shipping_no'] != '' ) {
+        if ($search_parameter['shipping_no'] != '') {
             $qb->andWhere('shipping.shipping_no = :shipping_no')
                 ->setParameter('shipping_no', $search_parameter['shipping_no']);
         }
-        switch( $search_parameter['shipping_status'] ) {
+        switch ($search_parameter['shipping_status']) {
             case 1:
                 $qb->andWhere('shipping.shipping_status = :shipping_status')
                     ->setParameter('shipping_status', 1);
@@ -97,12 +109,12 @@ class MstShippingRepository extends AbstractRepository
                     ->setParameter('shipping_status', 2);
                 break;
         }
-        if( $search_parameter['order_shipping'] != '0' ) {
+        if ($search_parameter['order_shipping'] != '0') {
             $qb->andWhere('order_status.shipping_code = :shipping_code')
                 ->setParameter('shipping_code', $search_parameter['order_shipping']);
         }
 
-        if( $search_parameter['order_otodoke'] != '0' ) {
+        if ($search_parameter['order_otodoke'] != '0') {
             $qb->andWhere('order_status.otodoke_code = :order_otodoke')
                 ->setParameter('order_otodoke', $search_parameter['order_otodoke']);
         }
@@ -123,9 +135,11 @@ class MstShippingRepository extends AbstractRepository
     }
 
     /**
+     * @param string $customer_code
+     * @param string $login_type
      * @return QueryBuilder
      */
-    public function getAllCustomer($customer_code='', $login_type='')
+    public function getAllCustomer($customer_code = '', $login_type = '')
     {
         $qb = $this->createQueryBuilder('shipping');
         $qb->select('customer.customer_code', 'customer.customer_name', 'customer.company_name');
@@ -148,7 +162,7 @@ class MstShippingRepository extends AbstractRepository
 
         $qb->where('shipping.delete_flg = 0')
             ->andWhere('shipping.shipping_date >= :shipping_date')
-            ->setParameter('shipping_date', date("Y-m-d", strtotime("-14 MONTH")));
+            ->setParameter('shipping_date', date('Y-m-d', strtotime('-14 MONTH')));
         $qb->andWhere('shipping.customer_code = :customer_code')
             ->setParameter('customer_code', $customer_code);
 
@@ -162,4 +176,3 @@ class MstShippingRepository extends AbstractRepository
         return $qb->getQuery()->getResult();
     }
 }
-
