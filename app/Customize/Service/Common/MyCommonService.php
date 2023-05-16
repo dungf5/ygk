@@ -2727,4 +2727,25 @@ SQL;
             return [];
         }
     }
+
+    public function getSumOrderAmoutWSEOS($order_no)
+    {
+        $sql = '
+            SELECT
+                SUM(IFNULL(dowe.order_price, 0) * IFNULL(dowe.order_num, 0)) AS sum_order_amount
+            FROM dt_order_ws_eos dowe
+            WHERE dowe.order_no = ?
+            GROUP BY  dowe.order_no
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$order_no]);
+            $rows = $result->fetchAllAssociative();
+
+            return (int) ($rows[0]['sum_order_amount']) ?? 0;
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
 }
