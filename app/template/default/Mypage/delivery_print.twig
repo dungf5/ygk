@@ -137,7 +137,7 @@ file that was distributed with this source code.
                 <tr>
                     <th title="選択">
                         {% if global_service.getPdfExportFlg %}
-                            <input type="checkbox" class="check-box-print-pdf" name="check-box-all-print-pdf" value="" onchange="handleCheckBox(this)"/>
+                            <input type="checkbox" class="check-box-all-print-pdf" name="check-box-all-print-pdf" value="" onchange="handleCheckBox(this)"/>
                         {% endif %}
                         {{ 'front.mypage.shipping.select'|trans| raw }}
                     </th>
@@ -627,6 +627,13 @@ file that was distributed with this source code.
                 if (count > 0) {
                     $("#check-box-value-print-pdf").val(temp_value);
                     $(".btn-print-pdf").prop('disabled', false);
+
+                    if ((count < 12 && count == {{ pagination.totalItemCount }}) || count >= 12) {
+                        $(".check-box-all-print-pdf").prop("checked", true);
+                    } else {
+                        $(".check-box-all-print-pdf").prop("checked", false);
+                    }
+
                 } else {
                     $(".btn-print-pdf").prop('disabled', true);
                 }
@@ -636,7 +643,7 @@ file that was distributed with this source code.
                 let temp_value = '';
                 let count = 0;
 
-                if (this.checked) {
+                if (target.checked) {
                     $(".check-box-print-pdf").each(function () {
                         temp_value += ',' + $(this).val();
                         count++;
