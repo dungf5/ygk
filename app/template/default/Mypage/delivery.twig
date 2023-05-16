@@ -114,7 +114,7 @@ file that was distributed with this source code.
                             <span class="glyphicon glyphicon-triangle-bottom"></span>
                         </a>
                         <br/>
-                        <select id="出荷先 届け先" name="search_shipping_date" onchange="handleSearch(this)">
+                        <select id="search_shipping_date" name="search_shipping_date" onchange="handleSearch(this)">
                             <option value="0" {% if 0 == search_shipping_date %}selected{%  endif %}>すべて</option>
                             {% for shippingDate in shippingDateOpt %}
                                 <option value="{{shippingDate.key}}" {% if shippingDate.key == search_shipping_date %}selected{%  endif %}>{{shippingDate.value}}</option>
