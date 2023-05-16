@@ -18,6 +18,7 @@ namespace Customize\Command;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtBreakKey;
 use Customize\Entity\DtOrder;
+use Customize\Entity\DtOrderNatEOS;
 use Customize\Entity\DtOrderStatus;
 use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstCustomer;
@@ -59,8 +60,8 @@ class ValidateCsvDataCommand extends Command
     private $errors = [];
     private $success = [];
     private $rate = 0;
-    private $customer_code = '7001';
-    private $shipping_code = '7001001000';
+    private $customer_code = '';
+    private $shipping_code = '';
     private $customer = null;
     private $customer_7001 = null;
     private $check_validate = false;
@@ -118,43 +119,45 @@ class ValidateCsvDataCommand extends Command
 
     public function handleProcess($param)
     {
-        /* The local path to load csv file */
-        $path = !empty(getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY')) ? getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') : '/html/download/';
-
         switch (trim($param)) {
             case 'ws-eos':
-                $path .= 'csv/order/';
+                $this->handleWSEOS();
+                break;
 
-                if (getenv('APP_IS_LOCAL') == 1) {
-                    $path = '.'.$path;
-                }
-
-                /* Initial data */
-                Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-                $this->customer_7001 = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
-                    'customer_code' => $this->customer_code,
-                ]);
-
-                $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
-                    'customer_code' => $this->shipping_code,
-                ]);
-
-                $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
-                /* End - Initial data */
-
-                $this->handleValidateWSEOS();
-                sleep(1);
-                $this->sendMailWSEOSValidateError();
-                sleep(1);
-                $this->handleImportOrderWSEOS();
-                sleep(1);
-                $this->sendMailOrderSuccess();
-
+            case 'nat-eos':
+                $this->handleNatEOS();
                 break;
 
             default:
                 break;
         }
+    }
+
+    private function handleWSEOS()
+    {
+        /* Initial data */
+        $this->customer_code = '7001';
+        $this->shipping_code = '7001001000';
+
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $this->customer_7001 = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
+            'customer_code' => $this->customer_code,
+        ]);
+
+        $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
+            'customer_code' => $this->shipping_code,
+        ]);
+
+        $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
+        /* End - Initial data */
+
+        $this->handleValidateWSEOS();
+        sleep(1);
+        $this->sendMailWSEOSValidateError();
+        sleep(1);
+        $this->handleImportOrderWSEOS();
+        sleep(1);
+        $this->sendMailOrderSuccess();
     }
 
     private function handleValidateWSEOS()
@@ -561,5 +564,198 @@ class ValidateCsvDataCommand extends Command
         }
 
         return;
+    }
+
+    private function handleNatEOS()
+    {
+        /* Initial data */
+        $this->customer_code = '7015';
+        $this->shipping_code = '7015001000';
+
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $this->customer_7001 = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
+            'customer_code' => $this->customer_code,
+        ]);
+
+        $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
+            'customer_code' => $this->shipping_code,
+        ]);
+
+        $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
+        /* End - Initial data */
+
+        $this->handleValidateNatEOS();
+        sleep(1);
+        $this->sendMailNatEOSValidateError();
+        sleep(1);
+        $this->handleImportOrderWSEOS();
+        sleep(1);
+        $this->sendMailOrderSuccess();
+    }
+
+    private function handleValidateNatEOS()
+    {
+        try {
+            log_info('Start Handle Validate NAT EOS DATA '.($this->check_validate ? 'With Check' : 'Without Check'));
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            // Get data to validate nat eos
+            $data = $this->entityManager->getRepository(DtOrderNatEOS::class)->findBy([
+                'order_import_day' => date('Ymd'),
+                'order_registed_flg' => 0,
+            ]);
+
+            foreach ($data as $item) {
+                $this->validateNatEOS($item['reqcd'], $item['jan']);
+            }
+
+            if (count($this->errors)) {
+                foreach ($this->errors as $error) {
+                    $this->entityManager->getRepository(DtOrderNatEOS::class)->updateError($error);
+                }
+            }
+
+            log_info('End Handle Validate NAT EOS DATA '.($this->check_validate ? 'With Check' : 'Without Check'));
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
+
+            return;
+        }
+    }
+
+    private function validateNatEOS($reqcd, $jan)
+    {
+        try {
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            $common = new MyCommonService($this->entityManager);
+
+            $object = $this->entityManager->getRepository(DtOrderNatEOS::class)->findOneBy([
+                'reqcd' => $reqcd,
+                'jan' => $jan,
+            ]);
+
+            if (empty($object)) {
+                log_info("No order ({$reqcd}-{$jan})");
+
+                return;
+            }
+
+            $otodoke_code = '7015001000';
+            $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy([
+                'jan_code' => $object['jan'],
+            ]);
+
+            // Set more data
+            $object->setCustomerCode($this->customer_code);
+            $object->setShippingCode($this->shipping_code);
+            $object->setOtodokeCode($otodoke_code);
+            $object->setProductCode(!empty($product) ? $product['product_code'] : '');
+
+            // Array contain error (if any)
+            $error = [];
+
+            log_info("Validate order ({$reqcd}-{$jan})");
+
+            // Check flag of check validate
+            if ($this->check_validate) {
+                // Validate jan_code
+                if (empty($object['jan']) || empty($product)) {
+                    $error['error_content1'] = 'JANコードが存在しません';
+                }
+
+
+                // validate order_date
+                if (empty($object['order_date']) || date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d')) {
+                    $error['error_content1'] = '発注日付が過去日付になっています';
+                }
+
+                // Validate customer
+                $dtCusRelation = $common->getDtCustomerRelation($this->customer_code, $this->shipping_code, $otodoke_code);
+                if (empty($dtCusRelation)) {
+                    $error['error_content2'] = '出荷先支店コード(顧客関連)が登録されていません';
+                }
+
+                // Validate shipping_shop_code
+                if (empty($object['shipping_shop_code']) || empty($this->customer)) {
+                    $error['error_content3'] = '出荷先支店コード(顧客情報)が登録されていません';
+                }
+
+                // validate delivery_date
+                if (empty($object['delivery_date']) || (date('Y-m-d', strtotime($object['delivery_date'])) < date('Y-m-d'))) {
+                    $error['error_content4'] = '納入希望日が過去日付になっています';
+                }
+
+
+
+                // Validate discontinued_date
+                if (!empty($product) && !empty($product['discontinued_date']) && date('Y-m-d') > date('Y-m-d', strtotime($product['discontinued_date']))) {
+                    $error['error_content6'] = '対象商品は廃番品となっております';
+                }
+
+                // Validdate special_order_flg
+                if (!empty($this->customer) && $this->customer['special_order_flg'] == 0 && !empty($product) && !empty($product['special_order_flg']) && strtolower($product['special_order_flg']) == 'y') {
+                    $error['error_content7'] = '取り扱い対象商品ではありません';
+                }
+
+                // Validate order_num
+                if (!empty($product)) {
+                    if ((int) $object['order_num'] % (int) $product['quantity']) {
+                        $error['error_content8'] = '発注数量の販売単位に誤りがあります';
+                    }
+                }
+
+                // Validate price
+                //if (!empty($product)) {
+                //    $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
+
+                //    if (empty($dtPrice) || (int) $dtPrice['price_s01'] != (int) ($object['order_price'] / (!empty($product['quantity']) ? $product['quantity'] : 1))) {
+                //        $error['error_content9'] = '発注単価が異なっています';
+                //    }
+                //}
+            }
+
+            if (count($error)) {
+                $error['order_no'] = $order_no;
+                $error['order_line_no'] = $order_line_no;
+
+                $this->errors[] = $error;
+            }
+
+            $this->entityManager->getRepository(DtOrderWSEOS::class)->save($object);
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
+
+            return;
+        }
+    }
+
+    private function sendMailNatEOSValidateError()
+    {
+        if (!count($this->errors)) {
+            return;
+        }
+
+        $information = [
+            'email' => getenv('EMAIL_WS_EOS') ?? '',
+            'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
+            'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
+            'file_name' => 'Mail/ws_eos_validate_error.twig',
+            'error_data' => $this->errors,
+        ];
+
+        try {
+            log_info('[WS-EOS] Send Mail Validate Error.');
+            $this->mailService->sendMailErrorWSEOS($information);
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
+
+            return;
+        }
     }
 }
