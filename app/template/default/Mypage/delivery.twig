@@ -95,10 +95,10 @@ file that was distributed with this source code.
             <table class="table myTable">
                 <thead>
                 <tr>
-                    <th title="delivery_no">{{ 'front.mypage.shipping.note_no'|trans| raw }}</th>
-                    <th title="delivery_no">
+                    <th title="納品書№">{{ 'front.mypage.shipping.note_no'|trans| raw }}</th>
+                    <th title="伝票" style="max-width: 40px;">
                         {{ 'front.mypage.shipping.sale_type'|trans| raw }}
-                        <a href="javascript:void(0)" style="color: red; {% if orderOtodokeOpt|length < 2 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_sale_type">
+                        <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_sale_type">
                             <span class="glyphicon glyphicon-triangle-bottom"></span>
                         </a>
                         <br/>
@@ -108,13 +108,13 @@ file that was distributed with this source code.
                             <option value="2" {% if search_sale_type == '2' %} selected {% endif %}>返品</option>
                         </select>
                     </th>
-                    <th title="shipping_date" style="max-width:100px">
+                    <th title="出荷日" style="max-width:100px">
                         {{ 'front.mypage.shipping.date'|trans| raw }}
                         <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_shipping_date">
                             <span class="glyphicon glyphicon-triangle-bottom"></span>
                         </a>
                         <br/>
-                        <select id="search_shipping_date" name="search_shipping_date" onchange="handleSearch(this)">
+                        <select id="出荷先 届け先" name="search_shipping_date" onchange="handleSearch(this)">
                             <option value="0" {% if 0 == search_shipping_date %}selected{%  endif %}>すべて</option>
                             {% for shippingDate in shippingDateOpt %}
                                 <option value="{{shippingDate.key}}" {% if shippingDate.key == search_shipping_date %}selected{%  endif %}>{{shippingDate.value}}</option>
@@ -147,7 +147,7 @@ file that was distributed with this source code.
                             {% endfor %}
                         </select>
                     </th>
-                    <th title="shipping_no">{{ 'front.mypage.shipping.delivery_no'|trans| raw }}</th>
+                    <th title="出荷指示№">{{ 'front.mypage.shipping.delivery_no'|trans| raw }}</th>
                 </tr>
                 </thead>
                 {% if pagination and pagination.totalItemCount > 0 %}
