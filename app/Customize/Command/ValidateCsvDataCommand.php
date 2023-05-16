@@ -67,7 +67,7 @@ class ValidateCsvDataCommand extends Command
     private $check_validate = false;
 
     protected static $defaultName = 'validate-csv-data-command';
-    protected static $defaultDescription = 'Process Validate Csv Data Command';
+    protected static $defaultDescription = 'Process Validate CSV Data Command';
 
     public function __construct(EntityManagerInterface $entityManager, MailService $mailService)
     {
@@ -92,7 +92,7 @@ class ValidateCsvDataCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         log_info('---------------------------------------');
-        log_info('Start Process Validate Csv Data');
+        log_info('Start Process Validate CSV Data');
         $param = $input->getArgument('arg1') ?? null;
         $option = $input->getOption('check');
 
@@ -103,7 +103,7 @@ class ValidateCsvDataCommand extends Command
         if (!$param) {
             log_error('No param. Process stopped.');
 
-            $message = 'Process Validate Csv Data. No param. Process stopped.';
+            $message = 'Process Validate CSV Data. No param. Process stopped.';
             $this->pushGoogleChat($message);
 
             return 0;
@@ -111,8 +111,8 @@ class ValidateCsvDataCommand extends Command
 
         $this->handleProcess($param);
 
-        log_info('End Process Validate Csv Data');
-        //$io->success('End Process Validate Csv Data');
+        log_info('End Process Validate CSV Data');
+        //$io->success('End Process Validate CSV Data');
 
         return 0;
     }
@@ -170,6 +170,12 @@ class ValidateCsvDataCommand extends Command
                 'order_import_day' => date('Ymd'),
                 'order_registed_flg' => 0,
             ]);
+
+            if (empty($data)) {
+                log_info('No data');
+
+                return;
+            }
 
             foreach ($data as $item) {
                 $this->validateWSEOS($item['order_no'], $item['order_line_no']);
@@ -571,26 +577,11 @@ class ValidateCsvDataCommand extends Command
         /* Initial data */
         $this->customer_code = '7015';
         $this->shipping_code = '7015001000';
-
-        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-        $this->customer_7001 = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
-            'customer_code' => $this->customer_code,
-        ]);
-
-        $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
-            'customer_code' => $this->shipping_code,
-        ]);
-
-        $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
         /* End - Initial data */
 
         $this->handleValidateNatEOS();
         sleep(1);
         $this->sendMailNatEOSValidateError();
-        sleep(1);
-        $this->handleImportOrderWSEOS();
-        sleep(1);
-        $this->sendMailOrderSuccess();
     }
 
     private function handleValidateNatEOS()
@@ -603,6 +594,12 @@ class ValidateCsvDataCommand extends Command
                 'order_import_day' => date('Ymd'),
                 'order_registed_flg' => 0,
             ]);
+
+            if (empty($data)) {
+                log_info('No data');
+
+                return;
+            }
 
             foreach ($data as $item) {
                 $this->validateNatEOS($item['reqcd'], $item['jan']);
@@ -663,65 +660,46 @@ class ValidateCsvDataCommand extends Command
                     $error['error_content1'] = 'JANコードが存在しません';
                 }
 
-
-                // validate order_date
-                if (empty($object['order_date']) || date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d')) {
-                    $error['error_content1'] = '発注日付が過去日付になっています';
-                }
-
-                // Validate customer
-                $dtCusRelation = $common->getDtCustomerRelation($this->customer_code, $this->shipping_code, $otodoke_code);
-                if (empty($dtCusRelation)) {
-                    $error['error_content2'] = '出荷先支店コード(顧客関連)が登録されていません';
-                }
-
-                // Validate shipping_shop_code
-                if (empty($object['shipping_shop_code']) || empty($this->customer)) {
-                    $error['error_content3'] = '出荷先支店コード(顧客情報)が登録されていません';
-                }
-
-                // validate delivery_date
-                if (empty($object['delivery_date']) || (date('Y-m-d', strtotime($object['delivery_date'])) < date('Y-m-d'))) {
-                    $error['error_content4'] = '納入希望日が過去日付になっています';
-                }
-
-
-
                 // Validate discontinued_date
                 if (!empty($product) && !empty($product['discontinued_date']) && date('Y-m-d') > date('Y-m-d', strtotime($product['discontinued_date']))) {
-                    $error['error_content6'] = '対象商品は廃番品となっております';
+                    $error['error_content2'] = '対象商品は廃番品となっております';
                 }
 
                 // Validdate special_order_flg
-                if (!empty($this->customer) && $this->customer['special_order_flg'] == 0 && !empty($product) && !empty($product['special_order_flg']) && strtolower($product['special_order_flg']) == 'y') {
-                    $error['error_content7'] = '取り扱い対象商品ではありません';
+                if (!empty($product) && !empty($product['special_order_flg']) && strtolower($product['special_order_flg']) == 'y') {
+                    $error['error_content3'] = '取り扱い対象商品ではありません';
                 }
 
-                // Validate order_num
+                // Validate qty
                 if (!empty($product)) {
-                    if ((int) $object['order_num'] % (int) $product['quantity']) {
-                        $error['error_content8'] = '発注数量の販売単位に誤りがあります';
+                    if ((int) $object['qty'] % (int) $product['quantity']) {
+                        $error['error_content4'] = '発注数の販売単位に誤りがあります';
                     }
                 }
 
-                // Validate price
-                //if (!empty($product)) {
-                //    $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
+                // Validate cost
+                if (!empty($product)) {
+                    $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
 
-                //    if (empty($dtPrice) || (int) $dtPrice['price_s01'] != (int) ($object['order_price'] / (!empty($product['quantity']) ? $product['quantity'] : 1))) {
-                //        $error['error_content9'] = '発注単価が異なっています';
-                //    }
-                //}
+                    if (empty($dtPrice) || (int) $dtPrice['price_s01'] != (int) $object['cost']) {
+                        $error['error_content5'] = '発注単価が異なっています';
+                    }
+                }
+
+                // validate delivery_day
+                if (empty($object['delivery_day']) || (date('Y-m-d', strtotime($object['delivery_day'])) < date('Y-m-d'))) {
+                    $error['error_content6'] = '納期が過去日付になっています';
+                }
             }
 
             if (count($error)) {
-                $error['order_no'] = $order_no;
-                $error['order_line_no'] = $order_line_no;
+                $error['reqcd'] = $reqcd;
+                $error['jan'] = $jan;
 
                 $this->errors[] = $error;
             }
 
-            $this->entityManager->getRepository(DtOrderWSEOS::class)->save($object);
+            $this->entityManager->getRepository(DtOrderNatEOS::class)->save($object);
 
             return;
         } catch (\Exception $e) {
@@ -742,13 +720,13 @@ class ValidateCsvDataCommand extends Command
             'email' => getenv('EMAIL_WS_EOS') ?? '',
             'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
             'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
-            'file_name' => 'Mail/ws_eos_validate_error.twig',
+            'file_name' => 'Mail/nat_eos_validate_error.twig',
             'error_data' => $this->errors,
         ];
 
         try {
-            log_info('[WS-EOS] Send Mail Validate Error.');
-            $this->mailService->sendMailErrorWSEOS($information);
+            log_info('[NAT-EOS] Send Mail Validate Error.');
+            $this->mailService->sendMailErrorNatEOS($information);
 
             return;
         } catch (\Exception $e) {
