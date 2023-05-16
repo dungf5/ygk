@@ -135,7 +135,12 @@ file that was distributed with this source code.
             <table class="table myTable">
                 <thead>
                 <tr>
-                    <th title="選択">{{ 'front.mypage.shipping.select'|trans| raw }}</th>
+                    <th title="選択">
+                        {% if global_service.getPdfExportFlg %}
+                            <input type="checkbox" class="check-box-print-pdf" name="check-box-all-print-pdf" value="" onchange="handleCheckBox(this)"/>
+                        {% endif %}
+                        {{ 'front.mypage.shipping.select'|trans| raw }}
+                    </th>
                     <th title="納品書№">{{ 'front.mypage.shipping.note_no'|trans| raw }}</th>
                     <th title="伝票" style="max-width: 40px;">
                         {{ 'front.mypage.shipping.sale_type'|trans| raw }}
@@ -611,13 +616,37 @@ file that was distributed with this source code.
 
             if (name == 'check-box-print-pdf') {
                 let temp_value = '';
-                let count = 0
+                let count = 0;
                 $(".check-box-print-pdf").each(function () {
                     if (this.checked) {
                        temp_value += ',' + $(this).val();
                        count++;
                     }
                 });
+
+                if (count > 0) {
+                    $("#check-box-value-print-pdf").val(temp_value);
+                    $(".btn-print-pdf").prop('disabled', false);
+                } else {
+                    $(".btn-print-pdf").prop('disabled', true);
+                }
+            }
+
+            if (name == 'check-box-all-print-pdf') {
+                let temp_value = '';
+                let count = 0;
+
+                if (this.checked) {
+                    $(".check-box-print-pdf").each(function () {
+                        temp_value += ',' + $(this).val();
+                        count++;
+                    });
+                    $(".check-box-print-pdf").prop("checked", true);
+
+                } else {
+                    count = 0;
+                    $(".check-box-print-pdf").prop("checked", false);
+                }
 
                 if (count > 0) {
                     $("#check-box-value-print-pdf").val(temp_value);
