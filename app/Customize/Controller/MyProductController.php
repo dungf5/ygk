@@ -238,7 +238,13 @@ class MyProductController extends AbstractController
             $customer_code = $this->globalService->customerCode();
             $is_favorite = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
             $dtPrice = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProduct->getProductCode(), $login_type, $login_code);
-            $location = $cmS->getCustomerLocation($customer_code);
+            $relationCus = $cmS->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
+
+            if ($relationCus) {
+                $customerCodeForLocation = $relationCus['customer_code'];
+            }
+
+            $location = $cmS->getCustomerLocation($customerCodeForLocation ?? '');
             $stock = $this->stockListRepository->getData($mstProduct->getProductCode(), $location);
 
             if ($stock) {
