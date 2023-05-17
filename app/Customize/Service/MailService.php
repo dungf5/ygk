@@ -1072,7 +1072,7 @@ class MailService
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function sendMailOrderSuccessWSEOS($information = [])
+    public function sendMailOrderSuccessEOS($information = [])
     {
         if (empty($information)) {
             return;
@@ -1082,7 +1082,7 @@ class MailService
             return;
         }
 
-        log_info('[WS-EOS] Start Send Mail Order Success.');
+        log_info('[EOS] Start Send Mail Order Success.');
 
         // Information
         $information['subject_mail'] = 'ご注文ありがとうございます';
@@ -1125,7 +1125,7 @@ class MailService
         }
 
         $count = $this->mailer->send($message);
-        log_info('[WS-EOS] End Send Mail Order Success.', ['count' => $count]);
+        log_info('[EOS] End Send Mail Order Success.', ['count' => $count]);
 
         return $message;
     }

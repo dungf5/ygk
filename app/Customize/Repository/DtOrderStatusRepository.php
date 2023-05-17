@@ -53,7 +53,7 @@ class DtOrderStatusRepository extends AbstractRepository
         $object->setOrderRemainNum((int) $data['order_num']);
         $object->setFlowType('2');
         $object->setEcType('2');
-        $object->setOrderDate(new \DateTime());
+        $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
 
         $this->getEntityManager()->persist($object);
         $this->getEntityManager()->flush();

@@ -472,6 +472,8 @@ class ValidateCsvDataCommand extends Command
                 $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
                 $sum_order_amout = $common->getSumOrderAmoutWSEOS($data['order_no']);
                 $data['fvehicleno'] = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
+                $data['seikyu_code'] = $data['customer_code'];
+                $data['ftrnsportcd'] = '87001';
 
                 return $this->entityManager->getRepository(DtOrder::class)->insertData($data);
             }
@@ -529,7 +531,7 @@ class ValidateCsvDataCommand extends Command
             'email' => getenv('EMAIL_WS_EOS') ?? '',
             'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
             'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
-            'file_name' => 'Mail/ws_eos_order_success.twig',
+            'file_name' => 'Mail/eos_order_success.twig',
         ];
 
         $order_success = [];
@@ -538,7 +540,7 @@ class ValidateCsvDataCommand extends Command
 
             try {
                 log_info('[WS-EOS] Send Mail Order Success. '.$key);
-                $this->mailService->sendMailOrderSuccessWSEOS($information);
+                $this->mailService->sendMailOrderSuccessEOS($information);
                 $order_success[] = $key;
             } catch (\Exception $e) {
                 log_error($e->getMessage());
@@ -646,7 +648,7 @@ class ValidateCsvDataCommand extends Command
             ]);
 
             // Set more data
-            $object->setCustomerCode($this->customer_code);
+            $object->setCustomerCode('7001');
             $object->setShippingCode($this->shipping_code);
             $object->setOtodokeCode($otodoke_code);
             $object->setProductCode(!empty($product) ? $product['product_code'] : '');

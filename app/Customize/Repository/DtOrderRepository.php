@@ -40,7 +40,7 @@ class DtOrderRepository extends AbstractRepository
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $object = new DtOrder();
         $object->setCustomerCode($data['customer_code'] ?? '');
-        $object->setSeikyuCode($data['customer_code'] ?? '');
+        $object->setSeikyuCode($data['seikyu_code'] ?? '');
         $object->setOrderNo($data['order_no'] ?? '');
         $object->setOrderLineno($data['order_line_no'] ?? '');
         $object->setShippingCode($data['shipping_code'] ?? '');
@@ -61,10 +61,10 @@ class DtOrderRepository extends AbstractRepository
         $object->setDynaModelSeg3('2');
         $object->setDynaModelSeg4($data['dtb_order_no'] ?? '');
         $object->setDynaModelSeg5($data['dtb_order_line_no'] ?? '');
-        $object->setDynaModelSeg6($data['remarks_line_no'] ?? '');
+        $object->setDynaModelSeg6($data['remarks_line_no'] ?? null);
         $object->setRequestFlg('Y');
         $object->setFvehicleno($data['fvehicleno']);
-        $object->setFtrnsportcd('87001');
+        $object->setFtrnsportcd($data['ftrnsportcd']);
 
         $this->getEntityManager()->persist($object);
         $this->getEntityManager()->flush();
