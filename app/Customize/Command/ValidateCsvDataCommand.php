@@ -154,10 +154,13 @@ class ValidateCsvDataCommand extends Command
         $this->handleValidateWSEOS();
         sleep(1);
         $this->sendMailWSEOSValidateError();
-        sleep(1);
-        $this->handleImportOrderWSEOS();
-        sleep(1);
-        $this->sendMailOrderSuccess();
+
+        if ($this->check_validate == false) {
+            sleep(1);
+            $this->handleImportOrderWSEOS();
+            sleep(1);
+            $this->sendMailOrderSuccess();
+        }
     }
 
     private function handleValidateWSEOS()
