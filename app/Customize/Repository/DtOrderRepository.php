@@ -49,7 +49,7 @@ class DtOrderRepository extends AbstractRepository
         $object->setDeliPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
         $object->setShipingPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
         $object->setItemNo($data['jan_code'] ?? '');
-        $object->setDemandQuantity((int) $data['order_num']);
+        $object->setDemandQuantity((int) $data['demand_quantity']);
         $object->setDemandUnit($data['demand_unit']);
         $object->setOrderPrice((float) $data['order_price']);
         $object->setUnitPriceStatus('FOR');
