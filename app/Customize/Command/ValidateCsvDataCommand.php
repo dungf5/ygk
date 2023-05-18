@@ -369,12 +369,7 @@ class ValidateCsvDataCommand extends Command
                     $this->entityManager->getConfiguration()->setSQLLogger(null);
                     $this->entityManager->getConnection()->beginTransaction();
                     if (!isset($order_id[$item['order_no']])) {
-                        $dtbOrderData = [
-                            'customer' => null,
-                            'name01' => '',
-                            'name02' => '',
-                        ];
-                        $id = $this->entityManager->getRepository(Order::class)->insertData($dtbOrderData);
+                        $id = $this->handleInsertDtbOrder();
                         $order_id[$item['order_no']] = $id;
 
                         log_info('Import data dtb_order with id '.$id);
@@ -431,6 +426,23 @@ class ValidateCsvDataCommand extends Command
             $this->pushGoogleChat($e->getMessage());
 
             return;
+        }
+    }
+
+    private function handleInsertDtbOrder()
+    {
+        $dtbOrderData = [
+            'customer' => null,
+            'name01' => '',
+            'name02' => '',
+        ];
+        $id = $this->entityManager->getRepository(Order::class)->insertData($dtbOrderData);
+
+        if (!empty($id)) {
+            return $id;
+        } else {
+            sleep(1);
+            return $this->handleInsertDtbOrder();
         }
     }
 
