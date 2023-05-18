@@ -670,11 +670,22 @@ class ValidateCsvDataCommand extends Command
                 'jan_code' => $object['jan'],
             ]);
 
-            // Set more data
+            // Set initial data
             $object->setCustomerCode('7001');
             $object->setShippingCode($this->shipping_code);
             $object->setOtodokeCode($otodoke_code);
             $object->setProductCode(!empty($product) ? $product['product_code'] : '');
+            $object->setErrorContent1(null);
+            $object->setErrorContent2(null);
+            $object->setErrorContent3(null);
+            $object->setErrorContent4(null);
+            $object->setErrorContent5(null);
+            $object->setErrorContent6(null);
+            $object->setErrorContent7(null);
+            $object->setErrorContent8(null);
+            $object->setErrorContent9(null);
+            $object->setErrorContent10(null);
+            $object->setErrorType(0);
 
             // Array contain error (if any)
             $error = [];
