@@ -17,21 +17,15 @@ namespace Customize\Command;
 
 use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
-use Customize\Entity\DtBreakKey;
-use Customize\Entity\DtCustomerRelation;
-use Customize\Entity\DtOrder;
 use Customize\Entity\DtOrderNatEOS;
-use Customize\Entity\DtOrderStatus;
-use Customize\Entity\DtOrderWSEOS;
-use Customize\Entity\MstCustomer;
-use Customize\Entity\MstProduct;
+use Customize\Entity\MstShipping;
+use Customize\Entity\MstShippingNatEOS;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\CurlPost;
 use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Command\PluginCommandTrait;
-use Eccube\Entity\Order;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -111,11 +105,108 @@ class ImportShippingDataCommand extends Command
 
         switch (trim($param)) {
             case 'nat-eos':
-
+                $this->handleImportShippingNatEOS();
                 break;
 
             default:
                 break;
+        }
+    }
+
+    private function handleImportShippingNatEOS()
+    {
+        try {
+            log_info('Start Handle Import Data To mst_shipping_nat_eos');
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
+            // Get data to import
+            $data = $this->entityManager->getRepository(DtOrderNatEOS::class)->findBy([
+                'order_registed_flg' => 1,
+                'shipping_sent_flg' => 0,
+            ], [
+                'reqcd' => 'ASC',
+                'order_lineno' => 'ASC',
+            ]);
+
+            if (empty($data)) {
+                log_info('No data');
+
+                return;
+            }
+
+            foreach ($data as $item) {
+                $this->importShippingNatEOS($item->toArray());
+            }
+
+            log_info('End Handle Import Data To mst_shipping_nat_eos');
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            $message = 'Handle Import Data To mst_shipping_nat_eos';
+            $message .= "\n".$e->getMessage();
+            $this->pushGoogleChat($message);
+
+            return;
+        }
+    }
+
+    private function importShippingNatEOS($data)
+    {
+        try {
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
+            $mstShipping = $this->entityManager->getRepository(MstShipping::class)->findOneBy([
+                'cus_order_no' => $data['reqcd'],
+                'cus_order_lineno' => $data['order_lineno'],
+                'shipping_status' => 2,
+            ]);
+
+            if (empty($mstShipping)) {
+                log_info('No data mst_shipping '.$data['reqcd'].'-'.$data['order_lineno'].' status = 2');
+
+                $message = 'Import Data To mst_shipping_nat_eos';
+                $message .= "\n".'No data mst_shipping '.$data['reqcd'].'-'.$data['order_lineno'].' status = 2';
+                $this->pushGoogleChat($message);
+
+                return 0;
+            }
+
+            $mstShippingNatEOS = $this->entityManager->getRepository(MstShippingNatEOS::class)->findOneBy([
+                'reqcd' => $data['reqcd'],
+                'order_lineno' => $data['order_lineno'],
+            ]);
+
+            if (!empty($mstShippingNatEOS)) {
+                log_info('mst_shipping_nat_eos is existed '.$data['reqcd'].'-'.$data['order_lineno']);
+                $message = 'Import Data To mst_shipping_nat_eos';
+                $message .= "\n".'Record is existed '.$data['reqcd'].'-'.$data['order_lineno'];
+                $this->pushGoogleChat($message);
+
+                return 1;
+            }
+
+            // Insert mst_shipping_nat_eos
+            if (empty($mstShippingNatEOS)) {
+                log_info('Import data mst_shipping_nat_eos '.$data['reqcd'].'-'.$data['order_lineno']);
+
+                $data['delivery_no'] = '9999'.str_pad(substr((string) $mstShipping['shipping_no'], -8), 8, '0', STR_PAD_LEFT);
+                $data['shipping_date'] = !empty($mstShipping['shipping_date']) ? date('Ymd', strtotime($mstShipping['shipping_date'])) : '';
+                $data['shipping_no'] = $mstShipping['shipping_no'] ?? null;
+
+                return $this->entityManager->getRepository(MstShippingNatEOS::class)->insertData($data);
+            }
+
+            return 0;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            $message = 'Import Data To mst_shipping_nat_eos';
+            $message .= "\n".$e->getMessage();
+            $this->pushGoogleChat($message);
+
+            return 0;
         }
     }
 }
