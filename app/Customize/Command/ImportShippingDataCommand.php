@@ -94,7 +94,7 @@ class ImportShippingDataCommand extends Command
             return 0;
         }
 
-        $this->handleProcess($param);
+        $this->handleProcess(trim($param));
 
         log_info('End Process Import Shipping Data');
 

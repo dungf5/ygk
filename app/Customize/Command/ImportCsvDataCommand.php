@@ -125,7 +125,7 @@ class ImportCsvDataCommand extends Command
                     $path = '.'.$path;
                 }
 
-                $this->handleImportCsvNatEOS($path.date('Y/m'));
+                $this->handleImportCsvOrderNatEOS($path.date('Y/m'));
                 break;
 
             default:
@@ -191,9 +191,6 @@ class ImportCsvDataCommand extends Command
                 $this->entityManager->getRepository(DtImportCSV::class)->updateData($data);
 
                 $this->pushGoogleChat('Import data to dt_order_ws_eos / dt_order_ws_eos_copy: '.$result['message']);
-
-                // Send mail
-                $this->SendMailWSEOSImport($result['status'], $data);
             }
         }
 
@@ -319,49 +316,7 @@ class ImportCsvDataCommand extends Command
         ];
     }
 
-    private function SendMailWSEOSImport($status = 1, $data)
-    {
-        $information = [
-            'email' => getenv('EMAIL_WS_EOS') ?? '',
-            'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
-            'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
-            'file_name' => 'Mail/ws_eos_ftp.twig',
-        ];
-
-        // Send mail successfully
-        if ($status == 1) {
-            $information['status'] = 1;
-            $information['finish_time'] = '('.$data['file_name'].') '.date('Y-m-d H:i:s');
-        }
-
-        // Send mail error
-        if ($status == 0) {
-            $information['status'] = 0;
-            $information['error_content'] = '('.$data['file_name'].') '.$data['message'];
-        }
-
-        try {
-            log_info('[WS-EOS] 注文メールの送信を行います.');
-
-            $this->mailService->sendMailImportWSEOS($information);
-
-            // Update information dt_import_csv
-            $data = [
-                'id' => $data['id'],
-                'is_send_mail' => 1,
-            ];
-            $this->entityManager->getRepository(DtImportCSV::class)->updateData($data);
-
-            return;
-        } catch (\Exception $e) {
-            log_error($e->getMessage());
-            $this->pushGoogleChat($e->getMessage());
-
-            return;
-        }
-    }
-
-    private function handleImportCsvNatEOS($path)
+    private function handleImportCsvOrderNatEOS($path)
     {
         log_info('Start Process Import Order NAT-EOS CSV for month '.date('m'));
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);

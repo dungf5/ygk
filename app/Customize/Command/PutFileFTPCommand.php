@@ -86,21 +86,22 @@ class PutFileFTPCommand extends Command
             return 0;
         }
 
-        log_info('Param: '.$param);
-        $this->processUploadFile(trim($param));
+        $this->handleProcess(trim($param));
 
         log_info('End Process Put File FTP');
 
         return 0;
     }
 
-    private function processUploadFile($param)
+    private function handleProcess($param)
     {
+        log_info("param {$param}");
+
         switch ($param) {
             case 'ws-eos':
-                log_info('Start Put File Shipping');
+                log_info('Start Put File WS EOS Shipping');
                 /* Put files to FTP server*/
-                $this->handleUploadFileShipping();
+                $this->handleUploadFileWSEOSShipping();
                 break;
 
             case 'nat-stock':
@@ -109,12 +110,18 @@ class PutFileFTPCommand extends Command
                 $this->handleUploadFileNatStockList();
                 break;
 
+            case 'nat-eos':
+                log_info('Start Put File NAT EOS Shipping');
+                /* Put files to FTP server*/
+                $this->handleUploadFileNatEOSShipping();
+                break;
+
             default:
                 break;
         }
     }
 
-    private function handleUploadFileShipping()
+    private function handleUploadFileWSEOSShipping()
     {
         try {
             $file_from = !empty(getenv('FTP_UPLOAD_SHIPPING_FILE_NAME')) ? getenv('FTP_UPLOAD_SHIPPING_FILE_NAME') : 'SYUKA-NEW.csv';
@@ -232,7 +239,7 @@ class PutFileFTPCommand extends Command
                     'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
                     'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
                     'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
-                    'file_name' => 'Mail/ws_eos_ftp.twig',
+                    'file_name' => 'Mail/nat_ftp.twig',
                     'status' => 0,
                     'error_content' => $result['message'],
                 ];
@@ -259,7 +266,7 @@ class PutFileFTPCommand extends Command
                     'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
                     'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
                     'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
-                    'file_name' => 'Mail/nat_stock_ftp.twig',
+                    'file_name' => 'Mail/nat_ftp.twig',
                     'status' => 1,
                     'finish_time' => '('.$file_from.') '.date('Y/m/d H:i:s'),
                 ];
@@ -292,4 +299,92 @@ class PutFileFTPCommand extends Command
         }
     }
 
+    private function handleUploadFileNatEOSShipping()
+    {
+        try {
+            $file_from = 'purchase_'.date('Ymd').'.csv';
+
+            if (!str_ends_with(trim($file_from), '.csv')) {
+                log_error("{$file_from} is not a csv file");
+
+                $this->pushGoogleChat("Put file FTP: {$file_from} is not a csv file");
+
+                return;
+            }
+
+            $path_local = !empty(getenv('LOCAL_FTP_UPLOAD_DIRECTORY')) ? getenv('LOCAL_FTP_UPLOAD_DIRECTORY') : '/html/upload/';
+            $path_from = $path_local.'csv/nat/';
+            $path_to = $path_local.'csv/nat/';
+            $error_file = 'error.txt';
+            $file_to = date('YmdHis').'.csv';
+
+            $result = $this->csvService->transferFile($path_from, $path_to, $file_from, $file_to, $error_file);
+            log_info($result['message']);
+
+            // Send mail result
+            if ($result['status'] == -1 || $result['status'] == 0) {
+                log_info('[NAT-EOS] Send Mail FTP.');
+                $information = [
+                    'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                    'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                    'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
+                    'file_name' => 'Mail/nat_ftp.twig',
+                    'status' => 0,
+                    'error_content' => $result['message'],
+                ];
+
+                try {
+                    // Save file information to DB
+                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                    $insertDate = [
+                        'file_name' => $file_to,
+                        'directory' => $path_to.date('Y/m'),
+                        'message' => $result['message'],
+                        'is_error' => 1,
+                        'is_send_mail' => 0,
+                    ];
+                    $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
+                } catch (\Exception $e) {
+                    log_error($e->getMessage());
+                    $this->pushGoogleChat($e->getMessage());
+                }
+            } else {
+                log_info('[NAT-EOS] Send Mail FTP.');
+
+                $information = [
+                    'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                    'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                    'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
+                    'file_name' => 'Mail/nat_ftp.twig',
+                    'status' => 1,
+                    'finish_time' => '('.$file_from.') '.date('Y/m/d H:i:s'),
+                ];
+
+                try {
+                    // Save file information to DB
+                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                    $insertDate = [
+                        'file_name' => $file_to,
+                        'directory' => $path_to.date('Y/m'),
+                        'message' => 'successfully',
+                        'is_error' => 0,
+                        'is_send_mail' => 1,
+                    ];
+                    $this->entityManager->getRepository(DtExportCSV::class)->insertData($insertDate);
+                } catch (\Exception $e) {
+                    log_error($e->getMessage());
+                    $this->pushGoogleChat($e->getMessage());
+                }
+            }
+
+            $this->mailService->sendMailExportNatEOS($information);
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
+
+            return;
+        }
+    }
 }

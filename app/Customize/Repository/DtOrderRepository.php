@@ -70,10 +70,10 @@ class DtOrderRepository extends AbstractRepository
 
         log_info('Call insertData to dt_order '.$object->getOrderNo().'-'.$object->getOrderLineno());
 
-        return $this->Execute($object);
+        return $this->Execute($object, 1);
     }
 
-    private function Execute($object)
+    private function Execute($object, $count)
     {
         $this->getEntityManager()->persist($object);
         $this->getEntityManager()->flush();
@@ -86,7 +86,13 @@ class DtOrderRepository extends AbstractRepository
             log_error($message);
             $this->pushGoogleChat($message);
 
-            return $this->Execute($object);
+            $count++;
+
+            if ($count > 5) {
+                return 0;
+            }
+
+            return $this->Execute($object, $count);
         }
     }
 }

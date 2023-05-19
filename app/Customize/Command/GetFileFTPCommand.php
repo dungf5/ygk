@@ -102,7 +102,7 @@ class GetFileFTPCommand extends Command
                 break;
 
             case 'nat-eos':
-                $this->NatStock();
+                $this->NatEOS();
                 break;
 
             default:
@@ -163,18 +163,35 @@ class GetFileFTPCommand extends Command
                 'message' => null,
                 'is_sync' => 0,
                 'is_error' => 0,
-                'is_send_mail' => 0,
+                'is_send_mail' => 1,
             ];
 
             $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
+
+            log_info('[WS-EOS] Send Mail FTP.');
+            $information = [
+                'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
+                'file_name' => 'Mail/ws_eos_ftp.twig',
+                'status' => 1,
+                'finish_time' => '('.$file_from.') '.date('Y/m/d H:i:s'),
+            ];
+
+            try {
+                $this->mailService->sendMailImportWSEOS($information);
+            } catch (\Exception $e) {
+                log_error($e->getMessage());
+                $this->pushGoogleChat($e->getMessage());
+            }
         }
 
         log_info('End Get File Order WS-EOS');
     }
 
-    private function NatStock()
+    private function NatEOS()
     {
-        log_info('Start Get File Nat Stock List');
+        log_info('Start Get File Nat EOS');
         /* Get files from FTP server*/
         $file_from = 'requestD_'.date('Ymd').'.csv';
 
@@ -197,18 +214,18 @@ class GetFileFTPCommand extends Command
 
         // Send mail error
         if ($result['status'] == -1) {
-            log_info('[NAT-STOCK] Send Mail FTP.');
+            log_info('[NAT-EOS] Send Mail FTP.');
             $information = [
                 'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
                 'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
                 'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
-                'file_name' => 'Mail/nat_stock_ftp.twig',
+                'file_name' => 'Mail/nat_ftp.twig',
                 'status' => 0,
                 'error_content' => $result['message'],
             ];
 
             try {
-                $this->mailService->sendMailImportNatStock($information);
+                $this->mailService->sendMailImportNatEOS($information);
             } catch (\Exception $e) {
                 log_error($e->getMessage());
                 $this->pushGoogleChat($e->getMessage());
@@ -225,29 +242,29 @@ class GetFileFTPCommand extends Command
                 'message' => null,
                 'is_sync' => 0,
                 'is_error' => 0,
-                'is_send_mail' => 0,
+                'is_send_mail' => 1,
             ];
 
             $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
 
-            log_info('[NAT-STOCK] Send Mail FTP.');
+            log_info('[NAT-EOS] Send Mail FTP.');
             $information = [
                 'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
                 'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
                 'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
-                'file_name' => 'Mail/nat_stock_ftp.twig',
+                'file_name' => 'Mail/nat_ftp.twig',
                 'status' => 1,
                 'finish_time' => '('.$file_from.') '.date('Y/m/d H:i:s'),
             ];
 
             try {
-                $this->mailService->sendMailImportNatStock($information);
+                $this->mailService->sendMailImportNatEOS($information);
             } catch (\Exception $e) {
                 log_error($e->getMessage());
                 $this->pushGoogleChat($e->getMessage());
             }
         }
 
-        log_info('End Get File Nat Stock List');
+        log_info('End Get File Nat EOS');
     }
 }
