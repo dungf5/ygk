@@ -15,9 +15,12 @@ declare(strict_types=1);
 
 namespace Customize\Command;
 
+use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtBreakKey;
+use Customize\Entity\DtOrderNatEOS;
 use Customize\Entity\DtOrderWSEOS;
+use Customize\Entity\MstShippingNatEOS;
 use Customize\Entity\MstShippingWSEOS;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\CSVService;
@@ -39,6 +42,7 @@ class ExportCsvShippingCommand extends Command
 {
     use PluginCommandTrait;
     use CurlPost;
+    use CSVHeader;
 
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -109,7 +113,7 @@ class ExportCsvShippingCommand extends Command
 
             case 'nat-eos':
                 $this->customer_code = '7015';
-                var_dump($this->customer_code);
+                $this->NatEOS();
                 break;
 
             default:
@@ -117,7 +121,7 @@ class ExportCsvShippingCommand extends Command
         }
     }
 
-    private function WSEOS()
+    private function resetBreakKey()
     {
         try {
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
@@ -134,6 +138,11 @@ class ExportCsvShippingCommand extends Command
             $this->pushGoogleChat($e->getMessage());
             log_error($message);
         }
+    }
+
+    private function WSEOS()
+    {
+        $this->resetBreakKey();
 
         /* The local path to export csv file */
         $path = getenv('LOCAL_FTP_UPLOAD_DIRECTORY') ?? '/html/upload/';
@@ -262,6 +271,127 @@ class ExportCsvShippingCommand extends Command
                     if (!empty($dtOrderWsEOS)) {
                         $dtOrderWsEOS->setShippingSentFlg(1);
                         $this->entityManager->getRepository(DtOrderWSEOS::class)->save($dtOrderWsEOS);
+                    }
+
+                    $this->entityManager->flush();
+                    $this->entityManager->getConnection()->commit();
+                } catch (\Exception $e) {
+                    log_error($e->getMessage());
+                    $this->entityManager->getConnection()->rollBack();
+                    $this->pushGoogleChat($e->getMessage());
+                }
+            }
+
+            fclose($fp);
+        }
+
+        // Check file after put data
+        if (($fp = fopen(trim($file), 'r')) !== false) {
+            $str = fread($fp, 100);
+            fclose($fp);
+
+            if (empty($str)) {
+                unlink(trim($file));
+            }
+        }
+
+        return;
+    }
+
+    private function NatEOS()
+    {
+        $this->resetBreakKey();
+
+        /* The local path to export csv file */
+        $path = getenv('LOCAL_FTP_UPLOAD_DIRECTORY') ?? '/html/upload/';
+        $path .= 'csv/nat/';
+
+        if (getenv('APP_IS_LOCAL') == 1) {
+            $path = '.'.$path;
+        }
+
+        $this->handleExportShippingNatEOS($path);
+    }
+
+    private function handleExportShippingNatEOS($path)
+    {
+        if (empty($path)) {
+            return;
+        }
+
+        $mstShippingNatEOS = $this->entityManager->getRepository(MstShippingNatEOS::class)->findBy([
+            'shipping_send_flg' => 1,
+        ]);
+
+        if (!count($mstShippingNatEOS)) {
+            log_info('No data');
+
+            return;
+        }
+
+        $file_name = 'purchase_'.date('Ymd').'.csv';
+        $file = $path.$file_name;
+
+        // Create directory local if have'n
+        $arr_path_local = array_diff(explode('/', $path), ['.', '..']);
+        $temp_path_local = '';
+
+        if (getenv('APP_IS_LOCAL') == 1) {
+            $temp_path_local = '.';
+        }
+
+        foreach ($arr_path_local as $subDir) {
+            if (empty($subDir)) {
+                continue;
+            }
+            $temp_path_local .= '/'.$subDir;
+
+            if (file_exists($temp_path_local) == false) {
+                mkdir($temp_path_local);
+            }
+        }
+        $temp_path_local = null;
+        // End - Create directory local if have'n
+
+        $fp = fopen(trim($file), 'w');
+
+        if ($fp) {
+            $headerFields = [];
+            foreach ($this->getNatExportShippingHeader() as $header) {
+                $headerFields[] = mb_convert_encoding($header, 'Shift-JIS', 'UTF-8');
+            }
+            fputcsv($fp, $headerFields);
+
+            foreach ($mstShippingNatEOS as $item) {
+                try {
+                    $dtOrderNatEOS = $this->entityManager->getRepository(DtOrderNatEOS::class)->findOneBy(['reqcd' => $item['reqcd'], 'order_lineno' => $item['order_lineno']]);
+
+                    $mstDelivery = $this->commonService->getMstDelivery($item['shipping_no'], $item['reqcd'], $item['order_lineno']);
+                    $delivery_num = $mstDelivery['quanlity'] ?? '';
+                    $delivery_price = $mstDelivery['unit_price'] ?? '';
+
+                    $this->entityManager->getConfiguration()->setSQLLogger(null);
+                    $this->entityManager->getConnection()->beginTransaction();
+
+                    $fields = [
+                        mb_convert_encoding($item['delivery_no'], 'Shift-JIS', 'UTF-8'),
+                        mb_convert_encoding($item['jan'], 'Shift-JIS', 'UTF-8'),
+                        mb_convert_encoding($item['mkrcd'], 'Shift-JIS', 'UTF-8'),
+                        mb_convert_encoding($item['natcd'], 'Shift-JIS', 'UTF-8'),
+                        mb_convert_encoding($delivery_num, 'Shift-JIS', 'UTF-8'),
+                        mb_convert_encoding($delivery_price, 'Shift-JIS', 'UTF-8'),
+                        mb_convert_encoding(!empty($item['delivery_day']) ? date('Ymd', strtotime($item['delivery_day'])) : '', 'Shift-JIS', 'UTF-8'),
+                    ];
+
+                    fputcsv($fp, $fields);
+
+                    $item->setShippingSendFlg(0);
+                    $item->setShippingSentFlg(1);
+                    $this->entityManager->getRepository(MstShippingNatEOS::class)->save($item);
+
+                    if (!empty($dtOrderNatEOS)) {
+                        $dtOrderNatEOS->setShippingSentFlg(1);
+                        $this->entityManager->getRepository(DtOrderNatEOS::class)->save($dtOrderNatEOS);
                     }
 
                     $this->entityManager->flush();

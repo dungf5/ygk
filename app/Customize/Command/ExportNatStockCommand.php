@@ -145,7 +145,7 @@ class ExportNatStockCommand extends Command
 
         if ($fp) {
             $headerFields = [];
-            foreach ($this->getNatExportCsvHeader() as $header) {
+            foreach ($this->getNatExportStockHeader() as $header) {
                 $headerFields[] = mb_convert_encoding($header, 'Shift-JIS', 'UTF-8');
             }
             fputcsv($fp, $headerFields);
