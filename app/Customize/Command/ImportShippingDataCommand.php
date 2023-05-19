@@ -291,7 +291,7 @@ class ImportShippingDataCommand extends Command
             if (empty($mstShippingNatEOS)) {
                 log_info('Import data mst_shipping_nat_eos '.$data['reqcd'].'-'.$data['order_lineno']);
 
-                $data['delivery_no'] = '9999'.str_pad(substr((string) $mstShipping['shipping_no'], -8), 8, '0', STR_PAD_LEFT);
+                $data['delivery_no'] = '9999'.str_pad(substr((string) $mstShipping['shipping_no'], -8), 8, '0', STR_PAD_LEFT).'3';
                 $data['shipping_date'] = !empty($mstShipping['shipping_date']) ? date('Ymd', strtotime($mstShipping['shipping_date'])) : '';
                 $data['shipping_no'] = $mstShipping['shipping_no'] ?? null;
 
