@@ -34,7 +34,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/* Run Batch: php bin/console export-csv-shipping-command */
+/* Run Batch: php bin/console export-csv-shipping-command [param] */
 class ExportCsvShippingCommand extends Command
 {
     use PluginCommandTrait;
@@ -49,7 +49,7 @@ class ExportCsvShippingCommand extends Command
      * @var MailService
      */
     private $mailService;
-    private $customer_code = '7001';
+    private $customer_code = '';
 
     protected static $defaultName = 'export-csv-shipping-command';
     protected static $defaultDescription = 'Process Export Shipping Csv Command';
@@ -76,9 +76,52 @@ class ExportCsvShippingCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        log_info('----------------------------------');
+        log_info('Start Process Export Shipping Csv for month '.date('m'));
 
+        $param = $input->getArgument('arg1') ?? null;
+
+        if (!$param) {
+            log_error('No param. Process stopped.');
+
+            $message = 'Process Export Shipping Data. No param. Process stopped.';
+            $this->pushGoogleChat($message);
+
+            return 0;
+        }
+
+        $this->handleProcess($param);
+
+        log_info('End Process Export Shipping Csv for month '.date('m'));
+
+        return 0;
+    }
+
+    public function handleProcess($param)
+    {
+        log_info("param {$param}");
+
+        switch (trim($param)) {
+            case 'ws-eos':
+                $this->customer_code = '7001';
+                $this->WSEOS();
+                break;
+
+            case 'nat-eos':
+                $this->customer_code = '7015';
+                var_dump($this->customer_code);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private function WSEOS()
+    {
         try {
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
             // Set dt_break_key.break_key = 0 when run batch
             $break_key = $this->entityManager->getRepository(DtBreakKey::class)->findOneBy(['customer_code' => $this->customer_code]);
             if (!empty($break_key)) {
@@ -92,7 +135,7 @@ class ExportCsvShippingCommand extends Command
             log_error($message);
         }
 
-        /* The local path to load csv file */
+        /* The local path to export csv file */
         $path = getenv('LOCAL_FTP_UPLOAD_DIRECTORY') ?? '/html/upload/';
         $path .= 'csv/unso/';
 
@@ -100,16 +143,10 @@ class ExportCsvShippingCommand extends Command
             $path = '.'.$path;
         }
 
-        log_info('----------------------------------');
-
-        log_info('Start Process Export Shipping Csv for month '.date('m'));
-        $this->handleExportShippingCsv($path);
-        log_info('End Process Export Shipping Csv for month '.date('m'));
-
-        return 0;
+        $this->handleExportShippingWSEOS($path);
     }
 
-    private function handleExportShippingCsv($path)
+    private function handleExportShippingWSEOS($path)
     {
         if (empty($path)) {
             return;
@@ -117,7 +154,6 @@ class ExportCsvShippingCommand extends Command
 
         $mstShippingWSEOS = $this->entityManager->getRepository(MstShippingWSEOS::class)->findBy([
             'shipping_send_flg' => 1,
-            //'shipping_sent_flg' => 0,
         ]);
 
         if (!count($mstShippingWSEOS)) {
