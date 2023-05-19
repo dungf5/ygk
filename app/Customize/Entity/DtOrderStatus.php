@@ -1,4 +1,16 @@
 <?php
+
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -394,15 +406,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return \DateTime
          */
-        public function getCreateDate(): \DateTime
+        public function getCreateDate()
         {
             return $this->create_date;
         }
 
         /**
-         * @param \DateTime $create_date
+         * @param $create_date
          */
-        public function setCreateDate(\DateTime $create_date)
+        public function setCreateDate($create_date)
         {
             $this->create_date = $create_date;
         }
@@ -410,15 +422,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return \DateTime
          */
-        public function getUpdateDate(): \DateTime
+        public function getUpdateDate()
         {
             return $this->update_date;
         }
 
         /**
-         * @param \DateTime $update_date
+         * @param $update_date
          */
-        public function setUpdateDate(\DateTime $update_date)
+        public function setUpdateDate($update_date)
         {
             $this->update_date = $update_date;
         }
@@ -428,7 +440,7 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
          *
          * @param \DateTime|null $orderDate
          */
-        public function setOrderDate(\DateTime $orderDate = null)
+        public function setOrderDate($orderDate = null)
         {
             $this->order_date = $orderDate;
         }
@@ -438,13 +450,13 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
          *
          * @return Date|null
          */
-        public function getOrderDate(): Date
+        public function getOrderDate()
         {
             return $this->order_date;
         }
 
         /**
-         * @return string | null
+         * @return string|null
          */
         public function getEcType()
         {
@@ -452,7 +464,7 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         }
 
         /**
-         * @param string | null $ec_type
+         * @param string|null $ec_type
          */
         public function setEcType($ec_type = null)
         {
@@ -542,9 +554,9 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return int
          */
-        public function getShippingNum(): int
+        public function getShippingNum()
         {
-            return (int)$this->shipping_num;
+            return (int) $this->shipping_num;
         }
 
         /**

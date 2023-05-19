@@ -15,12 +15,15 @@ namespace Customize\Repository;
 
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtOrder;
+use Customize\Service\CurlPost;
 use Doctrine\DBAL\Types\Type;
 use Eccube\Repository\AbstractRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class DtOrderRepository extends AbstractRepository
 {
+    use CurlPost;
+
     /**
      * MstProductRepository constructor.
      *
@@ -67,10 +70,24 @@ class DtOrderRepository extends AbstractRepository
         $object->setFtrnsportcd('87001');
 
         log_info('Call insertData to dt_order '.$object->getOrderNo().'-'.$object->getOrderLineno());
-        sleep(rand(1, 5));
+
+        return $this->Execute($object);
+    }
+
+    private function Execute($object)
+    {
         $this->getEntityManager()->persist($object);
         $this->getEntityManager()->flush();
 
-        return 1;
+        if (!empty($object->getCreateDate())) {
+            return 1;
+        } else {
+            $message = 'Import data dt_order '.$object->getOrderNo().'-'.$object->getOrderLineno().' error';
+            $message .= "\nProcess execute again";
+            log_error($message);
+            $this->pushGoogleChat($message);
+
+            return $this->Execute($object);
+        }
     }
 }
