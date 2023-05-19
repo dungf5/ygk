@@ -66,6 +66,8 @@ class DtOrderRepository extends AbstractRepository
         $object->setFvehicleno($data['fvehicleno']);
         $object->setFtrnsportcd('87001');
 
+        log_info('Call insertData to dt_order '.$object->getOrderNo().'-'.$object->getOrderLineno());
+        sleep(1);
         $this->getEntityManager()->persist($object);
         $this->getEntityManager()->flush();
 

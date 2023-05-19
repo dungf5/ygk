@@ -358,6 +358,9 @@ class ValidateCsvDataCommand extends Command
                 $order_error = [];
 
                 foreach ($data as $value) {
+                    $result = 0;
+                    $result1 = 0;
+
                     $item = $value->toArray();
 
                     // Check not exists order error_type = 1
