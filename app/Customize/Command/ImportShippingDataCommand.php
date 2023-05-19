@@ -18,8 +18,10 @@ namespace Customize\Command;
 use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtOrderNatEOS;
+use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstShipping;
 use Customize\Entity\MstShippingNatEOS;
+use Customize\Entity\MstShippingWSEOS;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\CurlPost;
 use Customize\Service\MailService;
@@ -104,12 +106,110 @@ class ImportShippingDataCommand extends Command
         log_info("param {$param}");
 
         switch (trim($param)) {
+            case 'ws-eos':
+                $this->handleImportShippingWSEOS();
+
+                break;
+
             case 'nat-eos':
                 $this->handleImportShippingNatEOS();
                 break;
 
             default:
                 break;
+        }
+    }
+
+    private function handleImportShippingWSEOS()
+    {
+        try {
+            log_info('Start Handle Import Data To mst_shipping_ws_eos');
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
+            // Get data to import
+            $data = $this->entityManager->getRepository(DtOrderWSEOS::class)->findBy([
+                'order_registed_flg' => 1,
+                'shipping_sent_flg' => 0,
+            ], [
+                'shipping_shop_code' => 'ASC',
+                'order_shop_code' => 'ASC',
+                'order_no' => 'ASC',
+                'order_line_no' => 'ASC',
+            ]);
+
+            foreach ($data as $item) {
+                $result = $this->importShippingWSEOS($item->toArray());
+
+                //if ($result) {
+                //    $item->setShippingSentFlg(1);
+                //    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
+                //}
+            }
+
+            log_info('End Handle Import Data To mst_shipping_ws_eos');
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            $message = 'Handle Import Data To mst_shipping_ws_eos';
+            $message .= "\n".$e->getMessage();
+            $this->pushGoogleChat($message);
+
+            return;
+        }
+    }
+
+    private function importShippingWSEOS($data)
+    {
+        try {
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
+            $mstShipping = $this->entityManager->getRepository(MstShipping::class)->findOneBy([
+                'cus_order_no' => $data['order_no'],
+                'cus_order_lineno' => $data['order_line_no'],
+                'shipping_status' => 2,
+            ]);
+
+            if (empty($mstShipping)) {
+                return 0;
+            }
+
+            $mstShippingWSEOS = $this->entityManager->getRepository(MstShippingWSEOS::class)->findOneBy([
+                'order_no' => $data['order_no'],
+                'order_line_no' => $data['order_line_no'],
+            ]);
+
+            if (!empty($mstShippingWSEOS)) {
+                return 1;
+            }
+
+            // Insert mst_shipping_ws_eos
+            if (empty($mstShippingWSEOS)) {
+                log_info('Import data mst_shipping_ws_eos '.$data['order_no'].'-'.$data['order_line_no']);
+                $data['shipping_date'] = $mstShipping['shipping_date'] ?? null;
+                $data['product_maker_code'] = $mstShipping['product_code'] ?? null;
+                $data['shipping_no'] = $mstShipping['shipping_no'] ?? null;
+
+                $data['delivery_no'] = null;
+                $data['delivery_line_no'] = null;
+                $data['delivery_day'] = null;
+                $data['delivery_num'] = null;
+                $data['delivery_price'] = null;
+                $data['delivery_amount'] = null;
+
+                return $this->entityManager->getRepository(MstShippingWSEOS::class)->insertData($data);
+            }
+
+            return 0;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            $message = 'Import Data To mst_shipping_ws_eos';
+            $message .= "\n".$e->getMessage();
+            $this->pushGoogleChat($message);
+
+            return 0;
         }
     }
 
