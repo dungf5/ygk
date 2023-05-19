@@ -15,12 +15,14 @@ namespace Customize\Repository;
 
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtOrderStatus;
+use Customize\Service\CurlPost;
 use Doctrine\DBAL\Types\Type;
 use Eccube\Repository\AbstractRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class DtOrderStatusRepository extends AbstractRepository
 {
+    use CurlPost;
     /**
      * MstProductRepository constructor.
      *
@@ -55,9 +57,25 @@ class DtOrderStatusRepository extends AbstractRepository
         $object->setEcType('2');
         $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
 
+        log_info('Call insertData to dt_order_status '.$object->getCusOrderNo().'-'.$object->getCusOrderLineno());
+
+        return $this->Execute($object);
+    }
+
+    private function Execute($object)
+    {
         $this->getEntityManager()->persist($object);
         $this->getEntityManager()->flush();
 
-        return 1;
+        if (!empty($object->getCreateDate())) {
+            return 1;
+        } else {
+            $message = 'Import data dt_order_status '.$object->getCusOrderNo().'-'.$object->getCusOrderLineno().' error';
+            $message .= "\nProcess execute again";
+            log_error($message);
+            $this->pushGoogleChat($message);
+
+            return $this->Execute($object);
+        }
     }
 }
