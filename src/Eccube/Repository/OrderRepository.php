@@ -465,6 +465,7 @@ class OrderRepository extends AbstractRepository
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();
 
+            sleep(1);
             return $object->getId();
         } catch (\Exception $e) {
             log_info('Insert dtb_order error');
