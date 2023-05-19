@@ -164,7 +164,7 @@ class ImportShippingDataCommand extends Command
             ]);
 
             if (empty($mstShipping)) {
-                log_info('No data mst_shipping '.$data['reqcd'].'-'.$data['order_lineno'].' status = 2');
+                log_error('No data mst_shipping '.$data['reqcd'].'-'.$data['order_lineno'].' status = 2');
 
                 $message = 'Import Data To mst_shipping_nat_eos';
                 $message .= "\n".'No data mst_shipping '.$data['reqcd'].'-'.$data['order_lineno'].' status = 2';
@@ -179,7 +179,7 @@ class ImportShippingDataCommand extends Command
             ]);
 
             if (!empty($mstShippingNatEOS)) {
-                log_info('mst_shipping_nat_eos is existed '.$data['reqcd'].'-'.$data['order_lineno']);
+                log_error('mst_shipping_nat_eos is existed '.$data['reqcd'].'-'.$data['order_lineno']);
                 $message = 'Import Data To mst_shipping_nat_eos';
                 $message .= "\n".'Record is existed '.$data['reqcd'].'-'.$data['order_lineno'];
                 $this->pushGoogleChat($message);
