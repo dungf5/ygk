@@ -97,7 +97,7 @@ class PutFileFTPCommand extends Command
     private function processUploadFile($param)
     {
         switch ($param) {
-            case 'shipping':
+            case 'ws-eos':
                 log_info('Start Put File Shipping');
                 /* Put files to FTP server*/
                 $this->handleUploadFileShipping();
