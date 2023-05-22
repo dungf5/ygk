@@ -2748,4 +2748,76 @@ SQL;
             return 0;
         }
     }
+
+    public function getSumOrderAmoutWSEOSDaitoTest($order_no)
+    {
+        $sql = '
+            SELECT
+                SUM(IFNULL(dowe.order_price, 0) * IFNULL(dowe.order_num, 0)) AS sum_order_amount
+            FROM dt_order_ws_eos_daito_test dowe
+            WHERE dowe.order_no = ?
+            GROUP BY  dowe.order_no
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$order_no]);
+            $rows = $result->fetchAllAssociative();
+
+            return (int) ($rows[0]['sum_order_amount']) ?? 0;
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+
+    public function insertDataQuery($data) {
+        $connection =  $this->entityManager->getConnection();
+
+        // // Build the SQL query
+         $sql = 'INSERT INTO dt_order_daito_test (customer_code, seikyu_code, order_no, order_lineno, shipping_code, otodoke_code,
+ order_date, 
+deli_plan_date, shiping_plan_date, item_no
+, demand_quantity, demand_unit,
+ order_price, unit_price_status, shiping_deposit_code, deploy, company_id, 
+product_code,
+ dyna_model_seg2, dyna_model_seg3, dyna_model_seg4, dyna_model_seg5, 
+dyna_model_seg6,
+ request_flg,  fvehicleno, ftrnsportcd) 
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        $params =[$data['customer_code'] ?? '',
+            $data['customer_code'] ?? '',
+            $data['order_no'] ?? '',
+            $data['order_line_no'] ?? '',
+            $data['shipping_code'] ?? '',
+            $data['otodoke_code'] ?? '',
+            $data['order_date'],
+
+            $data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '',
+            $data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '',
+            $data['jan_code'] ?? '',
+            $data['demand_quantity'],
+            $data['demand_unit'],
+
+            (float) $data['order_price'],
+            'FOR',
+            $data['location'],
+            'XB',
+            'XB',
+            $data['product_code'] ?? '',
+
+            $data['order_no'] ?? '',//dyna_model_seg2
+            '2',
+            $data['dtb_order_no'] ?? '',
+            $data['dtb_order_line_no'] ?? '',
+            $data['remarks_line_no'] ?? '',//dyna_model_seg6
+            'Y',
+            $data['fvehicleno'],
+            '87001'
+        ];
+
+        // Execute the query
+        $stmt = $connection->prepare($sql);
+        return $stmt->executeStatement($params);
+
+    }
 }
