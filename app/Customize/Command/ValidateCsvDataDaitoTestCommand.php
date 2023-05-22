@@ -19,7 +19,7 @@ use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtBreakKeyDaitoTest;
 use Customize\Entity\DtOrderDaitoTest;
 use Customize\Entity\DtOrderStatusDaitoTest;
-use Customize\Entity\DtOrderWSEOSDaitoTest;
+use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstCustomer;
 use Customize\Entity\MstProduct;
 use Customize\Service\Common\MyCommonService;
@@ -150,7 +150,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
                     sleep(1);
                     $this->handleImportOrderWSEOS();
                     sleep(1);
-                    $this->sendMailOrderSuccess();
+                    //$this->sendMailOrderSuccess();
                 }
 
                 break;
@@ -166,7 +166,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
             log_info('Start Handle Validate WS EOS DATA Daito Test '.($this->check_validate ? 'With Check' : 'Without Check'));
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             // Get data to validate ws eos
-            $data = $this->entityManager->getRepository(DtOrderWSEOSDaitoTest::class)->findBy([
+            $data = $this->entityManager->getRepository(DtOrderWSEOS::class)->findBy([
                 'order_import_day' => date('Ymd'),
                 'order_registed_flg' => 0,
             ]);
@@ -177,7 +177,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
 
             if (count($this->errors)) {
                 foreach ($this->errors as $error) {
-                    $this->entityManager->getRepository(DtOrderWSEOSDaitoTest::class)->updateError($error);
+                    $this->entityManager->getRepository(DtOrderWSEOS::class)->updateError($error);
                 }
             }
 
@@ -196,7 +196,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $common = new MyCommonService($this->entityManager);
 
-            $object = $this->entityManager->getRepository(DtOrderWSEOSDaitoTest::class)->findOneBy([
+            $object = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy([
                 'order_no' => $order_no,
                 'order_line_no' => $order_line_no,
             ]);
@@ -297,7 +297,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
                 $this->errors[] = $error;
             }
 
-            $this->entityManager->getRepository(DtOrderWSEOSDaitoTest::class)->save($object);
+            $this->entityManager->getRepository(DtOrderWSEOS::class)->save($object);
 
             return;
         } catch (\Exception $e) {
@@ -342,7 +342,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
             // Get data to import
-            $data = $this->entityManager->getRepository(DtOrderWSEOSDaitoTest::class)->findBy([
+            $data = $this->entityManager->getRepository(DtOrderWSEOS::class)->findBy([
                 'order_import_day' => date('Ymd'),
                 'order_registed_flg' => 0,
                 'error_type' => 0,
@@ -364,7 +364,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
                     $item = $value->toArray();
 
                     // Check not exists order error_type = 1
-                    if (isset($order_error[$item['order_no']]) || $this->entityManager->getRepository(DtOrderWSEOSDaitoTest::class)->findOneBy(['order_no' => $item['order_no'], 'error_type' => '1'])) {
+                    if (isset($order_error[$item['order_no']]) || $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy(['order_no' => $item['order_no'], 'error_type' => '1'])) {
                         $order_error[$item['order_no']] = 1;
 
                         continue;
@@ -416,7 +416,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
                         $this->success["{$item['order_no']}"]['summary']['total_amount'] = ($this->success["{$item['order_no']}"]['summary']['order_amount'] ?? 0) + (int) ($this->success["{$item['order_no']}"]['summary']['tax'] ?? 0);
 
                         $value->setOrderRegistedFlg(1);
-                        $this->entityManager->getRepository(DtOrderWSEOSDaitoTest::class)->save($value);
+                        $this->entityManager->getRepository(DtOrderWSEOS::class)->save($value);
                     } else {
                         $this->entityManager->getConnection()->rollBack();
                     }
