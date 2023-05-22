@@ -41,38 +41,51 @@ class DtOrderDaitoTestRepository extends AbstractRepository
             return 0;
         }
 
-        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-        $object = new DtOrderDaitoTest();
-        $object->setCustomerCode($data['customer_code'] ?? '');
-        $object->setSeikyuCode($data['customer_code'] ?? '');
-        $object->setOrderNo($data['order_no'] ?? '');
-        $object->setOrderLineno($data['order_line_no'] ?? '');
-        $object->setShippingCode($data['shipping_code'] ?? '');
-        $object->setOtodokeCode($data['otodoke_code'] ?? '');
-        $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
-        $object->setDeliPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
-        $object->setShipingPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
-        $object->setItemNo($data['jan_code'] ?? '');
-        $object->setDemandQuantity($data['demand_quantity']);
-        $object->setDemandUnit($data['demand_unit']);
-        $object->setOrderPrice((float) $data['order_price']);
-        $object->setUnitPriceStatus('FOR');
-        $object->setShipingDepositCode($data['location']);
-        $object->setDeploy('XB');
-        $object->setCompanyId('XB');
-        $object->setProductCode($data['product_code'] ?? '');
-        $object->setDynaModelSeg2($data['order_no'] ?? '');
-        $object->setDynaModelSeg3('2');
-        $object->setDynaModelSeg4($data['dtb_order_no'] ?? '');
-        $object->setDynaModelSeg5($data['dtb_order_line_no'] ?? '');
-        $object->setDynaModelSeg6($data['remarks_line_no'] ?? '');
-        $object->setRequestFlg('Y');
-        $object->setFvehicleno($data['fvehicleno']);
-        $object->setFtrnsportcd('87001');
+        //Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        //$object = new DtOrderDaitoTest();
+        //$object->setCustomerCode($data['customer_code'] ?? '');
+        //$object->setSeikyuCode($data['customer_code'] ?? '');
+        //$object->setOrderNo($data['order_no'] ?? '');
+        //$object->setOrderLineno($data['order_line_no'] ?? '');
+        //$object->setShippingCode($data['shipping_code'] ?? '');
+        //$object->setOtodokeCode($data['otodoke_code'] ?? '');
+        //$object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
+        //$object->setDeliPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
+        //$object->setShipingPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
+        //$object->setItemNo($data['jan_code'] ?? '');
+        //$object->setDemandQuantity($data['demand_quantity']);
+        //$object->setDemandUnit($data['demand_unit']);
+        //$object->setOrderPrice((float) $data['order_price']);
+        //$object->setUnitPriceStatus('FOR');
+        //$object->setShipingDepositCode($data['location']);
+        //$object->setDeploy('XB');
+        //$object->setCompanyId('XB');
+        //$object->setProductCode($data['product_code'] ?? '');
+        //$object->setDynaModelSeg2($data['order_no'] ?? '');
+        //$object->setDynaModelSeg3('2');
+        //$object->setDynaModelSeg4($data['dtb_order_no'] ?? '');
+        //$object->setDynaModelSeg5($data['dtb_order_line_no'] ?? '');
+        //$object->setDynaModelSeg6($data['remarks_line_no'] ?? '');
+        //$object->setRequestFlg('Y');
+        //$object->setFvehicleno($data['fvehicleno']);
+        //$object->setFtrnsportcd('87001');
+        //return $this->Execute($object, 1);
 
-        log_info('Call insertData to dt_order '.$object->getOrderNo().'-'.$object->getOrderLineno());
+        log_info('Call insertData to dt_order '.$data['order_no'].'-'.$data['order_line_no']);
 
-        return $this->Execute($object, 1);
+        try {
+            $myCommonService = new MyCommonService($this->getEntityManager());
+            $myCommonService->insertDtOrderByQuery($data);
+
+            return 1;
+        } catch (\Exception $e) {
+            $message = 'Import data dt_order '.$data['order_no'].'-'.$data['order_line_no'].' error';
+            $message .= "\n".$e->getMessage();
+            log_error($message);
+            $this->pushGoogleChat($message);
+
+            return 0;
+        }
     }
 
     private function Execute($object, $count)

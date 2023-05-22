@@ -13,6 +13,7 @@
 
 namespace Customize\Service\Common;
 
+use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtOrder;
 use Customize\Entity\DtOrderStatus;
 use Customize\Entity\MoreOrder;
@@ -20,6 +21,7 @@ use Customize\Entity\MstShipping;
 use Customize\Entity\Order;
 use Customize\Repository\MoreOrderRepository;
 use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Entity\Cart;
 use Eccube\Entity\CartItem;
@@ -437,7 +439,9 @@ SQL;
      * @param $loginType
      * @param $customerId
      * @param MoreOrder $moreOrder
+     *
      * @return array
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function getMstShippingCustomer($loginType, $customerId, MoreOrder $moreOrder = null)
@@ -660,7 +664,9 @@ SQL;
     /**
      * @param $myCart
      * @param $customer_code
+     *
      * @return array|null
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function getdtPriceFromCart($myCart, $customer_code)
@@ -1456,7 +1462,9 @@ SQL;
     /**
      * @param $customerId
      * @param $pre_order_id
+     *
      * @return mixed|null
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function getMstShippingOrder($customerId, $pre_order_id)
@@ -2770,54 +2778,126 @@ SQL;
         }
     }
 
-    public function insertDataQuery($data) {
-        $connection =  $this->entityManager->getConnection();
+    public function insertDtOrderByQuery($data)
+    {
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $connection = $this->entityManager->getConnection();
+        $sql = '
+                INSERT INTO dt_order_daito_test (
+                    customer_code,
+                    seikyu_code,
+                    order_no,
+                    order_lineno,
+                    shipping_code,
+                    otodoke_code,
+                    order_date, 
+                    deli_plan_date,
+                    shiping_plan_date,
+                    item_no,
+                    demand_quantity,
+                    demand_unit,
+                    order_price,
+                    unit_price_status,
+                    shiping_deposit_code,
+                    deploy,
+                    company_id, 
+                    product_code,
+                    dyna_model_seg2,
+                    dyna_model_seg3,
+                    dyna_model_seg4,
+                    dyna_model_seg5, 
+                    dyna_model_seg6,
+                    request_flg,
+                    fvehicleno,
+                    ftrnsportcd
+                ) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ';
 
-        // // Build the SQL query
-         $sql = 'INSERT INTO dt_order_daito_test (customer_code, seikyu_code, order_no, order_lineno, shipping_code, otodoke_code,
- order_date, 
-deli_plan_date, shiping_plan_date, item_no
-, demand_quantity, demand_unit,
- order_price, unit_price_status, shiping_deposit_code, deploy, company_id, 
-product_code,
- dyna_model_seg2, dyna_model_seg3, dyna_model_seg4, dyna_model_seg5, 
-dyna_model_seg6,
- request_flg,  fvehicleno, ftrnsportcd) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        $params =[$data['customer_code'] ?? '',
+        $params = [
+            $data['customer_code'] ?? '',
             $data['customer_code'] ?? '',
             $data['order_no'] ?? '',
             $data['order_line_no'] ?? '',
             $data['shipping_code'] ?? '',
             $data['otodoke_code'] ?? '',
-            $data['order_date'],
-
+            new \DateTime($data['order_date'] ?? ''),
             $data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '',
             $data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '',
             $data['jan_code'] ?? '',
             $data['demand_quantity'],
             $data['demand_unit'],
-
             (float) $data['order_price'],
             'FOR',
             $data['location'],
             'XB',
             'XB',
             $data['product_code'] ?? '',
-
-            $data['order_no'] ?? '',//dyna_model_seg2
+            $data['order_no'] ?? '', //dyna_model_seg2
             '2',
             $data['dtb_order_no'] ?? '',
             $data['dtb_order_line_no'] ?? '',
-            $data['remarks_line_no'] ?? '',//dyna_model_seg6
+            $data['remarks_line_no'] ?? '', //dyna_model_seg6
             'Y',
             $data['fvehicleno'],
-            '87001'
+            '87001',
         ];
+
+        log_info($sql);
+        log_info(implode(',', $params));
 
         // Execute the query
         $stmt = $connection->prepare($sql);
         return $stmt->executeStatement($params);
+    }
 
+    public function insertDtOrderStatusByQuery($data)
+    {
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $connection = $this->entityManager->getConnection();
+        $sql = '
+                INSERT INTO dt_order_status_daito_test (
+                    order_no,
+                    order_line_no,
+                    order_status,
+                    cus_order_no,
+                    cus_order_lineno,
+                    ec_order_no,
+                    ec_order_lineno,
+                    customer_code,
+                    shipping_code,
+                    otodoke_code,
+                    product_code,
+                    order_remain_num,
+                    flow_type,
+                    ec_type,
+                    order_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ';
+
+        $params = [
+            '',
+            0,
+            1,
+            $data['order_no'] ?? '',
+            $data['order_line_no'] ?? '',
+            $data['dtb_order_no'] ?? '',
+            $data['dtb_order_line_no'] ?? '',
+            $data['customer_code'] ?? '',
+            $data['shipping_code'] ?? '',
+            $data['otodoke_code'] ?? '',
+            $data['product_code'] ?? '',
+            (int) $data['order_num'],
+            2,
+            2,
+            new \DateTime(),
+        ];
+
+        log_info($sql);
+        log_info(implode(',', $params));
+
+        // Execute the query
+        $stmt = $connection->prepare($sql);
+        return $stmt->executeStatement($params);
     }
 }
