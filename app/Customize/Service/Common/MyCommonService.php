@@ -2821,7 +2821,7 @@ SQL;
             $data['order_line_no'] ?? '',
             $data['shipping_code'] ?? '',
             $data['otodoke_code'] ?? '',
-            new \DateTime($data['order_date'] ?? ''),
+            $data['order_date'] ? date('Y-m-d H:i:s', strtotime($data['order_date'])) : '',
             $data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '',
             $data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '',
             $data['jan_code'] ?? '',
@@ -2890,7 +2890,7 @@ SQL;
             (int) $data['order_num'],
             2,
             2,
-            new \DateTime(),
+            date('Y-m-d'),
         ];
 
         log_info($sql);
