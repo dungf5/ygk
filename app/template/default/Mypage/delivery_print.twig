@@ -667,35 +667,53 @@ file that was distributed with this source code.
         function handlePreviewPDF() {
             let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
             let handled = {};
+            let delivery_no = '';
 
             $.each(arr_print_pdf_value, function( index, value ) {
                 if (value && !handled[value]) {
                     handled[value] = true;
 
-                    let url = '/mypage/exportOrderPdf?preview=1&delivery_no=' + value;
-                    let a = document.createElement('a');
-                    a.target = '_blank';
-                    a.href = url;
-                    a.click();
+                    // let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + value;
+                    // let a = document.createElement('a');
+                    // a.target = '_blank';
+                    // a.href = url;
+                    // a.click();
+
+                    delivery_no += ',' + value;
                 }
             });
+
+            let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + delivery_no;
+            let a = document.createElement('a');
+            a.target = '_blank';
+            a.href = url;
+            a.click();
         }
 
         function handlePrintPDF() {
             let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
             let handled = {};
+            let delivery_no = '';
 
             $.each(arr_print_pdf_value, function( index, value ) {
-                if (value && !handled[value]) {
-                    handled[value] = true;
+               if (value && !handled[value]) {
+                   handled[value] = true;
 
-                    let url = '/mypage/exportOrderPdf?delivery_no=' + value;
-                    let a = document.createElement('a');
-                    a.target = '_blank';
-                    a.href = url;
-                    a.click();
-                }
+                   // let url = '/mypage/export_Pdf_multiple?delivery_no=' + value;
+                   // let a = document.createElement('a');
+                   // a.target = '_blank';
+                   // a.href = url;
+                   // a.click();
+
+                   delivery_no += ',' + value;
+               }
             });
+
+            let url = '/mypage/export_Pdf_multiple?delivery_no=' + delivery_no;
+            let a = document.createElement('a');
+            a.target = '_blank';
+            a.href = url;
+            a.click();
         }
     </script>
 {% endblock %}

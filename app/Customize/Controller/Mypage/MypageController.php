@@ -1065,4 +1065,75 @@ class MypageController extends AbstractController
             'search_shipping_date_to' => $param['search_shipping_date_to'],
         ];
     }
+
+    /**
+     * マイページ.
+     *
+     * @Route("/mypage/export_Pdf_multiple", name="exportPdfMultiple", methods={"GET"})
+     * @Template("/Mypage/exportPdfMultiple.twig")
+     */
+    public function exportPdfMultiple(Request $request)
+    {
+        $htmlFileName = 'Mypage/exportPdfMultiple.twig';
+        $preview = MyCommon::getPara('preview');
+        $delivery_no = MyCommon::getPara('delivery_no');
+        $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
+        $comS = new MyCommonService($this->entityManager);
+        $arr_data = [];
+
+        foreach ($arr_delivery_no as $item_delivery_no) {
+            $arRe = $comS->getPdfDelivery($item_delivery_no);
+
+            //add special line
+            $totalTax = 0;
+            $totalaAmount = 0;
+            $inCr = 0;
+            $totalTaxRe = 0;
+
+            foreach ($arRe as &$item) {
+                $inCr++;
+                $totalTax = $totalTax + $item['tax'];
+                $totalaAmount = $totalaAmount + $item['amount'];
+                $totalTaxRe = $totalTaxRe + (10 / 100) * (int) $item['amount'];
+                $item['is_total'] = 0;
+                $item['autoIncr'] = $inCr;
+                $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
+            }
+
+            $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
+            $arSpecial = ['is_total' => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
+            $arRe[] = $arSpecial;
+
+            $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
+            FileUtil::makeDirectory($dirPdf);
+            $arReturn = [
+                'myDatas' => array_chunk($arRe, 20),
+                'OrderTotal' => $totalaAmount,
+                'totalTaxRe' => $totalTaxRe,
+                'totalaAmountTax' => $totalaAmountTax,
+            ];
+
+            $arr_data['data'][] = $arReturn;
+        }
+
+        if (!$preview) {
+            $namePdf = 'ship_'.date('Ymd').'.pdf';
+            $file = $dirPdf.'/'.$namePdf;
+
+            if (getenv('APP_IS_LOCAL') == 0) {
+                $htmlBody = $this->twig->render($htmlFileName, $arr_data);
+                MyCommon::converHtmlToPdf($dirPdf, $namePdf, $htmlBody);
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="'.basename($file).'"');
+
+                readfile($file);
+                exit();
+            } else {
+                exec('"C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe" c:/wamp/www/test/pdf.html c:/wamp/www/test/pdf.pdf');
+            }
+        }
+
+        return $arr_data;
+    }
 }
