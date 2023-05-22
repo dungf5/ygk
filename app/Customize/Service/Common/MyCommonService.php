@@ -2772,7 +2772,6 @@ SQL;
 
     public function insertDtOrderByQuery($data)
     {
-        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $connection = $this->entityManager->getConnection();
         $sql = '
                 INSERT INTO dt_order_daito_test (
@@ -2845,7 +2844,6 @@ SQL;
 
     public function insertDtOrderStatusByQuery($data)
     {
-        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $connection = $this->entityManager->getConnection();
         $sql = '
                 INSERT INTO dt_order_status_daito_test (
