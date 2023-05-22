@@ -2806,32 +2806,32 @@ SQL;
             ';
 
         $params = [
-            $data['customer_code'] ?? '',
-            $data['customer_code'] ?? '',
+            $data['customer_code'] ?? '', //customer_code
+            $data['customer_code'] ?? '', //seikyu_code
             $data['order_no'] ?? '',
             $data['order_line_no'] ?? '',
             $data['shipping_code'] ?? '',
             $data['otodoke_code'] ?? '',
-            $data['order_date'] ? date('Y-m-d H:i:s', strtotime($data['order_date'])) : '',
-            $data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '',
-            $data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '',
-            $data['jan_code'] ?? '',
+            $data['order_date'] ? date('Y-m-d', strtotime($data['order_date'])) : '',
+            $data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '', //deli_plan_date
+            $data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '', //shiping_plan_date
+            $data['jan_code'] ?? '', //item_no
             $data['demand_quantity'],
             $data['demand_unit'],
             (float) $data['order_price'],
-            'FOR',
-            $data['location'],
-            'XB',
-            'XB',
+            'FOR', //unit_price_status
+            $data['location'], //shiping_deposit_code
+            'XB', //deploy
+            'XB', //company_id
             $data['product_code'] ?? '',
             $data['order_no'] ?? '', //dyna_model_seg2
-            '2',
-            $data['dtb_order_no'] ?? '',
-            $data['dtb_order_line_no'] ?? '',
+            '2', //dyna_model_seg3
+            $data['dtb_order_no'] ?? '', //dyna_model_seg4
+            $data['dtb_order_line_no'] ?? '', //dyna_model_seg5
             $data['remarks_line_no'] ?? '', //dyna_model_seg6
-            'Y',
+            'Y', //request_flg
             $data['fvehicleno'],
-            '87001',
+            '87001', //ftrnsportcd
         ];
 
         log_info($sql);
@@ -2866,21 +2866,21 @@ SQL;
             ';
 
         $params = [
-            '',
-            0,
-            1,
-            $data['order_no'] ?? '',
-            $data['order_line_no'] ?? '',
-            $data['dtb_order_no'] ?? '',
-            $data['dtb_order_line_no'] ?? '',
+            '', //order_no
+            0, //order_line_no
+            1, //order_status
+            $data['order_no'] ?? '', //cus_order_no
+            $data['order_line_no'] ?? '', //cus_order_lineno
+            $data['dtb_order_no'] ?? '', //ec_order_no
+            $data['dtb_order_line_no'] ?? '', //ec_order_lineno
             $data['customer_code'] ?? '',
             $data['shipping_code'] ?? '',
             $data['otodoke_code'] ?? '',
             $data['product_code'] ?? '',
-            (int) $data['order_num'],
-            2,
-            2,
-            date('Y-m-d'),
+            (int) $data['order_num'], //order_remain_num
+            2, //flow_type
+            2, //ec_type
+            date('Y-m-d'), //order_date
         ];
 
         log_info($sql);
