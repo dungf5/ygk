@@ -1079,6 +1079,7 @@ class MypageController extends AbstractController
         $delivery_no = MyCommon::getPara('delivery_no');
         $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
         $comS = new MyCommonService($this->entityManager);
+        $arr_data = [];
 
         foreach ($arr_delivery_no as $item_delivery_no) {
             $arRe = $comS->getPdfDelivery($item_delivery_no);
@@ -1111,8 +1112,10 @@ class MypageController extends AbstractController
                 'totalTaxRe' => $totalTaxRe,
                 'totalaAmountTax' => $totalaAmountTax,
             ];
-        }
 
+            $arr_data[] = $arReturn;
+        }
+var_dump($arr_data);die();
         if (!$preview) {
             $namePdf = 'ship_'.$delivery_no.'.pdf';
             $file = $dirPdf.'/'.$namePdf;
