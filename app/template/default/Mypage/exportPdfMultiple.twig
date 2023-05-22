@@ -242,7 +242,13 @@
         </style>
     </head>
     <body style="margin: -25px 25px -5px 25px; margin-top: 0; margin-bottom: 25px;">
-        <div style="height: 1051.48445px;">
+    {% for item in data %}
+        {% set myDatas = item['myDatas'] %}
+        {% set OrderTotal = item['OrderTotal'] %}
+        {% set totalTaxRe = item['totalTaxRe'] %}
+        {% set totalaAmountTax = item['totalaAmountTax'] %}
+
+        <div class="pagebreak" style="height: 1051.48445px;">
             {% set page = 0 %}
             {% for myData in myDatas %}
                 {% set page = page + 1 %}
@@ -382,6 +388,7 @@
                 <span style="float: right">page {{ myDatas|length }}</span>
             {% endif %}
         </div>
+    {% endfor %}
     </body>
 </html>
 

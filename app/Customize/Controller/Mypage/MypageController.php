@@ -1113,15 +1113,15 @@ class MypageController extends AbstractController
                 'totalaAmountTax' => $totalaAmountTax,
             ];
 
-            $arr_data[] = $arReturn;
+            $arr_data['data'][] = $arReturn;
         }
-var_dump($arr_data);die();
+
         if (!$preview) {
-            $namePdf = 'ship_'.$delivery_no.'.pdf';
+            $namePdf = 'ship_'.date('Ymd').'.pdf';
             $file = $dirPdf.'/'.$namePdf;
 
             if (getenv('APP_IS_LOCAL') == 0) {
-                $htmlBody = $this->twig->render($htmlFileName, $arReturn);
+                $htmlBody = $this->twig->render($htmlFileName, $arr_data);
                 MyCommon::converHtmlToPdf($dirPdf, $namePdf, $htmlBody);
                 header('Content-Description: File Transfer');
                 header('Content-Type: application/octet-stream');
@@ -1134,6 +1134,6 @@ var_dump($arr_data);die();
             }
         }
 
-        return $arReturn;
+        return $arr_data;
     }
 }
