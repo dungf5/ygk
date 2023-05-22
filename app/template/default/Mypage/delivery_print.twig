@@ -665,20 +665,26 @@ file that was distributed with this source code.
         }
 
         function handlePreviewPDF() {
-            let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
-            let handled = {};
+            // let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+            // let handled = {};
+            //
+            // $.each(arr_print_pdf_value, function( index, value ) {
+            //     if (value && !handled[value]) {
+            //         handled[value] = true;
+            //
+            //         let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + value;
+            //         let a = document.createElement('a');
+            //         a.target = '_blank';
+            //         a.href = url;
+            //         a.click();
+            //     }
+            // });
 
-            $.each(arr_print_pdf_value, function( index, value ) {
-                if (value && !handled[value]) {
-                    handled[value] = true;
-
-                    let url = '/mypage/exportOrderPdf?preview=1&delivery_no=' + value;
-                    let a = document.createElement('a');
-                    a.target = '_blank';
-                    a.href = url;
-                    a.click();
-                }
-            });
+            let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + $("#check-box-value-print-pdf").val();
+            let a = document.createElement('a');
+            a.target = '_blank';
+            a.href = url;
+            a.click();
         }
 
         function handlePrintPDF() {
@@ -689,7 +695,7 @@ file that was distributed with this source code.
                 if (value && !handled[value]) {
                     handled[value] = true;
 
-                    let url = '/mypage/exportOrderPdf?delivery_no=' + value;
+                    let url = '/mypage/export_Pdf_multiple?delivery_no=' + value;
                     let a = document.createElement('a');
                     a.target = '_blank';
                     a.href = url;

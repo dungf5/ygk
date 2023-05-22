@@ -1070,47 +1070,48 @@ class MypageController extends AbstractController
      * マイページ.
      *
      * @Route("/mypage/export_Pdf_multiple", name="exportPdfMultiple", methods={"GET"})
-     * @Template("/Mypage/exportOrderPdf.twig")
+     * @Template("/Mypage/exportPdfMultiple.twig")
      */
     public function exportPdfMultiple(Request $request)
     {
         $htmlFileName = 'Mypage/exportPdfMultiple.twig';
         $preview = MyCommon::getPara('preview');
         $delivery_no = MyCommon::getPara('delivery_no');
-        $order_no_line_no = MyCommon::getPara('order_no_line_no');
-
+        $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
         $comS = new MyCommonService($this->entityManager);
-        $orderNo = explode('-', $order_no_line_no)[0];
-        $arRe = $comS->getPdfDelivery($delivery_no, $orderNo);
 
-        //add special line
-        $totalTax = 0;
-        $totalaAmount = 0;
-        $inCr = 0;
-        $totalTaxRe = 0;
+        foreach ($arr_delivery_no as $item_delivery_no) {
+            $arRe = $comS->getPdfDelivery($item_delivery_no);
 
-        foreach ($arRe as &$item) {
-            $inCr++;
-            $totalTax = $totalTax + $item['tax'];
-            $totalaAmount = $totalaAmount + $item['amount'];
-            $totalTaxRe = $totalTaxRe + (10 / 100) * (int) $item['amount'];
-            $item['is_total'] = 0;
-            $item['autoIncr'] = $inCr;
-            $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
+            //add special line
+            $totalTax = 0;
+            $totalaAmount = 0;
+            $inCr = 0;
+            $totalTaxRe = 0;
+
+            foreach ($arRe as &$item) {
+                $inCr++;
+                $totalTax = $totalTax + $item['tax'];
+                $totalaAmount = $totalaAmount + $item['amount'];
+                $totalTaxRe = $totalTaxRe + (10 / 100) * (int) $item['amount'];
+                $item['is_total'] = 0;
+                $item['autoIncr'] = $inCr;
+                $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
+            }
+
+            $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
+            $arSpecial = ['is_total' => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
+            $arRe[] = $arSpecial;
+
+            $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
+            FileUtil::makeDirectory($dirPdf);
+            $arReturn = [
+                'myDatas' => array_chunk($arRe, 20),
+                'OrderTotal' => $totalaAmount,
+                'totalTaxRe' => $totalTaxRe,
+                'totalaAmountTax' => $totalaAmountTax,
+            ];
         }
-
-        $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
-        $arSpecial = ['is_total' => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
-        $arRe[] = $arSpecial;
-
-        $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
-        FileUtil::makeDirectory($dirPdf);
-        $arReturn = [
-            'myDatas' => array_chunk($arRe, 20),
-            'OrderTotal' => $totalaAmount,
-            'totalTaxRe' => $totalTaxRe,
-            'totalaAmountTax' => $totalaAmountTax,
-        ];
 
         if (!$preview) {
             $namePdf = 'ship_'.$delivery_no.'.pdf';
