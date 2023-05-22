@@ -2774,7 +2774,7 @@ SQL;
     {
         $connection = $this->entityManager->getConnection();
         $sql = '
-                INSERT INTO dt_order_daito_test (
+                INSERT INTO dt_order (
                     customer_code,
                     seikyu_code,
                     order_no,
@@ -2846,7 +2846,7 @@ SQL;
     {
         $connection = $this->entityManager->getConnection();
         $sql = '
-                INSERT INTO dt_order_status_daito_test (
+                INSERT INTO dt_order_status (
                     order_no,
                     order_line_no,
                     order_status,
