@@ -15,6 +15,7 @@ namespace Customize\Repository;
 
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtOrderStatus;
+use Customize\Service\Common\MyCommonService;
 use Customize\Service\CurlPost;
 use Doctrine\DBAL\Types\Type;
 use Eccube\Repository\AbstractRepository;
@@ -39,27 +40,41 @@ class DtOrderStatusRepository extends AbstractRepository
             return 0;
         }
 
-        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-        $object = new DtOrderStatus();
-        $object->setOrderNo('');
-        $object->setOrderLineNo('0');
-        $object->setOrderStatus(1);
-        $object->setCusOrderNo($data['order_no'] ?? '');
-        $object->setCusOrderLineno($data['order_line_no'] ?? '');
-        $object->setEcOrderNo($data['dtb_order_no'] ?? '');
-        $object->setEcOrderLineno($data['dtb_order_line_no'] ?? '');
-        $object->setCustomerCode('7001');
-        $object->setShippingCode($data['shipping_code'] ?? '');
-        $object->setOtodokeCode($data['otodoke_code'] ?? '');
-        $object->setProductCode($data['product_code'] ?? '');
-        $object->setOrderRemainNum((int) $data['order_num']);
-        $object->setFlowType('2');
-        $object->setEcType('2');
-        $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
+        //Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        //$object = new DtOrderStatus();
+        //$object->setOrderNo('');
+        //$object->setOrderLineNo('0');
+        //$object->setOrderStatus(1);
+        //$object->setCusOrderNo($data['order_no'] ?? '');
+        //$object->setCusOrderLineno($data['order_line_no'] ?? '');
+        //$object->setEcOrderNo($data['dtb_order_no'] ?? '');
+        //$object->setEcOrderLineno($data['dtb_order_line_no'] ?? '');
+        //$object->setCustomerCode('7001');
+        //$object->setShippingCode($data['shipping_code'] ?? '');
+        //$object->setOtodokeCode($data['otodoke_code'] ?? '');
+        //$object->setProductCode($data['product_code'] ?? '');
+        //$object->setOrderRemainNum((int) $data['order_num']);
+        //$object->setFlowType('2');
+        //$object->setEcType('2');
+        //$object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
+        //log_info('Call insertData to dt_order_status '.$object->getCusOrderNo().'-'.$object->getCusOrderLineno());
+        //return $this->Execute($object, 1);
 
-        log_info('Call insertData to dt_order_status '.$object->getCusOrderNo().'-'.$object->getCusOrderLineno());
+        log_info('Call insertData to dt_order_status '.$data['order_no'].'-'.$data['order_line_no']);
 
-        return $this->Execute($object, 1);
+        try {
+            $myCommonService = new MyCommonService($this->getEntityManager());
+            $myCommonService->insertDtOrderStatusByQuery($data);
+
+            return 1;
+        } catch (\Exception $e) {
+            $message = 'Import data dt_order_status '.$data['order_no'].'-'.$data['order_line_no'].' error';
+            $message .= "\n".$e->getMessage();
+            log_error($message);
+            $this->pushGoogleChat($message);
+
+            return 0;
+        }
     }
 
     private function Execute($object, $count)
