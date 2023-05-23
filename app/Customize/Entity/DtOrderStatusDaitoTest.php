@@ -29,9 +29,9 @@ if (!class_exists('\Customize\Entity\DtOrderStatusDaitoTest', false)) {
         /**
          * @var string
          *
-         * @ORM\Column(name="order_no",nullable=true, type="string", length=15, options={"comment":"STRA注文番号"})
+         * @ORM\Column(name="order_no",nullable=true, type="string", length=15, options={"comment":"STRA注文番号", "default": ''})
          */
-        private $order_no;
+        private $order_no = '';
 
         /**
          * @var string
@@ -45,14 +45,14 @@ if (!class_exists('\Customize\Entity\DtOrderStatusDaitoTest', false)) {
          *
          * @ORM\Column(name="order_line_no",nullable=true, type="string", length=15, options={"comment":"STRA注文明細番号"})
          */
-        private $order_line_no;
+        private $order_line_no = 0;
 
         /**
          * @ORM\Column(name="order_status",type="integer",nullable=false, options={"comment":"受注ステータス
 ステータス種類
         1:未引当、2:一部引当、3:引当済、4:キャンセル、9:クロース(出荷済)" ,"default":1 })
          */
-        private $order_status;
+        private $order_status = 3;
 
         /**
          * @var string
