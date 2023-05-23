@@ -121,7 +121,7 @@ class DtOrderDaitoTestRepository extends AbstractRepository
     private function Execute($objOrder, $objOrderStatus)
     {
         $this->getEntityManager()->persist($objOrder);
-        $this->getEntityManager()->persist($objOrderStatus);
+        //$this->getEntityManager()->persist($objOrderStatus);
         $this->getEntityManager()->flush();
 
         if (!empty($objOrder->getCreateDate()) && !empty($objOrderStatus->getCreateDate())) {
