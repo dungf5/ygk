@@ -86,7 +86,7 @@ class DtOrderStatusDaitoTestRepository extends AbstractRepository
             $this->pushGoogleChat('Loi loi loi: '.$e->getMessage());
         }
 
-        if (!empty($object->getCusOrderLineno())) {
+        if (!empty($object->getCreateDate())) {
             return 1;
         } else {
             $message = 'Import data dt_order_status '.$object->getCusOrderNo().'-'.$object->getCusOrderLineno().' error';

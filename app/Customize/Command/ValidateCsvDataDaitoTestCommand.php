@@ -390,9 +390,6 @@ class ValidateCsvDataDaitoTestCommand extends Command
                     //$result1 = 1;
 
                     if ($result && $result1) {
-                        $this->entityManager->flush();
-                        $this->entityManager->getConnection()->commit();
-
                         // Save to success array to send mail
                         $this->success["{$item['order_no']}"]['detail'][] = [
                             'jan_code' => $item['jan_code'],
@@ -418,6 +415,9 @@ class ValidateCsvDataDaitoTestCommand extends Command
 
                         $value->setOrderRegistedFlg(1);
                         $this->entityManager->getRepository(DtOrderWSEOSDaitoTest::class)->save($value);
+
+                        $this->entityManager->flush();
+                        $this->entityManager->getConnection()->commit();
                     } else {
                         $this->entityManager->getConnection()->rollBack();
                     }
