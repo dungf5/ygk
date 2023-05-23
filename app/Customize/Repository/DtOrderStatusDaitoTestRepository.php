@@ -56,7 +56,7 @@ class DtOrderStatusDaitoTestRepository extends AbstractRepository
         $object->setOrderRemainNum((int) $data['order_num']);
         $object->setFlowType('2');
         $object->setEcType('2');
-        $object->setOrderDate(new \DateTime());
+        $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
         log_info('Call insertData to dt_order_status '.$object->getCusOrderNo().'-'.$object->getCusOrderLineno());
         return $this->Execute($object, 1);
 
