@@ -89,7 +89,7 @@ class DtOrderDaitoTestRepository extends AbstractRepository
         $object2->setFlowType('2');
         $object2->setEcType('2');
         $object2->setOrderDate(new \DateTime($data['order_date'] ?? ''));
-        log_info('Call insertData to dt_order_status '.$object->getCusOrderNo().'-'.$object->getCusOrderLineno());
+        log_info('Call insertData to dt_order_status '.$object2->getCusOrderNo().'-'.$object2->getCusOrderLineno());
         return $this->Execute($object, $object2, 1);
 
 
