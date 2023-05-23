@@ -43,56 +43,61 @@ class DtOrderDaitoTestRepository extends AbstractRepository
         }
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-        $object = new DtOrderDaitoTest();
-        $object->setCustomerCode($data['customer_code'] ?? '');
-        $object->setSeikyuCode($data['customer_code'] ?? '');
-        $object->setOrderNo($data['order_no'] ?? '');
-        $object->setOrderLineno($data['order_line_no'] ?? '');
-        $object->setShippingCode($data['shipping_code'] ?? '');
-        $object->setOtodokeCode($data['otodoke_code'] ?? '');
-        $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
-        $object->setDeliPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
-        $object->setShipingPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
-        $object->setItemNo($data['jan_code'] ?? '');
-        $object->setDemandQuantity($data['demand_quantity']);
-        $object->setDemandUnit($data['demand_unit']);
-        $object->setOrderPrice((float) $data['order_price']);
-        $object->setUnitPriceStatus('FOR');
-        $object->setShipingDepositCode($data['location']);
-        $object->setDeploy('XB');
-        $object->setCompanyId('XB');
-        $object->setProductCode($data['product_code'] ?? '');
-        $object->setDynaModelSeg2($data['order_no'] ?? '');
-        $object->setDynaModelSeg3('2');
-        $object->setDynaModelSeg4($data['dtb_order_no'] ?? '');
-        $object->setDynaModelSeg5($data['dtb_order_line_no'] ?? '');
-        $object->setDynaModelSeg6($data['remarks_line_no'] ?? null);
-        $object->setRequestFlg('Y');
-        $object->setFvehicleno($data['fvehicleno']);
-        $object->setFtrnsportcd('87001');
 
-        log_info('Call insertData to dt_order '.$data['order_no'].'-'.$data['order_line_no']);
+        // dt_order
+        $objOrder = new DtOrderDaitoTest();
+        $objOrder->setCustomerCode($data['customer_code'] ?? '');
+        $objOrder->setSeikyuCode($data['seikyu_code'] ?? '');
+        $objOrder->setOrderNo($data['order_no'] ?? '');
+        $objOrder->setOrderLineno($data['order_line_no'] ?? '');
+        $objOrder->setShippingCode($data['shipping_code'] ?? '');
+        $objOrder->setOtodokeCode($data['otodoke_code'] ?? '');
+        $objOrder->setOrderDate(new \DateTime($data['order_date'] ?? ''));
+        $objOrder->setDeliPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
+        $objOrder->setShipingPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
+        $objOrder->setItemNo($data['jan_code'] ?? '');
+        $objOrder->setDemandQuantity($data['demand_quantity']);
+        $objOrder->setDemandUnit($data['demand_unit']);
+        $objOrder->setOrderPrice((float) $data['order_price']);
+        $objOrder->setUnitPriceStatus('FOR');
+        $objOrder->setShipingDepositCode($data['location']);
+        $objOrder->setDeploy('XB');
+        $objOrder->setCompanyId('XB');
+        $objOrder->setProductCode($data['product_code'] ?? '');
+        $objOrder->setDynaModelSeg2($data['order_no'] ?? '');
+        $objOrder->setDynaModelSeg3('2');
+        $objOrder->setDynaModelSeg4($data['dtb_order_no'] ?? '');
+        $objOrder->setDynaModelSeg5($data['dtb_order_line_no'] ?? '');
+        $objOrder->setDynaModelSeg6($data['remarks_line_no'] ?? null);
+        $objOrder->setRequestFlg('Y');
+        $objOrder->setFvehicleno($data['fvehicleno']);
+        $objOrder->setFtrnsportcd($data['ftrnsportcd']);
 
-//        $object2 = new DtOrderStatusDaitoTest();
-//        $object2->setOrderNo('');
-//        $object2->setOrderLineNo('0');
-//        $object2->setOrderStatus(1);
-//        $object2->setCusOrderNo($data['order_no'] ?? '');
-//        $object2->setCusOrderLineno($data['order_line_no'] ?? '');
-//        $object2->setEcOrderNo($data['dtb_order_no'] ?? '');
-//        $object2->setEcOrderLineno($data['dtb_order_line_no'] ?? '');
-//        $object2->setCustomerCode('7001');
-//        $object2->setShippingCode($data['shipping_code'] ?? '');
-//        $object2->setOtodokeCode($data['otodoke_code'] ?? '');
-//        $object2->setProductCode($data['product_code'] ?? '');
-//        $object2->setOrderRemainNum((int) $data['order_num']);
-//        $object2->setFlowType('2');
-//        $object2->setEcType('2');
-//        $object2->setOrderDate(new \DateTime($data['order_date'] ?? ''));
-//        log_info('Call insertData to dt_order_status '.$object2->getCusOrderNo().'-'.$object2->getCusOrderLineno());
-        return $this->Execute($object, 1);
+        log_info('Call insertData to dt_order '.$objOrder->getOrderNo().'-'.$objOrder->getOrderLineno());
 
+        // dt_order_status
+        $objOrderStatus = new DtOrderStatusDaitoTest();
+        $objOrderStatus->setOrderNo('');
+        $objOrderStatus->setOrderLineNo('0');
+        $objOrderStatus->setOrderStatus(1);
+        $objOrderStatus->setCusOrderNo($data['order_no'] ?? '');
+        $objOrderStatus->setCusOrderLineno($data['order_line_no'] ?? '');
+        $objOrderStatus->setEcOrderNo($data['dtb_order_no'] ?? '');
+        $objOrderStatus->setEcOrderLineno($data['dtb_order_line_no'] ?? '');
+        $objOrderStatus->setCustomerCode('7001');
+        $objOrderStatus->setShippingCode($data['shipping_code'] ?? '');
+        $objOrderStatus->setOtodokeCode($data['otodoke_code'] ?? '');
+        $objOrderStatus->setProductCode($data['product_code'] ?? '');
+        $objOrderStatus->setOrderRemainNum((int) $data['order_num']);
+        $objOrderStatus->setFlowType('2');
+        $objOrderStatus->setEcType('2');
+        $objOrderStatus->setOrderDate(new \DateTime($data['order_date'] ?? ''));
 
+        log_info('Call insertData to dt_order_status '.$objOrderStatus->getCusOrderNo().'-'.$objOrderStatus->getCusOrderLineno());
+
+        return $this->Execute($objOrder, $objOrderStatus);
+
+//        log_info('Call insertData to dt_order '.$data['order_no'].'-'.$data['order_line_no']);
 //
 //        try {
 //            $myCommonService = new MyCommonService($this->getEntityManager());
@@ -109,27 +114,34 @@ class DtOrderDaitoTestRepository extends AbstractRepository
 //        }
     }
 
-    private function Execute($object, $count)
+    private function Execute($objOrder, $objOrderStatus)
     {
-        $this->getEntityManager()->persist($object);
-        //$this->getEntityManager()->persist($object2);
-        //$this->getEntityManager()->flush();
+        $this->getEntityManager()->persist($objOrder);
+        $this->getEntityManager()->persist($objOrderStatus);
 
-        if (!empty($object->getCreateDate())) {
+        if (!empty($objOrder->getCreateDate()) && !empty($objOrderStatus->getCreateDate())) {
             return 1;
         } else {
-            $message = 'Import data dt_order '.$object->getOrderNo().'-'.$object->getOrderLineno().' error';
+            $message = '';
+            if (empty($objOrder->getCreateDate())) {
+                $message = 'Import data dt_order '.$objOrder->getOrderNo().'-'.$objOrder->getOrderLineno().' error';
+            } elseif (empty($objOrderStatus->getCreateDate())) {
+                $message = 'Import data dt_order_status '.$objOrderStatus->getCusOrderNo().'-'.$objOrderStatus->getCusOrderLineno().' error';
+            }
+
             $message .= "\nProcess execute again";
             log_error($message);
             $this->pushGoogleChat($message);
 
-            $count++;
+//            $count++;
+//
+//            if ($count > 5) {
+//                return 0;
+//            }
 
-            if ($count > 5) {
-                return 0;
-            }
+            //return $this->Execute($objOrder, $objOrderStatus, $count);
 
-            return $this->Execute($object, $count);
+            return 0;
         }
     }
 }

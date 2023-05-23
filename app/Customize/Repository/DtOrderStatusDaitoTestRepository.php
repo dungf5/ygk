@@ -24,6 +24,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class DtOrderStatusDaitoTestRepository extends AbstractRepository
 {
     use CurlPost;
+
     /**
      * MstProductRepository constructor.
      *
@@ -57,7 +58,9 @@ class DtOrderStatusDaitoTestRepository extends AbstractRepository
         $object->setFlowType('2');
         $object->setEcType('2');
         $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
+
         log_info('Call insertData to dt_order_status '.$object->getCusOrderNo().'-'.$object->getCusOrderLineno());
+
         return $this->Execute($object, 1);
 
 //        log_info('Call insertData to dt_order_status '.$data['order_no'].'-'.$data['order_line_no']);
@@ -79,12 +82,8 @@ class DtOrderStatusDaitoTestRepository extends AbstractRepository
 
     private function Execute($object, $count)
     {
-        try {
-            $this->getEntityManager()->persist($object);
-            //$this->getEntityManager()->flush();
-        } catch (\Exception $e) {
-            $this->pushGoogleChat('Loi loi loi: '.$e->getMessage());
-        }
+        $this->getEntityManager()->persist($object);
+        $this->getEntityManager()->flush();
 
         if (!empty($object->getCreateDate())) {
             return 1;
