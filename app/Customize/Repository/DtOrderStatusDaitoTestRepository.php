@@ -42,9 +42,9 @@ class DtOrderStatusDaitoTestRepository extends AbstractRepository
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $object = new DtOrderStatusDaitoTest();
-        $object->setOrderNo('');
-        $object->setOrderLineNo('0');
-        $object->setOrderStatus(1);
+//        $object->setOrderNo('');
+//        $object->setOrderLineNo('0');
+//        $object->setOrderStatus(1);
         $object->setCusOrderNo($data['order_no'] ?? '');
         $object->setCusOrderLineno($data['order_line_no'] ?? '');
 //        $object->setEcOrderNo($data['dtb_order_no'] ?? '');
