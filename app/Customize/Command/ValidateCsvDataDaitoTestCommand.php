@@ -421,6 +421,8 @@ class ValidateCsvDataDaitoTestCommand extends Command
                     } else {
                         $this->entityManager->getConnection()->rollBack();
                     }
+
+                    $this->entityManager->getConnection()->close();
                 }
             }
 
