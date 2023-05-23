@@ -18,193 +18,205 @@ if (!class_exists('\Customize\Entity\DtOrderDaitoTest', false)) {
          *
          * @ORM\Column(name="customer_code",nullable=false, type="string", length=25, options={"comment":"顧客コード"})
          */
-        private $customer_code;
+        private $customer_code = '';
         /**
          * @var string
          *
          * @ORM\Column(name="seikyu_code",nullable=false, type="string", length=25, options={"comment":"請求先コード"})
          */
-        private $seikyu_code;
+        private $seikyu_code = '';
         /**
          * @var string
          *
          * @ORM\Column(name="order_no", type="string", length=25,options={"comment":"発注番号"}, nullable=false)
          * @ORM\Id
          */
-        private $order_no;
+        private $order_no = '';
         /**
          * @var string
          *
          * @ORM\Column(name="order_lineno", type="string", length=25,options={"comment":"発注明細番号"}, nullable=false)
          * @ORM\Id
          */
-        private $order_lineno;
+        private $order_lineno = 0;
         /**
          * @var string
          *
          * @ORM\Column(name="shipping_code",nullable=false, type="string", length=25, options={"comment":"出荷先コード"})
          */
-        private $shipping_code;
+        private $shipping_code = '';
         /**
          * @var string
          *
          * @ORM\Column(name="otodoke_code",nullable=false, type="string", length=25, options={"comment":"届け先コード"})
          */
-        private $otodoke_code;
+        private $otodoke_code = '';
         /**
          * @var \DateTime
          *
          * @ORM\Column(name="order_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT '受注日'")
          */
-        private $order_date;
+        private $order_date = null;
         /**
          * @var string
          *
          * @ORM\Column(name="deli_plan_date",nullable=true, type="string", length=12, options={"comment":"希望納期（納入予定日）"})
          */
-        private $deli_plan_date;
+        private $deli_plan_date = '';
         /**
          * @var string
          *
          * @ORM\Column(name="shiping_plan_date",nullable=true, type="string", length=12, options={"comment":"出荷予定日"})
          */
-        private $shiping_plan_date;
+        private $shiping_plan_date = '';
         /**
          * @var string
          *
          * @ORM\Column(name="item_no",nullable=true, type="string", length=45, options={"comment":"品目No"})
          */
-        private $item_no;
+        private $item_no = '';
         /**
          * @ORM\Column(name="demand_quantity",type="integer",nullable=true, options={"comment":"需要数(需要単位ベース)"  })
          */
-        private $demand_quantity;
+        private $demand_quantity = 0;
         /**
          * @var string
          *
          * @ORM\Column(name="demand_unit",nullable=true, type="string", length=50, options={"comment":"需要単位"})
          */
-        private $demand_unit;
+        private $demand_unit = '';
         /**
          * @ORM\Column(name="order_price",type="float",nullable=true, options={"comment":"受注単価"  })
          */
-        private $order_price;
+        private $order_price = 0;
         /**
          * @ORM\Column(name="unit_price_status",type="string",nullable=true, options={"comment":"単価ステイタス"  })
          */
-        private $unit_price_status;
+        private $unit_price_status = '';
         /**
          * @var string
          *
          * @ORM\Column(name="deploy",nullable=true, type="string", length=50, options={"comment":"営業部門"})
          */
-        private $deploy;
+        private $deploy = '';
         /**
          * @var string
          *
          * @ORM\Column(name="company_id",nullable=true, type="string", length=50, options={"comment":"会社ID"})
          */
-        private $company_id;
+        private $company_id = '';
         /**
          * @var string
          *
          * @ORM\Column(name="product_code",nullable=true, type="string", length=50, options={"comment":"製品コード"})
          */
-        private $product_code;
+        private $product_code = '';
         /**
          * @var string
          *
          * @ORM\Column(name="dyna_model_seg1",nullable=true, type="string", length=50, options={"comment":"ダイナ規格セグメント01"})
          */
-        private $dyna_model_seg1;
+        private $dyna_model_seg1 = '';
         /**
          * @var string
          *
          * @ORM\Column(name="dyna_model_seg2",nullable=true, type="string", length=50, options={"comment":"ダイナ規格セグメント02"})
          */
-        private $dyna_model_seg2;
+        private $dyna_model_seg2 = '';
         /**
          * @var string
          *
          * @ORM\Column(name="dyna_model_seg3",nullable=true, type="string", length=50, options={"comment":"ダイナ規格セグメント03"})
          */
-        private $dyna_model_seg3;
+        private $dyna_model_seg3 = '';
         /**
          * @var string
          *
          * @ORM\Column(name="dyna_model_seg4",nullable=true, type="string", length=50, options={"comment":"ダイナ規格セグメント04"})
          */
-        private $dyna_model_seg4;
+        private $dyna_model_seg4 = '';
         /**
          * @var string
          *
          * @ORM\Column(name="dyna_model_seg5",nullable=true, type="string", length=50, options={"comment":"ダイナ規格セグメント05"})
          */
-        private $dyna_model_seg5;
+        private $dyna_model_seg5 = '';
         /**
          * @var string
          *
          * @ORM\Column(name="dyna_model_seg6",nullable=true, type="string", length=50, options={"comment":"ダイナ規格セグメント06"})
          */
-        private $dyna_model_seg6;
+        private $dyna_model_seg6 = '';
         /**
          * @var string
          *
          * @ORM\Column(name="dyna_model_seg7",nullable=true, type="string", length=50, options={"comment":"ダイナ規格セグメント07"})
          */
-        private $dyna_model_seg7;
+        private $dyna_model_seg7 = '';
         /**
          * @var string
          *
          * @ORM\Column(name="dyna_model_seg8",nullable=true, type="string", length=50, options={"comment":"ダイナ規格セグメント08"})
          */
-        private $dyna_model_seg8;
+        private $dyna_model_seg8 = '';
         /**
          * @var string
          *
          * @ORM\Column(name="dyna_model_seg9",nullable=true, type="string", length=50, options={"comment":"ダイナ規格セグメント09"})
          */
-        private $dyna_model_seg9;
+        private $dyna_model_seg9 = '';
         /**
          * @var string
          *
          * @ORM\Column(name="dyna_model_seg10",nullable=true, type="string", length=50, options={"comment":"ダイナ規格セグメント10"})
          */
-        private $dyna_model_seg10;
+        private $dyna_model_seg10 = '';
         /**
          * @var string
          *
          * @ORM\Column(name="dyna_model_seg11",nullable=true, type="string", length=50, options={"comment":"ダイナ規格セグメント11"})
          */
-        private $dyna_model_seg11;
+        private $dyna_model_seg11 = '';
         /**
          * @var string
          *
          * @ORM\Column(name="dyna_model_seg12",nullable=true, type="string", length=50, options={"comment":"ダイナ規格セグメント12"})
          */
-        private $dyna_model_seg12;
+        private $dyna_model_seg12 = '';
         /**
          * @ORM\Column(name="request_flg",type="string",nullable=false, options={"comment":"申請フラグ,固定（1:Y,0:No）" ,"default":1 })
          */
-        private $request_flg;
+        private $request_flg = '';
         /**
          * @var string
          *
          * @ORM\Column(name="shiping_deposit_code",type="string",nullable=false, options={"comment":"出荷在庫場所", "default":"XB0101001" })
          */
-        private $shiping_deposit_code;
+        private $shiping_deposit_code = '';
         /**
          * @var string
          *
          * @ORM\Column(name="fvehicleno", type="string", nullable=true, options={"comment":"便No. 0:送料なし、１：送料あり"})
          */
-        private $fvehicleno;
+        private $fvehicleno = '';
         /**
          * @var string
          *
          * @ORM\Column(name="ftrnsportcd", type="string", nullable=true, options={"comment":"輸送便コード"})
          */
-        private $ftrnsportcd;
+        private $ftrnsportcd = '';
+        /**
+         * @var \DateTime
+         *
+         * @ORM\Column(name="create_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ登録日時'")
+         */
+        private $create_date = null;
+        /**
+         * @var \DateTime
+         *
+         * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ更新日時'")
+         */
+        private $update_date = null;
 
         /**
          * @return string
@@ -717,18 +729,6 @@ if (!class_exists('\Customize\Entity\DtOrderDaitoTest', false)) {
         {
             $this->update_date = $update_date;
         }
-        /**
-         * @var \DateTime
-         *
-         * @ORM\Column(name="create_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ登録日時'")
-         */
-        private $create_date;
-        /**
-         * @var \DateTime
-         *
-         * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ更新日時'")
-         */
-        private $update_date;
 
         /**
          * @return string
