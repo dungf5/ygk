@@ -79,23 +79,23 @@ class DtOrderDaitoTestRepository extends AbstractRepository
 
         // dt_order_status
         $objOrderStatus = new DtOrderStatusDaitoTest();
-        $objOrderStatus->setOrderNo('');
-        $objOrderStatus->setOrderLineNo('0');
-        $objOrderStatus->setOrderStatus(1);
+//        $objOrderStatus->setOrderNo('');
+//        $objOrderStatus->setOrderLineNo(0);
+//        $objOrderStatus->setOrderStatus(1);
         $objOrderStatus->setCusOrderNo($data['order_no'] ?? '');
         $objOrderStatus->setCusOrderLineno($data['order_line_no'] ?? 0);
 //        $objOrderStatus->setEcOrderNo($data['dtb_order_no'] ?? '');
-        $objOrderStatus->setEcOrderNo(null);
+//        $objOrderStatus->setEcOrderNo(null);
 //        $objOrderStatus->setEcOrderLineno($data['dtb_order_line_no'] ?? 0);
-        $objOrderStatus->setEcOrderLineno(0);
-        $objOrderStatus->setCustomerCode('7001');
-        $objOrderStatus->setShippingCode($data['shipping_code'] ?? '');
-        $objOrderStatus->setOtodokeCode($data['otodoke_code'] ?? '');
-        $objOrderStatus->setProductCode($data['product_code'] ?? '');
-        $objOrderStatus->setOrderRemainNum((int) $data['order_num'] ?? 0);
-        $objOrderStatus->setFlowType('2');
-        $objOrderStatus->setEcType('2');
-        $objOrderStatus->setOrderDate(new \DateTime($data['order_date'] ?? ''));
+//        $objOrderStatus->setEcOrderLineno(0);
+//        $objOrderStatus->setCustomerCode('7001');
+//        $objOrderStatus->setShippingCode($data['shipping_code'] ?? '');
+//        $objOrderStatus->setOtodokeCode($data['otodoke_code'] ?? '');
+//        $objOrderStatus->setProductCode($data['product_code'] ?? '');
+//        $objOrderStatus->setOrderRemainNum((int) $data['order_num'] ?? 0);
+//        $objOrderStatus->setFlowType('2');
+//        $objOrderStatus->setEcType('2');
+//        $objOrderStatus->setOrderDate(new \DateTime($data['order_date'] ?? ''));
 
         log_info('Call insertData to dt_order_status '.$objOrderStatus->getCusOrderNo().'-'.$objOrderStatus->getCusOrderLineno());
 
