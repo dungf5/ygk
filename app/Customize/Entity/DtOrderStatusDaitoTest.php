@@ -26,12 +26,12 @@ if (!class_exists('\Customize\Entity\DtOrderStatusDaitoTest', false)) {
      */
     class DtOrderStatusDaitoTest extends AbstractEntity
     {
-//        /**
-//         * @var string
-//         *
-//         * @ORM\Column(name="order_no",nullable=true, type="string", length=15, options={"comment":"STRA注文番号", "default": ''})
-//         */
-//        private $order_no = '';
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="order_no",nullable=true, type="string", length=15, options={"comment":"STRA注文番号", "default": ''})
+         */
+        private $order_no = '';
 //
 //        /**
 //         * @var string
@@ -275,21 +275,21 @@ if (!class_exists('\Customize\Entity\DtOrderStatusDaitoTest', false)) {
             $this->cus_order_no = $cus_order_no;
         }
 
-//        /**
-//         * @return string
-//         */
-//        public function getOrderNo()
-//        {
-//            return $this->order_no;
-//        }
-//
-//        /**
-//         * @param $order_no
-//         */
-//        public function setOrderNo($order_no)
-//        {
-//            $this->order_no = $order_no;
-//        }
+        /**
+         * @return string
+         */
+        public function getOrderNo()
+        {
+            return $this->order_no;
+        }
+
+        /**
+         * @param $order_no
+         */
+        public function setOrderNo($order_no)
+        {
+            $this->order_no = $order_no;
+        }
 
 //        /**
 //         * @return string
