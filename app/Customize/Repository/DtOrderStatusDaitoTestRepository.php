@@ -80,8 +80,12 @@ class DtOrderStatusDaitoTestRepository extends AbstractRepository
 
     private function Execute($object, $count)
     {
-        $this->getEntityManager()->persist($object);
-        $this->getEntityManager()->flush();
+        try {
+            $this->getEntityManager()->persist($object);
+            $this->getEntityManager()->flush();
+        } catch (\Exception $e) {
+            $this->pushGoogleChat('Loi loi loi: '.$e->getMessage());
+        }
 
         if (!empty($object->getCreateDate())) {
             return 1;
