@@ -50,28 +50,28 @@ class DtOrderDaitoTestRepository extends AbstractRepository
         $object->setShippingCode($data['shipping_code'] ?? '');
         $object->setOtodokeCode($data['otodoke_code'] ?? '');
         $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
-        $object->setDeliPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
-        $object->setShipingPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
-        $object->setItemNo($data['jan_code'] ?? '');
-        $object->setDemandQuantity($data['demand_quantity']);
-        $object->setDemandUnit($data['demand_unit']);
-        $object->setOrderPrice((float) $data['order_price']);
+//        $object->setDeliPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
+//        $object->setShipingPlanDate($data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '');
+//        $object->setItemNo($data['jan_code'] ?? '');
+//        $object->setDemandQuantity($data['demand_quantity']);
+//        $object->setDemandUnit($data['demand_unit']);
+//        $object->setOrderPrice((float) $data['order_price']);
         $object->setUnitPriceStatus('FOR');
         $object->setShipingDepositCode($data['location']);
         $object->setDeploy('XB');
         $object->setCompanyId('XB');
-        $object->setProductCode($data['product_code'] ?? '');
-        $object->setDynaModelSeg2($data['order_no'] ?? '');
-        $object->setDynaModelSeg3('2');
-        $object->setDynaModelSeg4($data['dtb_order_no'] ?? '');
-        $object->setDynaModelSeg5($data['dtb_order_line_no'] ?? '');
-        $object->setDynaModelSeg6($data['remarks_line_no'] ?? null);
+//        $object->setProductCode($data['product_code'] ?? '');
+//        $object->setDynaModelSeg2($data['order_no'] ?? '');
+//        $object->setDynaModelSeg3('2');
+//        $object->setDynaModelSeg4($data['dtb_order_no'] ?? '');
+//        $object->setDynaModelSeg5($data['dtb_order_line_no'] ?? '');
+//        $object->setDynaModelSeg6($data['remarks_line_no'] ?? null);
         $object->setRequestFlg('Y');
-        $object->setFvehicleno($data['fvehicleno']);
-        $object->setFtrnsportcd('87001');
-        return $this->Execute($object, 1);
+//        $object->setFvehicleno($data['fvehicleno']);
+//        $object->setFtrnsportcd('87001');
 
-//        log_info('Call insertData to dt_order '.$data['order_no'].'-'.$data['order_line_no']);
+        log_info('Call insertData to dt_order '.$data['order_no'].'-'.$data['order_line_no']);
+        return $this->Execute($object, 1);
 //
 //        try {
 //            $myCommonService = new MyCommonService($this->getEntityManager());
