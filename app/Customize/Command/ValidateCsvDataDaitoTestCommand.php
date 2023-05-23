@@ -554,30 +554,30 @@ class ValidateCsvDataDaitoTestCommand extends Command
             if (empty($dtOrder) && empty($dtOrderStatus)) {
                 log_info('Import data dt_order '.$data['order_no'].'-'.$data['order_line_no']);
 
-                $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy([
-                    'jan_code' => $data['jan_code'] ?? '',
-                ]);
-
-                $data['demand_unit'] = (!empty($product) && $product['quantity'] > 1) ? 'CS' : 'PC';
-                $data['demand_quantity'] = (!empty($product) && $product['quantity'] > 1) ? (int) ($data['order_num'] / $product['quantity']) : (int) $data['order_num'];
-
-                //$data['order_price'] = (!empty($product) && $product['quantity'] > 1) ? ($data['order_price'] * $product['quantity']) : $data['order_price'];
-
-                $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
-
-                if (!empty($dtPrice)) {
-                    $data['order_price'] = $dtPrice['price_s01'] ?? 0;
-                } else {
-                    $data['order_price'] = $product['unit_price'] ?? 0;
-                }
-
-                $location = $this->commonService->getCustomerLocation($data['customer_code']);
-                $data['location'] = $location ?? 'XB0201001';
-                $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
-                $sum_order_amout = $common->getSumOrderAmoutWSEOSDaitoTest($data['order_no']);
-                $data['fvehicleno'] = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
-                $data['seikyu_code'] = $this->customer_code;
-                $data['ftrnsportcd'] = '87001';
+//                $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy([
+//                    'jan_code' => $data['jan_code'] ?? '',
+//                ]);
+//
+//                $data['demand_unit'] = (!empty($product) && $product['quantity'] > 1) ? 'CS' : 'PC';
+//                $data['demand_quantity'] = (!empty($product) && $product['quantity'] > 1) ? (int) ($data['order_num'] / $product['quantity']) : (int) $data['order_num'];
+//
+//                //$data['order_price'] = (!empty($product) && $product['quantity'] > 1) ? ($data['order_price'] * $product['quantity']) : $data['order_price'];
+//
+//                $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
+//
+//                if (!empty($dtPrice)) {
+//                    $data['order_price'] = $dtPrice['price_s01'] ?? 0;
+//                } else {
+//                    $data['order_price'] = $product['unit_price'] ?? 0;
+//                }
+//
+//                $location = $this->commonService->getCustomerLocation($data['customer_code']);
+//                $data['location'] = $location ?? 'XB0201001';
+//                $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
+//                $sum_order_amout = $common->getSumOrderAmoutWSEOSDaitoTest($data['order_no']);
+//                $data['fvehicleno'] = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
+//                $data['seikyu_code'] = $this->customer_code;
+//                $data['ftrnsportcd'] = '87001';
 
                 // Import dt_order and dt_order_status
                 return $this->entityManager->getRepository(DtOrderDaitoTest::class)->insertData($data);
