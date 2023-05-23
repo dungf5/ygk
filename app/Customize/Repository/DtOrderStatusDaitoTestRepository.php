@@ -42,22 +42,21 @@ class DtOrderStatusDaitoTestRepository extends AbstractRepository
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $object = new DtOrderStatusDaitoTest();
-//        $object->setOrderNo('');
-//        $object->setOrderLineNo('0');
-//        $object->setOrderStatus(1);
-//        $object->setOrderStatus(3);
+        $object->setOrderNo('');
+        $object->setOrderLineNo('0');
+        $object->setOrderStatus(1);
         $object->setCusOrderNo($data['order_no'] ?? '');
         $object->setCusOrderLineno($data['order_line_no'] ?? '');
-//        $object->setEcOrderNo($data['dtb_order_no'] ?? '');
-//        $object->setEcOrderLineno($data['dtb_order_line_no'] ?? '');
-//        $object->setCustomerCode('7001');
-//        $object->setShippingCode($data['shipping_code'] ?? '');
-//        $object->setOtodokeCode($data['otodoke_code'] ?? '');
-//        $object->setProductCode($data['product_code'] ?? '');
-//        $object->setOrderRemainNum((int) $data['order_num']);
-//        $object->setFlowType('2');
-//        $object->setEcType('2');
-//        $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
+        $object->setEcOrderNo($data['dtb_order_no'] ?? '');
+        $object->setEcOrderLineno($data['dtb_order_line_no'] ?? '');
+        $object->setCustomerCode('7001');
+        $object->setShippingCode($data['shipping_code'] ?? '');
+        $object->setOtodokeCode($data['otodoke_code'] ?? '');
+        $object->setProductCode($data['product_code'] ?? '');
+        $object->setOrderRemainNum((int) $data['order_num']);
+        $object->setFlowType('2');
+        $object->setEcType('2');
+        $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
         log_info('Call insertData to dt_order_status '.$object->getCusOrderNo().'-'.$object->getCusOrderLineno());
         return $this->Execute($object, 1);
 
