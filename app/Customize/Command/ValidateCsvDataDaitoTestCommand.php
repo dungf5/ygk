@@ -385,9 +385,9 @@ class ValidateCsvDataDaitoTestCommand extends Command
                     $item['dtb_order_no'] = $id;
                     $item['dtb_order_line_no'] = $item['order_line_no'];
 
-                    //$result = $this->importDtOrder($item);
-                    $result = 1;
-                    $result1 = $this->importDtOrderStatus($item);
+                    $result = $this->importDtOrder($item);
+//                    $result1 = $this->importDtOrderStatus($item);
+                    $result1 = 1;
 
                     if ($result && $result1) {
                         $this->entityManager->flush();
