@@ -45,6 +45,7 @@ class DtOrderStatusDaitoTestRepository extends AbstractRepository
 //        $object->setOrderNo('');
 //        $object->setOrderLineNo('0');
 //        $object->setOrderStatus(1);
+        $object->setOrderStatus(3);
         $object->setCusOrderNo($data['order_no'] ?? '');
         $object->setCusOrderLineno($data['order_line_no'] ?? '');
 //        $object->setEcOrderNo($data['dtb_order_no'] ?? '');
