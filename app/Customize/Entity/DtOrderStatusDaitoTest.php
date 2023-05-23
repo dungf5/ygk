@@ -38,7 +38,7 @@ if (!class_exists('\Customize\Entity\DtOrderStatusDaitoTest', false)) {
          *
          * @ORM\Column(name="product_code",nullable=true, type="string", length=45, options={"comment":"product_code"})
          */
-        private $product_code;
+        private $product_code = '';
 
         /**
          * @var string
@@ -52,26 +52,26 @@ if (!class_exists('\Customize\Entity\DtOrderStatusDaitoTest', false)) {
 ステータス種類
         1:未引当、2:一部引当、3:引当済、4:キャンセル、9:クロース(出荷済)" ,"default":1 })
          */
-        private $order_status = 3;
+        private $order_status = 1;
 
         /**
          * @var string
          *
          * @ORM\Column(name="ec_order_no", type="string", length=15,options={"comment":"EC発注番号"}, nullable=false)
          */
-        private $ec_order_no;
+        private $ec_order_no = '';
 
         /**
          * @var string
          *
          * @ORM\Column(name="ec_order_lineno", type="string", length=15,options={"comment":"EC発注明細番号"}, nullable=false)
          */
-        private $ec_order_lineno;
+        private $ec_order_lineno = 0;
 
         /**
          * @ORM\Column(name="reserve_stock_num",type="integer",nullable=true, options={"comment":"引当在庫数"  })
          */
-        private $reserve_stock_num;
+        private $reserve_stock_num = 0;
 
         /**
          * @var string
@@ -79,105 +79,105 @@ if (!class_exists('\Customize\Entity\DtOrderStatusDaitoTest', false)) {
          * @ORM\Column(name="cus_order_no", type="string", length=40,options={"comment":"客先発注No"}, nullable=false)
          * @ORM\Id
          */
-        private $cus_order_no;
+        private $cus_order_no = '';
 
         /**
          * @var string
          *
          * @ORM\Column(name="cus_order_lineno", type="string", length=2,options={"comment":"客先発注No"}, nullable=false)
          */
-        private $cus_order_lineno;
+        private $cus_order_lineno = 0;
 
         /**
          * @var string
          *
          * @ORM\Column(name="customer_code", type="string", length=25,options={"comment":"顧客"}, nullable=true)
          */
-        private $customer_code;
+        private $customer_code = '';
 
         /**
          * @var string
          *
          * @ORM\Column(name="shipping_code", type="string", length=25,options={"comment":"顧客"}, nullable=true)
          */
-        private $shipping_code;
+        private $shipping_code = '';
 
         /**
          * @var string
          *
          * @ORM\Column(name="otodoke_code", type="string", length=25,options={"comment":"届け先コード"}, nullable=true)
          */
-        private $otodoke_code;
+        private $otodoke_code = '';
 
         /**
          * @ORM\Column(name="order_remain_num",type="integer",nullable=true, options={"comment":"受注残"  })
          */
-        private $order_remain_num;
+        private $order_remain_num = 0;
         /**
          * @var string
          *
          * @ORM\Column(name="flow_type",nullable=true, type="string", length=10, options={"comment":"商流区分(ダイナ規格セグメント03)"})
          */
-        private $flow_type;
+        private $flow_type = '';
         /**
          * @var \DateTime
          *
          * @ORM\Column(name="create_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ登録日時'")
          */
-        private $create_date;
+        private $create_date = null;
         /**
          * @var \DateTime
          *
          * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ更新日時'")
          */
-        private $update_date;
+        private $update_date = null;
 
         /**
          * @var \DateTime|null
          *
          * @ORM\Column(name="order_date", type="date", nullable=true, options={"comment":"受注日"})
          */
-        private $order_date;
+        private $order_date = null;
 
         /**
          * @var string
          *
          * @ORM\Column(name="ec_type", nullable=true, type="string", length=10, options={"comment":"EC1区分"})
          */
-        private $ec_type;
+        private $ec_type = '';
 
         /**
          * @var string|null
          *
          * @ORM\Column(name="remarks1", type="text",options={"comment":"備考１"}, nullable=true)
          */
-        private $remarks1;
+        private $remarks1 = '';
 
         /**
          * @var string|null
          *
          * @ORM\Column(name="remarks2", type="text",options={"comment":"備考２"}, nullable=true)
          */
-        private $remarks2;
+        private $remarks2 = '';
 
         /**
          * @var string|null
          *
          * @ORM\Column(name="remarks3", type="text",options={"comment":"発注書"}, nullable=true)
          */
-        private $remarks3;
+        private $remarks3 = '';
 
         /**
          * @var string|null
          *
          * @ORM\Column(name="remarks4", type="text",options={"comment":"発注書備考"}, nullable=true)
          */
-        private $remarks4;
+        private $remarks4 = '';
 
         /**
          * @ORM\Column(name="shipping_num",type="integer",nullable=true, options={"comment":"出荷済数" ,"default": null })
          */
-        private $shipping_num;
+        private $shipping_num = 0;
 
         /**
          * @return string
