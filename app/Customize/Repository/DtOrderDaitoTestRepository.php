@@ -66,8 +66,10 @@ class DtOrderDaitoTestRepository extends AbstractRepository
         $objOrder->setProductCode($data['product_code'] ?? '');
         $objOrder->setDynaModelSeg2($data['order_no'] ?? '');
         $objOrder->setDynaModelSeg3('2');
-        $objOrder->setDynaModelSeg4($data['dtb_order_no'] ?? '');
-        $objOrder->setDynaModelSeg5($data['dtb_order_line_no'] ?? 0);
+//        $objOrder->setDynaModelSeg4($data['dtb_order_no'] ?? '');
+        $objOrder->setDynaModelSeg4(null);
+//        $objOrder->setDynaModelSeg5($data['dtb_order_line_no'] ?? 0);
+        $objOrder->setDynaModelSeg5(0);
         $objOrder->setDynaModelSeg6($data['remarks_line_no'] ?? null);
         $objOrder->setRequestFlg('Y');
         $objOrder->setFvehicleno($data['fvehicleno'] ?? '');
@@ -82,8 +84,10 @@ class DtOrderDaitoTestRepository extends AbstractRepository
         $objOrderStatus->setOrderStatus(1);
         $objOrderStatus->setCusOrderNo($data['order_no'] ?? '');
         $objOrderStatus->setCusOrderLineno($data['order_line_no'] ?? 0);
-        $objOrderStatus->setEcOrderNo($data['dtb_order_no'] ?? '');
-        $objOrderStatus->setEcOrderLineno($data['dtb_order_line_no'] ?? 0);
+//        $objOrderStatus->setEcOrderNo($data['dtb_order_no'] ?? '');
+        $objOrderStatus->setEcOrderNo(null);
+//        $objOrderStatus->setEcOrderLineno($data['dtb_order_line_no'] ?? 0);
+        $objOrderStatus->setEcOrderLineno(0);
         $objOrderStatus->setCustomerCode('7001');
         $objOrderStatus->setShippingCode($data['shipping_code'] ?? '');
         $objOrderStatus->setOtodokeCode($data['otodoke_code'] ?? '');
