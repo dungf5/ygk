@@ -73,24 +73,24 @@ class DtOrderDaitoTestRepository extends AbstractRepository
 
         log_info('Call insertData to dt_order '.$data['order_no'].'-'.$data['order_line_no']);
 
-        $object2 = new DtOrderStatusDaitoTest();
-        $object2->setOrderNo('');
-        $object2->setOrderLineNo('0');
-        $object2->setOrderStatus(1);
-        $object2->setCusOrderNo($data['order_no'] ?? '');
-        $object2->setCusOrderLineno($data['order_line_no'] ?? '');
-        $object2->setEcOrderNo($data['dtb_order_no'] ?? '');
-        $object2->setEcOrderLineno($data['dtb_order_line_no'] ?? '');
-        $object2->setCustomerCode('7001');
-        $object2->setShippingCode($data['shipping_code'] ?? '');
-        $object2->setOtodokeCode($data['otodoke_code'] ?? '');
-        $object2->setProductCode($data['product_code'] ?? '');
-        $object2->setOrderRemainNum((int) $data['order_num']);
-        $object2->setFlowType('2');
-        $object2->setEcType('2');
-        $object2->setOrderDate(new \DateTime($data['order_date'] ?? ''));
-        log_info('Call insertData to dt_order_status '.$object2->getCusOrderNo().'-'.$object2->getCusOrderLineno());
-        return $this->Execute($object, $object2, 1);
+//        $object2 = new DtOrderStatusDaitoTest();
+//        $object2->setOrderNo('');
+//        $object2->setOrderLineNo('0');
+//        $object2->setOrderStatus(1);
+//        $object2->setCusOrderNo($data['order_no'] ?? '');
+//        $object2->setCusOrderLineno($data['order_line_no'] ?? '');
+//        $object2->setEcOrderNo($data['dtb_order_no'] ?? '');
+//        $object2->setEcOrderLineno($data['dtb_order_line_no'] ?? '');
+//        $object2->setCustomerCode('7001');
+//        $object2->setShippingCode($data['shipping_code'] ?? '');
+//        $object2->setOtodokeCode($data['otodoke_code'] ?? '');
+//        $object2->setProductCode($data['product_code'] ?? '');
+//        $object2->setOrderRemainNum((int) $data['order_num']);
+//        $object2->setFlowType('2');
+//        $object2->setEcType('2');
+//        $object2->setOrderDate(new \DateTime($data['order_date'] ?? ''));
+//        log_info('Call insertData to dt_order_status '.$object2->getCusOrderNo().'-'.$object2->getCusOrderLineno());
+        return $this->Execute($object, 1);
 
 
 //
@@ -109,13 +109,13 @@ class DtOrderDaitoTestRepository extends AbstractRepository
 //        }
     }
 
-    private function Execute($object, $object2, $count)
+    private function Execute($object, $count)
     {
         $this->getEntityManager()->persist($object);
-        $this->getEntityManager()->persist($object2);
-        $this->getEntityManager()->flush();
+        //$this->getEntityManager()->persist($object2);
+        //$this->getEntityManager()->flush();
 
-        if (!empty($object->getCreateDate()) && !empty($object2->getCreateDate())) {
+        if (!empty($object->getCreateDate())) {
             return 1;
         } else {
             $message = 'Import data dt_order '.$object->getOrderNo().'-'.$object->getOrderLineno().' error';
@@ -129,7 +129,7 @@ class DtOrderDaitoTestRepository extends AbstractRepository
                 return 0;
             }
 
-            return $this->Execute($object, $object2, $count);
+            return $this->Execute($object, $count);
         }
     }
 }

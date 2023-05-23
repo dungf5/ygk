@@ -81,7 +81,7 @@ class DtOrderStatusDaitoTestRepository extends AbstractRepository
     {
         try {
             $this->getEntityManager()->persist($object);
-            $this->getEntityManager()->flush();
+            //$this->getEntityManager()->flush();
         } catch (\Exception $e) {
             $this->pushGoogleChat('Loi loi loi: '.$e->getMessage());
         }
