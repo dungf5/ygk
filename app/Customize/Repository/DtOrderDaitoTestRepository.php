@@ -124,7 +124,8 @@ class DtOrderDaitoTestRepository extends AbstractRepository
         //$this->getEntityManager()->persist($objOrderStatus);
         $this->getEntityManager()->flush();
 
-        if (!empty($objOrder->getCreateDate()) && !empty($objOrderStatus->getCreateDate())) {
+        //if (!empty($objOrder->getCreateDate()) && !empty($objOrderStatus->getCreateDate())) {
+        if (!empty($objOrder->getCreateDate())) {
             return 1;
         } else {
             $message = '';
