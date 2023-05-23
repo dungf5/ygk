@@ -38,7 +38,7 @@ if (!class_exists('\Customize\Entity\DtOrderStatusDaitoTest', false)) {
          *
          * @ORM\Column(name="product_code",nullable=true, type="string", length=45, options={"comment":"product_code"})
          */
-        //private $product_code = '';
+        private $product_code = '';
 
         /**
          * @var string
