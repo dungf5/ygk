@@ -2834,7 +2834,7 @@ SQL;
             $data['ftrnsportcd'],
         ];
 
-        log_info($sql);
+        log_info(str_replace(' ', '', $sql));
         log_info(implode(',', $params));
 
         // Execute the query
@@ -2884,7 +2884,7 @@ SQL;
             $data['order_date'] ? date('Y-m-d', strtotime($data['order_date'])) : date('Y-m-d'), //order_date
         ];
 
-        log_info($sql);
+        log_info(str_replace(' ', '', $sql));
         log_info(implode(',', $params));
 
         // Execute the query
