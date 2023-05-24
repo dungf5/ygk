@@ -41,11 +41,26 @@ class OrderItemRepository extends AbstractRepository
 
     /**
      * @param array $paramSearch
-     * @param array $order_status
+     * @param string $customer_code
+     * @param string $login_type
      * @return QueryBuilder
      */
-    public function getQueryBuilderByCustomer($paramSearch = [], $order_status = [])
+    public function getQueryBuilderByCustomer($paramSearch = [], $customer_code = '', $login_type = '')
     {
+        switch ($login_type) {
+            case 'shipping_code':
+                $condition = 'order_status.shipping_code = :customer_code';
+                break;
+
+            case 'otodoke_code':
+                $condition = 'order_status.otodoke_code = :customer_code';
+                break;
+
+            default:
+                $condition = 'order_status.customer_code = :customer_code';
+                break;
+        }
+
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('shipping.shipping_no');
         $qb->from('Customize\Entity\DtOrderStatus', 'order_status');
@@ -92,21 +107,10 @@ class OrderItemRepository extends AbstractRepository
         $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = order_status.shipping_code) shipping_name');
         $qb->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = order_status.otodoke_code) otodoke_name');
         $qb->where('shipping.delete_flg IS NULL OR shipping.delete_flg <> 0')
+            ->andWhere($condition)
             ->andWhere('order_status.order_date >= :order_date')
-            ->setParameter('order_date', date('Y-m-d', strtotime('-14 MONTH')));
-
-        if (count($order_status) > 0) {
-            $where = '';
-            foreach ($order_status as $k => $os) {
-                if (!empty($where)) {
-                    $where .= ' OR ';
-                }
-                $where .= " ( order_status.cus_order_no = :order_status_cus_order_no_{$k} AND order_status.cus_order_lineno = :order_status_cus_order_lineno_{$k} ) ";
-                $qb->setParameter("order_status_cus_order_no_{$k}", $os['cus_order_no']);
-                $qb->setParameter("order_status_cus_order_lineno_{$k}", $os['cus_order_lineno']);
-            }
-            $qb->andWhere($where);
-        }
+            ->setParameter('order_date', date('Y-m-d', strtotime('-14 MONTH')))
+            ->setParameter(':customer_code', $customer_code);
 
         if ($paramSearch['search_order_status'] != '') {
             $qb->andWhere('order_status.order_status  = :search_order_status')
@@ -129,8 +133,8 @@ class OrderItemRepository extends AbstractRepository
         }
 
         //group
-        $qb->addGroupBy('order_status.order_no');
-        $qb->addGroupBy('order_status.order_line_no');
+        $qb->addGroupBy('order_status.cus_order_no');
+        $qb->addGroupBy('order_status.cus_order_lineno');
 
         // Order By
         $qb->addOrderBy('order_status.order_date', 'DESC');
