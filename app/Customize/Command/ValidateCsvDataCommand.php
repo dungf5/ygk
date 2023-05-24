@@ -499,9 +499,11 @@ class ValidateCsvDataCommand extends Command
                 $data['ftrnsportcd'] = '87001';
 
                 return $this->entityManager->getRepository(DtOrder::class)->insertData($data);
+
+            } else {
+                return 1;
             }
 
-            return 0;
         } catch (\Exception $e) {
             log_error('Insert dt_order error');
             log_error($e->getMessage());
@@ -527,9 +529,11 @@ class ValidateCsvDataCommand extends Command
                 log_info('Import data dt_order_status '.$data['order_no'].'-'.$data['order_line_no']);
 
                 return $this->entityManager->getRepository(DtOrderStatus::class)->insertData($data);
+
+            } else {
+                return 1;
             }
 
-            return 0;
         } catch (\Exception $e) {
             log_error('Insert dt_order_status error');
             log_error($e->getMessage());

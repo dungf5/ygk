@@ -2807,12 +2807,12 @@ SQL;
 
         $params = [
             $data['customer_code'] ?? '', //customer_code
-            $data['customer_code'] ?? '', //seikyu_code
+            $data['seikyu_code'] ?? '', //seikyu_code
             $data['order_no'] ?? '',
             $data['order_line_no'] ?? '',
             $data['shipping_code'] ?? '',
             $data['otodoke_code'] ?? '',
-            $data['order_date'] ? date('Y-m-d', strtotime($data['order_date'])) : '',
+            $data['order_date'] ? date('Y-m-d 00:00:00.000', strtotime($data['order_date'])) : date('Y-m-d 00:00:00.000'),
             $data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '', //deli_plan_date
             $data['delivery_date'] ? date('Y-m-d', strtotime($data['delivery_date'])) : '', //shiping_plan_date
             $data['jan_code'] ?? '', //item_no
@@ -2831,7 +2831,7 @@ SQL;
             $data['remarks_line_no'] ?? '', //dyna_model_seg6
             'Y', //request_flg
             $data['fvehicleno'],
-            '87001', //ftrnsportcd
+            $data['ftrnsportcd'],
         ];
 
         log_info($sql);
@@ -2839,6 +2839,7 @@ SQL;
 
         // Execute the query
         $stmt = $connection->prepare($sql);
+
         return $stmt->executeStatement($params);
     }
 
@@ -2880,7 +2881,7 @@ SQL;
             (int) $data['order_num'], //order_remain_num
             2, //flow_type
             2, //ec_type
-            date('Y-m-d'), //order_date
+            $data['order_date'] ? date('Y-m-d', strtotime($data['order_date'])) : date('Y-m-d'), //order_date
         ];
 
         log_info($sql);
@@ -2888,6 +2889,7 @@ SQL;
 
         // Execute the query
         $stmt = $connection->prepare($sql);
+
         return $stmt->executeStatement($params);
     }
 }
