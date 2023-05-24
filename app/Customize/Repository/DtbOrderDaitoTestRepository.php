@@ -40,9 +40,6 @@ class DtbOrderDaitoTestRepository extends AbstractRepository
 
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = new DtbOrderDaitoTest();
-            $object->setCustomer($data['customer']);
-            $object->setName01($data['name01']);
-            $object->setName02($data['name02']);
 
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();

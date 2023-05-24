@@ -82,13 +82,13 @@ if (!class_exists('\Customize\Entity\DtbOrderDaitoTest', false)) {
         /**
          * @var string
          *
-         * @ORM\Column(name="name01",nullable=false, type="string", length=255, options={"comment":""})
+         * @ORM\Column(name="name01",nullable=true, type="string", length=255, options={"comment":""})
          */
         private $name01;
         /**
          * @var string
          *
-         * @ORM\Column(name="name02",nullable=false, type="string", length=255, options={"comment":""})
+         * @ORM\Column(name="name02",nullable=true, type="string", length=255, options={"comment":""})
          */
         private $name02;
         /**
@@ -164,7 +164,7 @@ if (!class_exists('\Customize\Entity\DtbOrderDaitoTest', false)) {
         /**
          * @var string
          *
-         * @ORM\Column(name="discriminator_type",nullable=false, type="string", length=255, options={"comment":""})
+         * @ORM\Column(name="discriminator_type",nullable=true, type="string", length=255, options={"comment":""})
          */
         private $discriminator_type;
 
