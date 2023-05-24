@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Customize\Command;
 
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\DtbOrderDaitoTest;
 use Customize\Entity\DtBreakKeyDaitoTest;
 use Customize\Entity\DtOrderDaitoTest;
 use Customize\Entity\DtOrderStatusDaitoTest;
@@ -30,7 +31,6 @@ use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Command\PluginCommandTrait;
-use Eccube\Entity\Order;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -150,7 +150,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
                     sleep(1);
                     $this->handleImportOrderWSEOS();
                     sleep(1);
-                    //$this->sendMailOrderSuccess();
+                    $this->sendMailOrderSuccess();
                 }
 
                 break;
@@ -382,9 +382,10 @@ class ValidateCsvDataDaitoTestCommand extends Command
                     $item['dtb_order_no'] = $id;
                     $item['dtb_order_line_no'] = $item['order_line_no'];
 
-                    $result = $this->importOrder_OrderStatus($item);
+                    $result = $this->importDtOrder($item);
+                    $result1 = $this->importDtOrderStatus($item);
 
-                    if ($result) {
+                    if ($result && $result1) {
                         // Save to success array to send mail
                         $this->success["{$item['order_no']}"]['detail'][] = [
                             'jan_code' => $item['jan_code'],
@@ -439,7 +440,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
             'name01' => '',
             'name02' => '',
         ];
-        $id = $this->entityManager->getRepository(Order::class)->insertData($dtbOrderData);
+        $id = $this->entityManager->getRepository(DtbOrderDaitoTest::class)->insertData($dtbOrderData);
 
         if (!empty($id)) {
             return $id;
@@ -484,6 +485,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
 
                 $location = $this->commonService->getCustomerLocation($data['customer_code']);
                 $data['location'] = $location ?? 'XB0201001';
+
                 $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
                 $sum_order_amout = $common->getSumOrderAmoutWSEOSDaitoTest($data['order_no']);
                 $data['fvehicleno'] = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
@@ -491,9 +493,9 @@ class ValidateCsvDataDaitoTestCommand extends Command
                 $data['ftrnsportcd'] = '87001';
 
                 return $this->entityManager->getRepository(DtOrderDaitoTest::class)->insertData($data);
+            } else {
+                return 1;
             }
-
-            return 0;
         } catch (\Exception $e) {
             log_error('Insert dt_order error');
             log_error($e->getMessage());
@@ -519,9 +521,9 @@ class ValidateCsvDataDaitoTestCommand extends Command
                 log_info('Import data dt_order_status '.$data['order_no'].'-'.$data['order_line_no']);
 
                 return $this->entityManager->getRepository(DtOrderStatusDaitoTest::class)->insertData($data);
+            } else {
+                return 1;
             }
-
-            return 0;
         } catch (\Exception $e) {
             log_error('Insert dt_order_status error');
             log_error($e->getMessage());
