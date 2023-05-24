@@ -17,14 +17,12 @@ use Customize\Common\FileUtil;
 use Customize\Common\MyCommon;
 use Customize\Common\MyConstant;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
-use Customize\Entity\MstDelivery;
-use Customize\Entity\MstShipping;
+use Customize\Repository\DtReturnsImageInfoRepository;
+use Customize\Repository\MstProductReturnsInfoRepository;
+use Customize\Repository\MstShippingRepository;
 use Customize\Repository\OrderItemRepository;
 use Customize\Repository\OrderRepository;
 use Customize\Repository\ProductImageRepository;
-use Customize\Repository\MstShippingRepository;
-use Customize\Repository\MstProductReturnsInfoRepository;
-use Customize\Repository\DtReturnsImageInfoRepository;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\GlobalService;
 use Customize\Service\MailService;
@@ -41,18 +39,15 @@ use Eccube\Repository\CustomerFavoriteProductRepository;
 use Eccube\Service\CartService;
 use Eccube\Service\PurchaseFlow\PurchaseFlow;
 use Knp\Component\Pager\PaginatorInterface;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\User;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class MypageController extends AbstractController
 {
-
     /**
      * @var BaseInfo
      */
@@ -141,9 +136,9 @@ class MypageController extends AbstractController
         $this->globalService = $globalService;
         $this->mailService = $mailService;
 
-        if ($this->twig->getGlobals()["app"]->getUser() != null) {
+        if ($this->twig->getGlobals()['app']->getUser() != null) {
             $MyDataMstCustomer = $myCm->getMstCustomer($this->globalService->customerId());
-            $this->twig->getGlobals()["app"]->MyDataMstCustomer = $MyDataMstCustomer;
+            $this->twig->getGlobals()['app']->MyDataMstCustomer = $MyDataMstCustomer;
         }
 
         $this->BaseInfo = $baseInfoRepository->get();
@@ -159,19 +154,19 @@ class MypageController extends AbstractController
     public function shippingList(Request $request)
     {
         $comS = new MyCommonService($this->entityManager);
-        $customer_code = $this->twig->getGlobals()["app"]->MyDataMstCustomer["customer_code"];
-        $type = $request->get("type");
-        $shipping_no = $request->get("shipping_no");
-        $order_no = $request->get("order_no");
-        $jan_code = $request->get("jan_code");
+        $customer_code = $this->twig->getGlobals()['app']->MyDataMstCustomer['customer_code'];
+        $type = $request->get('type');
+        $shipping_no = $request->get('shipping_no');
+        $order_no = $request->get('order_no');
+        $jan_code = $request->get('jan_code');
         $login_type = $this->globalService->getLoginType();
         $arRe = $comS->getShipList($type, $customer_code, $shipping_no, $order_no, $jan_code, $login_type);
         $otodoke_code = '';
         $shipping_code = '';
 
         if (count($arRe) > 0) {
-            $otodoke_code = $arRe[0]["otodoke_code"];
-            $shipping_code = $arRe[0]["shipping_code"];
+            $otodoke_code = $arRe[0]['otodoke_code'];
+            $shipping_code = $arRe[0]['shipping_code'];
 
             foreach ($arRe as $key => &$item) {
                 if ($item['jan_code'] == $jan_code) {
@@ -183,7 +178,7 @@ class MypageController extends AbstractController
         }
 
         $arMore = $comS->getShipListExtend($otodoke_code, $shipping_code);
-        $arReturn = ["myData" => $arRe, "arMore" => $arMore, "login_type" => $login_type];
+        $arReturn = ['myData' => $arRe, 'arMore' => $arMore, 'login_type' => $login_type];
 
         return $arReturn;
     }
@@ -197,15 +192,16 @@ class MypageController extends AbstractController
     public function exportOrderPdf(Request $request)
     {
         $login_type = $this->globalService->getLoginType();
-        if (in_array($login_type, ['shipping_code', 'otodoke_code']))
+        if (in_array($login_type, ['shipping_code', 'otodoke_code'])) {
             return;
+        }
 
-        $htmlFileName = "Mypage/exportOrderPdf.twig";
-        $delivery_no = MyCommon::getPara("delivery_no");
-        $order_no_line_no = MyCommon::getPara("order_no_line_no");
+        $htmlFileName = 'Mypage/exportOrderPdf.twig';
+        $delivery_no = MyCommon::getPara('delivery_no');
+        $order_no_line_no = MyCommon::getPara('order_no_line_no');
 
         $comS = new MyCommonService($this->entityManager);
-        $orderNo = explode("-", $order_no_line_no)[0];
+        $orderNo = explode('-', $order_no_line_no)[0];
         $arRe = $comS->getPdfDelivery($delivery_no, $orderNo);
 
         //add special line
@@ -216,35 +212,35 @@ class MypageController extends AbstractController
 
         foreach ($arRe as &$item) {
             $inCr++;
-            $totalTax = $totalTax + $item["tax"];
-            $totalaAmount = $totalaAmount + $item["amount"];
-            $totalTaxRe = $totalTaxRe + (10 / 100) * (int) $item["amount"];
+            $totalTax = $totalTax + $item['tax'];
+            $totalaAmount = $totalaAmount + $item['amount'];
+            $totalTaxRe = $totalTaxRe + (10 / 100) * (int) $item['amount'];
             $item['is_total'] = 0;
             $item['autoIncr'] = $inCr;
-            $item['delivery_date'] = explode(" ", $item['delivery_date'])[0];
+            $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
         }
 
         $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
-        $arSpecial = ["is_total" => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
+        $arSpecial = ['is_total' => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
         $arRe[] = $arSpecial;
 
-        $dirPdf = MyCommon::getHtmluserDataDir() . "/pdf";
+        $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
         FileUtil::makeDirectory($dirPdf);
         $arReturn = [
-            "myDatas" => array_chunk($arRe, 20),
-            "OrderTotal" => $totalaAmount,
-            "totalTaxRe" => $totalTaxRe,
-            "totalaAmountTax" => $totalaAmountTax
+            'myDatas' => array_chunk($arRe, 20),
+            'OrderTotal' => $totalaAmount,
+            'totalTaxRe' => $totalTaxRe,
+            'totalaAmountTax' => $totalaAmountTax,
         ];
-        $namePdf = "ship_" . $delivery_no . ".pdf";
-        $file = $dirPdf . "/" . $namePdf;
+        $namePdf = 'ship_'.$delivery_no.'.pdf';
+        $file = $dirPdf.'/'.$namePdf;
 
-        if (getenv("APP_IS_LOCAL") == 0) {
+        if (getenv('APP_IS_LOCAL') == 0) {
             $htmlBody = $this->twig->render($htmlFileName, $arReturn);
             MyCommon::converHtmlToPdf($dirPdf, $namePdf, $htmlBody);
-            header("Content-Description: File Transfer");
-            header("Content-Type: application/octet-stream");
-            header("Content-Disposition: attachment; filename=\"" . basename($file) . "\"");
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="'.basename($file).'"');
 
             readfile($file);
             exit();
@@ -278,14 +274,14 @@ class MypageController extends AbstractController
         ];
 
         // paginator
-        $user_login = $this->twig->getGlobals()["app"]->getUser();
+        $user_login = $this->twig->getGlobals()['app']->getUser();
         $customer_id = $this->globalService->customerId();
         $login_type = $this->globalService->getLoginType();
         $my_common = new MyCommonService($this->entityManager);
         $customer_code = $user_login->getCustomerCode();
 
-        if (!empty($_SESSION["usc_" . $customer_id]) && !empty($_SESSION["usc_" . $customer_id]['login_code'])) {
-            $represent_code = $_SESSION["usc_" . $customer_id]['login_code'];
+        if (!empty($_SESSION['usc_'.$customer_id]) && !empty($_SESSION['usc_'.$customer_id]['login_code'])) {
+            $represent_code = $_SESSION['usc_'.$customer_id]['login_code'];
             $temp_customer_code = $my_common->getCustomerRelation($represent_code);
 
             if (!empty($temp_customer_code)) {
@@ -309,7 +305,6 @@ class MypageController extends AbstractController
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
-
 
         No_Data_Case:
 
@@ -345,11 +340,11 @@ class MypageController extends AbstractController
 
             $myItem['order_type'] = '';
             if (!empty($myItem['ec_type'])) {
-                if ($myItem['ec_type'] == "1") {
+                if ($myItem['ec_type'] == '1') {
                     $myItem['order_type'] = 'EC';
                 }
 
-                if ($myItem['ec_type'] == "2") {
+                if ($myItem['ec_type'] == '2') {
                     $myItem['order_type'] = 'EOS';
                 }
             }
@@ -374,7 +369,7 @@ class MypageController extends AbstractController
         $hsKeyImg = [];
 
         foreach ($listImgs as $itemImg) {
-            $hsKeyImg[$itemImg["product_id"]] = $itemImg["file_name"];
+            $hsKeyImg[$itemImg['product_id']] = $itemImg['file_name'];
         }
 
         foreach ($listItem as &$myItem) {
@@ -400,12 +395,12 @@ class MypageController extends AbstractController
         /*create list order date*/
         $orderDateList = [];
         $orderDateList[] = [
-            'key' => (string) date("Y-m",),
-            'value' => (string) date("Y-m",),
+            'key' => (string) date('Y-m', ),
+            'value' => (string) date('Y-m', ),
         ];
 
         for ($i = 1; $i < 14; $i++) {
-            $date = date("Y-m", strtotime(date('Y-m-01') . " -$i months"));
+            $date = date('Y-m', strtotime(date('Y-m-01')." -$i months"));
             $orderDateList[] = [
                 'key' => (string) $date,
                 'value' => (string) $date,
@@ -427,8 +422,8 @@ class MypageController extends AbstractController
         if (count($shippingList) > 1) {
             foreach ($shippingList as $item) {
                 $orderShippingList[] = [
-                    'key' => $item["shipping_no"],
-                    'value' => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
+                    'key' => $item['shipping_no'],
+                    'value' => $item['name01'].'〒'.$item['postal_code'].$item['addr01'].$item['addr02'].$item['addr03'],
                 ];
             }
         }
@@ -440,8 +435,8 @@ class MypageController extends AbstractController
         if (count($otodokeList)) {
             foreach ($otodokeList as $item) {
                 $orderOtodeokeList[] = [
-                    'key' => $item["otodoke_code"],
-                    'value' => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
+                    'key' => $item['otodoke_code'],
+                    'value' => $item['name01'].'〒'.$item['postal_code'].$item['addr01'].$item['addr02'].$item['addr03'],
                 ];
             }
         }
@@ -469,24 +464,24 @@ class MypageController extends AbstractController
     public function login(Request $request, AuthenticationUtils $utils)
     {
         // Check case must to choose represent
-        if (!empty($_SESSION["choose_represent"])) {
+        if (!empty($_SESSION['choose_represent'])) {
             $my_common = new MyCommonService($this->entityManager);
             $representList = $my_common->getListRepresent();
 
             if (count($representList) > 1) {
                 return [
-                    'represent' => TRUE,
+                    'represent' => true,
                     'representOpt' => $representList,
                 ];
             }
 
             if (count($representList) == 1) {
                 $represent_code = $representList[0]['represent_code'];
-                $customerId = $_SESSION["customer_id"] ?? '';
+                $customerId = $_SESSION['customer_id'] ?? '';
 
                 if (!empty($represent_code) && !empty($customerId)) {
                     try {
-                        $_SESSION["choose_represent"] = FALSE;
+                        $_SESSION['choose_represent'] = false;
                         $_SESSION["usc_{$customerId}"]['su_represent_code'] = $represent_code;
 
                         $new_customer_id = $representList[0]['id'];
@@ -494,7 +489,7 @@ class MypageController extends AbstractController
                         $_SESSION["usc_{$new_customer_id}"]['login_type'] = $my_common->checkLoginType($represent_code);
                         $_SESSION["usc_{$new_customer_id}"]['login_code'] = $represent_code;
                     } catch (\Exception $e) {
-                        $_SESSION["choose_represent"] = TRUE;
+                        $_SESSION['choose_represent'] = true;
                         $_SESSION['customer_id'] = $customerId;
                         $_SESSION["usc_{$customerId}"]['su_represent_code'] = '';
                     }
@@ -503,32 +498,32 @@ class MypageController extends AbstractController
         }
 
         // Check case must to choose shipping
-        if (!empty($_SESSION["choose_shipping"])) {
+        if (!empty($_SESSION['choose_shipping'])) {
             $shippingList = $this->globalService->shippingOption();
 
             if (count($shippingList) > 1) {
                 return [
-                    'shipping' => TRUE,
+                    'shipping' => true,
                 ];
             }
 
             if (count($shippingList) == 1) {
                 $shipping_code = $shippingList[0]['shipping_no'];
-                $customerId = $_SESSION["customer_id"] ?? '';
+                $customerId = $_SESSION['customer_id'] ?? '';
 
                 if (!empty($customerId)) {
                     try {
                         $loginType = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
 
-                        if (!empty($loginType) && $loginType == "represent_code") {
-                            $_SESSION["choose_shipping"] = FALSE;
+                        if (!empty($loginType) && $loginType == 'represent_code') {
+                            $_SESSION['choose_shipping'] = false;
                             $_SESSION['s_shipping_code'] = $shipping_code;
-                            $_SESSION["usc_{$customerId}"]['login_type'] = "change_type";
+                            $_SESSION["usc_{$customerId}"]['login_type'] = 'change_type';
                         }
                     } catch (\Exception $e) {
-                        $_SESSION["choose_shipping"] = TRUE;
+                        $_SESSION['choose_shipping'] = true;
                         $_SESSION['s_shipping_code'] = '';
-                        $_SESSION["usc_{$customerId}"]['login_type'] = "represent_code";
+                        $_SESSION["usc_{$customerId}"]['login_type'] = 'represent_code';
                     }
                 }
             }
@@ -562,15 +557,16 @@ class MypageController extends AbstractController
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_MYPAGE_MYPAGE_LOGIN_INITIALIZE, $event);
 
         $form = $builder->getForm();
-        $this->session->set("is_update_cart", 1);
+        $this->session->set('is_update_cart', 1);
 
         return [
-            'shipping' => FALSE,
-            'represent' => FALSE,
+            'shipping' => false,
+            'represent' => false,
             'error' => $utils->getLastAuthenticationError(),
             'form' => $form->createView(),
         ];
     }
+
     /**
      * お気に入り商品を表示する.
      *
@@ -619,16 +615,16 @@ class MypageController extends AbstractController
         try {
             if ('POST' === $request->getMethod()) {
                 $shipping_code = $request->get('shipping_code', '');
-                $customerId = $_SESSION["customer_id"] ?? '';
+                $customerId = $_SESSION['customer_id'] ?? '';
 
                 if (!empty($customerId)) {
                     try {
                         $loginType = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
 
-                        if (!empty($loginType) && $loginType == "represent_code") {
-                            $_SESSION["choose_shipping"] = FALSE;
+                        if (!empty($loginType) && $loginType == 'represent_code') {
+                            $_SESSION['choose_shipping'] = false;
                             $_SESSION['s_shipping_code'] = $shipping_code;
-                            $_SESSION["usc_{$customerId}"]['login_type'] = "change_type";
+                            $_SESSION["usc_{$customerId}"]['login_type'] = 'change_type';
                         }
                     } catch (\Exception $e) {
                         return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
@@ -656,7 +652,7 @@ class MypageController extends AbstractController
 
         // paginator
         $customer_id = $this->globalService->customerId();
-        $user_login = $this->twig->getGlobals()["app"]->getUser();
+        $user_login = $this->twig->getGlobals()['app']->getUser();
         $login_type = $this->globalService->getLoginType();
         $customer_code = $user_login->getCustomerCode();
         $my_common = new MyCommonService($this->entityManager);
@@ -668,8 +664,8 @@ class MypageController extends AbstractController
             'order_otodoke' => $request->get('order_otodoke', '0'),
         ];
 
-        if (!empty($_SESSION["usc_" . $customer_id]) && !empty($_SESSION["usc_" . $customer_id]['login_code'])) {
-            $represent_code = $_SESSION["usc_" . $customer_id]['login_code'];
+        if (!empty($_SESSION['usc_'.$customer_id]) && !empty($_SESSION['usc_'.$customer_id]['login_code'])) {
+            $represent_code = $_SESSION['usc_'.$customer_id]['login_code'];
             $temp_customer_code = $my_common->getCustomerRelation($represent_code);
 
             if (!empty($temp_customer_code)) {
@@ -694,42 +690,41 @@ class MypageController extends AbstractController
 
         $listItem = !is_array($pagination) ? $pagination->getItems() : [];
 
-
         //modify data
         foreach ($listItem as &$myItem) {
             $myItem['shipping_company_code'] = trim($myItem['shipping_company_code']);
-            $myItem['delivery_url'] = "";
+            $myItem['delivery_url'] = '';
 
             if ($myItem['shipping_company_code'] == '8003') {
                 $inquiryNo = $myItem['inquiry_no'];
-                $arrInquiry = explode("-", $inquiryNo);
+                $arrInquiry = explode('-', $inquiryNo);
                 $count = (int) ($arrInquiry['1'] ?? null);
-                $okurijoNo = "okurijoNo=" . ($arrInquiry[0] ? trim($arrInquiry[0]) : "") . ",";
+                $okurijoNo = 'okurijoNo='.($arrInquiry[0] ? trim($arrInquiry[0]) : '').',';
 
                 for ($i = 1; $i < $count; $i++) {
-                    $okurijoNo .= (int) $arrInquiry[0] + $i . ",";
+                    $okurijoNo .= (int) $arrInquiry[0] + $i.',';
                 }
 
-                $okurijoNo = trim($okurijoNo, ",");
+                $okurijoNo = trim($okurijoNo, ',');
 
                 $myItem['delivery_url'] = "https://k2k.sagawa-exp.co.jp/p/web/okurijosearch.do?{$okurijoNo}";
             }
 
             if ($myItem['shipping_company_code'] == '8004') {
                 $inquiryNo = $myItem['inquiry_no'];
-                $arrInquiry = explode("-", $inquiryNo);
+                $arrInquiry = explode('-', $inquiryNo);
                 $count = (int) ($arrInquiry['1'] ?? null);
-                $requestNo = "requestNo1=" . ($arrInquiry[0] ? trim($arrInquiry[0]) : "") . "&";
+                $requestNo = 'requestNo1='.($arrInquiry[0] ? trim($arrInquiry[0]) : '').'&';
 
                 for ($i = 1; $i < 10; $i++) {
-                    $tempRequestNo = "";
+                    $tempRequestNo = '';
 
                     if ($i < $count) {
-                        $tempRequestNo = $arrInquiry[0] ?? "";
-                        $tempRequestNo = !empty($tempRequestNo) ? (int) $tempRequestNo + $i : "";
+                        $tempRequestNo = $arrInquiry[0] ?? '';
+                        $tempRequestNo = !empty($tempRequestNo) ? (int) $tempRequestNo + $i : '';
                     }
 
-                    $requestNo .= "requestNo" . ($i + 1) . "=" . $tempRequestNo . "&";
+                    $requestNo .= 'requestNo'.($i + 1).'='.$tempRequestNo.'&';
                 }
 
                 $myItem['delivery_url'] = "https://trackings.post.japanpost.jp/services/srv/search/?{$requestNo}search.x=104&search.y=15&startingUrlPatten=&locale=ja";
@@ -745,8 +740,8 @@ class MypageController extends AbstractController
         if (count($shippingList) > 1) {
             foreach ($shippingList as $item) {
                 $orderShippingList[] = [
-                    'key' => $item["shipping_no"],
-                    'value' => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
+                    'key' => $item['shipping_no'],
+                    'value' => $item['name01'].'〒'.$item['postal_code'].$item['addr01'].$item['addr02'].$item['addr03'],
                 ];
             }
         }
@@ -757,8 +752,8 @@ class MypageController extends AbstractController
         if (count($otodokeList)) {
             foreach ($otodokeList as $item) {
                 $orderOtodeokeList[] = [
-                    'key' => $item["otodoke_code"],
-                    'value' => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
+                    'key' => $item['otodoke_code'],
+                    'value' => $item['name01'].'〒'.$item['postal_code'].$item['addr01'].$item['addr02'].$item['addr03'],
                 ];
             }
         }
@@ -778,6 +773,13 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/delivery/history", name="mypage_delivery_history", methods={"GET"})
      * @Template("Mypage/delivery.twig")
+     *
+     * @param Request $request
+     * @param PaginatorInterface $paginator
+     *
+     * @return array
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
     public function delivery(Request $request, PaginatorInterface $paginator)
     {
@@ -807,18 +809,18 @@ class MypageController extends AbstractController
             $qb,
             $request->get('pageno', 1),
             $this->eccubeConfig['eccube_search_pmax'],
-            ['distinct' => true]
+            ['distinct' => false]
         );
 
         /*create list order date*/
         $shippingDateList = [];
         $shippingDateList[] = [
-            'key' => (string) date("Y-m",),
-            'value' => (string) date("Y-m",),
+            'key' => (string) date('Y-m', ),
+            'value' => (string) date('Y-m', ),
         ];
 
         for ($i = 1; $i < 14; $i++) {
-            $date = date("Y-m", strtotime(date('Y-m-01') . " -$i months"));
+            $date = date('Y-m', strtotime(date('Y-m-01')." -$i months"));
             $shippingDateList[] = [
                 'key' => (string) $date,
                 'value' => (string) $date,
@@ -840,8 +842,8 @@ class MypageController extends AbstractController
         if (count($shippingList) > 1) {
             foreach ($shippingList as $item) {
                 $orderShippingList[] = [
-                    'key' => $item["shipping_no"],
-                    'value' => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
+                    'key' => $item['shipping_no'],
+                    'value' => $item['name01'].'〒'.$item['postal_code'].$item['addr01'].$item['addr02'].$item['addr03'],
                 ];
             }
         }
@@ -853,8 +855,8 @@ class MypageController extends AbstractController
         if (count($otodokeList)) {
             foreach ($otodokeList as $item) {
                 $orderOtodeokeList[] = [
-                    'key' => $item["otodoke_code"],
-                    'value' => $item["name01"] . '〒' . $item["postal_code"] . $item["addr01"] . $item["addr02"] . $item["addr03"],
+                    'key' => $item['otodoke_code'],
+                    'value' => $item['name01'].'〒'.$item['postal_code'].$item['addr01'].$item['addr02'].$item['addr03'],
                 ];
             }
         }
@@ -882,19 +884,19 @@ class MypageController extends AbstractController
         try {
             if ('POST' === $request->getMethod()) {
                 $represent_code = $request->get('represent_code', '');
-                $represent_code = explode("-", $represent_code);
-                $customerId = $_SESSION["customer_id"] ?? '';
+                $represent_code = explode('-', $represent_code);
+                $customerId = $_SESSION['customer_id'] ?? '';
                 $my_common = new MyCommonService($this->entityManager);
 
                 if (!empty($represent_code) && !empty($customerId)) {
                     try {
-                        $_SESSION["choose_represent"] = FALSE;
-                        $_SESSION["usc_{$customerId}"]['su_represent_code'] = $represent_code[1] ?? "";
+                        $_SESSION['choose_represent'] = false;
+                        $_SESSION["usc_{$customerId}"]['su_represent_code'] = $represent_code[1] ?? '';
 
-                        $new_customer_id = $represent_code[0] ?? "";
+                        $new_customer_id = $represent_code[0] ?? '';
                         $_SESSION['customer_id'] = $new_customer_id;
-                        $_SESSION["usc_{$new_customer_id}"]['login_type'] = $my_common->checkLoginType($represent_code[1] ?? "");
-                        $_SESSION["usc_{$new_customer_id}"]['login_code'] = $represent_code[1] ?? "";
+                        $_SESSION["usc_{$new_customer_id}"]['login_type'] = $my_common->checkLoginType($represent_code[1] ?? '');
+                        $_SESSION["usc_{$new_customer_id}"]['login_code'] = $represent_code[1] ?? '';
                     } catch (\Exception $e) {
                         return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
                     }
@@ -922,23 +924,23 @@ class MypageController extends AbstractController
 
         //Params
         $param = [
-            'returns_status_flag'  => [0, 1, 2, 3, 4],
-            'pageno'               => $request->get('pageno', 1),
-            'search_jan_code'      => $request->get('search_jan_code', ''),
+            'returns_status_flag' => [0, 1, 2, 3, 4],
+            'pageno' => $request->get('pageno', 1),
+            'search_jan_code' => $request->get('search_jan_code', ''),
             'search_shipping_date' => $request->get('search_shipping_date', 0),
-            'search_shipping'      => $request->get('search_shipping', 0),
-            'search_otodoke'       => $request->get('search_otodoke', 0),
+            'search_shipping' => $request->get('search_shipping', 0),
+            'search_otodoke' => $request->get('search_otodoke', 0),
         ];
 
         // paginator
-        $my_common     = new MyCommonService($this->entityManager);
-        $user_login    = $this->twig->getGlobals()["app"]->getUser();
-        $customer_id   = $this->globalService->customerId();
-        $login_type    = $this->globalService->getLoginType();
+        $my_common = new MyCommonService($this->entityManager);
+        $user_login = $this->twig->getGlobals()['app']->getUser();
+        $customer_id = $this->globalService->customerId();
+        $login_type = $this->globalService->getLoginType();
         $customer_code = $this->globalService->customerCode();
-        
-        if (!empty($_SESSION["usc_" . $customer_id]) && !empty($_SESSION["usc_" . $customer_id]['login_code'])) {
-            $represent_code = $_SESSION["usc_" . $customer_id]['login_code'];
+
+        if (!empty($_SESSION['usc_'.$customer_id]) && !empty($_SESSION['usc_'.$customer_id]['login_code'])) {
+            $represent_code = $_SESSION['usc_'.$customer_id]['login_code'];
             $temp_customer_code = $my_common->getCustomerRelation($represent_code);
             if (!empty($temp_customer_code)) {
                 $customer_code = $temp_customer_code['customer_code'];
@@ -958,7 +960,7 @@ class MypageController extends AbstractController
         /*create list order date*/
         $shipping_date_list = [];
         for ($i = 0; $i < 24; $i++) {
-            $shipping_date_list[] = (string) date("Y-m", strtotime(date('Y-m-01') . " -$i months"));
+            $shipping_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
         }
 
         $shippings = $my_common->getMstShippingCustomer($login_type, $customer_id);
@@ -968,12 +970,12 @@ class MypageController extends AbstractController
         }
 
         return [
-            'pagination'         => $pagination,
-            'customer_id'        => $customer_id,
-            'param'              => $param,
+            'pagination' => $pagination,
+            'customer_id' => $customer_id,
+            'param' => $param,
             'shipping_date_list' => $shipping_date_list,
-            'shippings'          => $shippings,
-            'otodokes'           => $otodokes,
+            'shippings' => $shippings,
+            'otodokes' => $otodokes,
         ];
     }
 
@@ -986,13 +988,13 @@ class MypageController extends AbstractController
     public function returnCreate(Request $request)
     {
         try {
-            $commonService          = new MyCommonService($this->entityManager);
-            $login_type             = $this->globalService->getLoginType();
-            $customer_id            = $this->globalService->customerId();
-            $customer_code          = $this->globalService->customerCode();
-            $company_name           = $this->globalService->companyName();
+            $commonService = new MyCommonService($this->entityManager);
+            $login_type = $this->globalService->getLoginType();
+            $customer_id = $this->globalService->customerId();
+            $customer_code = $this->globalService->customerCode();
+            $company_name = $this->globalService->companyName();
             $customer_shipping_code = $this->globalService->getShippingCode();
-            $customer_otodoke_code  = $this->globalService->getOtodokeCode();
+            $customer_otodoke_code = $this->globalService->getOtodokeCode();
 
             //Params
             $param = [
@@ -1021,18 +1023,19 @@ class MypageController extends AbstractController
             }
 
             return [
-                'customer_id'            => $customer_id,
-                'customer_code'          => $customer_code,
-                'company_name'           => $company_name,
-                'returns_reson'          => $returns_reson,
-                'shippings'              => $shippings,
-                'otodokes'               => $otodokes,
+                'customer_id' => $customer_id,
+                'customer_code' => $customer_code,
+                'company_name' => $company_name,
+                'returns_reson' => $returns_reson,
+                'shippings' => $shippings,
+                'otodokes' => $otodokes,
                 'customer_shipping_code' => $customer_shipping_code,
-                'customer_otodoke_code'  => $customer_otodoke_code,
-                'param'                  => $param,
+                'customer_otodoke_code' => $customer_otodoke_code,
+                'param' => $param,
             ];
         } catch (\Exception $e) {
-            log_error("MypageController.php returnCreate(): " . $e->getMessage());
+            log_error('MypageController.php returnCreate(): '.$e->getMessage());
+
             return $this->redirectToRoute('mypage_return');
         }
     }
@@ -1047,30 +1050,30 @@ class MypageController extends AbstractController
     {
         try {
             $commonService = new MyCommonService($this->entityManager);
-            $login_type    = $this->globalService->getLoginType();
-            $customer_id   = $this->globalService->customerId();
+            $login_type = $this->globalService->getLoginType();
+            $customer_id = $this->globalService->customerId();
             $customer_code = $this->globalService->customerCode();
-            $company_name  = $this->globalService->companyName();
+            $company_name = $this->globalService->companyName();
 
-            $returns_no         = $request->get('returns_no');
-            $shipping_code      = $request->get('shipping_code', '');
-            $otodoke_code       = $request->get('otodoke_code', '');
-            $shipping_no        = $request->get('shipping_no', '');
-            $shipping_day       = $request->get('shipping_day', '');
-            $jan_code           = $request->get('jan_code', '');
-            $shipping_num       = $request->get('shipping_num', '');
-            $return_status      = $request->get('return_status', '');
-            $return_reason      = $request->get('return_reason', '');
-            $customer_comment   = $request->get('customer_comment', '');
-            $rerurn_num         = $request->get('rerurn_num', '');
-            $product_status     = $request->get('product_status', '');
+            $returns_no = $request->get('returns_no');
+            $shipping_code = $request->get('shipping_code', '');
+            $otodoke_code = $request->get('otodoke_code', '');
+            $shipping_no = $request->get('shipping_no', '');
+            $shipping_day = $request->get('shipping_day', '');
+            $jan_code = $request->get('jan_code', '');
+            $shipping_num = $request->get('shipping_num', '');
+            $return_status = $request->get('return_status', '');
+            $return_reason = $request->get('return_reason', '');
+            $customer_comment = $request->get('customer_comment', '');
+            $rerurn_num = $request->get('rerurn_num', '');
+            $product_status = $request->get('product_status', '');
             $cus_image_url_path = $request->get('cus_image_url_path', []);
 
             $product_code = $commonService->getJanCodeToProductCode($jan_code);
 
-            $returns_reson        = $commonService->getReturnsReson();
+            $returns_reson = $commonService->getReturnsReson();
             $returns_reson_column = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
-            $returns_reson_text   = $returns_reson_column[$return_reason] ?? '99';
+            $returns_reson_text = $returns_reson_column[$return_reason] ?? '99';
 
             $shippings = $commonService->getMstShippingCustomer($login_type, $customer_id);
             $shipping_name = '';
@@ -1094,22 +1097,28 @@ class MypageController extends AbstractController
             if (is_array($images) && count($images) > 0) {
                 foreach ($images as $image) {
                     $mimeType = $image->getMimeType();
-                    if (0 !== strpos($mimeType, 'image')) break;
+                    if (0 !== strpos($mimeType, 'image')) {
+                        break;
+                    }
 
                     $extension = $image->getClientOriginalExtension();
-                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) break;
-                    
-                    $size = $image->getSize();
-                    if( $size/1024/1024 > 7 ) break;
+                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
+                        break;
+                    }
 
-                    $filename = date('ymdHis') . uniqid('_') . '.' . $extension;
+                    $size = $image->getSize();
+                    if ($size / 1024 / 1024 > 7) {
+                        break;
+                    }
+
+                    $filename = date('ymdHis').uniqid('_').'.'.$extension;
                     $path = $this->getParameter('eccube_return_image_dir');
                     if ($image->move($this->getParameter('eccube_return_image_dir'), $filename)) {
-                        $cus_image_url_path[] = str_replace($this->getParameter('eccube_html_dir'), "html", $path) . '/' . $filename;
+                        $cus_image_url_path[] = str_replace($this->getParameter('eccube_html_dir'), 'html', $path).'/'.$filename;
                     }
                 }
             }
-            
+
             $errors = [];
             if (empty($return_reason)) {
                 $errors['return_reason'] = '顧客コメントを入力してください。';
@@ -1133,37 +1142,39 @@ class MypageController extends AbstractController
             }
 
             return [
-                'customer_id'        => $customer_id,
-                'customer_code'      => $customer_code,
-                'company_name'       => $company_name,
-                'returns_no'         => $returns_no,
-                'shipping_code'      => $shipping_code,
-                'shipping_name'      => $shipping_name,
-                'otodoke_code'       => $otodoke_code,
-                'otodoke_name'       => $otodoke_name,
-                'delivered_num'      => $delivered_num,
-                'returned_num'       => $returned_num,
-                'shipping_no'        => $shipping_no,
-                'shipping_day'       => $shipping_day,
-                'jan_code'           => $jan_code,
-                'product_code'       => $product_code,
-                'product_name'       => $product_name,
-                'shipping_num'       => $shipping_num,
-                'return_status'      => $return_status,
-                'returns_reson'      => $returns_reson,
+                'customer_id' => $customer_id,
+                'customer_code' => $customer_code,
+                'company_name' => $company_name,
+                'returns_no' => $returns_no,
+                'shipping_code' => $shipping_code,
+                'shipping_name' => $shipping_name,
+                'otodoke_code' => $otodoke_code,
+                'otodoke_name' => $otodoke_name,
+                'delivered_num' => $delivered_num,
+                'returned_num' => $returned_num,
+                'shipping_no' => $shipping_no,
+                'shipping_day' => $shipping_day,
+                'jan_code' => $jan_code,
+                'product_code' => $product_code,
+                'product_name' => $product_name,
+                'shipping_num' => $shipping_num,
+                'return_status' => $return_status,
+                'returns_reson' => $returns_reson,
                 'returns_reson_text' => $returns_reson_text,
-                'return_reason'      => $return_reason,
-                'customer_comment'   => $customer_comment,
-                'rerurn_num'         => $rerurn_num,
-                'product_status'     => $product_status,
+                'return_reason' => $return_reason,
+                'customer_comment' => $customer_comment,
+                'rerurn_num' => $rerurn_num,
+                'product_status' => $product_status,
                 'cus_image_url_path' => $cus_image_url_path,
-                'errors'             => $errors,
+                'errors' => $errors,
             ];
         } catch (\Exception $e) {
-            log_error("MypageController.php returnConfirm(): " . $e->getMessage());
+            log_error('MypageController.php returnConfirm(): '.$e->getMessage());
+
             return $this->redirectToRoute('mypage_return');
         }
     }
+
     /**
      * 返却手続き保存
      *
@@ -1174,22 +1185,22 @@ class MypageController extends AbstractController
     {
         try {
             $commonService = new MyCommonService($this->entityManager);
-            $login_type    = $this->globalService->getLoginType();
-            $customer_id   = $this->globalService->customerId();
+            $login_type = $this->globalService->getLoginType();
+            $customer_id = $this->globalService->customerId();
             $customer_code = $this->globalService->customerCode();
-            $customer      = $this->globalService->customer();
+            $customer = $this->globalService->customer();
 
-            $returns_no         = $request->get('returns_no');
-            $shipping_code      = $request->get('shipping_code', '');
-            $otodoke_code       = $request->get('otodoke_code', '');
-            $shipping_no        = $request->get('shipping_no', '');
-            $shipping_day       = $request->get('shipping_day', '');
-            $jan_code           = $request->get('jan_code', '');
-            $product_code       = $request->get('product_code', '');
-            $return_reason      = $request->get('return_reason');
-            $customer_comment   = $request->get('customer_comment', '');
-            $rerurn_num         = $request->get('rerurn_num', '');
-            $product_status     = $request->get('product_status', '');
+            $returns_no = $request->get('returns_no');
+            $shipping_code = $request->get('shipping_code', '');
+            $otodoke_code = $request->get('otodoke_code', '');
+            $shipping_no = $request->get('shipping_no', '');
+            $shipping_day = $request->get('shipping_day', '');
+            $jan_code = $request->get('jan_code', '');
+            $product_code = $request->get('product_code', '');
+            $return_reason = $request->get('return_reason');
+            $customer_comment = $request->get('customer_comment', '');
+            $rerurn_num = $request->get('rerurn_num', '');
+            $product_status = $request->get('product_status', '');
             $cus_image_url_path = $request->get('cus_image_url_path', []);
 
             $shippings = $commonService->getMstShippingCustomer($login_type, $customer_id);
@@ -1211,49 +1222,55 @@ class MypageController extends AbstractController
             if (is_array($images) && count($images) > 0) {
                 foreach ($images as $image) {
                     $mimeType = $image->getMimeType();
-                    if (0 !== strpos($mimeType, 'image')) break;
+                    if (0 !== strpos($mimeType, 'image')) {
+                        break;
+                    }
 
                     $extension = $image->getClientOriginalExtension();
-                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) break;
-                    
-                    $size = $image->getSize();
-                    if( $size/1024/1024 > 7 ) break;
+                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
+                        break;
+                    }
 
-                    $filename = date('ymdHis') . uniqid('_') . '.' . $extension;
+                    $size = $image->getSize();
+                    if ($size / 1024 / 1024 > 7) {
+                        break;
+                    }
+
+                    $filename = date('ymdHis').uniqid('_').'.'.$extension;
                     $path = $this->getParameter('eccube_return_image_dir');
                     if ($image->move($this->getParameter('eccube_return_image_dir'), $filename)) {
-                        $cus_image_url_path[] = str_replace($this->getParameter('eccube_html_dir'), "html", $path) . '/' . $filename;
+                        $cus_image_url_path[] = str_replace($this->getParameter('eccube_html_dir'), 'html', $path).'/'.$filename;
                     }
                 }
             }
-            
-            $returns_no    = !empty($returns_no) ? $returns_no : $commonService->getReturnsNo();
+
+            $returns_no = !empty($returns_no) ? $returns_no : $commonService->getReturnsNo();
             $shipping_date = date('Y-m-d', strtotime(str_replace('/', '-', $shipping_day)));
-            $shipping_num  = $commonService->getDeliveredNum($shipping_no, $product_code);
-            
+            $shipping_num = $commonService->getDeliveredNum($shipping_no, $product_code);
+
             $mst_product_returns_info = $this->mstProductReturnsInfoRepository->insertData([
-                'returns_no'           => $returns_no,
-                'customer_code'        => $customer_code,
-                'shipping_code'        => $shipping_code,
-                'shipping_name'        => $shipping_name,
-                'otodoke_code'         => $otodoke_code,
-                'otodoke_name'         => $otodoke_name,
-                'shipping_no'          => $shipping_no,
-                'shipping_date'        => $shipping_date,
-                'jan_code'             => $jan_code,
-                'product_code'         => $product_code,
-                'shipping_num'         => $shipping_num,
-                'reason_returns_code'  => $return_reason,
-                'customer_comment'     => $customer_comment,
-                'rerurn_num'           => $rerurn_num,
-                'cus_reviews_flag'     => $product_status,
-                'cus_image_url_path1'  => @$cus_image_url_path[0],
-                'cus_image_url_path2'  => @$cus_image_url_path[1],
-                'cus_image_url_path3'  => @$cus_image_url_path[2],
-                'cus_image_url_path4'  => @$cus_image_url_path[3],
-                'cus_image_url_path5'  => @$cus_image_url_path[4],
-                'cus_image_url_path6'  => @$cus_image_url_path[5],
-                'returns_status_flag'  => 0,
+                'returns_no' => $returns_no,
+                'customer_code' => $customer_code,
+                'shipping_code' => $shipping_code,
+                'shipping_name' => $shipping_name,
+                'otodoke_code' => $otodoke_code,
+                'otodoke_name' => $otodoke_name,
+                'shipping_no' => $shipping_no,
+                'shipping_date' => $shipping_date,
+                'jan_code' => $jan_code,
+                'product_code' => $product_code,
+                'shipping_num' => $shipping_num,
+                'reason_returns_code' => $return_reason,
+                'customer_comment' => $customer_comment,
+                'rerurn_num' => $rerurn_num,
+                'cus_reviews_flag' => $product_status,
+                'cus_image_url_path1' => @$cus_image_url_path[0],
+                'cus_image_url_path2' => @$cus_image_url_path[1],
+                'cus_image_url_path3' => @$cus_image_url_path[2],
+                'cus_image_url_path4' => @$cus_image_url_path[3],
+                'cus_image_url_path5' => @$cus_image_url_path[4],
+                'cus_image_url_path6' => @$cus_image_url_path[5],
+                'returns_status_flag' => 0,
                 'returns_request_date' => date('Y-m-d H:i:s'),
             ]);
             if (count($cus_image_url_path) > 0) {
@@ -1281,7 +1298,8 @@ class MypageController extends AbstractController
                 'save' => true,
             ];
         } catch (\Exception $e) {
-            log_error("MypageController.php returnSave(): " . $e->getMessage());
+            log_error('MypageController.php returnSave(): '.$e->getMessage());
+
             return $this->redirectToRoute('mypage_return');
         }
     }
@@ -1324,7 +1342,8 @@ class MypageController extends AbstractController
                 'returns_num' => $returns_num,
             ];
         } catch (\Exception $e) {
-            log_error("MypageController.php returnEdit(): " . $e->getMessage());
+            log_error('MypageController.php returnEdit(): '.$e->getMessage());
+
             return $this->redirectToRoute('mypage_return');
         }
     }
@@ -1354,7 +1373,8 @@ class MypageController extends AbstractController
                 'returns_reson_text' => $returns_reson_text,
             ];
         } catch (\Exception $e) {
-            log_error("MypageController.php returnPreview(): " . $e->getMessage());
+            log_error('MypageController.php returnPreview(): '.$e->getMessage());
+
             return $this->redirectToRoute('mypage_return');
         }
     }
@@ -1391,7 +1411,8 @@ class MypageController extends AbstractController
                 'returns_num' => $returns_num,
             ];
         } catch (\Exception $e) {
-            log_error("MypageController.php returnApprove(): " . $e->getMessage());
+            log_error('MypageController.php returnApprove(): '.$e->getMessage());
+
             return $this->redirectToRoute('mypage_return');
         }
     }
@@ -1436,11 +1457,11 @@ class MypageController extends AbstractController
                     'returns_num' => $returns_num,
                 ];
                 if ($submit == 'aprove') {
-                    $data["returns_status_flag"] = 1;
-                    $data["aprove_date"] = date('Y-m-d H:i:s');
+                    $data['returns_status_flag'] = 1;
+                    $data['aprove_date'] = date('Y-m-d H:i:s');
                 } else {
-                    $data["returns_status_flag"] = 2;
-                    $data["aprove_date_not_yet"] = date('Y-m-d H:i:s');
+                    $data['returns_status_flag'] = 2;
+                    $data['aprove_date_not_yet'] = date('Y-m-d H:i:s');
                 }
 
                 $product_returns_info = $this->mstProductReturnsInfoRepository->updadteData($returns_no, $data);
@@ -1465,7 +1486,8 @@ class MypageController extends AbstractController
                 'barcode' => $barcode,
             ];
         } catch (\Exception $e) {
-            log_error("MypageController.php returnApproveFinish(): " . $e->getMessage());
+            log_error('MypageController.php returnApproveFinish(): '.$e->getMessage());
+
             return $this->redirectToRoute('mypage_return');
         }
     }
@@ -1502,7 +1524,8 @@ class MypageController extends AbstractController
                 'returns_num' => $returns_num,
             ];
         } catch (\Exception $e) {
-            log_error("MypageController.php returnReceipt(): " . $e->getMessage());
+            log_error('MypageController.php returnReceipt(): '.$e->getMessage());
+
             return $this->redirectToRoute('mypage_return');
         }
     }
@@ -1537,18 +1560,24 @@ class MypageController extends AbstractController
             if (count($images) > 0) {
                 foreach ($images as $image) {
                     $mimeType = $image->getMimeType();
-                    if (0 !== strpos($mimeType, 'image')) break;
+                    if (0 !== strpos($mimeType, 'image')) {
+                        break;
+                    }
 
                     $extension = $image->getClientOriginalExtension();
-                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) break;
+                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
+                        break;
+                    }
 
                     $size = $image->getSize();
-                    if( $size/1024/1024 > 7 ) break;
+                    if ($size / 1024 / 1024 > 7) {
+                        break;
+                    }
 
-                    $filename = date('ymdHis') . uniqid('_') . '.' . $extension;
+                    $filename = date('ymdHis').uniqid('_').'.'.$extension;
                     $path = $this->getParameter('eccube_return_image_dir');
                     if ($image->move($this->getParameter('eccube_return_image_dir'), $filename)) {
-                        $stock_image_url_path[] = str_replace($this->getParameter('eccube_html_dir'), "html", $path) . '/' . $filename;
+                        $stock_image_url_path[] = str_replace($this->getParameter('eccube_html_dir'), 'html', $path).'/'.$filename;
                     }
                 }
             }
@@ -1565,14 +1594,14 @@ class MypageController extends AbstractController
                 ];
 
                 if ($receipt == 'yes') {
-                    $data["returns_status_flag"] = 3;
-                    $data["receipt_comment"] = $receipt_comment;
-                    $data["product_receipt_date"] = date('Y-m-d H:i:s');
-                    $data["stock_reviews_flag"] = $stock_reviews_flag;
+                    $data['returns_status_flag'] = 3;
+                    $data['receipt_comment'] = $receipt_comment;
+                    $data['product_receipt_date'] = date('Y-m-d H:i:s');
+                    $data['stock_reviews_flag'] = $stock_reviews_flag;
                 } else {
-                    $data["returns_status_flag"] = 4;
-                    $data["receipt_not_yet_comment"] = $receipt_not_yet_comment;
-                    $data["product_receipt_date_not_yet"] = date('Y-m-d H:i:s');
+                    $data['returns_status_flag'] = 4;
+                    $data['receipt_not_yet_comment'] = $receipt_not_yet_comment;
+                    $data['product_receipt_date_not_yet'] = date('Y-m-d H:i:s');
                 }
                 $product_returns_info = $this->mstProductReturnsInfoRepository->updadteData($returns_no, $data);
                 if (count($stock_image_url_path) > 0) {
@@ -1606,7 +1635,8 @@ class MypageController extends AbstractController
                 'returns_reson_text' => $returns_reson_text,
             ];
         } catch (\Exception $e) {
-            log_error("MypageController.php returnReceipt(): " . $e->getMessage());
+            log_error('MypageController.php returnReceipt(): '.$e->getMessage());
+
             return $this->redirectToRoute('mypage_return');
         }
     }
@@ -1636,7 +1666,8 @@ class MypageController extends AbstractController
                 'returns_reson_text' => $returns_reson_text,
             ];
         } catch (\Exception $e) {
-            log_error("MypageController.php returnComplete(): " . $e->getMessage());
+            log_error('MypageController.php returnComplete(): '.$e->getMessage());
+
             return $this->redirectToRoute('mypage_return');
         }
     }
@@ -1650,18 +1681,18 @@ class MypageController extends AbstractController
     public function returnCompleteFinish(Request $request, string $returns_no)
     {
         try {
-            $commonService        = new MyCommonService($this->entityManager);
+            $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
             $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
-            $product_name         = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
+            $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
 
             $xbj_reviews_flag = $request->get('xbj_reviews_flag', 0);
 
             if ('POST' === $request->getMethod()) {
                 $data = [
-                    'xbj_reviews_flag'    => $xbj_reviews_flag,
+                    'xbj_reviews_flag' => $xbj_reviews_flag,
                     'returns_status_flag' => 5,
-                    'returned_date'       => date('Y-m-d H:i:s'),
+                    'returned_date' => date('Y-m-d H:i:s'),
                 ];
 
                 $product_returns_info = $this->mstProductReturnsInfoRepository->updadteData($returns_no, $data);
@@ -1670,18 +1701,19 @@ class MypageController extends AbstractController
                 $this->mailService->sendMailReturnProductComplete($email);
             }
 
-            $returns_reson      = $commonService->getReturnsReson();
-            $returns_reson      = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
+            $returns_reson = $commonService->getReturnsReson();
+            $returns_reson = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
             $returns_reson_text = $returns_reson[$product_returns_info->getReasonReturnsCode()];
 
             return [
                 'product_returns_info' => $product_returns_info,
-                'customer'             => $customer,
-                'product_name'         => $product_name,
-                'returns_reson_text'   => $returns_reson_text,
+                'customer' => $customer,
+                'product_name' => $product_name,
+                'returns_reson_text' => $returns_reson_text,
             ];
         } catch (\Exception $e) {
-            log_error("MypageController.php returnCompleteFinish(): " . $e->getMessage());
+            log_error('MypageController.php returnCompleteFinish(): '.$e->getMessage());
+
             return $this->redirectToRoute('mypage_return');
         }
     }
@@ -1709,11 +1741,11 @@ class MypageController extends AbstractController
         ];
 
         // paginator
-        $my_common     = new MyCommonService($this->entityManager);
-        $customer_id   = $this->globalService->customerId();
-        $login_type    = $this->globalService->getLoginType();
+        $my_common = new MyCommonService($this->entityManager);
+        $customer_id = $this->globalService->customerId();
+        $login_type = $this->globalService->getLoginType();
         $customer_code = $this->globalService->customerCode();
-        $qb            = $this->mstProductReturnsInfoRepository->getReturnByCustomer($param, $customer_code);
+        $qb = $this->mstProductReturnsInfoRepository->getReturnByCustomer($param, $customer_code);
 
         // Paginator
         $pagination = $paginator->paginate(
@@ -1722,11 +1754,11 @@ class MypageController extends AbstractController
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
-        
+
         /*create list order date*/
         $request_date_list = [];
         for ($i = 0; $i < 14; $i++) {
-            $request_date_list[] = (string) date("Y-m", strtotime(date('Y-m-01') . " -$i months"));
+            $request_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
         }
 
         $returns_resons = $my_common->getReturnsReson();
