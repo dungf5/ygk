@@ -650,13 +650,6 @@ class MypageController extends AbstractController
     {
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
-        // paginator
-        $customer_id = $this->globalService->customerId();
-        $user_login = $this->twig->getGlobals()['app']->getUser();
-        $login_type = $this->globalService->getLoginType();
-        $customer_code = $user_login->getCustomerCode();
-        $my_common = new MyCommonService($this->entityManager);
-
         $search_parameter = [
             'shipping_no' => $request->get('shipping_no', ''),
             'shipping_status' => $request->get('shipping_status', 0),
@@ -664,23 +657,13 @@ class MypageController extends AbstractController
             'order_otodoke' => $request->get('order_otodoke', '0'),
         ];
 
-        if (!empty($_SESSION['usc_'.$customer_id]) && !empty($_SESSION['usc_'.$customer_id]['login_code'])) {
-            $represent_code = $_SESSION['usc_'.$customer_id]['login_code'];
-            $temp_customer_code = $my_common->getCustomerRelation($represent_code);
+        // paginator
+        $my_common = new MyCommonService($this->entityManager);
+        $customer_id = $this->globalService->customerId();
+        $login_type = $this->globalService->getLoginType();
+        $customer_code = $my_common->getMstCustomer($customer_id)['customer_code'] ?? '';
+        $qb = $this->orderItemRepository->getShippingByCustomer($search_parameter, $customer_code, $login_type);
 
-            if (!empty($temp_customer_code)) {
-                $customer_code = $temp_customer_code['customer_code'];
-            }
-        }
-
-        $order_status = $my_common->getOrderStatus($customer_code, $login_type);
-
-        if (empty($order_status)) {
-            $pagination = [];
-            goto No_Data_Case;
-        }
-
-        $qb = $this->mstShippingRepository->getQueryBuilderByCustomer($search_parameter, $order_status);
         $pagination = $paginator->paginate(
             $qb,
             $request->get('pageno', 1),
@@ -733,8 +716,6 @@ class MypageController extends AbstractController
 
         $pagination->setItems($listItem);
 
-        No_Data_Case:
-
         $orderShippingList = [];
         $shippingList = $this->globalService->shippingOption();
         if (count($shippingList) > 1) {
@@ -758,7 +739,6 @@ class MypageController extends AbstractController
             }
         }
 
-        // var_dump($orderOtodeokeList);die;
         return [
             'pagination' => $pagination,
             'search_parameter' => $search_parameter,
