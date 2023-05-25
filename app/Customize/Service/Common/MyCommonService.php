@@ -1318,6 +1318,8 @@ SQL;
             $orderItem->setShipingDepositCode($itemSave['location']);
             $orderItem->setFvehicleno($itemSave['fvehicleno']);
             $orderItem->setFtrnsportcd('87001');
+            $orderItem->setCreateDate($time);
+            $orderItem->setUpdateDate($time);
 
             // No41 注文情報送信I/F end
             $this->entityManager->persist($orderItem);
@@ -1361,6 +1363,8 @@ SQL;
             $orderItem->setRemarks3($itemSave['remarks3']);
             $orderItem->setRemarks4($itemSave['remarks4']);
             $orderItem->setEcType('1');
+            $orderItem->setCreateDate($time);
+            $orderItem->setUpdateDate($time);
 
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
