@@ -227,17 +227,6 @@ class ValidateCsvDataCommand extends Command
             $object->setShippingCode($this->shipping_code);
             $object->setOtodokeCode($otodoke_code);
             $object->setProductCode(!empty($product) ? $product['product_code'] : '');
-            $object->setErrorContent1(null);
-            $object->setErrorContent2(null);
-            $object->setErrorContent3(null);
-            $object->setErrorContent4(null);
-            $object->setErrorContent5(null);
-            $object->setErrorContent6(null);
-            $object->setErrorContent7(null);
-            $object->setErrorContent8(null);
-            $object->setErrorContent9(null);
-            $object->setErrorContent10(null);
-            $object->setErrorType(0);
 
             // Array contain error (if any)
             $error = [];
@@ -246,6 +235,19 @@ class ValidateCsvDataCommand extends Command
 
             // Check flag of check validate
             if ($this->check_validate) {
+                // Reset error
+                $object->setErrorContent1(null);
+                $object->setErrorContent2(null);
+                $object->setErrorContent3(null);
+                $object->setErrorContent4(null);
+                $object->setErrorContent5(null);
+                $object->setErrorContent6(null);
+                $object->setErrorContent7(null);
+                $object->setErrorContent8(null);
+                $object->setErrorContent9(null);
+                $object->setErrorContent10(null);
+                $object->setErrorType(0);
+
                 // validate order_date
                 if (empty($object['order_date']) || date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d')) {
                     $error['error_content1'] = '発注日付が過去日付になっています';
@@ -683,17 +685,6 @@ class ValidateCsvDataCommand extends Command
             $object->setShippingCode($this->shipping_code);
             $object->setOtodokeCode($otodoke_code);
             $object->setProductCode(!empty($product) ? $product['product_code'] : '');
-            $object->setErrorContent1(null);
-            $object->setErrorContent2(null);
-            $object->setErrorContent3(null);
-            $object->setErrorContent4(null);
-            $object->setErrorContent5(null);
-            $object->setErrorContent6(null);
-            $object->setErrorContent7(null);
-            $object->setErrorContent8(null);
-            $object->setErrorContent9(null);
-            $object->setErrorContent10(null);
-            $object->setErrorType(0);
 
             // Array contain error (if any)
             $error = [];
@@ -702,6 +693,19 @@ class ValidateCsvDataCommand extends Command
 
             // Check flag of check validate
             if ($this->check_validate) {
+                // Reset error
+                $object->setErrorContent1(null);
+                $object->setErrorContent2(null);
+                $object->setErrorContent3(null);
+                $object->setErrorContent4(null);
+                $object->setErrorContent5(null);
+                $object->setErrorContent6(null);
+                $object->setErrorContent7(null);
+                $object->setErrorContent8(null);
+                $object->setErrorContent9(null);
+                $object->setErrorContent10(null);
+                $object->setErrorType(0);
+
                 // Validate jan_code
                 if (empty($object['jan']) || empty($product)) {
                     $error['error_content1'] = 'JANコードが存在しません';
