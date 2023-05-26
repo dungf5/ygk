@@ -2739,6 +2739,27 @@ SQL;
         }
     }
 
+    public function getSumOrderAmout($order_no)
+    {
+        $sql = '
+            SELECT
+                SUM(IFNULL(do.order_price, 0) * IFNULL(do.demand_quantity, 0)) AS sum_order_amount
+            FROM dt_order do
+            WHERE do.order_no = ?
+            GROUP BY  do.order_no
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$order_no]);
+            $rows = $result->fetchAllAssociative();
+
+            return (int) ($rows[0]['sum_order_amount']) ?? 0;
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+
     public function getSumOrderAmoutWSEOS($order_no)
     {
         $sql = '
@@ -2747,6 +2768,27 @@ SQL;
             FROM dt_order_ws_eos dowe
             WHERE dowe.order_no = ?
             GROUP BY  dowe.order_no
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$order_no]);
+            $rows = $result->fetchAllAssociative();
+
+            return (int) ($rows[0]['sum_order_amount']) ?? 0;
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+
+    public function getSumOrderAmoutDaitoTest($order_no)
+    {
+        $sql = '
+            SELECT
+                SUM(IFNULL(do.order_price, 0) * IFNULL(do.demand_quantity, 0)) AS sum_order_amount
+            FROM dt_order_daito_test do
+            WHERE do.order_no = ?
+            GROUP BY  do.order_no
         ';
 
         try {
