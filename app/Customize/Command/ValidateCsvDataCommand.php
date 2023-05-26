@@ -498,11 +498,8 @@ class ValidateCsvDataCommand extends Command
 
                 $location = $this->commonService->getCustomerLocation($data['customer_code']);
                 $data['location'] = $location ?? 'XB0201001';
-
-                $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
-                $sum_order_amout = $common->getSumOrderAmoutWSEOS($data['order_no']);
-                $data['fvehicleno'] = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
-                $data['seikyu_code'] = $data['customer_code'];
+                $data['fvehicleno'] = '';
+                $data['seikyu_code'] = $this->customer_code;
                 $data['ftrnsportcd'] = '87001';
 
                 return $this->entityManager->getRepository(DtOrder::class)->insertData($data);
@@ -601,10 +598,9 @@ class ValidateCsvDataCommand extends Command
                     $fvehicleno_start = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
 
                     foreach ($dtOrder as $order) {
-                        $fvehicleno = $order->getFvehicleno();
-                        $fvehicleno2 = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+                        $fvehicleno_end = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
 
-                        $order->setFvehicleno($fvehicleno.$fvehicleno2);
+                        $order->setFvehicleno($fvehicleno_start.$fvehicleno_end);
                         $this->entityManager->getRepository(DtOrder::class)->save($order);
                     }
                 }
