@@ -459,6 +459,7 @@ class ValidateCsvDataCommand extends Command
             return $id;
         } else {
             sleep(1);
+
             return $this->handleInsertDtbOrder();
         }
     }
@@ -505,11 +506,9 @@ class ValidateCsvDataCommand extends Command
                 $data['ftrnsportcd'] = '87001';
 
                 return $this->entityManager->getRepository(DtOrder::class)->insertData($data);
-
             } else {
                 return 1;
             }
-
         } catch (\Exception $e) {
             log_error('Insert dt_order error');
             log_error($e->getMessage());
@@ -535,11 +534,9 @@ class ValidateCsvDataCommand extends Command
                 log_info('Import data dt_order_status '.$data['order_no'].'-'.$data['order_line_no']);
 
                 return $this->entityManager->getRepository(DtOrderStatus::class)->insertData($data);
-
             } else {
                 return 1;
             }
-
         } catch (\Exception $e) {
             log_error('Insert dt_order_status error');
             log_error($e->getMessage());
@@ -559,6 +556,7 @@ class ValidateCsvDataCommand extends Command
         }
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $common = new MyCommonService($this->entityManager);
 
         $information = [
             'email' => getenv('EMAIL_WS_EOS') ?? '',
@@ -592,9 +590,15 @@ class ValidateCsvDataCommand extends Command
         if ($break_key) {
             for ($i = 1; $i <= $break_key; $i++) {
                 if ($i > ($break_key - count($this->success)) && isset($order_success[$i - ($break_key - count($this->success)) - 1])) {
+                    $order_no = $order_success[$i - ($break_key - count($this->success)) - 1];
+
                     $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findBy([
-                        'order_no' => $order_success[$i - ($break_key - count($this->success)) - 1],
+                        'order_no' => $order_no,
                     ]);
+
+                    $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
+                    $sum_order_amout = $common->getSumOrderAmout($order_no);
+                    $fvehicleno_start = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
 
                     foreach ($dtOrder as $order) {
                         $fvehicleno = $order->getFvehicleno();
