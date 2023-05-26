@@ -485,10 +485,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
 
                 $location = $this->commonService->getCustomerLocation($data['customer_code']);
                 $data['location'] = $location ?? 'XB0201001';
-
-                $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
-                $sum_order_amout = $common->getSumOrderAmoutWSEOSDaitoTest($data['order_no']);
-                $data['fvehicleno'] = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
+                $data['fvehicleno'] = '';
                 $data['seikyu_code'] = $this->customer_code;
                 $data['ftrnsportcd'] = '87001';
 
@@ -607,6 +604,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
         }
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $common = new MyCommonService($this->entityManager);
 
         $information = [
             'email' => getenv('EMAIL_WS_EOS') ?? '',
@@ -621,7 +619,7 @@ class ValidateCsvDataDaitoTestCommand extends Command
 
             try {
                 log_info('[WS-EOS] Send Mail Order Success. '.$key);
-                $this->mailService->sendMailOrderSuccessWSEOS($information);
+                //$this->mailService->sendMailOrderSuccessWSEOS($information);
                 $order_success[] = $key;
             } catch (\Exception $e) {
                 log_error($e->getMessage());
@@ -630,7 +628,6 @@ class ValidateCsvDataDaitoTestCommand extends Command
         }
 
         // Update total order success to dt_break_key
-        //$total_order_success = str_pad((string) count($this->success), 3, '0', STR_PAD_LEFT);
         $break_key_data = [
             'customer_code' => $this->customer_code,
             'break_key' => count($this->success),
@@ -640,15 +637,20 @@ class ValidateCsvDataDaitoTestCommand extends Command
         if ($break_key) {
             for ($i = 1; $i <= $break_key; $i++) {
                 if ($i > ($break_key - count($this->success)) && isset($order_success[$i - ($break_key - count($this->success)) - 1])) {
+                    $order_no = $order_success[$i - ($break_key - count($this->success)) - 1];
+
                     $dtOrder = $this->entityManager->getRepository(DtOrderDaitoTest::class)->findBy([
-                        'order_no' => $order_success[$i - ($break_key - count($this->success)) - 1],
+                        'order_no' => $order_no,
                     ]);
 
-                    foreach ($dtOrder as $order) {
-                        $fvehicleno = $order->getFvehicleno();
-                        $fvehicleno2 = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+                    $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
+                    $sum_order_amout = $common->getSumOrderAmoutDaitoTest($order_no);
+                    $fvehicleno_start = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
 
-                        $order->setFvehicleno($fvehicleno.$fvehicleno2);
+                    foreach ($dtOrder as $order) {
+                        $fvehicleno_end = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+
+                        $order->setFvehicleno($fvehicleno_start.$fvehicleno_end);
                         $this->entityManager->getRepository(DtOrderDaitoTest::class)->save($order);
                     }
                 }
