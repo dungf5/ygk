@@ -578,34 +578,36 @@ class ValidateCsvDataCommand extends Command
 
         // Update total order success to dt_break_key
         //$total_order_success = str_pad((string) count($this->success), 3, '0', STR_PAD_LEFT);
-        $break_key_data = [
-            'customer_code' => $this->customer_code,
-            'break_key' => count($this->success),
-        ];
 
-        $break_key = $this->entityManager->getRepository(DtBreakKey::class)->insertOrUpdate($break_key_data);
-        if ($break_key) {
-            for ($i = 1; $i <= $break_key; $i++) {
-                if ($i > ($break_key - count($this->success)) && isset($order_success[$i - ($break_key - count($this->success)) - 1])) {
-                    $order_no = $order_success[$i - ($break_key - count($this->success)) - 1];
+        // Comment by task #1771
+        //$break_key_data = [
+        //    'customer_code' => $this->customer_code,
+        //    'break_key' => count($this->success),
+        //];
 
-                    $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findBy([
-                        'order_no' => $order_no,
-                    ]);
+        //$break_key = $this->entityManager->getRepository(DtBreakKey::class)->insertOrUpdate($break_key_data);
+        //if ($break_key) {
+        //    for ($i = 1; $i <= $break_key; $i++) {
+        //        if ($i > ($break_key - count($this->success)) && isset($order_success[$i - ($break_key - count($this->success)) - 1])) {
+        //            $order_no = $order_success[$i - ($break_key - count($this->success)) - 1];
 
-                    $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
-                    $sum_order_amout = $common->getSumOrderAmout($order_no);
-                    $fvehicleno_start = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
+        //            $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findBy([
+        //                'order_no' => $order_no,
+        //            ]);
 
-                    foreach ($dtOrder as $order) {
-                        $fvehicleno_end = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+        //            $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
+        //            $sum_order_amout = $common->getSumOrderAmout($order_no);
+        //            $fvehicleno_start = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
 
-                        $order->setFvehicleno($fvehicleno_start.$fvehicleno_end);
-                        $this->entityManager->getRepository(DtOrder::class)->save($order);
-                    }
-                }
-            }
-        }
+        //            foreach ($dtOrder as $order) {
+        //                $fvehicleno_end = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+
+        //                $order->setFvehicleno($fvehicleno_start.$fvehicleno_end);
+        //                $this->entityManager->getRepository(DtOrder::class)->save($order);
+        //            }
+        //        }
+        //    }
+        //}
 
         return;
     }
