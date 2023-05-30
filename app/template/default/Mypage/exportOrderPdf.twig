@@ -327,40 +327,34 @@
                     <tbody>
                         <tr class="tr-content">
                             <td style="width: 1200px;">
-
-                                <table style=" " class="tblFooterLeft">
+                                <table class="tblFooterLeft">
                                     <tbody>
+                                        <tr class="tr-content">
+                                            <td style="text-align: right">小計：{{ roundPriceZeroTotal(OrderTotal) }}</td>
+                                        </tr>
 
-                                    <tr class="tr-content">
-                                        <td style="width: 32.0866%;"></td>
-                                        <td style="width: 29.3307%;"> 小計：</td>
-                                        <td style="width: 21.6535%;text-align: right" >{{ roundPriceZeroTotal(OrderTotal) }}</td>
-                                    </tr>
+                                        <tr class="tr-content">
+                                            <td style="text-align: right">（消費税については請求時に一括計算させて頂きます）</td>
+                                        </tr>
 
-                                    <tr class="tr-content">
-                                        <td style="width: 32.0866%;"></td>
-                                        <td style="width: 67.9134%; text-align: right">（消費税については請求時に一括計算させて頂きます）</td>
-                                    </tr>
+{#                                        <tr class="tr-content">#}
+{#                                            <td style="width: 32.0866%;"></td>#}
+{#                                            <td style="width: 29.3307%;"> 消費税金額：</td>#}
+{#                                            <td style="width: 21.6535%;text-align: right" >{{ roundPriceZeroTax(totalTaxRe) }}</td>#}
+{#                                        </tr>#}
 
-{#                                    <tr class="tr-content">#}
-{#                                        <td style="width: 32.0866%;"></td>#}
-{#                                        <td style="width: 29.3307%;"> 消費税金額：</td>#}
-{#                                        <td style="width: 21.6535%;text-align: right" >{{ roundPriceZeroTax(totalTaxRe) }}</td>#}
-{#                                    </tr>#}
+{#                                        <tr class="tr-content">#}
+{#                                            <td style="width: 32.0866%;" ></td>#}
+{#                                            <td style="width: 29.3307%;">合計金額:</td>#}
+{#                                            <td style="width: 21.6535%;text-align: right" >{{ roundPriceZeroTotalAll(totalaAmountTax) }}</td>#}
+{#                                        </tr>#}
 
-{#                                    <tr class="tr-content">#}
-{#                                        <td style="width: 32.0866%;"></td>#}
-{#                                        <td style="width: 29.3307%;">合計金額:</td>#}
-{#                                        <td style="width: 21.6535%;text-align: right" >{{ roundPriceZeroTotalAll(totalaAmountTax) }}</td>#}
-{#                                    </tr>#}
-
-                                    <tr>
-                                        <td style="width: 32.0866%;" colspan="3">備考: {{ myDatas[0][0].footer_remark1}} </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 32.0866%;">出荷先: {{ myDatas[0][0].shiping_code }}</td>
-                                        <td style="width: 21.6535%;">&nbsp;</td>
-                                    </tr>
+                                        <tr>
+                                            <td>備考: {{ myDatas[0][0].footer_remark1}} </td>
+                                        </tr>
+                                        <tr>
+                                            <td>出荷先: {{ myDatas[0][0].shiping_code }}</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </td>
