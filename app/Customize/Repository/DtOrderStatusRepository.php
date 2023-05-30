@@ -56,8 +56,8 @@ class DtOrderStatusRepository extends AbstractRepository
         $object->setFlowType('2');
         $object->setEcType('2');
         $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
-        $object->setCreateDate(new \DateTime());
-        $object->setUpdateDate(new \DateTime());
+        //$object->setCreateDate(new \DateTime());
+        //$object->setUpdateDate(new \DateTime());
 
         log_info('Call insertData to dt_order_status '.$object->getCusOrderNo().'-'.$object->getCusOrderLineno());
 

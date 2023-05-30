@@ -68,8 +68,8 @@ class DtOrderRepository extends AbstractRepository
         $object->setRequestFlg('Y');
         $object->setFvehicleno($data['fvehicleno']);
         $object->setFtrnsportcd($data['ftrnsportcd']);
-        $object->setCreateDate(new \DateTime());
-        $object->setUpdateDate(new \DateTime());
+        //$object->setCreateDate(new \DateTime());
+        //$object->setUpdateDate(new \DateTime());
 
         log_info('Call insertData to dt_order '.$object->getOrderNo().'-'.$object->getOrderLineno());
 
