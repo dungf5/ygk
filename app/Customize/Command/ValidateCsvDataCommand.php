@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Customize\Command;
 
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\DtbOrderDaitoTest;
 use Customize\Entity\DtBreakKey;
 use Customize\Entity\DtOrder;
 use Customize\Entity\DtOrderStatus;
@@ -381,8 +382,8 @@ class ValidateCsvDataCommand extends Command
                     } else {
                         $id = $order_id[$item['order_no']];
                     }
-
-                    $item['dtb_order_no'] = $id;
+                    $wId = sprintf('%08d', $id);
+                    $item['dtb_order_no'] = "w_".$wId;
                     $item['dtb_order_line_no'] = $item['order_line_no'];
 
                     $result = $this->importDtOrder($item);
@@ -441,7 +442,7 @@ class ValidateCsvDataCommand extends Command
             'name01' => '',
             'name02' => '',
         ];
-        $id = $this->entityManager->getRepository(Order::class)->insertData($dtbOrderData);
+        $id = $this->entityManager->getRepository(DtbOrderDaitoTest::class)->insertData($dtbOrderData);
 
         if (!empty($id)) {
             return $id;
