@@ -62,22 +62,6 @@ class DtOrderStatusRepository extends AbstractRepository
         log_info('Call insertData to dt_order_status '.$object->getCusOrderNo().'-'.$object->getCusOrderLineno());
 
         return $this->Execute($object, 1);
-
-//        log_info('Call insertData to dt_order_status '.$data['order_no'].'-'.$data['order_line_no']);
-//
-//        try {
-//            $myCommonService = new MyCommonService($this->getEntityManager());
-//            $myCommonService->insertDtOrderStatusByQuery($data);
-//
-//            return 1;
-//        } catch (\Exception $e) {
-//            $message = 'Import data dt_order_status '.$data['order_no'].'-'.$data['order_line_no'].' error';
-//            $message .= "\n".$e->getMessage();
-//            log_error($message);
-//            $this->pushGoogleChat($message);
-//
-//            return 0;
-//        }
     }
 
     private function Execute($object, $count)
