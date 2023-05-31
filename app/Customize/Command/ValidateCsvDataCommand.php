@@ -365,26 +365,31 @@ class ValidateCsvDataCommand extends Command
                     $item = $value->toArray();
 
                     // Check not exists order error_type = 1
-                    if (isset($order_error[$item['order_no']]) || $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy(['order_no' => $item['order_no'], 'error_type' => '1'])) {
-                        $order_error[$item['order_no']] = 1;
+                    //if (isset($order_error[$item['order_no']]) || $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy(['order_no' => $item['order_no'], 'error_type' => '1'])) {
+                    //    $order_error[$item['order_no']] = 1;
 
-                        continue;
-                    }
+                    //    continue;
+                    //}
 
                     // Create dtb_order
                     $this->entityManager->getConfiguration()->setSQLLogger(null);
                     $this->entityManager->getConnection()->beginTransaction();
                     if (!isset($order_id[$item['order_no']])) {
+                        $index = 1;
                         $id = $this->handleInsertDtbOrder();
-                        $order_id[$item['order_no']] = $id;
+                        $order_id[$item['order_no']] = [$id, $index];
 
                         log_info('Import data dtb_order with id '.$id);
                     } else {
-                        $id = $order_id[$item['order_no']];
+                        $index = (int) $order_id[$item['order_no']][1] + 1;
+                        $id = $order_id[$item['order_no']][0];
+
+                        $order_id[$item['order_no']] = [$id, $index];
                     }
+
                     $wId = sprintf('%08d', $id);
-                    $item['dtb_order_no'] = "w_".$wId;
-                    $item['dtb_order_line_no'] = $item['order_line_no'];
+                    $item['dtb_order_no'] = 'w_'.$wId;
+                    $item['dtb_order_line_no'] = $index;
 
                     $result = $this->importDtOrder($item);
                     $result1 = $this->importDtOrderStatus($item);
