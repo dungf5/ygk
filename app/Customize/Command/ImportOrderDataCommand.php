@@ -17,6 +17,7 @@ namespace Customize\Command;
 
 use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\DtbOrderDaitoTest;
 use Customize\Entity\DtBreakKey;
 use Customize\Entity\DtCustomerRelation;
 use Customize\Entity\DtOrder;
@@ -171,11 +172,11 @@ class ImportOrderDataCommand extends Command
                 $item = $value->toArray();
 
                 // Check not exists order error_type = 1
-                if (isset($order_error[$item['reqcd']]) || $this->entityManager->getRepository(DtOrderNatEOS::class)->findOneBy(['reqcd' => $item['reqcd'], 'error_type' => '1'])) {
-                    $order_error[$item['reqcd']] = 1;
+                //if (isset($order_error[$item['reqcd']]) || $this->entityManager->getRepository(DtOrderNatEOS::class)->findOneBy(['reqcd' => $item['reqcd'], 'error_type' => '1'])) {
+                //    $order_error[$item['reqcd']] = 1;
 
-                    continue;
-                }
+                //    continue;
+                //}
 
                 $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy([
                     'jan_code' => $item['jan'] ?? '',
@@ -193,27 +194,30 @@ class ImportOrderDataCommand extends Command
                 // Create dtb_order
                 $this->entityManager->getConfiguration()->setSQLLogger(null);
                 $this->entityManager->getConnection()->beginTransaction();
+
                 if (!isset($order_id[$item['reqcd']])) {
-                    $dtbOrderData = [
-                        'customer' => null,
-                        'name01' => '',
-                        'name02' => '',
-                    ];
-                    $id = $this->entityManager->getRepository(Order::class)->insertData($dtbOrderData);
-                    $order_id[$item['reqcd']] = $id;
+                    $index = 1;
+                    $id = $this->handleInsertDtbOrder();
+                    $order_id[$item['reqcd']] = [$id, $index];
 
                     log_info('Import data dtb_order with id '.$id);
                 } else {
-                    $id = $order_id[$item['reqcd']];
+                    $index = (int) $order_id[$item['reqcd']][1] + 1;
+                    $id = $order_id[$item['reqcd']][0];
+
+                    $order_id[$item['reqcd']] = [$id, $index];
                 }
 
-                $item['dtb_order_no'] = $id;
-                $item['dtb_order_line_no'] = $item['order_lineno'];
+                $wId = sprintf('%08d', $id);
+                $item['dtb_order_no'] = 'w_'.$wId;
+                $item['dtb_order_line_no'] = $index;
+
                 $item['order_no'] = $item['reqcd'];
                 $item['order_line_no'] = $item['order_lineno'];
                 $item['order_num'] = $item['qty'];
                 $item['delivery_date'] = $item['delivery_day'];
                 $item['jan_code'] = $item['jan'];
+                $item['customer_code'] = $this->customer_code;
                 $item['seikyu_code'] = $this->customer_relation['seikyu_code'] ?? '';
                 $item['shipping_code'] = $this->customer_relation['shipping_code'] ?? '';
                 $item['otodoke_code'] = $this->customer_relation['otodoke_code'] ?? '';
@@ -268,6 +272,25 @@ class ImportOrderDataCommand extends Command
         }
     }
 
+    private function handleInsertDtbOrder()
+    {
+        $dtbOrderData = [
+            'customer' => null,
+            'name01' => '',
+            'name02' => '',
+        ];
+        //$id = $this->entityManager->getRepository(Order::class)->insertData($dtbOrderData);
+        $id = $this->entityManager->getRepository(DtbOrderDaitoTest::class)->insertData($dtbOrderData);
+
+        if (!empty($id)) {
+            return $id;
+        } else {
+            sleep(1);
+
+            return $this->handleInsertDtbOrder();
+        }
+    }
+
     private function importDtOrder($data, $product)
     {
         try {
@@ -296,19 +319,15 @@ class ImportOrderDataCommand extends Command
 
                 $data['order_price'] = (!empty($product) && $product['quantity'] > 1) ? ($unit_price * ((int) ($data['order_num'] / $product['quantity']))) : $unit_price;
 
-                $location = $this->commonService->getCustomerLocation($data['customer_code']);
-                $data['location'] = $location ?? 'XB0201001';
-
-                $customer_fusrdec1 = $this->customer['fusrdec1'] ?? 0;
-                $sum_order_amout = $common->getSumOrderAmoutNatEOS($data['reqcd']);
-                $data['fvehicleno'] = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
+                $location = $this->commonService->getCustomerLocation($this->customer_code);
+                $data['location'] = $location ?? '';
+                $data['fvehicleno'] = '';
                 $data['ftrnsportcd'] = '87001';
-                $data['customer_code'] = '7015';
 
                 return $this->entityManager->getRepository(DtOrder::class)->insertData($data);
+            } else {
+                return 1;
             }
-
-            return 0;
         } catch (\Exception $e) {
             log_error('Insert dt_order error');
             log_error($e->getMessage());
@@ -334,9 +353,9 @@ class ImportOrderDataCommand extends Command
                 log_info('Import data dt_order_status '.$data['reqcd'].'-'.$data['order_lineno']);
 
                 return $this->entityManager->getRepository(DtOrderStatus::class)->insertData($data);
+            } else {
+                return 1;
             }
-
-            return 0;
         } catch (\Exception $e) {
             log_error('Insert dt_order_status error');
             log_error($e->getMessage());
@@ -356,6 +375,7 @@ class ImportOrderDataCommand extends Command
         }
 
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $common = new MyCommonService($this->entityManager);
 
         $information = [
             'email' => getenv('EMAIL_WS_EOS') ?? '',
@@ -389,15 +409,22 @@ class ImportOrderDataCommand extends Command
         if ($break_key) {
             for ($i = 1; $i <= $break_key; $i++) {
                 if ($i > ($break_key - count($this->success)) && isset($order_success[$i - ($break_key - count($this->success)) - 1])) {
+                    $order_no = $order_success[$i - ($break_key - count($this->success)) - 1];
+
                     $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findBy([
-                        'order_no' => $order_success[$i - ($break_key - count($this->success)) - 1],
+                        'order_no' => $order_no,
                     ]);
 
-                    foreach ($dtOrder as $order) {
-                        $fvehicleno = $order->getFvehicleno();
-                        $fvehicleno2 = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+                    $customer_fusrdec1 = $this->customer['fusrdec1'] ?? 0;
+                    $sum_order_amout = $common->getSumOrderAmout($order_no);
+                    $fvehicleno_start = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
 
-                        $order->setFvehicleno($fvehicleno.$fvehicleno2);
+                    foreach ($dtOrder as $order) {
+                        $fvehicleno_end = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+
+                        // Comment by task #1771
+                        //$order->setFvehicleno($fvehicleno_start.$fvehicleno_end);
+                        $order->setFvehicleno($fvehicleno_start);
                         $this->entityManager->getRepository(DtOrder::class)->save($order);
                     }
                 }
