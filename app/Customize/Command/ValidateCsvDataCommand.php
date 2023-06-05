@@ -587,11 +587,11 @@ class ValidateCsvDataCommand extends Command
                     $fvehicleno_start = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
 
                     foreach ($dtOrder as $order) {
-                        $fvehicleno_end = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+                        // Change by task #1792
+                        //$fvehicleno_end = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+                        $fvehicleno_end = '001';
 
-                        // Comment by task #1771
-                        //$order->setFvehicleno($fvehicleno_start.$fvehicleno_end);
-                        $order->setFvehicleno($fvehicleno_start);
+                        $order->setFvehicleno($fvehicleno_start.$fvehicleno_end);
                         $this->entityManager->getRepository(DtOrder::class)->save($order);
                     }
                 }
