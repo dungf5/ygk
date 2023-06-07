@@ -634,6 +634,12 @@ file that was distributed with this source code.
                     {#    $(".check-box-all-print-pdf").prop("checked", false);#}
                     {#}#}
 
+                    if (count == {{ pagination.totalItemCount }}) {
+                        $(".check-box-all-print-pdf").prop("checked", true);
+                    } else {
+                        $(".check-box-all-print-pdf").prop("checked", false);
+                    }
+
                 } else {
                     $(".btn-print-pdf").prop('disabled', true);
                 }
