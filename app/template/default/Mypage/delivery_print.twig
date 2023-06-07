@@ -128,7 +128,7 @@ file that was distributed with this source code.
 
             <div class="row">
                 <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePreviewPDF()">Preview & Print</button>
-                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDF()">Download</button>
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDF()">Download & Print</button>
                 <input type="hidden" id="check-box-value-print-pdf" value=""/>
             </div>
 
@@ -628,11 +628,11 @@ file that was distributed with this source code.
                     $("#check-box-value-print-pdf").val(temp_value);
                     $(".btn-print-pdf").prop('disabled', false);
 
-                    if ((count < 12 && count == {{ pagination.totalItemCount }}) || count >= 12) {
-                        $(".check-box-all-print-pdf").prop("checked", true);
-                    } else {
-                        $(".check-box-all-print-pdf").prop("checked", false);
-                    }
+                    {#if ((count < 12 && count == {{ pagination.totalItemCount }}) || count >= 12) {#}
+                    {#    $(".check-box-all-print-pdf").prop("checked", true);#}
+                    {#} else {#}
+                    {#    $(".check-box-all-print-pdf").prop("checked", false);#}
+                    {#}#}
 
                 } else {
                     $(".btn-print-pdf").prop('disabled', true);
@@ -656,34 +656,34 @@ file that was distributed with this source code.
                 }
 
                 if (count > 0) {
-                    $("#check-box-value-print-pdf").val(temp_value);
+                    // change check-all to print all data
+                    // $("#check-box-value-print-pdf").val(temp_value);
+                    $("#check-box-value-print-pdf").val('all');
                     $(".btn-print-pdf").prop('disabled', false);
                 } else {
+                    $("#check-box-value-print-pdf").val('');
                     $(".btn-print-pdf").prop('disabled', true);
                 }
             }
         }
 
         function handlePreviewPDF() {
-            let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
-            let handled = {};
-            let delivery_no = '';
+            // let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+            // let handled = {};
+            //
+            // $.each(arr_print_pdf_value, function( index, value ) {
+            //     if (value && !handled[value]) {
+            //         handled[value] = true;
+            //
+            //         let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + value;
+            //         let a = document.createElement('a');
+            //         a.target = '_blank';
+            //         a.href = url;
+            //         a.click();
+            //     }
+            // });
 
-            $.each(arr_print_pdf_value, function( index, value ) {
-                if (value && !handled[value]) {
-                    handled[value] = true;
-
-                    // let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + value;
-                    // let a = document.createElement('a');
-                    // a.target = '_blank';
-                    // a.href = url;
-                    // a.click();
-
-                    delivery_no += ',' + value;
-                }
-            });
-
-            let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + delivery_no;
+            let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + $("#check-box-value-print-pdf").val();
             let a = document.createElement('a');
             a.target = '_blank';
             a.href = url;
@@ -691,25 +691,22 @@ file that was distributed with this source code.
         }
 
         function handlePrintPDF() {
-            let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
-            let handled = {};
-            let delivery_no = '';
+            // let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+            // let handled = {};
+            //
+            // $.each(arr_print_pdf_value, function( index, value ) {
+            //    if (value && !handled[value]) {
+            //        handled[value] = true;
+            //
+            //        // let url = '/mypage/export_Pdf_multiple?delivery_no=' + value;
+            //        // let a = document.createElement('a');
+            //        // a.target = '_blank';
+            //        // a.href = url;
+            //        // a.click();
+            //    }
+            // });
 
-            $.each(arr_print_pdf_value, function( index, value ) {
-               if (value && !handled[value]) {
-                   handled[value] = true;
-
-                   // let url = '/mypage/export_Pdf_multiple?delivery_no=' + value;
-                   // let a = document.createElement('a');
-                   // a.target = '_blank';
-                   // a.href = url;
-                   // a.click();
-
-                   delivery_no += ',' + value;
-               }
-            });
-
-            let url = '/mypage/export_Pdf_multiple?delivery_no=' + delivery_no;
+            let url = '/mypage/export_Pdf_multiple?delivery_no=' + $("#check-box-value-print-pdf").val();
             let a = document.createElement('a');
             a.target = '_blank';
             a.href = url;

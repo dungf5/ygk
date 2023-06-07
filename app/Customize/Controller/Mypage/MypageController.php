@@ -169,13 +169,21 @@ class MypageController extends AbstractController
     public function exportOrderPdf(Request $request)
     {
         $htmlFileName = 'Mypage/exportOrderPdf.twig';
-        $preview = MyCommon::getPara('preview');
         $delivery_no = MyCommon::getPara('delivery_no');
         $order_no_line_no = MyCommon::getPara('order_no_line_no');
 
         $comS = new MyCommonService($this->entityManager);
         $orderNo = explode('-', $order_no_line_no)[0];
-        $arRe = $comS->getPdfDelivery($delivery_no, $orderNo);
+
+        $customer_id = $this->globalService->customerId();
+        $login_type = $this->globalService->getLoginType();
+        $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
+
+        $arRe = $comS->getPdfDelivery($delivery_no, $orderNo, $customer_code, $login_type);
+
+        if (!count($arRe)) {
+            return $this->redirectToRoute('mypage_delivery_history');
+        }
 
         //add special line
         $totalTax = 0;
@@ -206,22 +214,20 @@ class MypageController extends AbstractController
             'totalaAmountTax' => $totalaAmountTax,
         ];
 
-        if (!$preview) {
-            $namePdf = 'ship_'.$delivery_no.'.pdf';
-            $file = $dirPdf.'/'.$namePdf;
+        $namePdf = 'ship_'.$delivery_no.'.pdf';
+        $file = $dirPdf.'/'.$namePdf;
 
-            if (getenv('APP_IS_LOCAL') == 0) {
-                $htmlBody = $this->twig->render($htmlFileName, $arReturn);
-                MyCommon::converHtmlToPdf($dirPdf, $namePdf, $htmlBody);
-                header('Content-Description: File Transfer');
-                header('Content-Type: application/octet-stream');
-                header('Content-Disposition: attachment; filename="'.basename($file).'"');
+        if (getenv('APP_IS_LOCAL') == 0) {
+            $htmlBody = $this->twig->render($htmlFileName, $arReturn);
+            MyCommon::converHtmlToPdf($dirPdf, $namePdf, $htmlBody);
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="'.basename($file).'"');
 
-                readfile($file);
-                exit();
-            } else {
-                exec('"C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe" c:/wamp/www/test/pdf.html c:/wamp/www/test/pdf.pdf');
-            }
+            readfile($file);
+            exit();
+        } else {
+            exec('"C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe" c:/wamp/www/test/pdf.html c:/wamp/www/test/pdf.pdf');
         }
 
         return $arReturn;
@@ -1077,12 +1083,25 @@ class MypageController extends AbstractController
         $htmlFileName = 'Mypage/exportPdfMultiple.twig';
         $preview = MyCommon::getPara('preview');
         $delivery_no = MyCommon::getPara('delivery_no');
-        $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
-        $comS = new MyCommonService($this->entityManager);
-        $arr_data = [];
 
+        $comS = new MyCommonService($this->entityManager);
+        $customer_id = $this->globalService->customerId();
+        $login_type = $this->globalService->getLoginType();
+        $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
+
+        if (trim($delivery_no) == 'all') {
+            $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type);
+        } else {
+            $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
+        }
+
+        $arr_data = [];
         foreach ($arr_delivery_no as $item_delivery_no) {
-            $arRe = $comS->getPdfDelivery($item_delivery_no);
+            $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
+
+            if (!count($arRe)) {
+                continue;
+            }
 
             //add special line
             $totalTax = 0;
@@ -1104,8 +1123,6 @@ class MypageController extends AbstractController
             $arSpecial = ['is_total' => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
             $arRe[] = $arSpecial;
 
-            $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
-            FileUtil::makeDirectory($dirPdf);
             $arReturn = [
                 'myDatas' => array_chunk($arRe, 20),
                 'OrderTotal' => $totalaAmount,
@@ -1117,6 +1134,8 @@ class MypageController extends AbstractController
         }
 
         if (!$preview) {
+            $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
+            FileUtil::makeDirectory($dirPdf);
             $namePdf = 'ship_'.date('Ymd').'.pdf';
             $file = $dirPdf.'/'.$namePdf;
 
@@ -1134,6 +1153,10 @@ class MypageController extends AbstractController
             }
         }
 
-        return $arr_data;
+        if (!empty($arr_data)) {
+            return $arr_data;
+        } else {
+            return $this->redirectToRoute('mypage_delivery_print');
+        }
     }
 }
