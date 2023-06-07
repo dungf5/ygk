@@ -179,7 +179,7 @@ class OrderItemRepository extends AbstractRepository
             'Customize\Entity\MstDelivery',
             'delivery',
             Join::WITH,
-            "delivery.shipping_no = shipping.shipping_no AND TRIM(delivery.order_no) = CONCAT(TRIM(shipping.ec_order_no),'-',TRIM(shipping.ec_order_lineno))"
+            "delivery.shipping_no = shipping.shipping_no AND TRIM(delivery.order_no) = CONCAT(TRIM(shipping.cus_order_no),'-',TRIM(shipping.cus_order_lineno))"
         );
 
         $qb->addSelect(
@@ -197,7 +197,7 @@ class OrderItemRepository extends AbstractRepository
 
         $qb->where('shipping.delete_flg IS NOT NULL AND shipping.delete_flg <> 0')
             ->andWhere('order_status.order_date >= :order_date')
-            //->andWhere('delivery.delivery_lineno = 1')
+            ->andWhere('delivery.delivery_lineno = 1')
             ->andWhere($condition)
             ->setParameter(':order_date', date('Y-m-d', strtotime('-14 MONTH')))
             ->setParameter(':customer_code', $customer_code);
@@ -243,11 +243,10 @@ class OrderItemRepository extends AbstractRepository
         }
 
         $qb->addGroupBy('delivery.delivery_no');
-        $qb->addGroupBy('delivery.delivery_lineno');
-        $qb->addGroupBy('delivery.order_no');
+        $qb->addGroupBy('shipping.order_no');
 
-        $qb->addOrderBy('order_status.order_date', 'DESC');
-        $qb->addOrderBy('delivery.order_no', 'ASC');
+        $qb->addOrderBy('delivery.delivery_no', 'DESC');
+        $qb->addOrderBy('shipping.shipping_date', 'DESC');
 
         //dump($qb->getQuery()->getSQL());
         //dump($qb->getParameters());
