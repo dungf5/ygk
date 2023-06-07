@@ -1045,72 +1045,151 @@ SQL;
         return $rows;
     }
 
-    public function getPdfDelivery($delivery_no, $orderNo = '')
+    public function getDeliveryNoPrintPDF($customer_code, $login_type)
     {
+        switch ($login_type) {
+            case 'shipping_code':
+                $condition = 'dt_order_status.shipping_code = ?';
+                break;
+
+            case 'otodoke_code':
+                $condition = 'dt_order_status.otodoke_code = ?';
+                break;
+
+            default:
+                $condition = 'dt_order_status.customer_code = ?';
+                break;
+        }
+
+        $sql = "
+                        SELECT
+                            mst_delivery.delivery_no
+                        FROM
+                            dt_order_status
+                        JOIN
+                            mst_shipping 
+                            ON mst_shipping.cus_order_no = dt_order_status.cus_order_no 
+                            AND mst_shipping.cus_order_lineno = dt_order_status.cus_order_lineno
+                        JOIN
+                             mst_delivery 
+                             ON mst_delivery.shipping_no = mst_shipping.shipping_no 
+                             AND TRIM(mst_delivery.order_no) = CONCAT(TRIM(mst_shipping.ec_order_no),'-',TRIM(mst_shipping.ec_order_lineno))
+                        WHERE
+                            {$condition}
+                        GROUP BY 
+                            mst_delivery.delivery_no
+                        ORDER BY
+                            dt_order_status.order_date DESC, mst_delivery.order_no ASC
+                ";
+
+        try {
+            $myPara = [$customer_code];
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery($myPara);
+            $rows = $result->fetchAllAssociative();
+            $arRe = [];
+
+            foreach ($rows as $item) {
+                $arRe[] = $item['delivery_no'];
+            }
+
+            return $arRe;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    public function getPdfDelivery($delivery_no, $orderNo = '', $customer_code, $login_type)
+    {
+        switch ($login_type) {
+            case 'shipping_code':
+                $condition = 'dt_order_status.shipping_code = ?';
+                break;
+
+            case 'otodoke_code':
+                $condition = 'dt_order_status.otodoke_code = ?';
+                break;
+
+            default:
+                $condition = 'dt_order_status.customer_code = ?';
+                break;
+        }
+
         $subQuantity = ' CASE
-                            WHEN m1_.quantity > 1 THEN m1_.quantity * m0_.quanlity
-                            ELSE m0_.quanlity
+                            WHEN mst_product.quantity > 1 THEN mst_product.quantity * mst_delivery.quanlity
+                            ELSE mst_delivery.quanlity
                             END AS quanlity
                         ';
 
         $subUnitPrice = '   CASE
-                            WHEN m1_.quantity > 1 THEN m0_.unit_price / m1_.quantity
-                            ELSE m0_.unit_price
+                            WHEN mst_product.quantity > 1 THEN mst_delivery.unit_price / mst_product.quantity
+                            ELSE mst_delivery.unit_price
                             END AS unit_price
                        ';
 
         $addCondition = '';
 
         if (!empty($orderNo)) {
-            $addCondition = ' and m0_.order_no LIKE ? ';
+            $addCondition = ' and mst_delivery.order_no LIKE ? ';
         }
 
         $sql = "
                         SELECT
                             {$subUnitPrice},
                             {$subQuantity},
-                            SUBSTRING(m0_.order_no, POSITION(\"-\" IN m0_.order_no)+1) AS orderByAs,
-                            m0_.delivery_no,
-                            m0_.delivery_date,
-                            m0_.deli_post_code,
-                            m0_.deli_addr01,
-                            m0_.deli_addr02,
-                            m0_.deli_addr03,
-                            m0_.deli_company_name,
-                            m0_.deli_department,
-                            m0_.postal_code,
-                            m0_.addr01 ,
-                            m0_.addr02,
-                            m0_.addr03,
-                            m0_.company_name,
-                            m0_.department,
-                            m0_.delivery_lineno,
-                            m0_.sale_type,
-                            m1_.jan_code as item_no,
-                            m0_.item_name,
+                            SUBSTRING(mst_delivery.order_no, POSITION(\"-\" IN mst_delivery.order_no)+1) AS orderByAs,
+                            mst_delivery.delivery_no,
+                            mst_delivery.delivery_date,
+                            mst_delivery.deli_post_code,
+                            mst_delivery.deli_addr01,
+                            mst_delivery.deli_addr02,
+                            mst_delivery.deli_addr03,
+                            mst_delivery.deli_company_name,
+                            mst_delivery.deli_department,
+                            mst_delivery.postal_code,
+                            mst_delivery.addr01 ,
+                            mst_delivery.addr02,
+                            mst_delivery.addr03,
+                            mst_delivery.company_name,
+                            mst_delivery.department,
+                            mst_delivery.delivery_lineno,
+                            mst_delivery.sale_type,
+                            mst_product.jan_code as item_no,
+                            mst_delivery.item_name,
                             'PC' as unit,
-                            m0_.amount,
-                            m0_.tax,
-                            m0_.order_no,
-                            m0_.item_remark,
-                            m0_.total_amount,
-                            m0_.footer_remark1,
-                            m0_.shiping_name as shiping_code,
-                            m0_.otodoke_name  as otodoke_code,
-                            m2_.department as deli_department_name,
-                            m0_.shipping_no
-                         FROM
-                            mst_delivery m0_
-                         LEFT JOIN
-                            mst_customer m2_ ON (m2_.customer_code = m0_.deli_department)
-                         LEFT JOIN
-                            mst_product m1_ ON (m1_.product_code = m0_.item_no)
-                    WHERE
-                        m0_.delivery_no = ? {$addCondition}
-                    ORDER BY
-                        CONVERT(orderByAs, SIGNED INTEGER) ASC";
+                            mst_delivery.amount,
+                            mst_delivery.tax,
+                            mst_delivery.order_no,
+                            mst_delivery.item_remark,
+                            mst_delivery.total_amount,
+                            mst_delivery.footer_remark1,
+                            mst_delivery.shiping_name as shiping_code,
+                            mst_delivery.otodoke_name  as otodoke_code,
+                            mst_customer.department as deli_department_name,
+                            mst_delivery.shipping_no
+                        FROM
+                            dt_order_status
+                        JOIN
+                            mst_shipping 
+                            ON mst_shipping.cus_order_no = dt_order_status.cus_order_no 
+                            AND mst_shipping.cus_order_lineno = dt_order_status.cus_order_lineno
+                        JOIN
+                             mst_delivery 
+                             ON mst_delivery.shipping_no = mst_shipping.shipping_no 
+                             AND TRIM(mst_delivery.order_no) = CONCAT(TRIM(mst_shipping.ec_order_no),'-',TRIM(mst_shipping.ec_order_lineno))
+                        LEFT JOIN
+                            mst_customer ON (mst_customer.customer_code = mst_delivery.deli_department)
+                        LEFT JOIN
+                            mst_product ON (mst_product.product_code = mst_delivery.item_no)
+                        WHERE
+                            {$condition}
+                        AND
+                            mst_delivery.delivery_no = ? 
+                            {$addCondition}
+                        ORDER BY
+                            CONVERT(orderByAs, SIGNED INTEGER) ASC";
 
-        $myPara = [$delivery_no];
+        $myPara = [$customer_code, $delivery_no];
 
         if (!empty($orderNo)) {
             $myPara[] = $orderNo.'-%';
