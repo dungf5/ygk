@@ -796,7 +796,7 @@ class MypageController extends AbstractController
         ];
 
         for ($i = 1; $i < 14; $i++) {
-            $date = date('Y-m', strtotime("- $i month"));
+            $date = date('Y-m', strtotime(date('Y-m-01')." -$i months"));
             $shippingDateList[] = [
                 'key' => (string) $date,
                 'value' => (string) $date,
