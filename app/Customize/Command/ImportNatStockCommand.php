@@ -113,7 +113,7 @@ class ImportNatStockCommand extends Command
         $mstShippingRoute = $this->entityManager->getRepository(MstShippingRoute::class)->findOneBy(['customer_code' => $this->customer_code]);
 
         if (empty($mstShippingRoute)) {
-            log_info('End Get Data');
+            log_info('End Get Data and Insert');
 
             return [];
         }
@@ -125,7 +125,7 @@ class ImportNatStockCommand extends Command
         $stockList = $this->entityManager->getRepository(StockList::class)->findBy(['stock_location' => $stock_location]);
 
         if (empty($stockList)) {
-            log_info('End Get Data');
+            log_info('End Get Data and Insert');
 
             return [];
         }
