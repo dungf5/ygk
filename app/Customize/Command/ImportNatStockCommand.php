@@ -90,7 +90,7 @@ class ImportNatStockCommand extends Command
             return;
         }
 
-        $this->handleGetData();
+        $this->handleGetDataAndImport();
     }
 
     private function handleDelete()
@@ -106,7 +106,7 @@ class ImportNatStockCommand extends Command
         return $result;
     }
 
-    private function handleGetData()
+    private function handleGetDataAndImport()
     {
         log_info('Start Get Data and Insert');
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
@@ -129,7 +129,7 @@ class ImportNatStockCommand extends Command
 
             return [];
         }
-
+        $rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
         foreach ($stockList as $item) {
             if (empty($item['product_code'])) {
                 continue;
@@ -143,7 +143,7 @@ class ImportNatStockCommand extends Command
                   'product_code' => $item['product_code'],
                   'jan_code' => $value['jan_code'],
                   'quantity' => $value['quantity'],
-                  'unit_price' => $value['unit_price'],
+                  'unit_price' => $value['unit_price'] + ($value['unit_price'] * $rate / 100),
                 ];
 
                 $this->handleImportData($data);
@@ -171,7 +171,6 @@ class ImportNatStockCommand extends Command
                 'unit_price' => (int) $data['unit_price'],
             ];
             $this->entityManager->getRepository(NatStockList::class)->insertData($insertData);
-
         } catch (\Exception $e) {
             $message = 'Insert nat_stock_list error, jan '.$data['jan_code'];
             $message .= "\n".$e->getMessage();

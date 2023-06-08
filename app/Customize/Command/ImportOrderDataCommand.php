@@ -242,7 +242,7 @@ class ImportOrderDataCommand extends Command
 
                     $this->success["{$item['reqcd']}"]['summary'] = [
                         'order_amount' => ($this->success["{$item['reqcd']}"]['summary']['order_amount'] ?? 0) + ($item['cost'] * $order_num),
-                        'tax' => $this->rate == 0 ? 0 : (int) ((($this->success["{$item['reqcd']}"]['summary']['order_amount'] ?? 0) + ($item['cost'] * $order_num)) / $this->rate),
+                        'tax' => $this->rate == 0 ? 0 : (int) ((($this->success["{$item['reqcd']}"]['summary']['order_amount'] ?? 0) + ($item['cost'] * $order_num)) * $this->rate / 100),
                         'order_company_name' => $this->customer_shipping['company_name'] ?? '',
                         'order_shop_name' => $this->customer_shipping['company_name'] ?? '',
                         'shipping_name' => $this->customer_shipping['company_name'] ?? '',
