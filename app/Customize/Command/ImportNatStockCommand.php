@@ -133,9 +133,13 @@ class ImportNatStockCommand extends Command
 
         $data = [];
         foreach ($stockList as $item) {
+            if (empty($item['product_code'])) {
+                continue;
+            }
+
             $value = $this->commonService->getDataImportNatStockList($item['product_code'], $this->customer_code, $this->shipping_code);
 
-            if (!empty($value)) {
+            if (!empty($value) && !empty($value['jan_code'])) {
                 $data[] = [
                   'stock_num' => $item['stock_num'],
                   'product_code' => $item['product_code'],
@@ -161,6 +165,10 @@ class ImportNatStockCommand extends Command
 
         foreach ($data as $item) {
             try {
+                if (!empty($this->entityManager->getRepository(NatStockList::class)->findOneBy(['jan' => (string) $item['jan_code']]))) {
+                    continue;
+                }
+
                 $insertData = [
                     'jan' => (string) $item['jan_code'],
                     'nat_stock_num' => (int) $item['stock_num'] == 0 ? '×' : ((int) $item['stock_num'] >= 31 ? '〇' : '△'),
