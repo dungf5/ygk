@@ -120,7 +120,10 @@ class ImportNatStockCommand extends Command
         }
 
         $stock_location = $mstShippingRoute->getStockLocation();
-        $stockList = $this->entityManager->getRepository(StockList::class)->findBy(['customer_code' => $this->customer_code, 'stock_location' => $stock_location]);
+
+        //Change by task #1814
+        //$stockList = $this->entityManager->getRepository(StockList::class)->findBy(['customer_code' => $this->customer_code, 'stock_location' => $stock_location]);
+        $stockList = $this->entityManager->getRepository(StockList::class)->findBy(['stock_location' => $stock_location]);
 
         if (empty($stockList)) {
             log_info('End Get Data');
