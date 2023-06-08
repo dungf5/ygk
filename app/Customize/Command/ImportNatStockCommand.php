@@ -90,8 +90,7 @@ class ImportNatStockCommand extends Command
             return;
         }
 
-        $data = $this->handleGetData();
-        $this->handleImportData($data);
+        $this->handleGetData();
     }
 
     private function handleDelete()
@@ -109,7 +108,7 @@ class ImportNatStockCommand extends Command
 
     private function handleGetData()
     {
-        log_info('Start Get Data');
+        log_info('Start Get Data and Insert');
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $mstShippingRoute = $this->entityManager->getRepository(MstShippingRoute::class)->findOneBy(['customer_code' => $this->customer_code]);
 
@@ -131,7 +130,6 @@ class ImportNatStockCommand extends Command
             return [];
         }
 
-        $data = [];
         foreach ($stockList as $item) {
             if (empty($item['product_code'])) {
                 continue;
@@ -140,51 +138,46 @@ class ImportNatStockCommand extends Command
             $value = $this->commonService->getDataImportNatStockList($item['product_code'], $this->customer_code, $this->shipping_code);
 
             if (!empty($value) && !empty($value['jan_code'])) {
-                $data[] = [
+                $data = [
                   'stock_num' => $item['stock_num'],
                   'product_code' => $item['product_code'],
                   'jan_code' => $value['jan_code'],
                   'quantity' => $value['quantity'],
                   'unit_price' => $value['unit_price'],
                 ];
+
+                $this->handleImportData($data);
             }
         }
 
-        log_info('End Get Data');
+        log_info('End Get Data and Insert');
 
-        return $data;
+        return;
     }
 
     private function handleImportData($data)
     {
-        log_info('Start Insert Data to nat_stock_list');
+        log_info('Insert Data to nat_stock_list, jan '.$data['jan_code']);
 
-        if (empty($data)) {
-            log_info('No data');
-        }
-
-        foreach ($data as $item) {
-            try {
-                if (!empty($this->entityManager->getRepository(NatStockList::class)->findOneBy(['jan' => (string) $item['jan_code']]))) {
-                    continue;
-                }
-
-                $insertData = [
-                    'jan' => (string) $item['jan_code'],
-                    'nat_stock_num' => (int) $item['stock_num'] == 0 ? '×' : ((int) $item['stock_num'] >= 31 ? '〇' : '△'),
-                    'order_lot' => (string) $item['quantity'],
-                    'unit_price' => (int) $item['unit_price'],
-                ];
-                $this->entityManager->getRepository(NatStockList::class)->insertData($insertData);
-            } catch (\Exception $e) {
-                $message = 'Insert nat_stock_list error';
-                $message .= "\n".$e->getMessage();
-                log_error($message);
-                $this->pushGoogleChat($message);
+        try {
+            if (!empty($this->entityManager->getRepository(NatStockList::class)->findOneBy(['jan' => (string) $data['jan_code']]))) {
+                return;
             }
-        }
 
-        log_info('End Insert Data to nat_stock_list');
+            $insertData = [
+                'jan' => (string) $data['jan_code'],
+                'nat_stock_num' => (int) $data['stock_num'] == 0 ? '×' : ((int) $data['stock_num'] >= 31 ? '〇' : '△'),
+                'order_lot' => (string) $data['quantity'],
+                'unit_price' => (int) $data['unit_price'],
+            ];
+            $this->entityManager->getRepository(NatStockList::class)->insertData($insertData);
+
+        } catch (\Exception $e) {
+            $message = 'Insert nat_stock_list error, jan '.$data['jan_code'];
+            $message .= "\n".$e->getMessage();
+            log_error($message);
+            $this->pushGoogleChat($message);
+        }
 
         return;
     }
