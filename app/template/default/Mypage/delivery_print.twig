@@ -209,7 +209,7 @@ file that was distributed with this source code.
                                 {{ Order.delivery_no }}
                             </td>
                             <td>{{Order.sale_type}}</td>
-                            <td>{{Order.shipping_date}}</td>
+                            <td>{{Order.delivery_date}}</td>
                             <td>
                                 {{Order.shiping_name}}<br/>
                                 {{Order.otodoke_name}}
@@ -688,8 +688,10 @@ file that was distributed with this source code.
             //         a.click();
             //     }
             // });
+            path = '&search_shipping_date_from=' + $("#search_shipping_date_from").val();
+            path += '&search_shipping_date_to=' + $("#search_shipping_date_to").val();
 
-            let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + $("#check-box-value-print-pdf").val();
+            let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + $("#check-box-value-print-pdf").val() + path;
             let a = document.createElement('a');
             a.target = '_blank';
             a.href = url;
@@ -712,7 +714,10 @@ file that was distributed with this source code.
             //    }
             // });
 
-            let url = '/mypage/export_Pdf_multiple?delivery_no=' + $("#check-box-value-print-pdf").val();
+            path = '&search_shipping_date_from=' + $("#search_shipping_date_from").val();
+            path += '&search_shipping_date_to=' + $("#search_shipping_date_to").val();
+            
+            let url = '/mypage/export_Pdf_multiple?delivery_no=' + $("#check-box-value-print-pdf").val() + path;
             let a = document.createElement('a');
             a.target = '_blank';
             a.href = url;

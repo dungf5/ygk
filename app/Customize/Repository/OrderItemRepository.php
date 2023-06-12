@@ -179,7 +179,7 @@ class OrderItemRepository extends AbstractRepository
             'Customize\Entity\MstDelivery',
             'delivery',
             Join::WITH,
-            "delivery.shipping_no = shipping.shipping_no AND TRIM(delivery.order_no) = CONCAT(TRIM(shipping.ec_order_no),'-',TRIM(shipping.ec_order_lineno))"
+            "delivery.shipping_no = shipping.shipping_no AND TRIM(delivery.order_no) = CONCAT(TRIM(shipping.cus_order_no),'-',TRIM(shipping.cus_order_lineno))"
         );
 
         $qb->addSelect(
@@ -189,6 +189,7 @@ class OrderItemRepository extends AbstractRepository
             'delivery.otodoke_name',
             'delivery.sale_type',
             'delivery.order_no',
+            "DATE_FORMAT(delivery.delivery_date,'%Y-%m-%d') AS delivery_date",
             'shipping.shipping_date',
             'shipping.shipping_no',
             'shipping.ec_order_no',
@@ -208,7 +209,7 @@ class OrderItemRepository extends AbstractRepository
         }
 
         if ($paramSearch['search_shipping_date'] != 0) {
-            $qb->andWhere('shipping.shipping_date like :search_shipping_date')
+            $qb->andWhere('delivery.delivery_date like :search_shipping_date')
                 ->setParameter(':search_shipping_date', $paramSearch['search_shipping_date'].'-%');
         }
 
@@ -233,12 +234,12 @@ class OrderItemRepository extends AbstractRepository
         }
 
         if (!empty($paramSearch['search_shipping_date_from'])) {
-            $qb->andWhere('shipping.shipping_date >= :shipping_date_from')
+            $qb->andWhere("DATE_FORMAT(delivery.delivery_date,'%Y-%m-%d') >= :shipping_date_from")
                 ->setParameter(':shipping_date_from', $paramSearch['search_shipping_date_from']);
         }
 
         if (!empty($paramSearch['search_shipping_date_to'])) {
-            $qb->andWhere('shipping.shipping_date <= :shipping_date_to')
+            $qb->andWhere("DATE_FORMAT(delivery.delivery_date,'%Y-%m-%d') <= :shipping_date_to")
                 ->setParameter(':shipping_date_to', $paramSearch['search_shipping_date_to']);
         }
 
