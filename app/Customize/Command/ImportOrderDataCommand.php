@@ -208,9 +208,8 @@ class ImportOrderDataCommand extends Command
                     $order_id[$item['reqcd']] = [$id, $index];
                 }
 
-                //$wId = sprintf('%08d', $id);
-                //$item['dtb_order_no'] = 'w_'.$wId;
-                $item['dtb_order_no'] = $id;
+                $wId = sprintf('%08d', $id);
+                $item['dtb_order_no'] = 'n_'.$wId;
                 $item['dtb_order_line_no'] = $index;
 
                 $item['order_no'] = $item['reqcd'];
