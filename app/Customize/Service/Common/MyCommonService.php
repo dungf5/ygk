@@ -1045,7 +1045,7 @@ SQL;
         return $rows;
     }
 
-    public function getDeliveryNoPrintPDF($customer_code, $login_type)
+    public function getDeliveryNoPrintPDF($customer_code, $login_type, $search_shipping_date_from, $search_shipping_date_to)
     {
         switch ($login_type) {
             case 'shipping_code':
@@ -1059,6 +1059,20 @@ SQL;
             default:
                 $condition = 'dt_order_status.customer_code = ?';
                 break;
+        }
+
+        $myPara = [$customer_code];
+
+        $date_from_condition = '';
+        if (!empty($search_shipping_date_from)) {
+            $date_from_condition = "AND DATE_FORMAT(mst_delivery.delivery_date,'%Y-%m-%d') >= ?";
+            $myPara[] = $search_shipping_date_from;
+        }
+
+        $date_to_condition = '';
+        if (!empty($search_shipping_date_to)) {
+            $date_to_condition = "AND DATE_FORMAT(mst_delivery.delivery_date,'%Y-%m-%d') <= ?";
+            $myPara[] = $search_shipping_date_to;
         }
 
         $sql = "
@@ -1076,6 +1090,8 @@ SQL;
                              AND TRIM(mst_delivery.order_no) = CONCAT(TRIM(mst_shipping.cus_order_no),'-',TRIM(mst_shipping.cus_order_lineno))
                         WHERE
                             {$condition}
+                            {$date_from_condition}
+                            {$date_to_condition}
                         GROUP BY 
                             mst_delivery.delivery_no
                         ORDER BY
@@ -1083,7 +1099,6 @@ SQL;
                 ";
 
         try {
-            $myPara = [$customer_code];
             $statement = $this->entityManager->getConnection()->prepare($sql);
             $result = $statement->executeQuery($myPara);
             $rows = $result->fetchAllAssociative();
