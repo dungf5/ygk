@@ -686,7 +686,7 @@ class ValidateCsvDataCommand extends Command
             ]);
 
             // Set initial data
-            $object->setCustomerCode('7001');
+            $object->setCustomerCode($this->customer_code);
             $object->setShippingCode($this->shipping_code);
             $object->setOtodokeCode($otodoke_code);
             $object->setProductCode(!empty($product) ? $product['product_code'] : '');
