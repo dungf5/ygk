@@ -1073,7 +1073,7 @@ SQL;
                         JOIN
                              mst_delivery 
                              ON mst_delivery.shipping_no = mst_shipping.shipping_no 
-                             AND TRIM(mst_delivery.order_no) = CONCAT(TRIM(mst_shipping.ec_order_no),'-',TRIM(mst_shipping.ec_order_lineno))
+                             AND TRIM(mst_delivery.order_no) = CONCAT(TRIM(mst_shipping.cus_order_no),'-',TRIM(mst_shipping.cus_order_lineno))
                         WHERE
                             {$condition}
                         GROUP BY 
