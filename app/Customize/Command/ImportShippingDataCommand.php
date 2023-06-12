@@ -138,12 +138,17 @@ class ImportShippingDataCommand extends Command
             ]);
 
             foreach ($data as $item) {
-                $result = $this->importShippingWSEOS($item->toArray());
+                $shipping_num = $this->importShippingWSEOS($item->toArray());
 
-                //if ($result) {
-                //    $item->setShippingSentFlg(1);
-                //    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
-                //}
+                if ((int) $shipping_num > 0) {
+                    $item->setShippingNum((int) $item->getShippingNum() + (int) $shipping_num);
+                    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
+                }
+
+                if ((int) $item->getShippingNum() == (int) $item->getOrderNum()) {
+                    $item->setShippingSentFlg(1);
+                    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
+                }
             }
 
             log_info('End Handle Import Data To mst_shipping_ws_eos');
@@ -162,6 +167,8 @@ class ImportShippingDataCommand extends Command
 
     private function importShippingWSEOS($data)
     {
+        $shipping_num = 0;
+
         try {
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
@@ -169,19 +176,22 @@ class ImportShippingDataCommand extends Command
                 'cus_order_no' => $data['order_no'],
                 'cus_order_lineno' => $data['order_line_no'],
                 'shipping_status' => 2,
+            ], [
+                'shipping_date' => 'DESC',
             ]);
 
             if (empty($mstShipping)) {
-                return 0;
+                return $shipping_num;
             }
 
             $mstShippingWSEOS = $this->entityManager->getRepository(MstShippingWSEOS::class)->findOneBy([
                 'order_no' => $data['order_no'],
                 'order_line_no' => $data['order_line_no'],
+                'shipping_no' => $mstShipping['shipping_no'],
             ]);
 
             if (!empty($mstShippingWSEOS)) {
-                return 1;
+                return $shipping_num;
             }
 
             // Insert mst_shipping_ws_eos
@@ -194,14 +204,16 @@ class ImportShippingDataCommand extends Command
                 $data['delivery_no'] = null;
                 $data['delivery_line_no'] = null;
                 $data['delivery_day'] = null;
-                $data['delivery_num'] = null;
+                $data['delivery_num'] = $mstShipping['shipping_num'] ?? null;
                 $data['delivery_price'] = null;
                 $data['delivery_amount'] = null;
 
-                return $this->entityManager->getRepository(MstShippingWSEOS::class)->insertData($data);
+                $this->entityManager->getRepository(MstShippingWSEOS::class)->insertData($data);
+
+                $shipping_num = $mstShipping['shipping_num'] ?? 0;
             }
 
-            return 0;
+            return $shipping_num;
         } catch (\Exception $e) {
             log_error($e->getMessage());
 
@@ -209,7 +221,7 @@ class ImportShippingDataCommand extends Command
             $message .= "\n".$e->getMessage();
             $this->pushGoogleChat($message);
 
-            return 0;
+            return $shipping_num;
         }
     }
 
