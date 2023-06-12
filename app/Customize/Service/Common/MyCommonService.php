@@ -1176,7 +1176,7 @@ SQL;
                         JOIN
                              mst_delivery 
                              ON mst_delivery.shipping_no = mst_shipping.shipping_no 
-                             AND TRIM(mst_delivery.order_no) = CONCAT(TRIM(mst_shipping.ec_order_no),'-',TRIM(mst_shipping.ec_order_lineno))
+                             AND TRIM(mst_delivery.order_no) = CONCAT(TRIM(mst_shipping.cus_order_no),'-',TRIM(mst_shipping.cus_order_lineno))
                         LEFT JOIN
                             mst_customer ON (mst_customer.customer_code = mst_delivery.deli_department)
                         LEFT JOIN
