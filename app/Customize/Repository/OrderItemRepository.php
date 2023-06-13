@@ -193,6 +193,9 @@ class OrderItemRepository extends AbstractRepository
             'delivery.delivery_lineno',
             'delivery.shiping_name',
             'delivery.otodoke_name',
+            'delivery.sale_type',
+            'delivery.order_no',
+            "DATE_FORMAT(delivery.delivery_date,'%Y-%m-%d') AS delivery_date",
             'shipping.shipping_date',
             'shipping.shipping_no',
             'shipping.ec_order_no',
@@ -212,7 +215,7 @@ class OrderItemRepository extends AbstractRepository
         }
 
         if ($paramSearch['search_shipping_date'] != 0) {
-            $qb->andWhere('shipping.shipping_date like :search_shipping_date')
+            $qb->andWhere('delivery.delivery_date like :search_shipping_date')
                 ->setParameter(':search_shipping_date', $paramSearch['search_shipping_date'].'-%');
         }
 
@@ -224,6 +227,26 @@ class OrderItemRepository extends AbstractRepository
         if ($paramSearch['search_order_otodoke'] != '0') {
             $qb->andWhere('delivery.otodoke_name in (select mc4.company_name from Customize\Entity\MstCustomer mc4 where mc4.customer_code = :search_order_otodoke)')
                 ->setParameter(':search_order_otodoke', $paramSearch['search_order_otodoke']);
+        }
+
+        if ($paramSearch['search_sale_type'] != '0') {
+            if ($paramSearch['search_sale_type'] == '1') {
+                $qb->andWhere(" TRIM(delivery.sale_type) = '通常' ");
+            }
+
+            if ($paramSearch['search_sale_type'] == '2') {
+                $qb->andWhere(" TRIM(delivery.sale_type) = '返品' ");
+            }
+        }
+
+        if (!empty($paramSearch['search_shipping_date_from'])) {
+            $qb->andWhere("DATE_FORMAT(delivery.delivery_date,'%Y-%m-%d') >= :shipping_date_from")
+                ->setParameter(':shipping_date_from', $paramSearch['search_shipping_date_from']);
+        }
+
+        if (!empty($paramSearch['search_shipping_date_to'])) {
+            $qb->andWhere("DATE_FORMAT(delivery.delivery_date,'%Y-%m-%d') <= :shipping_date_to")
+                ->setParameter(':shipping_date_to', $paramSearch['search_shipping_date_to']);
         }
 
         $qb->addGroupBy('delivery.delivery_no');
