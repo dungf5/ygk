@@ -217,4 +217,15 @@ class GlobalService
             return '';
         }
     }
+
+    public function getPdfExportFlg()
+    {
+        if ($this->customerId() != '') {
+            $pdfExportFlg = $this->myCommon->getMstCustomer($this->customerId())['pdf_export_flg'];
+
+            return $pdfExportFlg ?? 0;
+        }
+
+        return 0;
+    }
 }
