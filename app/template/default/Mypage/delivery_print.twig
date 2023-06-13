@@ -1,0 +1,727 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends 'default_frame.twig' %}
+
+{% set mypageno = 'delivery_print' %}
+
+{% set body_class = 'mypage' %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap-multiselect.min.css') }}">
+{% endblock stylesheet %}
+
+{% block main %}
+    <link rel="stylesheet" href="{{ asset('assets/selectbox/jquery_ui_1_13_2.css') }}">
+    <style>
+        div.multiselect-container.dropdown-menu {
+            color: black;
+        }
+        div.open>.dropdown-menu {
+            display: inline-grid;
+        }
+        .dropdown-item.multiselect-all {
+            width: 100%;
+            border: none;
+            padding-bottom: 5px;
+        }
+        .multiselect-option.dropdown-item {
+            width: 100%;
+            border: none;
+        }
+        .multiselect-option .form-check {
+            padding: 0;
+        }
+        .multiselect-container .multiselect-option .form-check-input {
+            display: none;
+        }
+        .multiselect-container .multiselect-option .form-check {
+            float: left;
+        }
+        .multiselect-container .multiselect-filter>input.multiselect-search {
+            margin-left: 0;
+        }
+        .multiselect-container .multiselect-filter>.fa-search {
+            position: absolute;
+            margin: 9px 0px 0 -3px;
+        }
+        button.multiselect {
+            display: none;
+        }
+        .row {
+            padding-left: 15px;
+        }
+        .alert-search {
+            border: solid 1px #333;
+            background-color: #ccc;
+            border-radius: 8px;
+            width: fit-content;
+        }
+        .btn-search, .btn-search:hover, .btn-search:focus {
+            background-color: #000;
+            color: #fff;
+            border-radius: 8px;
+        }
+    </style>
+
+    <div class="ec-layoutRole__main">
+        <div class="ec-mypageRole">
+            <div class="ec-pageHeader">
+                <h1>{{ 'front.mypage.title'|trans }}/{{ 'front.mypage.nav_delivery__print'|trans }}</h1>
+            </div>
+            {% include 'Mypage/navi.twig' %}
+        </div>
+
+        <style>
+            .myTable>thead>tr>th {
+                white-space: nowrap;
+            }
+        </style>
+
+        <iframe id="my_iframe" style="display:none;"></iframe>
+        <script>
+            function Download(url) {
+                document.getElementById('my_iframe').src = url;
+            };
+        </script>
+
+        <style>
+            .disBg {
+                background: #A7A7A7;
+                border-color: #A7A7A7;
+            }
+            .actBg {
+                background: #0065ff;
+            }
+        </style>
+
+        <div class="ec-mypageRole">
+            <div class="row">
+                <div>
+                    <div class="alert alert-search" role="alert">
+                        <form class="form-inline" method="GET">
+                            <div class="form-group">
+                                <label for="search_shipping_date_from">出荷日</label>
+                                <input type="text" class="form-control" id="search_shipping_date_from" name="search_shipping_date_from" value="{{ search_shipping_date_from }}" data-toggle="datetimepicker">
+                                <input type="text" class="form-control" id="search_shipping_date_to" name="search_shipping_date_to" value="{{ search_shipping_date_to }}">
+                            </div>
+                            <button type="submit" class="btn btn-search">
+                                <i class="fas fa-angle-double-right" style="color: #f00"></i> 絞り込み
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {% if pagination and pagination.totalItemCount > 0 %}
+                <div class="row">
+                    <p class="ec-para-normal">{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}</p>
+                </div>
+            {% endif %}
+
+            <div class="row">
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePreviewPDF()">Preview & Print</button>
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDF()">Download & Print</button>
+                <input type="hidden" id="check-box-value-print-pdf" value=""/>
+            </div>
+
+            <table class="table myTable">
+                <thead>
+                <tr>
+                    <th title="選択">
+                        {% if global_service.getPdfExportFlg %}
+                            <input type="checkbox" class="check-box-all-print-pdf" name="check-box-all-print-pdf" value="" onchange="handleCheckBox(this)"/>
+                        {% endif %}
+                        {{ 'front.mypage.shipping.select'|trans| raw }}
+                    </th>
+                    <th title="納品書№">{{ 'front.mypage.shipping.note_no'|trans| raw }}</th>
+                    <th title="伝票" style="max-width: 40px;">
+                        {{ 'front.mypage.shipping.sale_type'|trans| raw }}
+                        <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_sale_type">
+                            <span class="glyphicon glyphicon-triangle-bottom"></span>
+                        </a>
+                        <br/>
+                        <select id="search_sale_type" name="search_sale_type" onchange="handleSearch(this)">
+                            <option value="0" {% if search_sale_type == '0' %} selected {% endif %}>すべて</option>
+                            <option value="1" {% if search_sale_type == '1' %} selected {% endif %}>通常</option>
+                            <option value="2" {% if search_sale_type == '2' %} selected {% endif %}>返品</option>
+                        </select>
+                    </th>
+                    <th title="出荷日" style="max-width:100px">
+                        {{ 'front.mypage.shipping.date'|trans| raw }}
+                        <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_shipping_date">
+                            <span class="glyphicon glyphicon-triangle-bottom"></span>
+                        </a>
+                        <br/>
+                        <select id="search_shipping_date" name="search_shipping_date" onchange="handleSearch(this)">
+                            <option value="0" {% if 0 == search_shipping_date %}selected{%  endif %}>すべて</option>
+                            {% for shippingDate in shippingDateOpt %}
+                                <option value="{{shippingDate.key}}" {% if shippingDate.key == search_shipping_date %}selected{%  endif %}>{{shippingDate.value}}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <th title="出荷先 届け先" style="min-width: 150px">
+                        {{ 'front.mypage.shipping_code'|trans| raw }}
+                        <a href="javascript:void(0)" style="color: red; {% if orderShippingOpt|length < 2 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_shipping" onclick="handleGetLastSelected()">
+                            <span class="glyphicon glyphicon-triangle-bottom"></span>
+                        </a>
+                        <br/>
+                        <select id="search_order_shipping" name="search_order_shipping" onchange="handleSearch(this)">
+                            <option value="0" {% if 0 == search_order_shipping %}selected{%  endif %}>すべて</option>
+                            {% for orderShipping in orderShippingOpt %}
+                                <option value="{{orderShipping.key}}" {% if orderShipping.key == search_order_shipping %}selected{%  endif %}>{{orderShipping.value}}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="text" value="" id="last_order_shipping" hidden>
+                        <br/>
+                        {{ 'front.mypage.otodoke_code'|trans| raw }}
+                        <a href="javascript:void(0)" style="color: red; {% if orderOtodokeOpt|length < 2 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_otodoke">
+                            <span class="glyphicon glyphicon-triangle-bottom"></span>
+                        </a>
+                        <br/>
+                        <select id="search_order_otodoke" name="search_order_otodoke" onchange="handleSearch(this)">
+                            <option value="0" {% if search_order_otodoke == '0' %} selected {% endif %}>すべて</option>
+                            {% for orderOtodoke in orderOtodokeOpt %}
+                                <option value="{{orderOtodoke.key}}" {% if orderOtodoke.key == search_order_otodoke %} selected {% endif %}>{{orderOtodoke.value}}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <th title="出荷指示№">{{ 'front.mypage.shipping.delivery_no'|trans| raw }}</th>
+                </tr>
+                </thead>
+                {% if pagination and pagination.totalItemCount > 0 %}
+                    <tbody>
+                    {% for Order in pagination %}
+                        <tr>
+                            <td>
+                                {% if global_service.getPdfExportFlg %}
+                                    <input type="checkbox" class="check-box-print-pdf" name="check-box-print-pdf" value="{{Order.delivery_no}}" onchange="handleCheckBox(this)"/>
+                                {% endif %}
+                            </td>
+                            <td title="納品書№ {{ Order.delivery_no }}-{{ Order.delivery_lineno }}, 御社注文№ {{ Order.order_no }}">
+                                {{ Order.delivery_no }}
+                            </td>
+                            <td>{{Order.sale_type}}</td>
+                            <td>{{Order.delivery_date}}</td>
+                            <td>
+                                {{Order.shiping_name}}<br/>
+                                {{Order.otodoke_name}}
+                            </td>
+                            <td>
+                                <a href="/mypage/shipping/history?shipping_no={{Order.shipping_no}}" target="_blank">
+                                    {{Order.shipping_no}}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+
+                {% else %}
+                    <tbody>
+                    <tr>
+                        <td colspan="6">
+                            <p>納品書はありません。</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                {% endif %}
+            </table>
+
+            {% if pagination and pagination.totalItemCount > 0 %}
+                <div class="ec-pagerRole">
+                    {% include "pager.twig" with {'pages': pagination.paginationData} %}
+                </div>
+            {% endif %}
+        </div>
+
+        {% include "Mypage/modal_list.twig" with {'shipping_no':'Test' } %}
+    </div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ asset('assets/js/bootstrap-multiselect.min.js') }}"></script>
+<script src="{{ asset('assets/selectbox/jquery-ui_1_13_2.js') }}"></script>
+<script src="{{ asset('assets/selectbox/datepicker-ja.js') }}"></script>
+
+    <script>
+        $('#search_shipping_date').multiselect({
+            // includeSelectAllOption: true,
+            // selectAllText: 'すべて',
+            enableFiltering: true,
+            filterPlaceholder: '検索',
+            checkboxName: function(option) {
+                return 'multiselect[]';
+            },
+            buttonWidth: '150px',
+            buttonHeight: '34px',
+            buttonText: function(options, select) {
+                if (options.length === 0) {
+                    return '未選択';
+                }
+                else if (options.length == 14) {
+                    return 'すべて';
+                }
+                else if (options.length > 2) {
+                    return options.length + 'ヶ月選択済み';
+                }
+                else {
+                     var labels = [];
+                     options.each(function() {
+                         if ($(this).attr('label') !== undefined) {
+                             labels.push($(this).attr('label'));
+                         }
+                         else {
+                             labels.push($(this).html());
+                         }
+                     });
+                     labels.reverse();
+                     return labels.join(', ') + '';
+                }
+            },
+            buttonTitle: function(options, select) {
+                if (options.length === 0) {
+                    return '未選択';
+                }
+                else {
+                     var labels = [];
+                     options.each(function() {
+                         if ($(this).attr('label') !== undefined) {
+                             labels.push($(this).attr('label'));
+                         }
+                         else {
+                             labels.push($(this).html());
+                         }
+                     });
+                     labels.reverse();
+                     return labels.join(', ') + '';
+                }
+            },
+            buttonClass:'search_shipping_date',
+            nonSelectedText: '注文日検索',
+        });
+
+        $('#search_order_shipping').multiselect({
+            // includeSelectAllOption: true,
+            // selectAllText: 'すべて',
+            enableFiltering: true,
+            filterPlaceholder: '検索',
+            disableIfEmpty: true,
+            checkboxName: function(option) {
+                return 'multiselect[]';
+            },
+            buttonWidth: '150px',
+            buttonHeight: '34px',
+            buttonText: function(options, select) {
+                if (options.length === 0) {
+                    return '未選択';
+                }
+                else if (options.length == 14) {
+                    return 'すべて';
+                }
+                else if (options.length > 2) {
+                    return options.length + 'ヶ月選択済み';
+                }
+                else {
+                     var labels = [];
+                     options.each(function() {
+                         if ($(this).attr('label') !== undefined) {
+                             labels.push($(this).attr('label'));
+                         }
+                         else {
+                             labels.push($(this).html());
+                         }
+                     });
+                     labels.reverse();
+                     return labels.join(', ') + '';
+                }
+            },
+            buttonTitle: function(options, select) {
+                if (options.length === 0) {
+                    return '未選択';
+                }
+                else {
+                     var labels = [];
+                     options.each(function() {
+                         if ($(this).attr('label') !== undefined) {
+                             labels.push($(this).attr('label'));
+                         }
+                         else {
+                             labels.push($(this).html());
+                         }
+                     });
+                     labels.reverse();
+                     return labels.join(', ') + '';
+                }
+            },
+            buttonClass:'search_order_shipping',
+            nonSelectedText: '注文日検索',
+        });
+
+        $('#search_order_otodoke').multiselect({
+            includeSelectAllOption: true,
+            selectAllText: 'すべて',
+            enableFiltering: true,
+            filterPlaceholder: '検索',
+            disableIfEmpty: true,
+            checkboxName: function(option) {
+                return 'multiselect[]';
+            },
+            buttonWidth: '150px',
+            buttonHeight: '34px',
+            buttonText: function(options, select) {
+                if (options.length === 0) {
+                    return '未選択';
+                }
+                else if (options.length == 14) {
+                    return 'すべて';
+                }
+                else if (options.length > 2) {
+                    return options.length + 'ヶ月選択済み';
+                }
+                else {
+                     var labels = [];
+                     options.each(function() {
+                         if ($(this).attr('label') !== undefined) {
+                             labels.push($(this).attr('label'));
+                         }
+                         else {
+                             labels.push($(this).html());
+                         }
+                     });
+                     labels.reverse();
+                     return labels.join(', ') + '';
+                }
+            },
+            buttonTitle: function(options, select) {
+                if (options.length === 0) {
+                    return '未選択';
+                }
+                else {
+                     var labels = [];
+                     options.each(function() {
+                         if ($(this).attr('label') !== undefined) {
+                             labels.push($(this).attr('label'));
+                         }
+                         else {
+                             labels.push($(this).html());
+                         }
+                     });
+                     labels.reverse();
+                     return labels.join(', ') + '';
+                }
+            },
+            buttonClass:'search_order_otodoke',
+            nonSelectedText: '注文日検索',
+        });
+
+        $('#search_sale_type').multiselect({
+            includeSelectAllOption: true,
+            selectAllText: 'すべて',
+            enableFiltering: true,
+            filterPlaceholder: '検索',
+            disableIfEmpty: true,
+            checkboxName: function(option) {
+                return 'multiselect[]';
+            },
+            buttonWidth: '150px',
+            buttonHeight: '34px',
+            buttonText: function(options, select) {
+                if (options.length === 0) {
+                    return '未選択';
+                }
+                else if (options.length == 14) {
+                    return 'すべて';
+                }
+                else if (options.length > 2) {
+                    return options.length + 'ヶ月選択済み';
+                }
+                else {
+                     var labels = [];
+                     options.each(function() {
+                         if ($(this).attr('label') !== undefined) {
+                             labels.push($(this).attr('label'));
+                         }
+                         else {
+                             labels.push($(this).html());
+                         }
+                     });
+                     labels.reverse();
+                     return labels.join(', ') + '';
+                }
+            },
+            buttonTitle: function(options, select) {
+                if (options.length === 0) {
+                    return '未選択';
+                }
+                else {
+                     var labels = [];
+                     options.each(function() {
+                         if ($(this).attr('label') !== undefined) {
+                             labels.push($(this).attr('label'));
+                         }
+                         else {
+                             labels.push($(this).html());
+                         }
+                     });
+                     labels.reverse();
+                     return labels.join(', ') + '';
+                }
+            },
+            buttonClass:'search_sale_type',
+            nonSelectedText: '注文日検索',
+        });
+
+        var typingTimer;
+        var doneTypingInterval      = 2000;
+
+        function handleSearch(target) {
+            let name                = target.name;
+            let value               = target.value;
+            let origin              = window.location.origin;
+            let pathname            = window.location.pathname;
+            let search              = window.location.search;
+            pathname                += "?pageno=1";
+            pathname                += "&search_shipping_date_from=" + $("#search_shipping_date_from").val();
+            pathname                += "&search_shipping_date_to=" + $("#search_shipping_date_to").val();
+
+            if (name == 'search_shipping_date') {
+                clearTimeout(typingTimer);
+                loadingOverlay('hide');
+
+                typingTimer         = setTimeout(function () {
+                    loadingOverlay();
+                    handelChangeDate(origin, pathname, search);
+                }, doneTypingInterval);
+            }
+
+            if (name == 'search_order_shipping') {
+                loadingOverlay();
+                let previousSelected    = $("input#last_order_shipping").val();
+                let lastSelected        = $("#search_order_shipping option:selected").last().val();
+
+                if (value == previousSelected) {
+                    value               = lastSelected;
+                }
+
+                $('#search_order_shipping').multiselect('deselectAll');
+
+                setTimeout(function () {
+                    $('#search_order_shipping').multiselect('select', value);
+                    handelChangeShipping(origin, pathname);
+                }, 200);
+            }
+
+            if (name == 'search_order_otodoke') {
+                loadingOverlay();
+                handelChangeOtodoke(origin, pathname, search);
+            }
+
+            if (name == 'search_sale_type') {
+                loadingOverlay();
+                handelChangeSaleType(origin, pathname, search);
+            }
+        }
+
+        function handleGetLastSelected() {
+            let lastSelected        = $("#search_order_shipping option:selected").last().val();
+            if (lastSelected) {
+                $("input#last_order_shipping").val(lastSelected);
+            }
+
+            else {
+                $("input#last_order_shipping").val('');
+            }
+        }
+
+        function handelChangeDate(origin, pathname, search) {
+            pathname += "&shipping_date=" + $("#search_shipping_date").val();
+            window.location.href = origin + pathname;
+        }
+
+        function handelChangeShipping(origin, pathname) {
+            pathname += "&order_shipping=" + $("#search_order_shipping").val();
+            window.location.href = origin + pathname;
+        }
+
+        function handelChangeOtodoke(origin, pathname, search) {
+            pathname += "&order_shipping=" + $("#search_order_shipping").val();
+            pathname += "&order_otodoke=" + $("#search_order_otodoke").val();
+            window.location.href = origin + pathname;
+        }
+
+        function handelChangeSaleType(origin, pathname, search) {
+            pathname += "&sale_type=" + $("#search_sale_type").val();
+            window.location.href = origin + pathname;
+        }
+
+        $("a.multiselect.dropdown-toggle.search_shipping_date").on("click", function() {
+            let button          = $("button.search_shipping_date");
+            let aria_expanded   = button.attr("aria-expanded");
+            if (!aria_expanded || aria_expanded == 'false') {
+                setTimeout(function() {
+                    button.click();
+                }, 100);
+            }
+        })
+
+        $("a.multiselect.dropdown-toggle.search_order_shipping").on("click", function() {
+            let button          = $("button.search_order_shipping");
+            let aria_expanded   = button.attr("aria-expanded");
+            if (!aria_expanded || aria_expanded == 'false') {
+                setTimeout(function() {
+                    button.click();
+                }, 100);
+            }
+        })
+
+        $("a.multiselect.dropdown-toggle.search_order_otodoke").on("click", function() {
+            let button          = $("button.search_order_otodoke");
+            let aria_expanded   = button.attr("aria-expanded");
+            if (!aria_expanded || aria_expanded == 'false') {
+                setTimeout(function() {
+                    button.click();
+                }, 100);
+            }
+        })
+
+        $("a.multiselect.dropdown-toggle.search_sale_type").on("click", function() {
+            let button          = $("button.search_sale_type");
+            let aria_expanded   = button.attr("aria-expanded");
+            if (!aria_expanded || aria_expanded == 'false') {
+                setTimeout(function() {
+                    button.click();
+                }, 100);
+            }
+        })
+
+        $(document).ready(function() {
+            $("#search_shipping_date_from").datepicker({
+                dateFormat: "yy-mm-dd",
+                appendText: " ~ "
+            });
+            $("#search_shipping_date_to").datepicker({
+                dateFormat: "yy-mm-dd",
+            });
+        });
+
+        function handleCheckBox(target) {
+            let name                = target.name;
+
+            if (name == 'check-box-print-pdf') {
+                let temp_value = '';
+                let count = 0;
+                $(".check-box-print-pdf").each(function () {
+                    if (this.checked) {
+                       temp_value += ',' + $(this).val();
+                       count++;
+                    }
+                });
+
+                if (count > 0) {
+                    $("#check-box-value-print-pdf").val(temp_value);
+                    $(".btn-print-pdf").prop('disabled', false);
+
+                    {#if ((count < 12 && count == {{ pagination.totalItemCount }}) || count >= 12) {#}
+                    {#    $(".check-box-all-print-pdf").prop("checked", true);#}
+                    {#} else {#}
+                    {#    $(".check-box-all-print-pdf").prop("checked", false);#}
+                    {#}#}
+
+                    if (count == {{ pagination.totalItemCount }}) {
+                        $(".check-box-all-print-pdf").prop("checked", true);
+                    } else {
+                        $(".check-box-all-print-pdf").prop("checked", false);
+                    }
+
+                } else {
+                    $(".btn-print-pdf").prop('disabled', true);
+                }
+            }
+
+            if (name == 'check-box-all-print-pdf') {
+                let temp_value = '';
+                let count = 0;
+
+                if (target.checked) {
+                    $(".check-box-print-pdf").each(function () {
+                        temp_value += ',' + $(this).val();
+                        count++;
+                    });
+                    $(".check-box-print-pdf").prop("checked", true);
+
+                } else {
+                    count = 0;
+                    $(".check-box-print-pdf").prop("checked", false);
+                }
+
+                if (count > 0) {
+                    // change check-all to print all data
+                    // $("#check-box-value-print-pdf").val(temp_value);
+                    $("#check-box-value-print-pdf").val('all');
+                    $(".btn-print-pdf").prop('disabled', false);
+                } else {
+                    $("#check-box-value-print-pdf").val('');
+                    $(".btn-print-pdf").prop('disabled', true);
+                }
+            }
+        }
+
+        function handlePreviewPDF() {
+            // let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+            // let handled = {};
+            //
+            // $.each(arr_print_pdf_value, function( index, value ) {
+            //     if (value && !handled[value]) {
+            //         handled[value] = true;
+            //
+            //         let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + value;
+            //         let a = document.createElement('a');
+            //         a.target = '_blank';
+            //         a.href = url;
+            //         a.click();
+            //     }
+            // });
+            path = '&search_shipping_date_from=' + $("#search_shipping_date_from").val();
+            path += '&search_shipping_date_to=' + $("#search_shipping_date_to").val();
+
+            let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + $("#check-box-value-print-pdf").val() + path;
+            let a = document.createElement('a');
+            a.target = '_blank';
+            a.href = url;
+            a.click();
+        }
+
+        function handlePrintPDF() {
+            // let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+            // let handled = {};
+            //
+            // $.each(arr_print_pdf_value, function( index, value ) {
+            //    if (value && !handled[value]) {
+            //        handled[value] = true;
+            //
+            //        // let url = '/mypage/export_Pdf_multiple?delivery_no=' + value;
+            //        // let a = document.createElement('a');
+            //        // a.target = '_blank';
+            //        // a.href = url;
+            //        // a.click();
+            //    }
+            // });
+
+            path = '&search_shipping_date_from=' + $("#search_shipping_date_from").val();
+            path += '&search_shipping_date_to=' + $("#search_shipping_date_to").val();
+            
+            let url = '/mypage/export_Pdf_multiple?delivery_no=' + $("#check-box-value-print-pdf").val() + path;
+            let a = document.createElement('a');
+            a.target = '_blank';
+            a.href = url;
+            a.click();
+        }
+    </script>
+{% endblock %}
