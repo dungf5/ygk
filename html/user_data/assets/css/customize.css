@@ -2037,7 +2037,7 @@ a { color: #07c; }
 .ec-mypageRole .ec-navlistRole .ec-navlistRole__navlist {
   align-items: flex-end;
   width: 100%;
-  max-width: 750px;
+  /*max-width: 750px;*/
   border: none;
   margin: 0;
 }
