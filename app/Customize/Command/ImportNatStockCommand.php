@@ -136,6 +136,13 @@ class ImportNatStockCommand extends Command
             }
 
             $value = $this->commonService->getDataImportNatStockList($item['product_code'], $this->customer_code, $this->shipping_code);
+            $dtPrice = $this->commonService->getDtPrice($item['product_code'], $this->customer_code, $this->shipping_code);
+
+            if (!empty($dtPrice)) {
+                $unit_price = $dtPrice['price_s01'] ?? 0;
+            } else {
+                $unit_price = $value['unit_price'] ?? 0;
+            }
 
             if (!empty($value) && !empty($value['jan_code'])) {
                 $data = [
@@ -143,7 +150,7 @@ class ImportNatStockCommand extends Command
                   'product_code' => $item['product_code'],
                   'jan_code' => $value['jan_code'],
                   'quantity' => $value['quantity'],
-                  'unit_price' => $value['unit_price'] + ($value['unit_price'] * $rate / 100),
+                  'unit_price' => $unit_price + ($unit_price * $rate / 100),
                 ];
 
                 $this->handleImportData($data);
