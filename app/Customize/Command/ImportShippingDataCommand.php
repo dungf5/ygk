@@ -319,7 +319,8 @@ class ImportShippingDataCommand extends Command
             if (empty($mstShippingNatEOS)) {
                 log_info('Import data mst_shipping_nat_eos '.$data['reqcd'].'-'.$data['order_lineno']);
 
-                $data['delivery_no'] = '0633'.str_pad(substr((string) $mstShipping['shipping_no'], -8), 8, '0', STR_PAD_LEFT).'3';
+                $delivery_no = '0633'.str_pad(substr((string) $mstShipping['shipping_no'], -8), 8, '0', STR_PAD_LEFT);
+                $data['delivery_no'] = $delivery_no.$this->calcDeliveryNoDigit($delivery_no);
                 $data['shipping_date'] = !empty($mstShipping['shipping_date']) ? date('Ymd', strtotime($mstShipping['shipping_date'])) : '';
                 $data['shipping_no'] = $mstShipping['shipping_no'] ?? null;
 
@@ -338,5 +339,37 @@ class ImportShippingDataCommand extends Command
 
             return $shipping_num;
         }
+    }
+
+    private function calcDeliveryNoDigit($number)
+    {
+        // make sure there is just numbers
+        $number = preg_replace('/[^0-9]/', '', $number);
+
+        // change order of values to use in foreach
+        $vals = array_reverse(str_split($number));
+
+        // multiply every other value by 2
+        $mult = true;
+        foreach ($vals as $k => $v) {
+            $vals[$k] = $mult ? $v * 2 : $v;
+            $vals[$k] = (string) ($vals[$k]);
+            $mult = !$mult;
+        }
+
+        // checks for two digits (>9)
+        $mp = array_map(function ($v) {
+            return ($v > 9) ? $v[0] + $v[1] : $v;
+        }, $vals);
+
+        // adds the values
+        $sum = array_sum($mp);
+
+        //gets the mod
+        $md = $sum % 10;
+
+        // checks how much for 10
+        // returns the value
+        return 10 - $md;
     }
 }
