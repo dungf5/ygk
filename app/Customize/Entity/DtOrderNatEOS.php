@@ -185,6 +185,12 @@ if (!class_exists('\Customize\Entity\DtOrderNatEOS', false)) {
          * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP COMMENT 'データ更新日時'")
          */
         private $update_date;
+        /**
+         * @var int
+         *
+         * @ORM\Column(name="shipping_num", type="integer", nullable=false, options={"default":0})
+         */
+        private $shipping_num;
 
         /**
          * @return string
@@ -632,6 +638,22 @@ if (!class_exists('\Customize\Entity\DtOrderNatEOS', false)) {
         public function setUpdateDate($update_date)
         {
             $this->update_date = $update_date;
+        }
+
+        /**
+         * @return int
+         */
+        public function getShippingNum()
+        {
+            return $this->shipping_num;
+        }
+
+        /**
+         * @param $shipping_num
+         */
+        public function setShippingNum($shipping_num)
+        {
+            $this->shipping_num = $shipping_num;
         }
     }
 }

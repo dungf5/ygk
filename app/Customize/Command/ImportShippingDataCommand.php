@@ -181,6 +181,12 @@ class ImportShippingDataCommand extends Command
             ]);
 
             if (empty($mstShipping)) {
+                log_error('No data mst_shipping '.$data['order_no'].'-'.$data['order_line_no'].' status = 2');
+
+                $message = 'Import Data To mst_shipping_ws_eos';
+                $message .= "\n".'No data mst_shipping '.$data['order_no'].'-'.$data['order_line_no'].' status = 2';
+                $this->pushGoogleChat($message);
+
                 return $shipping_num;
             }
 
@@ -247,7 +253,17 @@ class ImportShippingDataCommand extends Command
             }
 
             foreach ($data as $item) {
-                $this->importShippingNatEOS($item->toArray());
+                $shipping_num = $this->importShippingNatEOS($item->toArray());
+
+                if ((int) $shipping_num > 0) {
+                    $item->setShippingNum((int) $item->getShippingNum() + (int) $shipping_num);
+                    $this->entityManager->getRepository(DtOrderNatEOS::class)->save($item);
+                }
+
+                if ((int) $item->getShippingNum() == (int) $item->getQty()) {
+                    $item->setShippingSentFlg(1);
+                    $this->entityManager->getRepository(DtOrderNatEOS::class)->save($item);
+                }
             }
 
             log_info('End Handle Import Data To mst_shipping_nat_eos');
@@ -266,6 +282,8 @@ class ImportShippingDataCommand extends Command
 
     private function importShippingNatEOS($data)
     {
+        $shipping_num = 0;
+
         try {
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
@@ -273,6 +291,8 @@ class ImportShippingDataCommand extends Command
                 'cus_order_no' => $data['reqcd'],
                 'cus_order_lineno' => $data['order_lineno'],
                 'shipping_status' => 2,
+            ], [
+                'shipping_date' => 'DESC',
             ]);
 
             if (empty($mstShipping)) {
@@ -282,21 +302,17 @@ class ImportShippingDataCommand extends Command
                 $message .= "\n".'No data mst_shipping '.$data['reqcd'].'-'.$data['order_lineno'].' status = 2';
                 $this->pushGoogleChat($message);
 
-                return 0;
+                return $shipping_num;
             }
 
             $mstShippingNatEOS = $this->entityManager->getRepository(MstShippingNatEOS::class)->findOneBy([
                 'reqcd' => $data['reqcd'],
                 'order_lineno' => $data['order_lineno'],
+                'shipping_no' => $mstShipping['shipping_no'],
             ]);
 
             if (!empty($mstShippingNatEOS)) {
-                log_error('mst_shipping_nat_eos is existed '.$data['reqcd'].'-'.$data['order_lineno']);
-                $message = 'Import Data To mst_shipping_nat_eos';
-                $message .= "\n".'Record is existed '.$data['reqcd'].'-'.$data['order_lineno'];
-                $this->pushGoogleChat($message);
-
-                return 1;
+                return $shipping_num;
             }
 
             // Insert mst_shipping_nat_eos
@@ -307,10 +323,12 @@ class ImportShippingDataCommand extends Command
                 $data['shipping_date'] = !empty($mstShipping['shipping_date']) ? date('Ymd', strtotime($mstShipping['shipping_date'])) : '';
                 $data['shipping_no'] = $mstShipping['shipping_no'] ?? null;
 
-                return $this->entityManager->getRepository(MstShippingNatEOS::class)->insertData($data);
+                $this->entityManager->getRepository(MstShippingNatEOS::class)->insertData($data);
+
+                $shipping_num = $mstShipping['shipping_num'] ?? 0;
             }
 
-            return 0;
+            return $shipping_num;
         } catch (\Exception $e) {
             log_error($e->getMessage());
 
@@ -318,7 +336,7 @@ class ImportShippingDataCommand extends Command
             $message .= "\n".$e->getMessage();
             $this->pushGoogleChat($message);
 
-            return 0;
+            return $shipping_num;
         }
     }
 }
