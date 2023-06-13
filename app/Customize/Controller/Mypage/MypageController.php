@@ -191,18 +191,22 @@ class MypageController extends AbstractController
      */
     public function exportOrderPdf(Request $request)
     {
-        $login_type = $this->globalService->getLoginType();
-        if (in_array($login_type, ['shipping_code', 'otodoke_code'])) {
-            return;
-        }
-
         $htmlFileName = 'Mypage/exportOrderPdf.twig';
         $delivery_no = MyCommon::getPara('delivery_no');
         $order_no_line_no = MyCommon::getPara('order_no_line_no');
 
         $comS = new MyCommonService($this->entityManager);
         $orderNo = explode('-', $order_no_line_no)[0];
-        $arRe = $comS->getPdfDelivery($delivery_no, $orderNo);
+
+        $customer_id = $this->globalService->customerId();
+        $login_type = $this->globalService->getLoginType();
+        $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
+
+        $arRe = $comS->getPdfDelivery($delivery_no, $orderNo, $customer_code, $login_type);
+
+        if (!count($arRe)) {
+            return $this->redirectToRoute('mypage_delivery_history');
+        }
 
         //add special line
         $totalTax = 0;
@@ -232,6 +236,7 @@ class MypageController extends AbstractController
             'totalTaxRe' => $totalTaxRe,
             'totalaAmountTax' => $totalaAmountTax,
         ];
+
         $namePdf = 'ship_'.$delivery_no.'.pdf';
         $file = $dirPdf.'/'.$namePdf;
 
@@ -1778,5 +1783,199 @@ class MypageController extends AbstractController
         }
 
         return $this->json($result, 200);
+    }
+
+    /**
+     * お気に入り商品を表示する.
+     *
+     * @Route("/mypage/delivery/print", name="mypage_delivery_print", methods={"GET"})
+     * @Template("Mypage/delivery_print.twig")
+     */
+    public function deliveryPrint(Request $request, PaginatorInterface $paginator)
+    {
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
+        // 購入処理中/決済処理中ステータスの受注を非表示にする.
+        $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
+
+        //Params
+        $param = [
+            'pageno' => $request->get('pageno', 1),
+            'delivery_no' => $request->get('delivery_no'),
+            'search_shipping_date' => $request->get('shipping_date', 0),
+            'search_order_shipping' => $request->get('order_shipping', '0'),
+            'search_order_otodoke' => $request->get('order_otodoke', '0'),
+            'search_sale_type' => $request->get('sale_type', '0'),
+            'search_shipping_date_from' => $request->get('search_shipping_date_from', ''),
+            'search_shipping_date_to' => $request->get('search_shipping_date_to', ''),
+        ];
+
+        // paginator
+        $my_common = new MyCommonService($this->entityManager);
+        $customer_id = $this->globalService->customerId();
+        $login_type = $this->globalService->getLoginType();
+        $customer_code = $my_common->getMstCustomer($customer_id)['customer_code'] ?? '';
+        $qb = $this->orderItemRepository->getDeliveryByCustomer($param, $customer_code, $login_type);
+
+        // Paginator
+        $pagination = $paginator->paginate(
+            $qb,
+            $request->get('pageno', 1),
+            $this->eccubeConfig['eccube_search_pmax'],
+            ['distinct' => false]
+        );
+
+        /*create list order date*/
+        $shippingDateList = [];
+        $shippingDateList[] = [
+            'key' => (string) date('Y-m', ),
+            'value' => (string) date('Y-m', ),
+        ];
+
+        for ($i = 1; $i < 14; $i++) {
+            $date = date('Y-m', strtotime("- $i month"));
+            $shippingDateList[] = [
+                'key' => (string) $date,
+                'value' => (string) $date,
+            ];
+        }
+
+        /*create list order status*/
+        $orderStatusList = [];
+        $orderStatusList[] = ['key' => '0', 'value' => '調査要'];
+        $orderStatusList[] = ['key' => '1', 'value' => '未確保'];
+        $orderStatusList[] = ['key' => '2', 'value' => '一部確保'];
+        $orderStatusList[] = ['key' => '3', 'value' => '確保済み'];
+        $orderStatusList[] = ['key' => '4', 'value' => 'キャンセル'];
+        $orderStatusList[] = ['key' => '9', 'value' => '注文完了'];
+
+        /*create list shipping code*/
+        $orderShippingList = [];
+        $shippingList = $this->globalService->shippingOption();
+        if (count($shippingList) > 1) {
+            foreach ($shippingList as $item) {
+                $orderShippingList[] = [
+                    'key' => $item['shipping_no'],
+                    'value' => $item['name01'].'〒'.$item['postal_code'].$item['addr01'].$item['addr02'].$item['addr03'],
+                ];
+            }
+        }
+
+        /*create list otodoke code*/
+        $s_order_shipping = (isset($param['search_order_shipping']) && $param['search_order_shipping'] != '0') ? $param['search_order_shipping'] : ($this->globalService->getShippingCode());
+        $orderOtodeokeList = [];
+        $otodokeList = $this->globalService->otodokeOption($customer_id, $s_order_shipping);
+        if (count($otodokeList)) {
+            foreach ($otodokeList as $item) {
+                $orderOtodeokeList[] = [
+                    'key' => $item['otodoke_code'],
+                    'value' => $item['name01'].'〒'.$item['postal_code'].$item['addr01'].$item['addr02'].$item['addr03'],
+                ];
+            }
+        }
+
+        return [
+            'pagination' => $pagination,
+            'shippingDateOpt' => $shippingDateList,
+            'orderShippingOpt' => $orderShippingList,
+            'orderOtodokeOpt' => $orderOtodeokeList,
+            'login_type' => $login_type,
+            'search_shipping_date' => $param['search_shipping_date'],
+            'search_order_shipping' => $param['search_order_shipping'],
+            'search_order_otodoke' => $param['search_order_otodoke'],
+            'search_sale_type' => $param['search_sale_type'],
+            'search_shipping_date_from' => $param['search_shipping_date_from'],
+            'search_shipping_date_to' => $param['search_shipping_date_to'],
+        ];
+    }
+
+    /**
+     * マイページ.
+     *
+     * @Route("/mypage/export_Pdf_multiple", name="exportPdfMultiple", methods={"GET"})
+     * @Template("/Mypage/exportPdfMultiple.twig")
+     */
+    public function exportPdfMultiple(Request $request)
+    {
+        $htmlFileName = 'Mypage/exportPdfMultiple.twig';
+        $preview = MyCommon::getPara('preview');
+        $delivery_no = MyCommon::getPara('delivery_no');
+        $search_shipping_date_from = MyCommon::getPara('search_shipping_date_from');
+        $search_shipping_date_to = MyCommon::getPara('search_shipping_date_to');
+
+        $comS = new MyCommonService($this->entityManager);
+        $customer_id = $this->globalService->customerId();
+        $login_type = $this->globalService->getLoginType();
+        $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
+
+        if (trim($delivery_no) == 'all') {
+            $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $search_shipping_date_from, $search_shipping_date_to);
+        } else {
+            $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
+        }
+
+        $arr_data = [];
+        foreach ($arr_delivery_no as $item_delivery_no) {
+            $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
+
+            if (!count($arRe)) {
+                continue;
+            }
+
+            //add special line
+            $totalTax = 0;
+            $totalaAmount = 0;
+            $inCr = 0;
+            $totalTaxRe = 0;
+
+            foreach ($arRe as &$item) {
+                $inCr++;
+                $totalTax = $totalTax + $item['tax'];
+                $totalaAmount = $totalaAmount + $item['amount'];
+                $totalTaxRe = $totalTaxRe + (10 / 100) * (int) $item['amount'];
+                $item['is_total'] = 0;
+                $item['autoIncr'] = $inCr;
+                $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
+            }
+
+            $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
+            $arSpecial = ['is_total' => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
+            $arRe[] = $arSpecial;
+
+            $arReturn = [
+                'myDatas' => array_chunk($arRe, 20),
+                'OrderTotal' => $totalaAmount,
+                'totalTaxRe' => $totalTaxRe,
+                'totalaAmountTax' => $totalaAmountTax,
+            ];
+
+            $arr_data['data'][] = $arReturn;
+        }
+
+        if (!$preview) {
+            $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
+            FileUtil::makeDirectory($dirPdf);
+            $namePdf = 'ship_'.date('Ymd').'.pdf';
+            $file = $dirPdf.'/'.$namePdf;
+
+            if (getenv('APP_IS_LOCAL') == 0) {
+                $htmlBody = $this->twig->render($htmlFileName, $arr_data);
+                MyCommon::converHtmlToPdf($dirPdf, $namePdf, $htmlBody);
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="'.basename($file).'"');
+
+                readfile($file);
+                exit();
+            } else {
+                exec('"C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe" c:/wamp/www/test/pdf.html c:/wamp/www/test/pdf.pdf');
+            }
+        }
+
+        if (!empty($arr_data)) {
+            return $arr_data;
+        } else {
+            return $this->redirectToRoute('mypage_delivery_print');
+        }
     }
 }
