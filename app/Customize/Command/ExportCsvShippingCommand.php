@@ -364,7 +364,13 @@ class ExportCsvShippingCommand extends Command
 
             foreach ($mstShippingNatEOS as $item) {
                 try {
-                    $dtOrderNatEOS = $this->entityManager->getRepository(DtOrderNatEOS::class)->findOneBy(['reqcd' => $item['reqcd'], 'order_lineno' => $item['order_lineno']]);
+                    //Change handle by task #1862
+                    $dtOrderNatEOS = $this->entityManager->getRepository(DtOrderNatEOS::class)
+                        ->findOneBy(['reqcd' => $item['reqcd'], 'order_lineno' => $item['order_lineno'], 'shipping_sent_flg' => 1]);
+
+                    if (!empty($dtOrderNatEOS)) {
+                        continue;
+                    }
 
                     $mstDelivery = $this->commonService->getMstDelivery($item['shipping_no'], $item['reqcd'], $item['order_lineno']);
                     $delivery_num = $mstDelivery['quanlity'] ?? '';
@@ -376,7 +382,9 @@ class ExportCsvShippingCommand extends Command
                     $fields = [
                         mb_convert_encoding($item['delivery_no'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($item['jan'], 'Shift-JIS', 'UTF-8'),
-                        mb_convert_encoding($item['mkrcd'], 'Shift-JIS', 'UTF-8'),
+                        //Change by task #1862
+                        //mb_convert_encoding($item['mkrcd'], 'Shift-JIS', 'UTF-8'),
+                        '',
                         mb_convert_encoding($item['natcd'], 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($delivery_num, 'Shift-JIS', 'UTF-8'),
                         mb_convert_encoding($delivery_price, 'Shift-JIS', 'UTF-8'),
@@ -389,10 +397,11 @@ class ExportCsvShippingCommand extends Command
                     $item->setShippingSentFlg(1);
                     $this->entityManager->getRepository(MstShippingNatEOS::class)->save($item);
 
-                    if (!empty($dtOrderNatEOS)) {
-                        $dtOrderNatEOS->setShippingSentFlg(1);
-                        $this->entityManager->getRepository(DtOrderNatEOS::class)->save($dtOrderNatEOS);
-                    }
+                    //Comment by task #1862
+                    //if (!empty($dtOrderNatEOS)) {
+                    //    $dtOrderNatEOS->setShippingSentFlg(1);
+                    //    $this->entityManager->getRepository(DtOrderNatEOS::class)->save($dtOrderNatEOS);
+                    //}
 
                     $this->entityManager->flush();
                     $this->entityManager->getConnection()->commit();
