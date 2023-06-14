@@ -150,7 +150,7 @@ class ImportNatStockCommand extends Command
                   'product_code' => $item['product_code'],
                   'jan_code' => $value['jan_code'],
                   'quantity' => $value['quantity'],
-                  'unit_price' => $unit_price + ($unit_price * $rate / 100),
+                  'unit_price' => $unit_price,
                 ];
 
                 $this->handleImportData($data);
