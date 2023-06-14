@@ -122,6 +122,7 @@ class ImportOrderDataCommand extends Command
 
                 $this->customer_relation = $this->entityManager->getRepository(DtCustomerRelation::class)->findOneBy([
                     'customer_code' => $this->customer_code,
+                    'represent_code' => '',
                 ]);
 
                 $shipping_code = $this->customer_relation['shipping_code'] ?? '';
