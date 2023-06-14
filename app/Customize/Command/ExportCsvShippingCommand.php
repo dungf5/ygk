@@ -368,7 +368,7 @@ class ExportCsvShippingCommand extends Command
                     $dtOrderNatEOS = $this->entityManager->getRepository(DtOrderNatEOS::class)
                         ->findOneBy(['reqcd' => $item['reqcd'], 'order_lineno' => $item['order_lineno'], 'shipping_sent_flg' => 1]);
 
-                    if (!empty($dtOrderNatEOS)) {
+                    if (empty($dtOrderNatEOS)) {
                         continue;
                     }
 
