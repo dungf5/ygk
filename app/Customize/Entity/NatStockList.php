@@ -110,19 +110,23 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
          * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'データ更新日時'")
          */
         private $update_date;
+        /**
+         * @ORM\Column(name="price_s01",type="integer",nullable=true, options={"comment":"原価"  })
+         */
+        private $price_s01;
 
         /**
          * @return string
          */
-        public function getJan(): string
+        public function getJan()
         {
             return $this->jan;
         }
 
         /**
-         * @param string $jan
+         * @param $jan
          */
-        public function setJan(string $jan): void
+        public function setJan($jan)
         {
             $this->jan = $jan;
         }
@@ -130,15 +134,15 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @return string
          */
-        public function getMkrcd(): string
+        public function getMkrcd()
         {
             return (string) $this->mkrcd;
         }
 
         /**
-         * @param string $mkrcd
+         * @param $mkrcd
          */
-        public function setMkrcd(string $mkrcd): void
+        public function setMkrcd($mkrcd)
         {
             $this->mkrcd = $mkrcd;
         }
@@ -146,15 +150,15 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @return string
          */
-        public function getGrade(): string
+        public function getGrade()
         {
             return (string) $this->grade;
         }
 
         /**
-         * @param string $grade
+         * @param $grade
          */
-        public function setGrade(string $grade): void
+        public function setGrade($grade)
         {
             $this->grade = $grade;
         }
@@ -162,15 +166,15 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @return string
          */
-        public function getNatStockNum(): string
+        public function getNatStockNum()
         {
             return (string) $this->nat_stock_num;
         }
 
         /**
-         * @param string $nat_stock_num
+         * @param $nat_stock_num
          */
-        public function setNatStockNum(string $nat_stock_num): void
+        public function setNatStockNum($nat_stock_num)
         {
             $this->nat_stock_num = $nat_stock_num;
         }
@@ -178,15 +182,15 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @return string
          */
-        public function getDeliveryDate(): string
+        public function getDeliveryDate()
         {
             return (string) $this->delivery_date;
         }
 
         /**
-         * @param string $delivery_date
+         * @param $delivery_date
          */
-        public function setDeliveryDate(string $delivery_date): void
+        public function setDeliveryDate($delivery_date)
         {
             $this->delivery_date = $delivery_date;
         }
@@ -202,7 +206,7 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @param mixed $quanlity
          */
-        public function setQuanlity($quanlity): void
+        public function setQuanlity($quanlity)
         {
             $this->quanlity = $quanlity;
         }
@@ -210,15 +214,15 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @return string
          */
-        public function getOrderLot(): string
+        public function getOrderLot()
         {
             return (string) $this->order_lot;
         }
 
         /**
-         * @param string $order_lot
+         * @param $order_lot
          */
-        public function setOrderLot(string $order_lot): void
+        public function setOrderLot($order_lot)
         {
             $this->order_lot = $order_lot;
         }
@@ -234,7 +238,7 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @param mixed $unit_price
          */
-        public function setUnitPrice($unit_price): void
+        public function setUnitPrice($unit_price)
         {
             $this->unit_price = $unit_price;
         }
@@ -242,15 +246,15 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @return string
          */
-        public function getProductCode(): string
+        public function getProductCode()
         {
             return (string) $this->product_code;
         }
 
         /**
-         * @param string $product_code
+         * @param $product_code
          */
-        public function setProductCode(string $product_code): void
+        public function setProductCode($product_code)
         {
             $this->product_code = $product_code;
         }
@@ -258,15 +262,15 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @return string
          */
-        public function getCatalogCode(): string
+        public function getCatalogCode()
         {
             return (string) $this->catalog_code;
         }
 
         /**
-         * @param string $catalog_code
+         * @param $catalog_code
          */
-        public function setCatalogCode(string $catalog_code): void
+        public function setCatalogCode($catalog_code)
         {
             $this->catalog_code = $catalog_code;
         }
@@ -274,15 +278,15 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @return string
          */
-        public function getColor(): string
+        public function getColor()
         {
             return (string) $this->color;
         }
 
         /**
-         * @param string $color
+         * @param $color
          */
-        public function setColor(string $color): void
+        public function setColor($color)
         {
             $this->color = $color;
         }
@@ -290,15 +294,15 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @return string
          */
-        public function getSize(): string
+        public function getSize()
         {
             return (string) $this->size;
         }
 
         /**
-         * @param string $size
+         * @param $size
          */
-        public function setSize(string $size): void
+        public function setSize($size)
         {
             $this->size = $size;
         }
@@ -314,7 +318,7 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @param mixed $stock_num
          */
-        public function setStockNum($stock_num): void
+        public function setStockNum($stock_num)
         {
             $this->stock_num = $stock_num;
         }
@@ -322,15 +326,15 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @return \DateTime
          */
-        public function getCreateDate(): \DateTime
+        public function getCreateDate()
         {
             return $this->create_date;
         }
 
         /**
-         * @param \DateTime $create_date
+         * @param $create_date
          */
-        public function setCreateDate(\DateTime $create_date): void
+        public function setCreateDate($create_date)
         {
             $this->create_date = $create_date;
         }
@@ -338,17 +342,34 @@ if (!class_exists('\Customize\Entity\NatStockList', false)) {
         /**
          * @return \DateTime
          */
-        public function getUpdateDate(): \DateTime
+        public function getUpdateDate()
         {
             return $this->update_date;
         }
 
         /**
-         * @param \DateTime $update_date
+         * @param $update_date
          */
-        public function setUpdateDate(\DateTime $update_date): void
+        public function setUpdateDate($update_date)
         {
             $this->update_date = $update_date;
         }
+
+        /**
+         * @return mixed
+         */
+        public function getPriceS01()
+        {
+            return $this->price_s01;
+        }
+
+        /**
+         * @param mixed $price_s01
+         */
+        public function setPriceS01($price_s01)
+        {
+            $this->price_s01 = $price_s01;
+        }
+
     }
 }
