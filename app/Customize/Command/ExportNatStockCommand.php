@@ -165,6 +165,7 @@ class ExportNatStockCommand extends Command
                     mb_convert_encoding($item['color'], 'Shift-JIS', 'UTF-8'),
                     mb_convert_encoding($item['size'], 'Shift-JIS', 'UTF-8'),
                     mb_convert_encoding($item['stock_num'], 'Shift-JIS', 'UTF-8'),
+                    mb_convert_encoding($item['price_s01'], 'Shift-JIS', 'UTF-8'),
                 ];
 
                 fputcsv($fp, $fields);
