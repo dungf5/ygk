@@ -43,6 +43,7 @@ class NatStockListRepository extends AbstractRepository
         $object->setNatStockNum($data['nat_stock_num']);
         $object->setOrderLot($data['order_lot']);
         $object->setUnitPrice($data['unit_price']);
+        $object->setPriceS01($data['price_s01']);
 
         $this->getEntityManager()->persist($object);
         $this->getEntityManager()->flush();

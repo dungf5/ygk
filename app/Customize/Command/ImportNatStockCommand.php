@@ -174,6 +174,7 @@ class ImportNatStockCommand extends Command
                 'nat_stock_num' => (int) $data['stock_num'] == 0 ? '×' : ((int) $data['stock_num'] >= 31 ? '〇' : '△'),
                 'order_lot' => (string) $data['quantity'],
                 'unit_price' => (int) $data['unit_price'],
+                'price_s01' => (int) $data['price_s01'],
             ];
             $this->entityManager->getRepository(NatStockList::class)->insertData($insertData);
         } catch (\Exception $e) {
