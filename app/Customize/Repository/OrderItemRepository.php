@@ -220,12 +220,12 @@ class OrderItemRepository extends AbstractRepository
         }
 
         if ($paramSearch['search_order_shipping'] != '0') {
-            $qb->andWhere('delivery.shiping_name = (select mc3.company_name from Customize\Entity\MstCustomer mc3 where mc3.customer_code = :search_order_shipping)')
+            $qb->andWhere('TRIM(delivery.shiping_name) = (select mc3.company_name from Customize\Entity\MstCustomer mc3 where mc3.customer_code = :search_order_shipping)')
                 ->setParameter(':search_order_shipping', $paramSearch['search_order_shipping']);
         }
 
         if ($paramSearch['search_order_otodoke'] != '0') {
-            $qb->andWhere('delivery.otodoke_name in (select mc4.company_name from Customize\Entity\MstCustomer mc4 where mc4.customer_code = :search_order_otodoke)')
+            $qb->andWhere('TRIM(delivery.otodoke_name) in (select mc4.company_name from Customize\Entity\MstCustomer mc4 where mc4.customer_code = :search_order_otodoke)')
                 ->setParameter(':search_order_otodoke', $paramSearch['search_order_otodoke']);
         }
 

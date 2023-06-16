@@ -1901,8 +1901,14 @@ class MypageController extends AbstractController
         $htmlFileName = 'Mypage/exportPdfMultiple.twig';
         $preview = MyCommon::getPara('preview');
         $delivery_no = MyCommon::getPara('delivery_no');
-        $search_shipping_date_from = MyCommon::getPara('search_shipping_date_from');
-        $search_shipping_date_to = MyCommon::getPara('search_shipping_date_to');
+        $params = [
+            'search_shipping_date' => MyCommon::getPara('shipping_date'),
+            'search_order_shipping' => MyCommon::getPara('order_shipping'),
+            '$search_order_otodoke' => MyCommon::getPara('order_otodoke'),
+            'search_sale_type' => MyCommon::getPara('sale_type'),
+            'search_shipping_date_from' => MyCommon::getPara('search_shipping_date_from'),
+            'search_shipping_date_to' => MyCommon::getPara('search_shipping_date_to'),
+        ];
 
         $comS = new MyCommonService($this->entityManager);
         $customer_id = $this->globalService->customerId();
@@ -1910,7 +1916,7 @@ class MypageController extends AbstractController
         $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
 
         if (trim($delivery_no) == 'all') {
-            $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $search_shipping_date_from, $search_shipping_date_to);
+            $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
         } else {
             $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
         }

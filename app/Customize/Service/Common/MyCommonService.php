@@ -1057,7 +1057,7 @@ SQL;
         return $rows;
     }
 
-    public function getDeliveryNoPrintPDF($customer_code, $login_type, $search_shipping_date_from, $search_shipping_date_to)
+    public function getDeliveryNoPrintPDF($customer_code, $login_type, $params_search)
     {
         switch ($login_type) {
             case 'shipping_code':
@@ -1076,15 +1076,44 @@ SQL;
         $myPara = [$customer_code];
 
         $date_from_condition = '';
-        if (!empty($search_shipping_date_from)) {
+        if (!empty($params_search['search_shipping_date_from'])) {
             $date_from_condition = "AND DATE_FORMAT(mst_delivery.delivery_date,'%Y-%m-%d') >= ?";
-            $myPara[] = $search_shipping_date_from;
+            $myPara[] = $params_search['search_shipping_date_from'];
         }
 
         $date_to_condition = '';
-        if (!empty($search_shipping_date_to)) {
+        if (!empty($params_search['search_shipping_date_to'])) {
             $date_to_condition = "AND DATE_FORMAT(mst_delivery.delivery_date,'%Y-%m-%d') <= ?";
-            $myPara[] = $search_shipping_date_to;
+            $myPara[] = $params_search['search_shipping_date_to'];
+        }
+
+        $shipping_date_condition = '';
+        if (!empty($params_search['search_shipping_date'])) {
+            $shipping_date_condition = 'AND mst_delivery.delivery_date like ?';
+            $myPara[] = $params_search['search_shipping_date'].'-%';
+        }
+
+        $order_shipping_condition = '';
+        if (!empty($params_search['search_order_shipping'])) {
+            $order_shipping_condition = 'AND TRIM(mst_delivery.shiping_name) = (select company_name from mst_customer where customer_code = ?)';
+            $myPara[] = $params_search['search_order_shipping'];
+        }
+
+        $order_otodoke_condition = '';
+        if (!empty($params_search['search_order_otodoke'])) {
+            $order_otodoke_condition = 'AND TRIM(mst_delivery.otodoke_name) = (select company_name from mst_customer where customer_code = ?)';
+            $myPara[] = $params_search['search_order_otodoke'];
+        }
+
+        $sale_type_condition = '';
+        if ($params_search['search_sale_type'] != '0') {
+            if ($params_search['search_sale_type'] == '1') {
+                $sale_type_condition = "AND TRIM(mst_delivery.sale_type) = '通常' ";
+            }
+
+            if ($params_search['search_sale_type'] == '2') {
+                $sale_type_condition = "AND TRIM(mst_delivery.sale_type) = '返品' ";
+            }
         }
 
         $sql = "
@@ -1104,6 +1133,10 @@ SQL;
                             {$condition}
                             {$date_from_condition}
                             {$date_to_condition}
+                            {$shipping_date_condition}
+                            {$order_shipping_condition}
+                            {$order_otodoke_condition}
+                            {$sale_type_condition}
                         GROUP BY 
                             mst_delivery.delivery_no
                         ORDER BY
@@ -2610,28 +2643,28 @@ SQL;
 
     public function getReturnsReson()
     {
-        $sql = "SELECT `returns_reson_id`, `returns_reson` FROM `dt_returns_reson`";
+        $sql = 'SELECT `returns_reson_id`, `returns_reson` FROM `dt_returns_reson`';
 
-        $statement      = $this->entityManager->getConnection()->prepare($sql);
+        $statement = $this->entityManager->getConnection()->prepare($sql);
 
         try {
-            $result     = $statement->executeQuery();
-            $rows       = $result->fetchAllAssociative();
-            return $rows;
+            $result = $statement->executeQuery();
+            $rows = $result->fetchAllAssociative();
 
+            return $rows;
         } catch (Exception $e) {
             return [];
         }
     }
 
-    public function getJanCodeToProductCode( $jan_code = '' )
+    public function getJanCodeToProductCode($jan_code = '')
     {
-        $sql = "SELECT `product_code` FROM `mst_product` WHERE `jan_code` = :jan_code limit 1";
+        $sql = 'SELECT `product_code` FROM `mst_product` WHERE `jan_code` = :jan_code limit 1';
 
         try {
-            $statement      = $this->entityManager->getConnection()->prepare($sql);
-            $result         = $statement->executeQuery([ 'jan_code'=>$jan_code ]);
-            $row            = $result->fetchAllAssociative();
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery(['jan_code' => $jan_code]);
+            $row = $result->fetchAllAssociative();
 
             return @$row[0]['product_code'];
         } catch (Exception $e) {
@@ -2639,14 +2672,15 @@ SQL;
 
         return null;
     }
-    
-    public function getJanCodeToProductName( $jan_code = '' ) {
-        $sql = "SELECT `product_name` FROM `mst_product` WHERE `jan_code` = :jan_code limit 1";
+
+    public function getJanCodeToProductName($jan_code = '')
+    {
+        $sql = 'SELECT `product_name` FROM `mst_product` WHERE `jan_code` = :jan_code limit 1';
 
         try {
-            $statement      = $this->entityManager->getConnection()->prepare($sql);
-            $result         = $statement->executeQuery([ 'jan_code'=>$jan_code ]);
-            $row            = $result->fetchAllAssociative();
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery(['jan_code' => $jan_code]);
+            $row = $result->fetchAllAssociative();
 
             return @$row[0]['product_name'];
         } catch (Exception $e) {
@@ -2655,26 +2689,29 @@ SQL;
         return null;
     }
 
-    public function getDeliveredNum(  $shipping_no='', $product_code=''  ) {
+    public function getDeliveredNum($shipping_no = '', $product_code = '')
+    {
         $result = 0;
-        if( !$shipping_no || !$product_code ) return $result;
+        if (!$shipping_no || !$product_code) {
+            return $result;
+        }
 
-        $sql = "SELECT 
+        $sql = 'SELECT 
                 SUM( `shipping_num` ) AS sum_shipping_num
             FROM `mst_shipping`
             WHERE
                 `shipping_no` = :shipping_no
                 AND `product_code` = :product_code
                 AND `shipping_status` = 2
-            GROUP BY shipping_no, product_code";
+            GROUP BY shipping_no, product_code';
 
         try {
             $statement = $this->entityManager->getConnection()->prepare($sql);
-            $query     = $statement->executeQuery([ 'shipping_no'=>$shipping_no, 'product_code'=>$product_code ]);
-            $row       = $query->fetchAllAssociative();
+            $query = $statement->executeQuery(['shipping_no' => $shipping_no, 'product_code' => $product_code]);
+            $row = $query->fetchAllAssociative();
 
-            foreach($row as $dt) {
-                $result += (int)$dt['sum_shipping_num'];
+            foreach ($row as $dt) {
+                $result += (int) $dt['sum_shipping_num'];
             }
         } catch (Exception $e) {
         }
@@ -2682,14 +2719,17 @@ SQL;
         return $result;
     }
 
-    public function getReturnedNum(  $shipping_no='', $product_code='', $returns_no=''  ) {
+    public function getReturnedNum($shipping_no = '', $product_code = '', $returns_no = '')
+    {
         $result = 0;
-        if( !$shipping_no || !$product_code ) return $result;
+        if (!$shipping_no || !$product_code) {
+            return $result;
+        }
 
-        $param = [ 'shipping_no'=>$shipping_no, 'product_code'=>$product_code ];
-        $where = "";
-        if( !empty($returns_no) ) {
-            $where = "AND returns_no <> :returns_no";
+        $param = ['shipping_no' => $shipping_no, 'product_code' => $product_code];
+        $where = '';
+        if (!empty($returns_no)) {
+            $where = 'AND returns_no <> :returns_no';
             $param['returns_no'] = $returns_no;
         }
 
@@ -2703,11 +2743,11 @@ SQL;
 
         try {
             $statement = $this->entityManager->getConnection()->prepare($sql);
-            $query     = $statement->executeQuery($param);
-            $row       = $query->fetchAllAssociative();
+            $query = $statement->executeQuery($param);
+            $row = $query->fetchAllAssociative();
 
-            foreach($row as $dt) {
-                $result += (int)$dt['sum_returns_num'];
+            foreach ($row as $dt) {
+                $result += (int) $dt['sum_returns_num'];
             }
         } catch (Exception $e) {
         }
@@ -2717,16 +2757,17 @@ SQL;
 
     public function getReturnsNo()
     {
-        $sql = "SELECT MAX(`returns_no`) AS `max_returns_no` FROM `mst_product_returns_info`";
+        $sql = 'SELECT MAX(`returns_no`) AS `max_returns_no` FROM `mst_product_returns_info`';
 
         try {
-            $statement      = $this->entityManager->getConnection()->prepare($sql);
-            $result         = $statement->executeQuery();
-            $row            = $result->fetchAllAssociative();
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery();
+            $row = $result->fetchAllAssociative();
 
-            $max_returns_no = (int)@$row[0]['max_returns_no'];
+            $max_returns_no = (int) @$row[0]['max_returns_no'];
             $max_returns_no = $max_returns_no > 1000 ? $max_returns_no + 1 : 1001;
-            return (string)$max_returns_no;
+
+            return (string) $max_returns_no;
         } catch (Exception $e) {
         }
 
@@ -2739,6 +2780,7 @@ SQL;
      * @param $shipping_no
      * @param $order_no
      * @param $order_line_no
+     *
      * @return array|mixed
      *
      * @throws \Doctrine\DBAL\Exception
