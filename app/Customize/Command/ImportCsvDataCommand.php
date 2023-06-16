@@ -393,6 +393,7 @@ class ImportCsvDataCommand extends Command
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         $reqcd_arr = [];
+        $reqcd_error_arr = [];
         $line_no = 1;
         // Foreach row
         foreach ($data as $x => $row) {
@@ -417,50 +418,76 @@ class ImportCsvDataCommand extends Command
 
             $objData['order_lineno'] = $line_no;
 
+            // Old handling to import dt_order_nat_eos
+//            $objectExist = $this->entityManager->getRepository(DtOrderNatEOS::class)->findOneBy([
+//                'reqcd' => $objData['reqcd'] ?? '',
+//                'jan' => $objData['jan'] ?? '',
+//            ]);
+//
+//            // Insert dt_order_nat_eos
+//            if (empty($objectExist)) {
+//                log_info('Insert dt_order_nat_eos '.$objData['reqcd'].'-'.$objData['jan']);
+//
+//                $this->entityManager->getRepository(DtOrderNatEOS::class)->insertData($objData);
+//            }
+//
+//            // Update
+//            else {
+//                $orderRegistedFlg = $objectExist['order_registed_flg'];
+//
+//                switch ((int) $orderRegistedFlg) {
+//                    case 1:
+//                        $objectCopyExist = $this->entityManager->getRepository(DtOrderNatEOSCopy::class)->findOneBy([
+//                            'reqcd' => $objData['reqcd'] ?? '',
+//                            'jan' => $objData['jan'] ?? '',
+//                        ]);
+//
+//                        // Insert dt_order_nat_eos_copy
+//                        if (empty($objectCopyExist)) {
+//                            log_info('Insert dt_order_nat_eos_copy '.$objData['reqcd'].'-'.$objData['jan']);
+//                            $this->entityManager->getRepository(DtOrderNatEOSCopy::class)->insertData($objData);
+//                        }
+//
+//                        // Update dt_order_nat_eos_copy
+//                        else {
+//                            log_info('Update dt_order_nat_eos_copy '.$objData['reqcd'].'-'.$objData['jan']);
+//                            $this->entityManager->getRepository(DtOrderNatEOSCopy::class)->updateData($objData);
+//                        }
+//                        break;
+//
+//                    default:
+//                        // Update dt_order_nat_eos
+//                        log_info('Update dt_order_nat_eos '.$objData['reqcd'].'-'.$objData['jan']);
+//                        $this->entityManager->getRepository(DtOrderNatEOS::class)->updateData($objData);
+//                        break;
+//                }
+//            }
+            // Old handling to import dt_order_nat_eos
+
+            // New handling import to dt_order_nat_eos
             $objectExist = $this->entityManager->getRepository(DtOrderNatEOS::class)->findOneBy([
                 'reqcd' => $objData['reqcd'] ?? '',
-                'jan' => $objData['jan'] ?? '',
+                'order_lineno' => $objData['order_lineno'] ?? '',
             ]);
 
             // Insert dt_order_nat_eos
             if (empty($objectExist)) {
-                log_info('Insert dt_order_nat_eos '.$objData['reqcd'].'-'.$objData['jan']);
+                log_info('Insert dt_order_nat_eos '.$objData['reqcd'].'-'.$objData['order_lineno']);
 
                 $this->entityManager->getRepository(DtOrderNatEOS::class)->insertData($objData);
             }
 
-            // Update
+            // Alert error existed
             else {
-                $orderRegistedFlg = $objectExist['order_registed_flg'];
-
-                switch ((int) $orderRegistedFlg) {
-                    case 1:
-                        $objectCopyExist = $this->entityManager->getRepository(DtOrderNatEOSCopy::class)->findOneBy([
-                            'reqcd' => $objData['reqcd'] ?? '',
-                            'jan' => $objData['jan'] ?? '',
-                        ]);
-
-                        // Insert dt_order_nat_eos_copy
-                        if (empty($objectCopyExist)) {
-                            log_info('Insert dt_order_nat_eos_copy '.$objData['reqcd'].'-'.$objData['jan']);
-                            $this->entityManager->getRepository(DtOrderNatEOSCopy::class)->insertData($objData);
-                        }
-
-                        // Update dt_order_nat_eos_copy
-                        else {
-                            log_info('Update dt_order_nat_eos_copy '.$objData['reqcd'].'-'.$objData['jan']);
-                            $this->entityManager->getRepository(DtOrderNatEOSCopy::class)->updateData($objData);
-                        }
-                        break;
-
-                    default:
-                        // Update dt_order_nat_eos
-                        log_info('Update dt_order_nat_eos '.$objData['reqcd'].'-'.$objData['jan']);
-                        $this->entityManager->getRepository(DtOrderNatEOS::class)->updateData($objData);
-                        break;
+                if (!in_array($objData['reqcd'], $reqcd_error_arr)) {
+                    array_push($reqcd_error_arr, $objData['reqcd']);
                 }
             }
+            // New handling import to dt_order_nat_eos
         }
+
+        // Send mail alert arror
+        $this->sendMailNatEOSError($reqcd_error_arr);
 
         log_info('End save/update data Order NAT EOS');
 
@@ -468,5 +495,32 @@ class ImportCsvDataCommand extends Command
             'status' => 1,
             'message' => 'successfully',
         ];
+    }
+
+    private function sendMailNatEOSError($reqcd_error_arr)
+    {
+        if (!count($reqcd_error_arr)) {
+            return;
+        }
+
+        $information = [
+            'email' => getenv('EMAIL_WS_EOS') ?? '',
+            'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
+            'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
+            'file_name' => 'Mail/nat_eos_import_error.twig',
+            'error_data' => $reqcd_error_arr,
+        ];
+
+        try {
+            log_info('[NAT-EOS] Send Mail Error.');
+            $this->mailService->sendMailErrorNatEOS($information);
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
+
+            return;
+        }
     }
 }
