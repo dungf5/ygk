@@ -1904,7 +1904,7 @@ class MypageController extends AbstractController
         $params = [
             'search_shipping_date' => MyCommon::getPara('shipping_date'),
             'search_order_shipping' => MyCommon::getPara('order_shipping'),
-            '$search_order_otodoke' => MyCommon::getPara('order_otodoke'),
+            'search_order_otodoke' => MyCommon::getPara('order_otodoke'),
             'search_sale_type' => MyCommon::getPara('sale_type'),
             'search_shipping_date_from' => MyCommon::getPara('search_shipping_date_from'),
             'search_shipping_date_to' => MyCommon::getPara('search_shipping_date_to'),
