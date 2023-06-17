@@ -471,7 +471,7 @@ class ImportCsvDataCommand extends Command
             ]);
 
             // Insert dt_order_nat_eos
-            if (empty($objectExist)) {
+            if (empty($objectExist) && !in_array($objData['reqcd'], $reqcd_error_arr)) {
                 log_info('Insert dt_order_nat_eos '.$objData['reqcd'].'-'.$objData['order_lineno']);
 
                 $this->entityManager->getRepository(DtOrderNatEOS::class)->insertData($objData);
