@@ -36,7 +36,6 @@ if (!class_exists('\Customize\Entity\DtOrderNatEOS', false)) {
          * @var string
          *
          * @ORM\Column(name="jan", type="string", length=13,options={"comment":"JANコード"}, nullable=false)
-         * @ORM\Id
          */
         private $jan;
         /**
@@ -67,6 +66,7 @@ if (!class_exists('\Customize\Entity\DtOrderNatEOS', false)) {
         private $delivery_day;
         /**
          * @ORM\Column(name="order_lineno",type="integer",nullable=true, options={"comment":"発注明細番号"  })
+         * @ORM\Id
          */
         private $order_lineno;
         /**
