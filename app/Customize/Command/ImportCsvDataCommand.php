@@ -494,7 +494,6 @@ class ImportCsvDataCommand extends Command
             }
             // No check. Insert by any way
             else {
-                log_info(json_encode($objData));
                 $this->entityManager->getRepository(DtOrderNatEOS::class)->insertData($objData);
             }
             // New handling import to dt_order_nat_eos
