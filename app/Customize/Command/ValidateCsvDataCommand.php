@@ -636,6 +636,7 @@ class ValidateCsvDataCommand extends Command
             $data = $this->entityManager->getRepository(DtOrderNatEOS::class)->findBy([
                 'order_import_day' => date('Ymd'),
                 'order_registed_flg' => 0,
+                'error_type' => 0,
             ]);
 
             if (empty($data)) {
