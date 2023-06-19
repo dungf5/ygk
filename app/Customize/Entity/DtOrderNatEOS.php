@@ -42,7 +42,7 @@ if (!class_exists('\Customize\Entity\DtOrderNatEOS', false)) {
         /**
          * @var string
          *
-         * @ORM\Column(name="mkrcd",nullable=true, type="string", length=20, options={"comment":"品番"})
+         * @ORM\Column(name="mkrcd",nullable=true, type="string", length=50, options={"comment":"品番"})
          */
         private $mkrcd;
         /**
