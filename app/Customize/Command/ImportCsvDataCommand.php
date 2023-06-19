@@ -37,7 +37,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/* Run Batch: php bin/console import-csv-data-command [param] */
+/* Run Batch: php bin/console import-csv-data-command [param] {option} */
 class ImportCsvDataCommand extends Command
 {
     use PluginCommandTrait;
@@ -56,6 +56,7 @@ class ImportCsvDataCommand extends Command
     private $commonService;
     private $csvService;
     private $ftpService;
+    private $check = false;
 
     protected static $defaultName = 'import-csv-data-command';
     protected static $defaultDescription = 'Process Import Csv Data Command';
@@ -75,7 +76,8 @@ class ImportCsvDataCommand extends Command
         $this
             ->setDescription(self::$defaultDescription)
             ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description');
+            ->addOption('check', null, InputOption::VALUE_OPTIONAL, 'Option check when import eos')
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -84,6 +86,7 @@ class ImportCsvDataCommand extends Command
         log_info('---------------------------------------');
         log_info('Start Process Import Csv Data');
         $param = $input->getArgument('arg1') ?? null;
+        $option = $input->getOption('check');
 
         if (!$param) {
             log_error('No param. Process stopped.');
@@ -92,6 +95,10 @@ class ImportCsvDataCommand extends Command
             $this->pushGoogleChat($message);
 
             return 0;
+        }
+
+        if (!empty($option) && ($option == 'true' || $option == '1')) {
+            $this->check = true;
         }
 
         $this->handleProcess($param);
@@ -465,23 +472,29 @@ class ImportCsvDataCommand extends Command
             // Old handling to import dt_order_nat_eos
 
             // New handling import to dt_order_nat_eos
-            $objectExist = $this->entityManager->getRepository(DtOrderNatEOS::class)->findOneBy([
-                'reqcd' => $objData['reqcd'] ?? '',
-                'order_lineno' => $objData['order_lineno'] ?? '',
-            ]);
+            if ($this->check) {
+                $objectExist = $this->entityManager->getRepository(DtOrderNatEOS::class)->findOneBy([
+                    'reqcd' => $objData['reqcd'] ?? '',
+                    'order_lineno' => $objData['order_lineno'] ?? '',
+                ]);
 
-            // Insert dt_order_nat_eos
-            if (empty($objectExist) && !in_array($objData['reqcd'], $reqcd_error_arr)) {
-                log_info('Insert dt_order_nat_eos '.$objData['reqcd'].'-'.$objData['order_lineno']);
+                // Insert dt_order_nat_eos
+                if (empty($objectExist) && !in_array($objData['reqcd'], $reqcd_error_arr)) {
+                    log_info('Insert dt_order_nat_eos '.$objData['reqcd'].'-'.$objData['order_lineno']);
 
-                $this->entityManager->getRepository(DtOrderNatEOS::class)->insertData($objData);
-            }
-
-            // Alert error existed
-            else {
-                if (!in_array($objData['reqcd'], $reqcd_error_arr)) {
-                    array_push($reqcd_error_arr, $objData['reqcd']);
+                    $this->entityManager->getRepository(DtOrderNatEOS::class)->insertData($objData);
                 }
+
+                // Alert error existed
+                else {
+                    if (!in_array($objData['reqcd'], $reqcd_error_arr)) {
+                        array_push($reqcd_error_arr, $objData['reqcd']);
+                    }
+                }
+            }
+            // No check. Insert by any way
+            else {
+                $this->entityManager->getRepository(DtOrderNatEOS::class)->insertData($objData);
             }
             // New handling import to dt_order_nat_eos
         }
