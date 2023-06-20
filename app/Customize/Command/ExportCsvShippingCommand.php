@@ -418,6 +418,9 @@ class ExportCsvShippingCommand extends Command
         // Check file after put data
         if (($fp = fopen(trim($file), 'r')) !== false) {
             $str = fread($fp, 100);
+            $getFileCSV = file_get_contents($file, (bool) FILE_USE_INCLUDE_PATH);
+            $getFileCSV = str_replace('"', '', $getFileCSV);
+            file_put_contents($file, $getFileCSV);
             fclose($fp);
 
             if (empty($str)) {
