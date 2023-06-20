@@ -3051,4 +3051,58 @@ SQL;
 
         return $stmt->executeStatement($params);
     }
+
+    public function getShippingWSExportData()
+    {
+        $sql = '
+                SELECT * 
+                FROM 
+                    mst_shipping_ws_eos mswe 
+                JOIN 
+                    dt_order_ws_eos dowe  
+                ON 
+                    dowe.order_no = mswe.order_no 
+                AND 
+                    dowe.order_line_no = mswe.order_line_no
+                WHERE 
+                    mswe.shipping_send_flg = 1
+                AND 
+                    dowe.shipping_sent_flg = 1;
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery();
+            return $result->fetchAllAssociative();
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getShippingNatExportData()
+    {
+        $sql = '
+                SELECT * 
+                FROM 
+                    mst_shipping_nat_eos msne 
+                JOIN 
+                    dt_order_nat_eos done 
+                ON 
+                    done.reqcd = msne.reqcd 
+                AND 
+                    done.order_lineno = msne.order_lineno
+                WHERE 
+                    msne.shipping_send_flg = 1
+                AND 
+                    done.shipping_sent_flg = 1;
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery();
+            return $result->fetchAllAssociative();
+        } catch (Exception $e) {
+            return [];
+        }
+    }
 }

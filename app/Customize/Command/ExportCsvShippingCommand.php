@@ -18,8 +18,6 @@ namespace Customize\Command;
 use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtBreakKey;
-use Customize\Entity\DtOrderNatEOS;
-use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstShippingNatEOS;
 use Customize\Entity\MstShippingWSEOS;
 use Customize\Service\Common\MyCommonService;
@@ -161,9 +159,7 @@ class ExportCsvShippingCommand extends Command
             return;
         }
 
-        $mstShippingWSEOS = $this->entityManager->getRepository(MstShippingWSEOS::class)->findBy([
-            'shipping_send_flg' => 1,
-        ]);
+        $mstShippingWSEOS = $this->commonService->getShippingWSExportData();
 
         if (!count($mstShippingWSEOS)) {
             log_info('No data');
@@ -200,14 +196,6 @@ class ExportCsvShippingCommand extends Command
         if ($fp) {
             foreach ($mstShippingWSEOS as $item) {
                 try {
-                    $dtOrderWsEOS = $this->entityManager->getRepository(DtOrderWSEOS::class)
-                        ->findOneBy(['order_no' => $item['order_no'], 'order_line_no' => $item['order_line_no'], 'shipping_sent_flg' => 1]);
-
-                    if (empty($dtOrderWsEOS)) {
-                        log_info('shipping have not enough '.$item['order_no'].'-'.$item['order_line_no']);
-                        continue;
-                    }
-
                     $mstDelivery = $this->commonService->getMstDelivery($item['shipping_no'], $item['order_no'], $item['order_line_no']);
                     $delivery_no = $mstDelivery['delivery_no'] ?? null;
                     $delivery_line_no = $mstDelivery['delivery_lineno'] ?? null;
@@ -270,15 +258,17 @@ class ExportCsvShippingCommand extends Command
 
                     fputcsv($fp, $fields);
 
-                    $item->setShippingSendFlg(0);
-                    $item->setShippingSentFlg(1);
-                    $this->entityManager->getRepository(MstShippingWSEOS::class)->save($item);
+                    $objShippingWSEOS = $this->entityManager->getRepository(MstShippingWSEOS::class)->findOneBy([
+                        'order_no' => $item['order_no'],
+                        'order_line_no' => $item['order_line_no'],
+                        'shipping_no' => $item['shipping_no'],
+                    ]);
 
-                    //Comment by task #1843
-                    //if (!empty($dtOrderWsEOS)) {
-                    //    $dtOrderWsEOS->setShippingSentFlg(1);
-                    //    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($dtOrderWsEOS);
-                    //}
+                    if (!empty($objShippingWSEOS)) {
+                        $objShippingWSEOS->setShippingSendFlg(0);
+                        $objShippingWSEOS->setShippingSentFlg(1);
+                        $this->entityManager->getRepository(MstShippingWSEOS::class)->save($objShippingWSEOS);
+                    }
 
                     $this->entityManager->flush();
                     $this->entityManager->getConnection()->commit();
@@ -326,9 +316,7 @@ class ExportCsvShippingCommand extends Command
             return;
         }
 
-        $mstShippingNatEOS = $this->entityManager->getRepository(MstShippingNatEOS::class)->findBy([
-            'shipping_send_flg' => 1,
-        ]);
+        $mstShippingNatEOS = $this->commonService->getShippingNatExportData();
 
         if (!count($mstShippingNatEOS)) {
             log_info('No data');
@@ -371,15 +359,6 @@ class ExportCsvShippingCommand extends Command
 
             foreach ($mstShippingNatEOS as $item) {
                 try {
-                    //Change handle by task #1862
-                    $dtOrderNatEOS = $this->entityManager->getRepository(DtOrderNatEOS::class)
-                        ->findOneBy(['reqcd' => $item['reqcd'], 'order_lineno' => $item['order_lineno'], 'shipping_sent_flg' => 1]);
-
-                    if (empty($dtOrderNatEOS)) {
-                        log_info('shipping have not enough '.$item['reqcd'].'-'.$item['order_lineno']);
-                        continue;
-                    }
-
                     $mstDelivery = $this->commonService->getMstDelivery($item['shipping_no'], $item['reqcd'], $item['order_lineno']);
                     $delivery_num = $mstDelivery['quanlity'] ?? '';
                     $delivery_price = $mstDelivery['unit_price'] ?? '';
@@ -401,15 +380,17 @@ class ExportCsvShippingCommand extends Command
 
                     fputcsv($fp, $fields);
 
-                    $item->setShippingSendFlg(0);
-                    $item->setShippingSentFlg(1);
-                    $this->entityManager->getRepository(MstShippingNatEOS::class)->save($item);
+                    $objShippingNatEOS = $this->entityManager->getRepository(MstShippingNatEOS::class)->findOneBy([
+                        'shipping_no' => $item['shipping_no'],
+                        'reqcd' => $item['reqcd'],
+                        'order_lineno' => $item['order_lineno'],
+                    ]);
 
-                    //Comment by task #1862
-                    //if (!empty($dtOrderNatEOS)) {
-                    //    $dtOrderNatEOS->setShippingSentFlg(1);
-                    //    $this->entityManager->getRepository(DtOrderNatEOS::class)->save($dtOrderNatEOS);
-                    //}
+                    if (!empty($objShippingNatEOS)) {
+                        $objShippingNatEOS->setShippingSendFlg(0);
+                        $objShippingNatEOS->setShippingSentFlg(1);
+                        $this->entityManager->getRepository(MstShippingNatEOS::class)->save($objShippingNatEOS);
+                    }
 
                     $this->entityManager->flush();
                     $this->entityManager->getConnection()->commit();
