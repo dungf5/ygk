@@ -204,6 +204,7 @@ class ExportCsvShippingCommand extends Command
                         ->findOneBy(['order_no' => $item['order_no'], 'order_line_no' => $item['order_line_no'], 'shipping_sent_flg' => 1]);
 
                     if (empty($dtOrderWsEOS)) {
+                        log_info('shipping have not enough '.$item['order_no'].'-'.$item['order_line_no']);
                         continue;
                     }
 
@@ -375,6 +376,7 @@ class ExportCsvShippingCommand extends Command
                         ->findOneBy(['reqcd' => $item['reqcd'], 'order_lineno' => $item['order_lineno'], 'shipping_sent_flg' => 1]);
 
                     if (empty($dtOrderNatEOS)) {
+                        log_info('shipping have not enough '.$item['reqcd'].'-'.$item['order_lineno']);
                         continue;
                     }
 
