@@ -200,7 +200,12 @@ class ExportCsvShippingCommand extends Command
         if ($fp) {
             foreach ($mstShippingWSEOS as $item) {
                 try {
-                    $dtOrderWsEOS = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy(['order_no' => $item['order_no'], 'order_line_no' => $item['order_line_no']]);
+                    $dtOrderWsEOS = $this->entityManager->getRepository(DtOrderWSEOS::class)
+                        ->findOneBy(['order_no' => $item['order_no'], 'order_line_no' => $item['order_line_no'], 'shipping_sent_flg' => 1]);
+
+                    if (empty($dtOrderWsEOS)) {
+                        continue;
+                    }
 
                     $mstDelivery = $this->commonService->getMstDelivery($item['shipping_no'], $item['order_no'], $item['order_line_no']);
                     $delivery_no = $mstDelivery['delivery_no'] ?? null;
@@ -268,10 +273,11 @@ class ExportCsvShippingCommand extends Command
                     $item->setShippingSentFlg(1);
                     $this->entityManager->getRepository(MstShippingWSEOS::class)->save($item);
 
-                    if (!empty($dtOrderWsEOS)) {
-                        $dtOrderWsEOS->setShippingSentFlg(1);
-                        $this->entityManager->getRepository(DtOrderWSEOS::class)->save($dtOrderWsEOS);
-                    }
+                    //Comment by task #1843
+                    //if (!empty($dtOrderWsEOS)) {
+                    //    $dtOrderWsEOS->setShippingSentFlg(1);
+                    //    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($dtOrderWsEOS);
+                    //}
 
                     $this->entityManager->flush();
                     $this->entityManager->getConnection()->commit();
