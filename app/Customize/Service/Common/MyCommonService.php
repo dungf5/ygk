@@ -1045,7 +1045,7 @@ SQL;
         return $rows;
     }
 
-    public function getDeliveryNoPrintPDF($customer_code, $login_type, $search_shipping_date_from, $search_shipping_date_to)
+    public function getDeliveryNoPrintPDF($customer_code, $login_type, $params_search)
     {
         switch ($login_type) {
             case 'shipping_code':
@@ -1064,15 +1064,44 @@ SQL;
         $myPara = [$customer_code];
 
         $date_from_condition = '';
-        if (!empty($search_shipping_date_from)) {
+        if (!empty($params_search['search_shipping_date_from'])) {
             $date_from_condition = "AND DATE_FORMAT(mst_delivery.delivery_date,'%Y-%m-%d') >= ?";
-            $myPara[] = $search_shipping_date_from;
+            $myPara[] = $params_search['search_shipping_date_from'];
         }
 
         $date_to_condition = '';
-        if (!empty($search_shipping_date_to)) {
+        if (!empty($params_search['search_shipping_date_to'])) {
             $date_to_condition = "AND DATE_FORMAT(mst_delivery.delivery_date,'%Y-%m-%d') <= ?";
-            $myPara[] = $search_shipping_date_to;
+            $myPara[] = $params_search['search_shipping_date_to'];
+        }
+
+        $shipping_date_condition = '';
+        if (!empty($params_search['search_shipping_date'])) {
+            $shipping_date_condition = 'AND mst_delivery.delivery_date like ?';
+            $myPara[] = $params_search['search_shipping_date'].'-%';
+        }
+
+        $order_shipping_condition = '';
+        if (!empty($params_search['search_order_shipping'])) {
+            $order_shipping_condition = 'AND TRIM(mst_delivery.shiping_name) = (select company_name from mst_customer where customer_code = ?)';
+            $myPara[] = $params_search['search_order_shipping'];
+        }
+
+        $order_otodoke_condition = '';
+        if (!empty($params_search['search_order_otodoke'])) {
+            $order_otodoke_condition = 'AND TRIM(mst_delivery.otodoke_name) = (select company_name from mst_customer where customer_code = ?)';
+            $myPara[] = $params_search['search_order_otodoke'];
+        }
+
+        $sale_type_condition = '';
+        if ($params_search['search_sale_type'] != '0') {
+            if ($params_search['search_sale_type'] == '1') {
+                $sale_type_condition = "AND TRIM(mst_delivery.sale_type) = '通常' ";
+            }
+
+            if ($params_search['search_sale_type'] == '2') {
+                $sale_type_condition = "AND TRIM(mst_delivery.sale_type) = '返品' ";
+            }
         }
 
         $sql = "
@@ -1092,6 +1121,10 @@ SQL;
                             {$condition}
                             {$date_from_condition}
                             {$date_to_condition}
+                            {$shipping_date_condition}
+                            {$order_shipping_condition}
+                            {$order_otodoke_condition}
+                            {$sale_type_condition}
                         GROUP BY 
                             mst_delivery.delivery_no
                         ORDER BY
