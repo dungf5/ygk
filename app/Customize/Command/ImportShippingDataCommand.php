@@ -341,35 +341,53 @@ class ImportShippingDataCommand extends Command
         }
     }
 
+//    private function calcDeliveryNoDigit($number)
+//    {
+//        // make sure there is just numbers
+//        $number = preg_replace('/[^0-9]/', '', $number);
+//
+//        // change order of values to use in foreach
+//        $vals = array_reverse(str_split($number));
+//
+//        // multiply every other value by 2
+//        $mult = true;
+//        foreach ($vals as $k => $v) {
+//            $vals[$k] = $mult ? $v * 2 : $v;
+//            $vals[$k] = (string) ($vals[$k]);
+//            $mult = !$mult;
+//        }
+//
+//        // checks for two digits (>9)
+//        $mp = array_map(function ($v) {
+//            return ($v > 9) ? $v[0] + $v[1] : $v;
+//        }, $vals);
+//
+//        // adds the values
+//        $sum = array_sum($mp);
+//
+//        //gets the mod
+//        $md = $sum % 10;
+//
+//        // checks how much for 10
+//        // returns the value
+//        return 10 - $md;
+//    }
+
     private function calcDeliveryNoDigit($number)
     {
-        // make sure there is just numbers
-        $number = preg_replace('/[^0-9]/', '', $number);
-
-        // change order of values to use in foreach
-        $vals = array_reverse(str_split($number));
-
-        // multiply every other value by 2
-        $mult = true;
-        foreach ($vals as $k => $v) {
-            $vals[$k] = $mult ? $v * 2 : $v;
-            $vals[$k] = (string) ($vals[$k]);
-            $mult = !$mult;
+        $arr = str_split($number);
+        $odd = 0;
+        $mod = 0;
+        for ($i = 0; $i < count($arr); $i++) {
+            if (($i + 1) % 2 == 0) {
+                $mod += intval($arr[$i]);
+            } else {
+                $odd += intval($arr[$i]);
+            }
         }
 
-        // checks for two digits (>9)
-        $mp = array_map(function ($v) {
-            return ($v > 9) ? $v[0] + $v[1] : $v;
-        }, $vals);
+        $cd = 10 - intval(substr((string) (($mod * 3) + $odd), -1));
 
-        // adds the values
-        $sum = array_sum($mp);
-
-        //gets the mod
-        $md = $sum % 10;
-
-        // checks how much for 10
-        // returns the value
-        return 10 - $md;
+        return $cd === 10 ? 0 : $cd;
     }
 }
