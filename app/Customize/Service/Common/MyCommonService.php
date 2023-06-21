@@ -3067,7 +3067,7 @@ SQL;
                 WHERE 
                     mswe.shipping_send_flg = 1
                 AND 
-                    dowe.shipping_sent_flg = 1;
+                    (dowe.shipping_sent_flg = 1 OR dowe.order_num = dowe.shipping_num);
         ';
 
         try {
@@ -3094,7 +3094,7 @@ SQL;
                 WHERE 
                     msne.shipping_send_flg = 1
                 AND 
-                    done.shipping_sent_flg = 1;
+                    (done.shipping_sent_flg = 1 OR done.qty = done.shipping_num);
         ';
 
         try {
