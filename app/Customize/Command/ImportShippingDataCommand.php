@@ -19,6 +19,7 @@ use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtOrderNatEOS;
 use Customize\Entity\DtOrderWSEOS;
+use Customize\Entity\MstProduct;
 use Customize\Entity\MstShipping;
 use Customize\Entity\MstShippingNatEOS;
 use Customize\Entity\MstShippingWSEOS;
@@ -216,7 +217,10 @@ class ImportShippingDataCommand extends Command
 
                 $this->entityManager->getRepository(MstShippingWSEOS::class)->insertData($data);
 
-                $shipping_num = $mstShipping['shipping_num'] ?? 0;
+                // Add handling by task #1888
+                $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy(['jan_code' => $data['jan_code']]);
+
+                $shipping_num = ($mstShipping['shipping_num'] ?? 0) * ((!empty($product) && $product['quantity'] > 1) ? $product['quantity'] : 1);
             }
 
             return $shipping_num;
