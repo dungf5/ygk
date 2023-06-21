@@ -330,7 +330,10 @@ class ImportShippingDataCommand extends Command
 
                 $this->entityManager->getRepository(MstShippingNatEOS::class)->insertData($data);
 
-                $shipping_num = $mstShipping['shipping_num'] ?? 0;
+                // Add handling by task #1889
+                $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy(['jan_code' => $data['jan']]);
+
+                $shipping_num = ($mstShipping['shipping_num'] ?? 0) * ((!empty($product) && $product['quantity'] > 1) ? $product['quantity'] : 1);
             }
 
             return $shipping_num;
