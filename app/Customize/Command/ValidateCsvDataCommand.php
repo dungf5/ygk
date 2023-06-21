@@ -646,7 +646,7 @@ class ValidateCsvDataCommand extends Command
             }
 
             foreach ($data as $item) {
-                $this->validateNatEOS($item['reqcd'], $item['jan']);
+                $this->validateNatEOS($item['reqcd'], $item['order_lineno']);
             }
 
             if (count($this->errors)) {
@@ -664,7 +664,7 @@ class ValidateCsvDataCommand extends Command
         }
     }
 
-    private function validateNatEOS($reqcd, $jan)
+    private function validateNatEOS($reqcd, $order_lineno)
     {
         try {
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
@@ -672,11 +672,11 @@ class ValidateCsvDataCommand extends Command
 
             $object = $this->entityManager->getRepository(DtOrderNatEOS::class)->findOneBy([
                 'reqcd' => $reqcd,
-                'jan' => $jan,
+                'order_lineno' => $order_lineno,
             ]);
 
             if (empty($object)) {
-                log_info("No order ({$reqcd}-{$jan})");
+                log_info("No order ({$reqcd}-{$order_lineno})");
 
                 return;
             }
@@ -695,7 +695,7 @@ class ValidateCsvDataCommand extends Command
             // Array contain error (if any)
             $error = [];
 
-            log_info("Validate order ({$reqcd}-{$jan})");
+            log_info("Validate order ({$reqcd}-{$order_lineno})");
 
             // Check flag of check validate
             if ($this->check_validate) {
@@ -751,7 +751,8 @@ class ValidateCsvDataCommand extends Command
 
             if (count($error)) {
                 $error['reqcd'] = $reqcd;
-                $error['jan'] = $jan;
+                $error['order_lineno'] = $order_lineno;
+                $error['jan'] = $object['jan'];
 
                 $this->errors[] = $error;
             }
