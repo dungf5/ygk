@@ -18,6 +18,7 @@ namespace Customize\Command;
 use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtBreakKey;
+use Customize\Entity\DtOrderNatEOS;
 use Customize\Entity\MstShippingNatEOS;
 use Customize\Entity\MstShippingWSEOS;
 use Customize\Service\Common\MyCommonService;
@@ -390,6 +391,16 @@ class ExportCsvShippingCommand extends Command
                         $objShippingNatEOS->setShippingSendFlg(0);
                         $objShippingNatEOS->setShippingSentFlg(1);
                         $this->entityManager->getRepository(MstShippingNatEOS::class)->save($objShippingNatEOS);
+                    }
+
+                    $objNatEos = $this->entityManager->getRepository(DtOrderNatEOS::class)->findOneBy([
+                        'reqcd' => $item['reqcd'],
+                        'order_lineno' => $item['order_lineno'],
+                    ]);
+
+                    if (!empty($objNatEos)) {
+                        $objNatEos->setShippingSentFlg(1);
+                        $this->entityManager->getRepository(DtOrderNatEOS::class)->save($objNatEos);
                     }
 
                     $this->entityManager->flush();

@@ -264,10 +264,10 @@ class ImportShippingDataCommand extends Command
                     $this->entityManager->getRepository(DtOrderNatEOS::class)->save($item);
                 }
 
-                if ((int) $item->getShippingNum() == (int) $item->getQty()) {
-                    $item->setShippingSentFlg(1);
-                    $this->entityManager->getRepository(DtOrderNatEOS::class)->save($item);
-                }
+                //if ((int) $item->getShippingNum() == (int) $item->getQty()) {
+                //    $item->setShippingSentFlg(1);
+                //    $this->entityManager->getRepository(DtOrderNatEOS::class)->save($item);
+                //}
             }
 
             log_info('End Handle Import Data To mst_shipping_nat_eos');
