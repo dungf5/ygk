@@ -146,10 +146,10 @@ class ImportShippingDataCommand extends Command
                     $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
                 }
 
-                if ((int) $item->getShippingNum() == (int) $item->getOrderNum()) {
-                    $item->setShippingSentFlg(1);
-                    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
-                }
+                //if ((int) $item->getShippingNum() == (int) $item->getOrderNum()) {
+                //    $item->setShippingSentFlg(1);
+                //    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
+                //}
             }
 
             log_info('End Handle Import Data To mst_shipping_ws_eos');

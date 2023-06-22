@@ -19,6 +19,7 @@ use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtBreakKey;
 use Customize\Entity\DtOrderNatEOS;
+use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstShippingNatEOS;
 use Customize\Entity\MstShippingWSEOS;
 use Customize\Service\Common\MyCommonService;
@@ -271,6 +272,16 @@ class ExportCsvShippingCommand extends Command
                         $this->entityManager->getRepository(MstShippingWSEOS::class)->save($objShippingWSEOS);
                     }
 
+                    $objWsEos = $this->entityManager->getRepository(DtOrderWSEOS::class)->findOneBy([
+                        'order_no' => $item['order_no'],
+                        'order_line_no' => $item['order_line_no'],
+                    ]);
+
+                    if (!empty($objWsEos) && (int) $objWsEos->getShippingNum() == (int) $objWsEos->getOrderNum()) {
+                        $objWsEos->setShippingSentFlg(1);
+                        $this->entityManager->getRepository(DtOrderWSEOS::class)->save($objWsEos);
+                    }
+
                     $this->entityManager->flush();
                     $this->entityManager->getConnection()->commit();
                 } catch (\Exception $e) {
@@ -398,7 +409,7 @@ class ExportCsvShippingCommand extends Command
                         'order_lineno' => $item['order_lineno'],
                     ]);
 
-                    if (!empty($objNatEos)) {
+                    if (!empty($objNatEos) && (int) $objNatEos->getShippingNum() == (int) $objNatEos->getQty()) {
                         $objNatEos->setShippingSentFlg(1);
                         $this->entityManager->getRepository(DtOrderNatEOS::class)->save($objNatEos);
                     }
