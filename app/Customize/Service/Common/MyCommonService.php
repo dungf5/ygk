@@ -3105,4 +3105,23 @@ SQL;
             return [];
         }
     }
+
+    public function getNatSortExportData()
+    {
+        $sql = '
+                SELECT * 
+                FROM 
+                    dt_order_nat_sort  
+                ORDER BY
+                    reqcd, jan;
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery();
+            return $result->fetchAllAssociative();
+        } catch (Exception $e) {
+            return [];
+        }
+    }
 }

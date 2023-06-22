@@ -108,4 +108,17 @@ trait CSVHeader
             '到着予定日',
         ];
     }
+
+    public function getNatSortExportHeader()
+    {
+        return [
+            '発注番号',
+            'JANコード',
+            '品番',
+            'ナチュラム商品番号',
+            '発注数',
+            '発注単価',
+            '納期',
+        ];
+    }
 }
