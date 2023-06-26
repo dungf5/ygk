@@ -38,7 +38,6 @@ class DtOrderNatSortRepository extends AbstractRepository
                 return;
             }
 
-            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
             $object = new DtOrderNatSort();
             $object->setReqcd($data['reqcd']);
             $object->setJan($data['jan']);
