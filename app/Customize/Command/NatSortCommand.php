@@ -336,6 +336,8 @@ class NatSortCommand extends Command
                 $objData["{$col}"] = trim($data[$x][$y]);
             }
 
+            log_info("Insert dt_order_nat_sort {$objData['reqcd']} - {$objData['jan']}");
+
             // insert dt_order_nat_sort
             $this->entityManager->getRepository(DtOrderNatSort::class)->insertData($objData);
         }
