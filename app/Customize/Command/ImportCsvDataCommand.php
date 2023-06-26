@@ -380,7 +380,7 @@ class ImportCsvDataCommand extends Command
                 ];
                 $this->entityManager->getRepository(DtImportCSV::class)->updateData($data);
 
-                $this->pushGoogleChat('Import data to dt_order_nat_eos / dt_order_nat_eos_copy: '.$result['message']);
+                $this->pushGoogleChat('Import data to dt_order_nat_eos: '.$result['message']);
             }
         }
 
