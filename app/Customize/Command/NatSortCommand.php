@@ -135,8 +135,7 @@ class NatSortCommand extends Command
                 break;
 
             case 'export':
-                $path = getenv('LOCAL_FTP_UPLOAD_DIRECTORY') ?? '/html/upload/';
-                $path .= 'csv/nat/sort/';
+                $path .= 'csv/nat/';
 
                 if (getenv('APP_IS_LOCAL') == 1) {
                     $path = '.'.$path;
