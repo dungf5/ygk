@@ -753,6 +753,7 @@ class MypageController extends AbstractController
             'search_shipping_date' => $request->get('shipping_date', 0),
             'search_order_shipping' => $request->get('order_shipping', '0'),
             'search_order_otodoke' => $request->get('order_otodoke', '0'),
+            'search_sale_type' => $request->get('sale_type', '0'),
         ];
 
         // paginator
