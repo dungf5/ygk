@@ -10,7 +10,7 @@ file that was distributed with this source code.
 #}
 {% extends 'default_frame.twig' %}
 
-{% set mypageno = 'delivery' %}
+{% set mypageno = 'delivery_print' %}
 
 {% set body_class = 'mypage' %}
 
@@ -19,6 +19,7 @@ file that was distributed with this source code.
 {% endblock stylesheet %}
 
 {% block main %}
+    <link rel="stylesheet" href="{{ asset('assets/selectbox/jquery_ui_1_13_2.css') }}">
     <style>
         div.multiselect-container.dropdown-menu {
             color: black;
@@ -54,12 +55,26 @@ file that was distributed with this source code.
         button.multiselect {
             display: none;
         }
+        .row {
+            padding-left: 15px;
+        }
+        .alert-search {
+            border: solid 1px #333;
+            background-color: #ccc;
+            border-radius: 8px;
+            width: fit-content;
+        }
+        .btn-search, .btn-search:hover, .btn-search:focus {
+            background-color: #000;
+            color: #fff;
+            border-radius: 8px;
+        }
     </style>
 
     <div class="ec-layoutRole__main">
         <div class="ec-mypageRole">
             <div class="ec-pageHeader">
-                <h1>{{ 'front.mypage.title'|trans }}/{{ 'front.mypage.nav_delivery__history'|trans }}</h1>
+                <h1>{{ 'front.mypage.title'|trans }}/{{ 'front.mypage.nav_delivery__print'|trans }}</h1>
             </div>
             {% include 'Mypage/navi.twig' %}
         </div>
@@ -88,15 +103,58 @@ file that was distributed with this source code.
         </style>
 
         <div class="ec-mypageRole">
+            <div class="row">
+                <div>
+                    <div class="alert alert-search" role="alert">
+                        <form class="form-inline" method="GET">
+                            <div class="form-group">
+                                <label for="search_shipping_date_from">出荷日</label>
+                                <input type="text" class="form-control" id="search_shipping_date_from" name="search_shipping_date_from" value="{{ search_shipping_date_from }}" data-toggle="datetimepicker">
+                                <input type="text" class="form-control" id="search_shipping_date_to" name="search_shipping_date_to" value="{{ search_shipping_date_to }}">
+                            </div>
+                            <button type="submit" class="btn btn-search">
+                                <i class="fas fa-angle-double-right" style="color: #f00"></i> 絞り込み
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             {% if pagination and pagination.totalItemCount > 0 %}
-                <p class="ec-para-normal">{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}</p>
+                <div class="row">
+                    <p class="ec-para-normal">{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}</p>
+                </div>
             {% endif %}
+
+            <div class="row">
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePreviewPDF()">Preview & Print</button>
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDF()">Download & Print</button>
+                <input type="hidden" id="check-box-value-print-pdf" value=""/>
+            </div>
 
             <table class="table myTable">
                 <thead>
                 <tr>
-                    <th title="delivery_no">{{ 'front.mypage.shipping.note_no'|trans| raw }}</th>
-                    <th title="shipping_date" style="max-width:100px">
+                    <th title="選択">
+                        {% if global_service.getPdfExportFlg %}
+                            <input type="checkbox" class="check-box-all-print-pdf" name="check-box-all-print-pdf" value="" onchange="handleCheckBox(this)"/>
+                        {% endif %}
+                        {{ 'front.mypage.shipping.select'|trans| raw }}
+                    </th>
+                    <th title="納品書№">{{ 'front.mypage.shipping.note_no'|trans| raw }}</th>
+                    <th title="伝票" style="max-width: 40px;">
+                        {{ 'front.mypage.shipping.sale_type'|trans| raw }}
+                        <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_sale_type">
+                            <span class="glyphicon glyphicon-triangle-bottom"></span>
+                        </a>
+                        <br/>
+                        <select id="search_sale_type" name="search_sale_type" onchange="handleSearch(this)">
+                            <option value="0" {% if search_sale_type == '0' %} selected {% endif %}>すべて</option>
+                            <option value="1" {% if search_sale_type == '1' %} selected {% endif %}>通常</option>
+                            <option value="2" {% if search_sale_type == '2' %} selected {% endif %}>返品</option>
+                        </select>
+                    </th>
+                    <th title="出荷日" style="max-width:100px">
                         {{ 'front.mypage.shipping.date'|trans| raw }}
                         <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_shipping_date">
                             <span class="glyphicon glyphicon-triangle-bottom"></span>
@@ -109,7 +167,7 @@ file that was distributed with this source code.
                             {% endfor %}
                         </select>
                     </th>
-                    <th title="shipping_code otodoke_code" style="min-width: 150px">
+                    <th title="出荷先 届け先" style="min-width: 150px">
                         {{ 'front.mypage.shipping_code'|trans| raw }}
                         <a href="javascript:void(0)" style="color: red; {% if orderShippingOpt|length < 2 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_shipping" onclick="handleGetLastSelected()">
                             <span class="glyphicon glyphicon-triangle-bottom"></span>
@@ -135,7 +193,7 @@ file that was distributed with this source code.
                             {% endfor %}
                         </select>
                     </th>
-                    <th title="shipping_no">{{ 'front.mypage.shipping.delivery_no'|trans| raw }}</th>
+                    <th title="出荷指示№">{{ 'front.mypage.shipping.delivery_no'|trans| raw }}</th>
                 </tr>
                 </thead>
                 {% if pagination and pagination.totalItemCount > 0 %}
@@ -144,13 +202,13 @@ file that was distributed with this source code.
                         <tr>
                             <td>
                                 {% if global_service.getPdfExportFlg %}
-                                    <a target="_blank" href="/mypage/exportOrderPdf?delivery_no={{Order.delivery_no}}">
-                                        {{ Order.delivery_no }}
-                                    </a>
-                                {% else %}
-                                    {{ Order.delivery_no }}
+                                    <input type="checkbox" class="check-box-print-pdf" name="check-box-print-pdf" value="{{Order.delivery_no}}" onchange="handleCheckBox(this)"/>
                                 {% endif %}
                             </td>
+                            <td title="納品書№ {{ Order.delivery_no }}-{{ Order.delivery_lineno }}, 御社注文№ {{ Order.order_no }}">
+                                {{ Order.delivery_no }}
+                            </td>
+                            <td>{{Order.sale_type}}</td>
                             <td>{{Order.delivery_date}}</td>
                             <td>
                                 {{Order.shiping_name}}<br/>
@@ -168,7 +226,7 @@ file that was distributed with this source code.
                 {% else %}
                     <tbody>
                     <tr>
-                        <td colspan="4">
+                        <td colspan="6">
                             <p>納品書はありません。</p>
                         </td>
                     </tr>
@@ -189,6 +247,8 @@ file that was distributed with this source code.
 
 {% block javascript %}
 <script src="{{ asset('assets/js/bootstrap-multiselect.min.js') }}"></script>
+<script src="{{ asset('assets/selectbox/jquery-ui_1_13_2.js') }}"></script>
+<script src="{{ asset('assets/selectbox/datepicker-ja.js') }}"></script>
 
     <script>
         $('#search_shipping_date').multiselect({
@@ -361,6 +421,63 @@ file that was distributed with this source code.
             nonSelectedText: '注文日検索',
         });
 
+        $('#search_sale_type').multiselect({
+            includeSelectAllOption: true,
+            selectAllText: 'すべて',
+            enableFiltering: true,
+            filterPlaceholder: '検索',
+            disableIfEmpty: true,
+            checkboxName: function(option) {
+                return 'multiselect[]';
+            },
+            buttonWidth: '150px',
+            buttonHeight: '34px',
+            buttonText: function(options, select) {
+                if (options.length === 0) {
+                    return '未選択';
+                }
+                else if (options.length == 14) {
+                    return 'すべて';
+                }
+                else if (options.length > 2) {
+                    return options.length + 'ヶ月選択済み';
+                }
+                else {
+                     var labels = [];
+                     options.each(function() {
+                         if ($(this).attr('label') !== undefined) {
+                             labels.push($(this).attr('label'));
+                         }
+                         else {
+                             labels.push($(this).html());
+                         }
+                     });
+                     labels.reverse();
+                     return labels.join(', ') + '';
+                }
+            },
+            buttonTitle: function(options, select) {
+                if (options.length === 0) {
+                    return '未選択';
+                }
+                else {
+                     var labels = [];
+                     options.each(function() {
+                         if ($(this).attr('label') !== undefined) {
+                             labels.push($(this).attr('label'));
+                         }
+                         else {
+                             labels.push($(this).html());
+                         }
+                     });
+                     labels.reverse();
+                     return labels.join(', ') + '';
+                }
+            },
+            buttonClass:'search_sale_type',
+            nonSelectedText: '注文日検索',
+        });
+
         var typingTimer;
         var doneTypingInterval      = 2000;
 
@@ -371,6 +488,8 @@ file that was distributed with this source code.
             let pathname            = window.location.pathname;
             let search              = window.location.search;
             pathname                += "?pageno=1";
+            pathname                += "&search_shipping_date_from=" + $("#search_shipping_date_from").val();
+            pathname                += "&search_shipping_date_to=" + $("#search_shipping_date_to").val();
 
             if (name == 'search_shipping_date') {
                 clearTimeout(typingTimer);
@@ -403,6 +522,11 @@ file that was distributed with this source code.
                 loadingOverlay();
                 handelChangeOtodoke(origin, pathname, search);
             }
+
+            if (name == 'search_sale_type') {
+                loadingOverlay();
+                handelChangeSaleType(origin, pathname, search);
+            }
         }
 
         function handleGetLastSelected() {
@@ -429,6 +553,11 @@ file that was distributed with this source code.
         function handelChangeOtodoke(origin, pathname, search) {
             pathname += "&order_shipping=" + $("#search_order_shipping").val();
             pathname += "&order_otodoke=" + $("#search_order_otodoke").val();
+            window.location.href = origin + pathname;
+        }
+
+        function handelChangeSaleType(origin, pathname, search) {
+            pathname += "&sale_type=" + $("#search_sale_type").val();
             window.location.href = origin + pathname;
         }
 
@@ -461,5 +590,146 @@ file that was distributed with this source code.
                 }, 100);
             }
         })
+
+        $("a.multiselect.dropdown-toggle.search_sale_type").on("click", function() {
+            let button          = $("button.search_sale_type");
+            let aria_expanded   = button.attr("aria-expanded");
+            if (!aria_expanded || aria_expanded == 'false') {
+                setTimeout(function() {
+                    button.click();
+                }, 100);
+            }
+        })
+
+        $(document).ready(function() {
+            $("#search_shipping_date_from").datepicker({
+                dateFormat: "yy-mm-dd",
+                appendText: " ~ "
+            });
+            $("#search_shipping_date_to").datepicker({
+                dateFormat: "yy-mm-dd",
+            });
+        });
+
+        function handleCheckBox(target) {
+            let name                = target.name;
+
+            if (name == 'check-box-print-pdf') {
+                let temp_value = '';
+                let count = 0;
+                $(".check-box-print-pdf").each(function () {
+                    if (this.checked) {
+                       temp_value += ',' + $(this).val();
+                       count++;
+                    }
+                });
+
+                if (count > 0) {
+                    $("#check-box-value-print-pdf").val(temp_value);
+                    $(".btn-print-pdf").prop('disabled', false);
+
+                    {#if ((count < 12 && count == {{ pagination.totalItemCount }}) || count >= 12) {#}
+                    {#    $(".check-box-all-print-pdf").prop("checked", true);#}
+                    {#} else {#}
+                    {#    $(".check-box-all-print-pdf").prop("checked", false);#}
+                    {#}#}
+
+                    if (count == {{ pagination.totalItemCount }}) {
+                        $(".check-box-all-print-pdf").prop("checked", true);
+                    } else {
+                        $(".check-box-all-print-pdf").prop("checked", false);
+                    }
+
+                } else {
+                    $(".btn-print-pdf").prop('disabled', true);
+                }
+            }
+
+            if (name == 'check-box-all-print-pdf') {
+                let temp_value = '';
+                let count = 0;
+
+                if (target.checked) {
+                    $(".check-box-print-pdf").each(function () {
+                        temp_value += ',' + $(this).val();
+                        count++;
+                    });
+                    $(".check-box-print-pdf").prop("checked", true);
+
+                } else {
+                    count = 0;
+                    $(".check-box-print-pdf").prop("checked", false);
+                }
+
+                if (count > 0) {
+                    // change check-all to print all data
+                    // $("#check-box-value-print-pdf").val(temp_value);
+                    $("#check-box-value-print-pdf").val('all');
+                    $(".btn-print-pdf").prop('disabled', false);
+                } else {
+                    $("#check-box-value-print-pdf").val('');
+                    $(".btn-print-pdf").prop('disabled', true);
+                }
+            }
+        }
+
+        function handlePreviewPDF() {
+            // let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+            // let handled = {};
+            //
+            // $.each(arr_print_pdf_value, function( index, value ) {
+            //     if (value && !handled[value]) {
+            //         handled[value] = true;
+            //
+            //         let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + value;
+            //         let a = document.createElement('a');
+            //         a.target = '_blank';
+            //         a.href = url;
+            //         a.click();
+            //     }
+            // });
+            path = '&search_shipping_date_from=' + $("#search_shipping_date_from").val();
+            path += '&search_shipping_date_to=' + $("#search_shipping_date_to").val();
+            path += "&sale_type=" + $("#search_sale_type").val();
+            path += "&shipping_date=" + $("#search_shipping_date").val();
+            path += "&order_shipping=" + $("#search_order_shipping").val();
+            path += "&order_otodoke=" + $("#search_order_otodoke").val();
+
+            let url = '/mypage/export_Pdf_multiple?preview=1&delivery_no=' + $("#check-box-value-print-pdf").val() + path;
+            let a = document.createElement('a');
+            a.target = '_blank';
+            a.href = url;
+            a.click();
+        }
+
+        function handlePrintPDF() {
+            // let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+            // let handled = {};
+            //
+            // $.each(arr_print_pdf_value, function( index, value ) {
+            //    if (value && !handled[value]) {
+            //        handled[value] = true;
+            //
+            //        // let url = '/mypage/export_Pdf_multiple?delivery_no=' + value;
+            //        // let a = document.createElement('a');
+            //        // a.target = '_blank';
+            //        // a.href = url;
+            //        // a.click();
+            //    }
+            // });
+
+            path = '&search_shipping_date_from=' + $("#search_shipping_date_from").val();
+            path += '&search_shipping_date_to=' + $("#search_shipping_date_to").val();
+            path += "&sale_type=" + $("#search_sale_type").val();
+            path += "&shipping_date=" + $("#search_shipping_date").val();
+            path += "&order_shipping=" + $("#search_order_shipping").val();
+            path += "&order_otodoke=" + $("#search_order_otodoke").val();
+            
+            let url = '/mypage/export_Pdf_multiple?delivery_no=' + $("#check-box-value-print-pdf").val() + path;
+            let a = document.createElement('a');
+            a.target = '_blank';
+            a.href = url;
+            a.click();
+        }
     </script>
 {% endblock %}

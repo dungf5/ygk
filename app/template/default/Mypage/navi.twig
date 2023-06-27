@@ -19,6 +19,9 @@ file that was distributed with this source code.
         <li class="ec-navlistRole__item {% if mypageno|default('') == 'delivery' %}active{% endif %}">
             <a href="{{ url('mypage_delivery_history') }}">{{ 'front.mypage.nav_delivery__history'|trans }}</a>
         </li>
+        <li class="ec-navlistRole__item {% if mypageno|default('') == 'delivery_print' %}active{% endif %}">
+            <a href="{{ url('mypage_delivery_print') }}">{{ 'front.mypage.nav_delivery__print'|trans }}</a>
+        </li>
         {% if BaseInfo.option_favorite_product %}
             <li class="ec-navlistRole__item {% if mypageno|default('') == 'favorite' %}active{% endif %}">
                 <a href="{{ url('mypage_favorite') }}">{{ 'front.mypage.nav__favorite'|trans }}</a>
