@@ -3124,4 +3124,33 @@ SQL;
             return [];
         }
     }
+
+    public function getMstShippingImportEOS($data)
+    {
+        $sql = "
+                SELECT * 
+                FROM 
+                    mst_shipping
+                WHERE
+                    cus_order_no = ?
+                AND
+                    cus_order_lineno = ?
+                AND
+                    shipping_status = 2
+                AND 
+                    DATE_FORMAT(shipping_date, '%Y-%m-%d') >= ?;
+        ";
+
+        try {
+            $params = [$data['reqcd'], $data['order_lineno'], date('Y-m-d', strtotime($data['shipping_date'] ?? ''))];
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery($params);
+            $row = $result->fetchAllAssociative();
+
+            return $row[0] ?? [];
+
+        } catch (Exception $e) {
+            return [];
+        }
+    }
 }
