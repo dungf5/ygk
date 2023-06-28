@@ -211,10 +211,10 @@ file that was distributed with this source code.
                     margin-top: 10px;
                 }
                 .shipping_destination_left{
-                    width: 130px
+                    width: 140px
                 }
                 .shipping_destination_left >div{
-                    width: 110px;
+                    width: 130px;
                     background-color: #c9b5b5;
                     text-align: center;
 
@@ -377,6 +377,54 @@ file that was distributed with this source code.
 
             {# Remarks#}
             <div class="shipping_destination">
+                <p>
+                    <span>▼</span>
+                    出荷案内書と納品書の備考に表示される項目（店名、オーダー番号、その他）
+                </p>
+            </div>
+            <div class="shipping_destination">
+                <div class="shipping_destination_left">
+                    <div>発生書備考</div>
+                </div>
+                <div class="shipping_destination_right">
+                    <div>
+                        <div>
+                            {% if Order.MoreOrder is defined %}
+                                {{ Order.MoreOrder.remarks3 }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shipping_destination">
+                <p>
+                    <span>▼</span>
+                    発注に対するコメント
+                </p>
+            </div>
+            <div class="shipping_destination">
+                <div class="shipping_destination_left">
+                    <div>発生書コメント</div>
+                </div>
+                <div class="shipping_destination_right">
+                    <div>
+                        <div>
+                            {% if Order.MoreOrder is defined %}
+                                {{ Order.MoreOrder.remarks4 }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shipping_destination">
+                <p>
+                    <span>▼</span>
+                    生産依頼項目（特注の仕様など）
+                </p>
+            </div>
+            <div class="shipping_destination">
                 <div class="shipping_destination_left">
                     <div> {{ 'front.shopping.remarks'|trans }}１</div>
                 </div>
@@ -400,36 +448,6 @@ file that was distributed with this source code.
                         <div>
                             {% if Order.MoreOrder is defined %}
                                 {{ Order.MoreOrder.remarks2 }}
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="shipping_destination">
-                <div class="shipping_destination_left">
-                    <div>発注書宛先</div>
-                </div>
-                <div class="shipping_destination_right">
-                    <div>
-                        <div>
-                            {% if Order.MoreOrder is defined %}
-                                {{ Order.MoreOrder.remarks3 }}
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="shipping_destination">
-                <div class="shipping_destination_left">
-                    <div>発注書備考</div>
-                </div>
-                <div class="shipping_destination_right">
-                    <div>
-                        <div>
-                            {% if Order.MoreOrder is defined %}
-                                {{ Order.MoreOrder.remarks4 }}
                             {% endif %}
                         </div>
                     </div>
