@@ -756,7 +756,7 @@ SQL;
                     dt_price pri
                 WHERE
                     pri.customer_code = ?
-                {$queryShippingNo}    
+                {$queryShippingNo}
                 AND
                     DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date
                 AND
@@ -1122,12 +1122,12 @@ SQL;
                         FROM
                             dt_order_status
                         JOIN
-                            mst_shipping 
-                            ON mst_shipping.cus_order_no = dt_order_status.cus_order_no 
+                            mst_shipping
+                            ON mst_shipping.cus_order_no = dt_order_status.cus_order_no
                             AND mst_shipping.cus_order_lineno = dt_order_status.cus_order_lineno
                         JOIN
-                             mst_delivery 
-                             ON mst_delivery.shipping_no = mst_shipping.shipping_no 
+                             mst_delivery
+                             ON mst_delivery.shipping_no = mst_shipping.shipping_no
                              AND TRIM(mst_delivery.order_no) = CONCAT(TRIM(mst_shipping.cus_order_no),'-',TRIM(mst_shipping.cus_order_lineno))
                         WHERE
                             {$condition}
@@ -1137,7 +1137,7 @@ SQL;
                             {$order_shipping_condition}
                             {$order_otodoke_condition}
                             {$sale_type_condition}
-                        GROUP BY 
+                        GROUP BY
                             mst_delivery.delivery_no
                         ORDER BY
                             dt_order_status.order_date DESC, mst_delivery.order_no ASC
@@ -1230,12 +1230,12 @@ SQL;
                         FROM
                             dt_order_status
                         JOIN
-                            mst_shipping 
-                            ON mst_shipping.cus_order_no = dt_order_status.cus_order_no 
+                            mst_shipping
+                            ON mst_shipping.cus_order_no = dt_order_status.cus_order_no
                             AND mst_shipping.cus_order_lineno = dt_order_status.cus_order_lineno
                         JOIN
-                             mst_delivery 
-                             ON mst_delivery.shipping_no = mst_shipping.shipping_no 
+                             mst_delivery
+                             ON mst_delivery.shipping_no = mst_shipping.shipping_no
                              AND TRIM(mst_delivery.order_no) = CONCAT(TRIM(mst_shipping.cus_order_no),'-',TRIM(mst_shipping.cus_order_lineno))
                         LEFT JOIN
                             mst_customer ON (mst_customer.customer_code = mst_delivery.deli_department)
@@ -1244,7 +1244,7 @@ SQL;
                         WHERE
                             {$condition}
                         AND
-                            mst_delivery.delivery_no = ? 
+                            mst_delivery.delivery_no = ?
                             {$addCondition}
                         ORDER BY
                             CONVERT(orderByAs, SIGNED INTEGER) ASC";
@@ -2696,7 +2696,7 @@ SQL;
             return $result;
         }
 
-        $sql = 'SELECT 
+        $sql = 'SELECT
                 SUM( `shipping_num` ) AS sum_shipping_num
             FROM `mst_shipping`
             WHERE
@@ -2829,29 +2829,29 @@ SQL;
     public function getDataImportNatStockList($product_code, $customer_code, $shipping_code)
     {
         $sql = "
-            SELECT 
+            SELECT
                 mp.jan_code,
                 mp.unit_price,
                 mp.quantity
-            FROM 
-                mst_product mp 
+            FROM
+                mst_product mp
             JOIN
                 dt_price dp
             ON
                 mp.product_code = dp.product_code
-            WHERE 
+            WHERE
                 mp.product_code = ?
             AND
                 (mp.discontinued_date > NOW() OR mp.discontinued_date IS NULL)
-            AND 
+            AND
                 (UPPER(mp.special_order_flg) <> 'Y' OR mp.special_order_flg IS NULL)
-            AND 
+            AND
                 dp.customer_code = ?
             AND
                 dp.shipping_no = ?
             AND
                 dp.price_s01 > 0
-            GROUP BY 
+            GROUP BY
                 mp.product_code
         ";
 
@@ -2940,7 +2940,7 @@ SQL;
                     order_lineno,
                     shipping_code,
                     otodoke_code,
-                    order_date, 
+                    order_date,
                     deli_plan_date,
                     shiping_plan_date,
                     item_no,
@@ -2950,17 +2950,17 @@ SQL;
                     unit_price_status,
                     shiping_deposit_code,
                     deploy,
-                    company_id, 
+                    company_id,
                     product_code,
                     dyna_model_seg2,
                     dyna_model_seg3,
                     dyna_model_seg4,
-                    dyna_model_seg5, 
+                    dyna_model_seg5,
                     dyna_model_seg6,
                     request_flg,
                     fvehicleno,
                     ftrnsportcd
-                ) 
+                )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ';
 
@@ -3055,18 +3055,18 @@ SQL;
     public function getShippingWSExportData()
     {
         $sql = '
-                SELECT * 
-                FROM 
-                    mst_shipping_ws_eos mswe 
-                JOIN 
-                    dt_order_ws_eos dowe  
-                ON 
-                    dowe.order_no = mswe.order_no 
-                AND 
+                SELECT *
+                FROM
+                    mst_shipping_ws_eos mswe
+                JOIN
+                    dt_order_ws_eos dowe
+                ON
+                    dowe.order_no = mswe.order_no
+                AND
                     dowe.order_line_no = mswe.order_line_no
-                WHERE 
+                WHERE
                     mswe.shipping_send_flg = 1
-                AND 
+                AND
                     IFNULL(dowe.shipping_num, 0) > 0;
         ';
 
@@ -3082,18 +3082,18 @@ SQL;
     public function getShippingNatExportData()
     {
         $sql = '
-                SELECT * 
-                FROM 
-                    mst_shipping_nat_eos msne 
-                JOIN 
-                    dt_order_nat_eos done 
-                ON 
-                    done.reqcd = msne.reqcd 
-                AND 
+                SELECT *
+                FROM
+                    mst_shipping_nat_eos msne
+                JOIN
+                    dt_order_nat_eos done
+                ON
+                    done.reqcd = msne.reqcd
+                AND
                     done.order_lineno = msne.order_lineno
-                WHERE 
+                WHERE
                     msne.shipping_send_flg = 1
-                AND 
+                AND
                     IFNULL(done.shipping_num, 0) > 0;
         ';
 
@@ -3109,9 +3109,9 @@ SQL;
     public function getNatSortExportData()
     {
         $sql = '
-                SELECT * 
-                FROM 
-                    dt_order_nat_sort  
+                SELECT *
+                FROM
+                    dt_order_nat_sort
                 ORDER BY
                     reqcd, jan;
         ';
@@ -3128,8 +3128,8 @@ SQL;
     public function getMstShippingImportEOS($data)
     {
         $sql = "
-                SELECT * 
-                FROM 
+                SELECT *
+                FROM
                     mst_shipping
                 WHERE
                     cus_order_no = ?
@@ -3137,8 +3137,8 @@ SQL;
                     cus_order_lineno = ?
                 AND
                     shipping_status = 2
-                AND 
-                    DATE_FORMAT(shipping_date, '%Y-%m-%d') >= ?;
+                AND
+                    DATE_FORMAT(shipping_date, '%Y-%m-%d') > ?;
         ";
 
         try {
