@@ -371,6 +371,12 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
          * @ORM\Column(name="shipping_num", type="integer", nullable=false, options={"default":0})
          */
         private $shipping_num;
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="shipping_date",nullable=true, type="string", length=10, options={"comment":"出荷日"})
+         */
+        private $shipping_date;
 
         /**
          * @return mixed
@@ -1378,6 +1384,22 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         public function setShippingNum($shipping_num)
         {
             $this->shipping_num = $shipping_num;
+        }
+
+        /**
+         * @return string
+         */
+        public function getShippingDate()
+        {
+            return $this->shipping_date;
+        }
+
+        /**
+         * @param $shipping_date
+         */
+        public function setShippingDate($shipping_date)
+        {
+            $this->shipping_date = $shipping_date;
         }
     }
 }

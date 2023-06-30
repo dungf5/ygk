@@ -3142,7 +3142,7 @@ SQL;
         ";
 
         try {
-            $params = [$data['reqcd'], $data['order_lineno'], date('Y-m-d', strtotime($data['shipping_date'] ?? ''))];
+            $params = [$data['cus_order_no'], $data['cus_order_lineno'], date('Y-m-d', strtotime($data['shipping_date'] ?? ''))];
             $statement = $this->entityManager->getConnection()->prepare($sql);
             $result = $statement->executeQuery($params);
             $row = $result->fetchAllAssociative();

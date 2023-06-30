@@ -139,10 +139,17 @@ class ImportShippingDataCommand extends Command
             ]);
 
             foreach ($data as $item) {
-                $shipping_num = $this->importShippingWSEOS($item->toArray());
+                $result = $this->importShippingWSEOS($item->toArray());
+                $shipping_num = $result[0];
+                $shipping_date = $result[1];
 
                 if ((int) $shipping_num > 0) {
                     $item->setShippingNum((int) $item->getShippingNum() + (int) $shipping_num);
+                    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
+                }
+
+                if (!empty($shipping_date)) {
+                    $item->setShippingDate($shipping_date);
                     $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
                 }
 
@@ -169,17 +176,14 @@ class ImportShippingDataCommand extends Command
     private function importShippingWSEOS($data)
     {
         $shipping_num = 0;
+        $shipping_date = '';
 
         try {
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
-            $mstShipping = $this->entityManager->getRepository(MstShipping::class)->findOneBy([
-                'cus_order_no' => $data['order_no'],
-                'cus_order_lineno' => $data['order_line_no'],
-                'shipping_status' => 2,
-            ], [
-                'shipping_date' => 'DESC',
-            ]);
+            $data['cus_order_no'] = $data['order_no'];
+            $data['cus_order_lineno'] = $data['order_line_no'];
+            $mstShipping = $this->commonService->getMstShippingImportEOS($data);
 
             if (empty($mstShipping)) {
                 log_error('No data mst_shipping '.$data['order_no'].'-'.$data['order_line_no'].' status = 2');
@@ -188,7 +192,7 @@ class ImportShippingDataCommand extends Command
                 $message .= "\n".'No data mst_shipping '.$data['order_no'].'-'.$data['order_line_no'].' status = 2';
                 $this->pushGoogleChat($message);
 
-                return $shipping_num;
+                return [$shipping_num, $shipping_date];
             }
 
             $mstShippingWSEOS = $this->entityManager->getRepository(MstShippingWSEOS::class)->findOneBy([
@@ -198,7 +202,7 @@ class ImportShippingDataCommand extends Command
             ]);
 
             if (!empty($mstShippingWSEOS)) {
-                return $shipping_num;
+                return [$shipping_num, $shipping_date];
             }
 
             // Insert mst_shipping_ws_eos
@@ -221,9 +225,11 @@ class ImportShippingDataCommand extends Command
                 $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy(['jan_code' => $data['jan_code']]);
 
                 $shipping_num = ($mstShipping['shipping_num'] ?? 0) * ((!empty($product) && $product['quantity'] > 1) ? $product['quantity'] : 1);
+                $shipping_date = $mstShipping['shipping_date'] ?? '';
             }
 
-            return $shipping_num;
+            return [$shipping_num, $shipping_date];
+
         } catch (\Exception $e) {
             log_error($e->getMessage());
 
@@ -231,7 +237,7 @@ class ImportShippingDataCommand extends Command
             $message .= "\n".$e->getMessage();
             $this->pushGoogleChat($message);
 
-            return $shipping_num;
+            return [$shipping_num, $shipping_date];
         }
     }
 
@@ -299,6 +305,8 @@ class ImportShippingDataCommand extends Command
         try {
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
+            $data['cus_order_no'] = $data['reqcd'];
+            $data['cus_order_lineno'] = $data['order_lineno'];
             $mstShipping = $this->commonService->getMstShippingImportEOS($data);
 
             if (empty($mstShipping)) {
