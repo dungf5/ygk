@@ -365,6 +365,8 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
          * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ更新日時'")
          */
         private $update_date;
+
+//Tạm thời comment. Do chưa release
 //        /**
 //         * @var int
 //         *
