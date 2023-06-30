@@ -23,6 +23,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class DtOrderStatusRepository extends AbstractRepository
 {
     use CurlPost;
+
     /**
      * MstProductRepository constructor.
      *
@@ -48,7 +49,7 @@ class DtOrderStatusRepository extends AbstractRepository
         $object->setCusOrderLineno($data['order_line_no'] ?? '');
         $object->setEcOrderNo($data['dtb_order_no'] ?? '');
         $object->setEcOrderLineno($data['dtb_order_line_no'] ?? '');
-        $object->setCustomerCode('7001');
+        $object->setCustomerCode($data['customer_code'] ?? '');
         $object->setShippingCode($data['shipping_code'] ?? '');
         $object->setOtodokeCode($data['otodoke_code'] ?? '');
         $object->setProductCode($data['product_code'] ?? '');
@@ -56,8 +57,6 @@ class DtOrderStatusRepository extends AbstractRepository
         $object->setFlowType('2');
         $object->setEcType('2');
         $object->setOrderDate(new \DateTime($data['order_date'] ?? ''));
-        //$object->setCreateDate(new \DateTime());
-        //$object->setUpdateDate(new \DateTime());
 
         log_info('Call insertData to dt_order_status '.$object->getCusOrderNo().'-'.$object->getCusOrderLineno());
 

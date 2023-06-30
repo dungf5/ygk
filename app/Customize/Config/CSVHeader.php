@@ -63,7 +63,7 @@ trait CSVHeader
         ];
     }
 
-    public function getNatExportCsvHeader()
+    public function getNatExportStockHeader()
     {
         return [
             'JANコード',
@@ -73,12 +73,52 @@ trait CSVHeader
             '次回入荷日',
             '次回入荷数',
             '発注ロット',
-            '発注',
+            '定価',
             '仕入先品番',
             'メーカーコード',
             'カラーコード',
             'サイズコード',
             'メーカー在庫数',
+            '原価',
+        ];
+    }
+
+    public function getNatEOSCsvOrderHeader()
+    {
+        return [
+            'reqcd',
+            'jan',
+            'mkrcd',
+            'natcd',
+            'qty',
+            'cost',
+            'delivery_day',
+        ];
+    }
+
+    public function getNatExportShippingHeader()
+    {
+        return [
+            '納品書番号',
+            'JANコード',
+            '品番(メーカー品番)',
+            'ナチュラム商品番号',
+            '納品数',
+            '納品単価',
+            '到着予定日',
+        ];
+    }
+
+    public function getNatSortExportHeader()
+    {
+        return [
+            '発注番号',
+            'JANコード',
+            '品番',
+            'ナチュラム商品番号',
+            '発注数',
+            '発注単価',
+            '納期',
         ];
     }
 }

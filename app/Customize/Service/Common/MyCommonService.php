@@ -20,7 +20,6 @@ use Customize\Entity\MstShipping;
 use Customize\Entity\Order;
 use Customize\Repository\MoreOrderRepository;
 use Doctrine\DBAL\Driver\Exception;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Entity\Cart;
 use Eccube\Entity\CartItem;
@@ -92,8 +91,8 @@ class MyCommonService extends AbstractRepository
                     a.email as customer_email,
                     a.special_order_flg,
                     a.price_view_flg,
-                    a.pdf_export_flg,
-                    a.fusrdec1
+                    a.fusrdec1,
+                    a.pdf_export_flg
          ';
 
         $sql = " SELECT $column   FROM mst_customer a join `dtb_customer` `dtcus` on((`dtcus`.`id` = `a`.`ec_customer_id`))  WHERE ec_customer_id=?";
@@ -277,26 +276,16 @@ SQL;
 
     public function getMstCustomerCode($customer_code)
     {
-        if (empty($customer_code)) {
-            return null;
-        }
-
-        $sql = '
-                SELECT
-                    mstcus.*
-                FROM
-                    mst_customer AS mstcus
-                WHERE
-                    mstcus.customer_code = ?
-                LIMIT 1
-            ';
-
+        $column = 'customer_code as shipping_no,customer_code, ec_customer_id,customer_name, company_name as name01, company_name, company_name_abb, department, postal_code, addr01, addr02, addr03, email, phone_number, create_date, update_date, fusrdec1';
+        $sql = " SELECT $column   FROM mst_customer a WHERE customer_code=?";
+        $param = [];
+        $param[] = $customer_code;
+        $statement = $this->entityManager->getConnection()->prepare($sql);
         try {
-            $statement = $this->entityManager->getConnection()->prepare($sql);
-            $result = $statement->executeQuery([$customer_code]);
+            $result = $statement->executeQuery($param);
             $rows = $result->fetchAllAssociative();
 
-            return $rows[0] ?? null;
+            return $rows[0];
         } catch (Exception $e) {
             return null;
         }
@@ -600,6 +589,10 @@ SQL;
 
     /**
      * @param
+     *
+     * @return array|null
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getMstProductsOrderNo($order_no)
     {
@@ -778,7 +771,7 @@ SQL;
                     dt_price pri
                 WHERE
                     pri.customer_code = ?
-                {$queryShippingNo}    
+                {$queryShippingNo}
                 AND
                     DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date
                 AND
@@ -964,11 +957,10 @@ SQL;
      * @param $customer_code
      * @param string $login_type
      * @param string $login_code
-     * @param string $shipping_code
      * @return array
      * @throws Exception
      */
-    public function getCustomerBillSeikyuCode($customer_code, $login_type = '', $login_code = '', $shipping_code = '')
+    public function getCustomerBillSeikyuCode($customer_code, $login_type = '', $login_code = '')
     {
         $newComs = new MyCommonService($this->entityManager);
         $relationCus = $newComs->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
@@ -1024,12 +1016,9 @@ SQL;
 
     /***
      * Otodoke  nhan hang hoa
-     * @param $loginType
      * @param $customer_id
-     * @param $shipping_code
-     * @param null $moreOrder
      * @return array
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
      * @throws \Doctrine\DBAL\Exception
      */
     public function getCustomerOtodoke($loginType, $customer_id, $shipping_code, $moreOrder = null)
@@ -1153,12 +1142,12 @@ SQL;
                         FROM
                             dt_order_status
                         JOIN
-                            mst_shipping 
-                            ON mst_shipping.cus_order_no = dt_order_status.cus_order_no 
+                            mst_shipping
+                            ON mst_shipping.cus_order_no = dt_order_status.cus_order_no
                             AND mst_shipping.cus_order_lineno = dt_order_status.cus_order_lineno
                         JOIN
-                             mst_delivery 
-                             ON mst_delivery.shipping_no = mst_shipping.shipping_no 
+                             mst_delivery
+                             ON mst_delivery.shipping_no = mst_shipping.shipping_no
                              AND TRIM(mst_delivery.order_no) = CONCAT(TRIM(mst_shipping.cus_order_no),'-',TRIM(mst_shipping.cus_order_lineno))
                         WHERE
                             {$condition}
@@ -1168,7 +1157,7 @@ SQL;
                             {$order_shipping_condition}
                             {$order_otodoke_condition}
                             {$sale_type_condition}
-                        GROUP BY 
+                        GROUP BY
                             mst_delivery.delivery_no
                         ORDER BY
                             dt_order_status.order_date DESC, mst_delivery.order_no ASC
@@ -1261,12 +1250,12 @@ SQL;
                         FROM
                             dt_order_status
                         JOIN
-                            mst_shipping 
-                            ON mst_shipping.cus_order_no = dt_order_status.cus_order_no 
+                            mst_shipping
+                            ON mst_shipping.cus_order_no = dt_order_status.cus_order_no
                             AND mst_shipping.cus_order_lineno = dt_order_status.cus_order_lineno
                         JOIN
-                             mst_delivery 
-                             ON mst_delivery.shipping_no = mst_shipping.shipping_no 
+                             mst_delivery
+                             ON mst_delivery.shipping_no = mst_shipping.shipping_no
                              AND TRIM(mst_delivery.order_no) = CONCAT(TRIM(mst_shipping.cus_order_no),'-',TRIM(mst_shipping.cus_order_lineno))
                         LEFT JOIN
                             mst_customer ON (mst_customer.customer_code = mst_delivery.deli_department)
@@ -1275,7 +1264,7 @@ SQL;
                         WHERE
                             {$condition}
                         AND
-                            mst_delivery.delivery_no = ? 
+                            mst_delivery.delivery_no = ?
                             {$addCondition}
                         ORDER BY
                             CONVERT(orderByAs, SIGNED INTEGER) ASC";
@@ -1317,8 +1306,6 @@ SQL;
     /***
      * @param $shipping_code
      * @param $pre_order_id
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
      */
     public function saveTempCart($shipping_code, $pre_order_id)
     {
@@ -1445,8 +1432,6 @@ SQL;
             $orderItem->setShipingDepositCode($itemSave['location']);
             $orderItem->setFvehicleno($itemSave['fvehicleno']);
             $orderItem->setFtrnsportcd('87001');
-            $orderItem->setCreateDate($time);
-            $orderItem->setUpdateDate($time);
 
             // No41 注文情報送信I/F end
             $this->entityManager->persist($orderItem);
@@ -1490,8 +1475,6 @@ SQL;
             $orderItem->setRemarks3($itemSave['remarks3']);
             $orderItem->setRemarks4($itemSave['remarks4']);
             $orderItem->setEcType('1');
-            $orderItem->setCreateDate($time);
-            $orderItem->setUpdateDate($time);
 
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
@@ -1567,7 +1550,8 @@ SQL;
     }
 
     /**
-     * @param
+     * @return mixed|null
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getTaxInfo()
     {
@@ -1592,9 +1576,7 @@ SQL;
     /**
      * @param $customerId
      * @param $pre_order_id
-     *
      * @return mixed|null
-     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function getMstShippingOrder($customerId, $pre_order_id)
@@ -1623,6 +1605,8 @@ SQL;
 
     /**
      * @param
+     * @return array|null
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getMstProductsOrderCustomer($order_no)
     {
@@ -1699,7 +1683,6 @@ SQL;
 
     /**
      * @param $order_id
-     * @param $paymentTotal
      */
     public function updateOrderNo($order_id, $paymentTotal)
     {
@@ -1740,6 +1723,8 @@ SQL;
 
     /**
      * @param
+     * @return mixed|null
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getMoreOrderCustomer($pre_order_id)
     {
@@ -2413,6 +2398,8 @@ SQL;
 
     /**
      * @param
+     * @return mixed|null
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getCustomerLocation($customer_code)
     {
@@ -2612,6 +2599,91 @@ SQL;
         return $objRep;
     }
 
+    /**
+     * Get dt_price
+     *
+     * @param $product_code
+     * @param $customer_code
+     * @param $shipping_code
+     *
+     * @return array|mixed
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getDtPrice($product_code, $customer_code, $shipping_code)
+    {
+        $sql = "
+            SELECT dp.*
+            FROM dt_price dp
+            WHERE dp.product_code = ?
+            AND dp.customer_code = ?
+            AND dp.shipping_no = ?
+            AND DATE_FORMAT(NOW(),'%Y-%m-%d') >= dp.valid_date
+            AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(dp.expire_date, INTERVAL 1 DAY)
+            ORDER BY dp.tanka_number DESC
+            LIMIT 1
+        ";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$product_code, $customer_code, $shipping_code]);
+            $rows = $result->fetchAllAssociative();
+
+            return $rows[0] ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get dt_customer_relation
+     *
+     * @param $customer_code
+     * @param $shipping_code
+     * @param $otodoke_code
+     *
+     * @return array|mixed
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getDtCustomerRelation($customer_code, $shipping_code, $otodoke_code)
+    {
+        $sql = '
+            SELECT dcr.*
+            FROM dt_customer_relation dcr
+            WHERE dcr.customer_code = ?
+            AND dcr.shipping_code = ?
+            AND dcr.otodoke_code = ?
+            LIMIT 1
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$customer_code, $shipping_code, $otodoke_code]);
+            $rows = $result->fetchAllAssociative();
+
+            return $rows[0] ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getReturnsReson()
+    {
+        $sql = 'SELECT `returns_reson_id`, `returns_reson` FROM `dt_returns_reson`';
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result = $statement->executeQuery();
+            $rows = $result->fetchAllAssociative();
+
+            return $rows;
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
     public function getJanCodeToProductCode($jan_code = '')
     {
         $sql = 'SELECT `product_code` FROM `mst_product` WHERE `jan_code` = :jan_code limit 1';
@@ -2651,7 +2723,7 @@ SQL;
             return $result;
         }
 
-        $sql = 'SELECT 
+        $sql = 'SELECT
                 SUM( `shipping_num` ) AS sum_shipping_num
             FROM `mst_shipping`
             WHERE
@@ -2781,29 +2853,33 @@ SQL;
         }
     }
 
-    /**
-     * Get dt_price
-     *
-     * @param $product_code
-     * @param $customer_code
-     * @param $shipping_code
-     *
-     * @return array|mixed
-     *
-     * @throws \Doctrine\DBAL\Exception
-     */
-    public function getDtPrice($product_code, $customer_code, $shipping_code)
+    public function getDataImportNatStockList($product_code, $customer_code, $shipping_code)
     {
         $sql = "
-            SELECT dp.*
-            FROM dt_price dp
-            WHERE dp.product_code = ?
-            AND dp.customer_code = ?
-            AND dp.shipping_no = ?
-            AND DATE_FORMAT(NOW(),'%Y-%m-%d') >= dp.valid_date
-            AND DATE_FORMAT(NOW(),'%Y-%m-%d') <  DATE_SUB(dp.expire_date, INTERVAL 1 DAY)
-            ORDER BY dp.tanka_number DESC
-            LIMIT 1
+            SELECT
+                mp.jan_code,
+                mp.unit_price,
+                mp.quantity
+            FROM
+                mst_product mp
+            JOIN
+                dt_price dp
+            ON
+                mp.product_code = dp.product_code
+            WHERE
+                mp.product_code = ?
+            AND
+                (mp.discontinued_date > NOW() OR mp.discontinued_date IS NULL)
+            AND
+                (UPPER(mp.special_order_flg) <> 'Y' OR mp.special_order_flg IS NULL)
+            AND
+                dp.customer_code = ?
+            AND
+                dp.shipping_no = ?
+            AND
+                dp.price_s01 > 0
+            GROUP BY
+                mp.product_code
         ";
 
         try {
@@ -2812,55 +2888,6 @@ SQL;
             $rows = $result->fetchAllAssociative();
 
             return $rows[0] ?? [];
-        } catch (Exception $e) {
-            return [];
-        }
-    }
-
-    /**
-     * Get dt_customer_relation
-     *
-     * @param $customer_code
-     * @param $shipping_code
-     * @param $otodoke_code
-     *
-     * @return array|mixed
-     *
-     * @throws \Doctrine\DBAL\Exception
-     */
-    public function getDtCustomerRelation($customer_code, $shipping_code, $otodoke_code)
-    {
-        $sql = '
-            SELECT dcr.*
-            FROM dt_customer_relation dcr
-            WHERE dcr.customer_code = ?
-            AND dcr.shipping_code = ?
-            AND dcr.otodoke_code = ?
-            LIMIT 1
-        ';
-
-        try {
-            $statement = $this->entityManager->getConnection()->prepare($sql);
-            $result = $statement->executeQuery([$customer_code, $shipping_code, $otodoke_code]);
-            $rows = $result->fetchAllAssociative();
-
-            return $rows[0] ?? [];
-        } catch (Exception $e) {
-            return [];
-        }
-    }
-
-    public function getReturnsReson()
-    {
-        $sql = 'SELECT `returns_reson_id`, `returns_reson` FROM `dt_returns_reson`';
-
-        $statement = $this->entityManager->getConnection()->prepare($sql);
-
-        try {
-            $result = $statement->executeQuery();
-            $rows = $result->fetchAllAssociative();
-
-            return $rows;
         } catch (Exception $e) {
             return [];
         }
@@ -2908,35 +2935,14 @@ SQL;
         }
     }
 
-    public function getSumOrderAmoutDaitoTest($order_no)
+    public function getSumOrderAmoutNatEOS($order_no)
     {
         $sql = '
             SELECT
-                SUM(IFNULL(do.order_price, 0) * IFNULL(do.demand_quantity, 0)) AS sum_order_amount
-            FROM dt_order_daito_test do
-            WHERE do.order_no = ?
-            GROUP BY  do.order_no
-        ';
-
-        try {
-            $statement = $this->entityManager->getConnection()->prepare($sql);
-            $result = $statement->executeQuery([$order_no]);
-            $rows = $result->fetchAllAssociative();
-
-            return (int) ($rows[0]['sum_order_amount']) ?? 0;
-        } catch (Exception $e) {
-            return 0;
-        }
-    }
-
-    public function getSumOrderAmoutWSEOSDaitoTest($order_no)
-    {
-        $sql = '
-            SELECT
-                SUM(IFNULL(dowe.order_price, 0) * IFNULL(dowe.order_num, 0)) AS sum_order_amount
-            FROM dt_order_ws_eos_daito_test dowe
-            WHERE dowe.order_no = ?
-            GROUP BY  dowe.order_no
+                SUM(IFNULL(done.cost, 0) * IFNULL(done.qty, 0)) AS sum_order_amount
+            FROM dt_order_nat_eos done
+            WHERE done.reqcd = ?
+            GROUP BY  done.reqcd
         ';
 
         try {
@@ -2954,14 +2960,14 @@ SQL;
     {
         $connection = $this->entityManager->getConnection();
         $sql = '
-                INSERT INTO dt_order_daito_test (
+                INSERT INTO dt_order (
                     customer_code,
                     seikyu_code,
                     order_no,
                     order_lineno,
                     shipping_code,
                     otodoke_code,
-                    order_date, 
+                    order_date,
                     deli_plan_date,
                     shiping_plan_date,
                     item_no,
@@ -2971,17 +2977,17 @@ SQL;
                     unit_price_status,
                     shiping_deposit_code,
                     deploy,
-                    company_id, 
+                    company_id,
                     product_code,
                     dyna_model_seg2,
                     dyna_model_seg3,
                     dyna_model_seg4,
-                    dyna_model_seg5, 
+                    dyna_model_seg5,
                     dyna_model_seg6,
                     request_flg,
                     fvehicleno,
                     ftrnsportcd
-                ) 
+                )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ';
 
@@ -3027,7 +3033,7 @@ SQL;
     {
         $connection = $this->entityManager->getConnection();
         $sql = '
-                INSERT INTO dt_order_status_daito_test (
+                INSERT INTO dt_order_status (
                     order_no,
                     order_line_no,
                     order_status,
@@ -3061,7 +3067,7 @@ SQL;
             (int) $data['order_num'], //order_remain_num
             2, //flow_type
             2, //ec_type
-            $data['order_date'] ? date('Y-m-d', strtotime($data['order_date'])) : date('Y-m-d'),
+            $data['order_date'] ? date('Y-m-d', strtotime($data['order_date'])) : date('Y-m-d'), //order_date
         ];
 
         log_info(str_replace('  ', '', $sql));
@@ -3071,5 +3077,109 @@ SQL;
         $stmt = $connection->prepare($sql);
 
         return $stmt->executeStatement($params);
+    }
+
+    public function getShippingWSExportData()
+    {
+        $sql = '
+                SELECT *
+                FROM
+                    mst_shipping_ws_eos mswe
+                JOIN
+                    dt_order_ws_eos dowe
+                ON
+                    dowe.order_no = mswe.order_no
+                AND
+                    dowe.order_line_no = mswe.order_line_no
+                WHERE
+                    mswe.shipping_send_flg = 1
+                AND
+                    IFNULL(dowe.shipping_num, 0) > 0;
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery();
+
+            return $result->fetchAllAssociative();
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getShippingNatExportData()
+    {
+        $sql = '
+                SELECT *
+                FROM
+                    mst_shipping_nat_eos msne
+                JOIN
+                    dt_order_nat_eos done
+                ON
+                    done.reqcd = msne.reqcd
+                AND
+                    done.order_lineno = msne.order_lineno
+                WHERE
+                    msne.shipping_send_flg = 1
+                AND
+                    IFNULL(done.shipping_num, 0) > 0;
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery();
+
+            return $result->fetchAllAssociative();
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getNatSortExportData()
+    {
+        $sql = '
+                SELECT *
+                FROM
+                    dt_order_nat_sort
+                ORDER BY
+                    reqcd, jan;
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery();
+
+            return $result->fetchAllAssociative();
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getMstShippingImportEOS($data)
+    {
+        $sql = "
+                SELECT *
+                FROM
+                    mst_shipping
+                WHERE
+                    cus_order_no = ?
+                AND
+                    cus_order_lineno = ?
+                AND
+                    shipping_status = 2
+                AND
+                    DATE_FORMAT(shipping_date, '%Y-%m-%d') > ?;
+        ";
+
+        try {
+            $params = [$data['cus_order_no'], $data['cus_order_lineno'], date('Y-m-d', strtotime($data['shipping_date'] ?? ''))];
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery($params);
+            $row = $result->fetchAllAssociative();
+
+            return $row[0] ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
     }
 }

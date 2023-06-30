@@ -194,6 +194,8 @@ class DtOrderWSEOSRepository extends AbstractRepository
             ]);
 
             if (!empty($object)) {
+                $this->resetError($object);
+
                 foreach ($data as $key => $value) {
                     if ($key == 'error_content1') {
                         $object->setErrorContent1($value);

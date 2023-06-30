@@ -19,6 +19,7 @@ use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtbOrderDaitoTest;
 use Customize\Entity\DtBreakKey;
 use Customize\Entity\DtOrder;
+use Customize\Entity\DtOrderNatEOS;
 use Customize\Entity\DtOrderStatus;
 use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstCustomer;
@@ -60,14 +61,14 @@ class ValidateCsvDataCommand extends Command
     private $errors = [];
     private $success = [];
     private $rate = 0;
-    private $customer_code = '7001';
-    private $shipping_code = '7001001000';
+    private $customer_code = '';
+    private $shipping_code = '';
     private $customer = null;
     private $customer_7001 = null;
     private $check_validate = false;
 
     protected static $defaultName = 'validate-csv-data-command';
-    protected static $defaultDescription = 'Process Validate Csv Data Command';
+    protected static $defaultDescription = 'Process Validate CSV Data Command';
 
     public function __construct(EntityManagerInterface $entityManager, MailService $mailService)
     {
@@ -92,7 +93,7 @@ class ValidateCsvDataCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         log_info('---------------------------------------');
-        log_info('Start Process Validate Csv Data');
+        log_info('Start Process Validate CSV Data');
         $param = $input->getArgument('arg1') ?? null;
         $option = $input->getOption('check');
 
@@ -103,7 +104,7 @@ class ValidateCsvDataCommand extends Command
         if (!$param) {
             log_error('No param. Process stopped.');
 
-            $message = 'Process Validate Csv Data. No param. Process stopped.';
+            $message = 'Process Validate CSV Data. No param. Process stopped.';
             $this->pushGoogleChat($message);
 
             return 0;
@@ -111,53 +112,55 @@ class ValidateCsvDataCommand extends Command
 
         $this->handleProcess($param);
 
-        log_info('End Process Validate Csv Data');
-        //$io->success('End Process Validate Csv Data');
+        log_info('End Process Validate CSV Data');
+        //$io->success('End Process Validate CSV Data');
 
         return 0;
     }
 
     public function handleProcess($param)
     {
-        /* The local path to load csv file */
-        $path = !empty(getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY')) ? getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') : '/html/download/';
-
         switch (trim($param)) {
             case 'ws-eos':
-                $path .= 'csv/order/';
+                $this->handleWSEOS();
+                break;
 
-                if (getenv('APP_IS_LOCAL') == 1) {
-                    $path = '.'.$path;
-                }
-
-                /* Initial data */
-                Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-                $this->customer_7001 = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
-                    'customer_code' => $this->customer_code,
-                ]);
-
-                $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
-                    'customer_code' => $this->shipping_code,
-                ]);
-
-                $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
-                /* End - Initial data */
-
-                $this->handleValidateWSEOS();
-                sleep(1);
-                $this->sendMailWSEOSValidateError();
-
-                if ($this->check_validate == false) {
-                    sleep(1);
-                    $this->handleImportOrderWSEOS();
-                    sleep(1);
-                    $this->sendMailOrderSuccess();
-                }
-
+            case 'nat-eos':
+                $this->handleNatEOS();
                 break;
 
             default:
                 break;
+        }
+    }
+
+    private function handleWSEOS()
+    {
+        /* Initial data */
+        $this->customer_code = '7001';
+        $this->shipping_code = '7001001000';
+
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+        $this->customer_7001 = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
+            'customer_code' => $this->customer_code,
+        ]);
+
+        $this->customer = $this->entityManager->getRepository(MstCustomer::class)->findOneBy([
+            'customer_code' => $this->shipping_code,
+        ]);
+
+        $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
+        /* End - Initial data */
+
+        $this->handleValidateWSEOS();
+        sleep(1);
+        $this->sendMailWSEOSValidateError();
+
+        if ($this->check_validate == false) {
+            sleep(1);
+            $this->handleImportOrderWSEOS();
+            sleep(1);
+            $this->sendMailOrderSuccess();
         }
     }
 
@@ -171,6 +174,12 @@ class ValidateCsvDataCommand extends Command
                 'order_import_day' => date('Ymd'),
                 'order_registed_flg' => 0,
             ]);
+
+            if (empty($data)) {
+                log_info('No data');
+
+                return;
+            }
 
             foreach ($data as $item) {
                 $this->validateWSEOS($item['order_no'], $item['order_line_no']);
@@ -214,22 +223,11 @@ class ValidateCsvDataCommand extends Command
                 return;
             }
 
-            // Set Initial data
+            // Set initial data
             $object->setCustomerCode($this->customer_code);
             $object->setShippingCode($this->shipping_code);
             $object->setOtodokeCode($otodoke_code);
             $object->setProductCode(!empty($product) ? $product['product_code'] : '');
-            $object->setErrorContent1(null);
-            $object->setErrorContent2(null);
-            $object->setErrorContent3(null);
-            $object->setErrorContent4(null);
-            $object->setErrorContent5(null);
-            $object->setErrorContent6(null);
-            $object->setErrorContent7(null);
-            $object->setErrorContent8(null);
-            $object->setErrorContent9(null);
-            $object->setErrorContent10(null);
-            $object->setErrorType(0);
 
             // Array contain error (if any)
             $error = [];
@@ -238,6 +236,19 @@ class ValidateCsvDataCommand extends Command
 
             // Check flag of check validate
             if ($this->check_validate) {
+                // Reset error
+                $object->setErrorContent1(null);
+                $object->setErrorContent2(null);
+                $object->setErrorContent3(null);
+                $object->setErrorContent4(null);
+                $object->setErrorContent5(null);
+                $object->setErrorContent6(null);
+                $object->setErrorContent7(null);
+                $object->setErrorContent8(null);
+                $object->setErrorContent9(null);
+                $object->setErrorContent10(null);
+                $object->setErrorType(0);
+
                 // validate order_date
                 if (empty($object['order_date']) || date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d')) {
                     $error['error_content1'] = '発注日付が過去日付になっています';
@@ -359,9 +370,6 @@ class ValidateCsvDataCommand extends Command
                 $order_error = [];
 
                 foreach ($data as $value) {
-                    $result = 0;
-                    $result1 = 0;
-
                     $item = $value->toArray();
 
                     // Check not exists order error_type = 1
@@ -447,6 +455,7 @@ class ValidateCsvDataCommand extends Command
             'name01' => '',
             'name02' => '',
         ];
+        //$id = $this->entityManager->getRepository(Order::class)->insertData($dtbOrderData);
         $id = $this->entityManager->getRepository(DtbOrderDaitoTest::class)->insertData($dtbOrderData);
 
         if (!empty($id)) {
@@ -497,9 +506,9 @@ class ValidateCsvDataCommand extends Command
                 $data['ftrnsportcd'] = '87001';
 
                 return $this->entityManager->getRepository(DtOrder::class)->insertData($data);
+            } else {
+                return 1;
             }
-
-            return 0;
         } catch (\Exception $e) {
             log_error('Insert dt_order error');
             log_error($e->getMessage());
@@ -525,9 +534,9 @@ class ValidateCsvDataCommand extends Command
                 log_info('Import data dt_order_status '.$data['order_no'].'-'.$data['order_line_no']);
 
                 return $this->entityManager->getRepository(DtOrderStatus::class)->insertData($data);
+            } else {
+                return 1;
             }
-
-            return 0;
         } catch (\Exception $e) {
             log_error('Insert dt_order_status error');
             log_error($e->getMessage());
@@ -553,7 +562,7 @@ class ValidateCsvDataCommand extends Command
             'email' => getenv('EMAIL_WS_EOS') ?? '',
             'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
             'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
-            'file_name' => 'Mail/ws_eos_order_success.twig',
+            'file_name' => 'Mail/eos_order_success.twig',
         ];
 
         $order_success = [];
@@ -562,7 +571,7 @@ class ValidateCsvDataCommand extends Command
 
             try {
                 log_info('[WS-EOS] Send Mail Order Success. '.$key);
-                $this->mailService->sendMailOrderSuccessWSEOS($information);
+                $this->mailService->sendMailOrderSuccessEOS($information);
                 $order_success[] = $key;
             } catch (\Exception $e) {
                 log_error($e->getMessage());
@@ -604,5 +613,185 @@ class ValidateCsvDataCommand extends Command
         }
 
         return;
+    }
+
+    private function handleNatEOS()
+    {
+        /* Initial data */
+        $this->customer_code = '7015';
+        $this->shipping_code = '7015001000';
+        /* End - Initial data */
+
+        $this->handleValidateNatEOS();
+        sleep(1);
+        $this->sendMailNatEOSValidateError();
+    }
+
+    private function handleValidateNatEOS()
+    {
+        try {
+            log_info('Start Handle Validate NAT EOS DATA '.($this->check_validate ? 'With Check' : 'Without Check'));
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            // Get data to validate nat eos
+            $data = $this->entityManager->getRepository(DtOrderNatEOS::class)->findBy([
+                'order_import_day' => date('Ymd'),
+                'order_registed_flg' => 0,
+                'error_type' => 0,
+            ]);
+
+            if (empty($data)) {
+                log_info('No data');
+
+                return;
+            }
+
+            foreach ($data as $item) {
+                $this->validateNatEOS($item['reqcd'], $item['order_lineno']);
+            }
+
+            if (count($this->errors)) {
+                foreach ($this->errors as $error) {
+                    $this->entityManager->getRepository(DtOrderNatEOS::class)->updateError($error);
+                }
+            }
+
+            log_info('End Handle Validate NAT EOS DATA '.($this->check_validate ? 'With Check' : 'Without Check'));
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
+
+            return;
+        }
+    }
+
+    private function validateNatEOS($reqcd, $order_lineno)
+    {
+        try {
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            $common = new MyCommonService($this->entityManager);
+
+            $object = $this->entityManager->getRepository(DtOrderNatEOS::class)->findOneBy([
+                'reqcd' => $reqcd,
+                'order_lineno' => $order_lineno,
+            ]);
+
+            if (empty($object)) {
+                log_info("No order ({$reqcd}-{$order_lineno})");
+
+                return;
+            }
+
+            $otodoke_code = '7015001000';
+            $product = $this->entityManager->getRepository(MstProduct::class)->findOneBy([
+                'jan_code' => $object['jan'],
+            ]);
+
+            // Set initial data
+            $object->setCustomerCode($this->customer_code);
+            $object->setShippingCode($this->shipping_code);
+            $object->setOtodokeCode($otodoke_code);
+            $object->setProductCode(!empty($product) ? $product['product_code'] : '');
+
+            // Array contain error (if any)
+            $error = [];
+
+            log_info("Validate order ({$reqcd}-{$order_lineno})");
+
+            // Check flag of check validate
+            if ($this->check_validate) {
+                // Reset error
+                $object->setErrorContent1(null);
+                $object->setErrorContent2(null);
+                $object->setErrorContent3(null);
+                $object->setErrorContent4(null);
+                $object->setErrorContent5(null);
+                $object->setErrorContent6(null);
+                $object->setErrorContent7(null);
+                $object->setErrorContent8(null);
+                $object->setErrorContent9(null);
+                $object->setErrorContent10(null);
+                $object->setErrorType(0);
+
+                // Validate jan_code
+                if (empty($object['jan']) || empty($product)) {
+                    $error['error_content1'] = 'JANコードが存在しません';
+                }
+
+                // Validate discontinued_date
+                if (!empty($product) && !empty($product['discontinued_date']) && date('Y-m-d') > date('Y-m-d', strtotime($product['discontinued_date']))) {
+                    $error['error_content2'] = '対象商品は廃番品となっております';
+                }
+
+                // Validdate special_order_flg
+                if (!empty($product) && !empty($product['special_order_flg']) && strtolower($product['special_order_flg']) == 'y') {
+                    $error['error_content3'] = '取り扱い対象商品ではありません';
+                }
+
+                // Validate qty
+                if (!empty($product)) {
+                    if ((int) $object['qty'] % (int) $product['quantity']) {
+                        $error['error_content4'] = '発注数の販売単位に誤りがあります';
+                    }
+                }
+
+                // Validate cost
+                if (!empty($product)) {
+                    $dtPrice = $common->getDtPrice($product['product_code'], $this->customer_code, $this->shipping_code);
+
+                    if (empty($dtPrice) || (int) $dtPrice['price_s01'] != (int) $object['cost']) {
+                        $error['error_content5'] = '発注単価が異なっています';
+                    }
+                }
+
+                // validate delivery_day
+                if (empty($object['delivery_day']) || (date('Y-m-d', strtotime($object['delivery_day'])) < date('Y-m-d'))) {
+                    $error['error_content6'] = '納期が過去日付になっています';
+                }
+            }
+
+            if (count($error)) {
+                $error['reqcd'] = $reqcd;
+                $error['order_lineno'] = $order_lineno;
+                $error['jan'] = $object['jan'];
+
+                $this->errors[] = $error;
+            }
+
+            $this->entityManager->getRepository(DtOrderNatEOS::class)->save($object);
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
+
+            return;
+        }
+    }
+
+    private function sendMailNatEOSValidateError()
+    {
+        if (!count($this->errors)) {
+            return;
+        }
+
+        $information = [
+            'email' => getenv('EMAIL_WS_EOS') ?? '',
+            'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
+            'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
+            'file_name' => 'Mail/nat_eos_validate_error.twig',
+            'error_data' => $this->errors,
+        ];
+
+        try {
+            log_info('[NAT-EOS] Send Mail Validate Error.');
+            $this->mailService->sendMailErrorNatEOS($information);
+
+            return;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+            $this->pushGoogleChat($e->getMessage());
+
+            return;
+        }
     }
 }

@@ -64,12 +64,10 @@ class DtOrderRepository extends AbstractRepository
         $object->setDynaModelSeg3('2');
         $object->setDynaModelSeg4($data['dtb_order_no'] ?? '');
         $object->setDynaModelSeg5($data['dtb_order_line_no'] ?? '');
-        $object->setDynaModelSeg6($data['remarks_line_no'] ?? '');
+        $object->setDynaModelSeg6($data['remarks_line_no'] ?? null);
         $object->setRequestFlg('Y');
         $object->setFvehicleno($data['fvehicleno']);
         $object->setFtrnsportcd($data['ftrnsportcd']);
-        //$object->setCreateDate(new \DateTime());
-        //$object->setUpdateDate(new \DateTime());
 
         log_info('Call insertData to dt_order '.$object->getOrderNo().'-'.$object->getOrderLineno());
 

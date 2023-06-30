@@ -74,6 +74,34 @@ front.mypage.shipping.note_no: 納品書№
 front.mypage.shipping.packing_slip: お問い合わせ番号
 front.mypage.shipping.order_number: 注文番号
 front.mypage.shipping.detail: 明細
+front.mypage.return.return_type: 返品
+front.mypage.return.return_number: 返品数
+front.mypage.return.return_status: 返品中
+front.mypage.return.shipping_no: 出荷指示№
+front.mypage.return.shipping_date: 出荷日
+front.mypage.return.shiping_code: 出荷先
+front.mypage.return.otodoke_code: 届け先 
+front.mypage.return.jan_code: JANコード
+front.mypage.return.product_name: 商品名
+front.mypage.return.shipping_num: 出荷数
+front.mypage.history.return_no: 返品番号
+front.mypage.history.return_request_date: 返品依頼日
+front.mypage.history.reason_return: 返品理由
+front.mypage.history.return_status: 返品ステータス
+front.mypage.history.shipping_no: 出荷指示№
+front.mypage.history.shipping_date: 出荷日
+front.mypage.history.shiping_code: 出荷先
+front.mypage.history.otodoke_code: 届け先
+front.mypage.history.jan_code: JANコード
+front.mypage.history.product_name: 商品名
+front.mypage.history.shipping_num: 出荷数
+front.mypage.history.return_number: 返品数
+front.mypage.nav_delivery__print: 納品書印刷
+front.mypage.shipping.select: 選択
+front.mypage.shipping.sale_type: 伝票
+front.mypage.nav_return_product: 返品手続き
+front.mypage.nav_return_history_product: 返品履歴
+
 #login
 common.mail_address: ユーザーコード
 #alert

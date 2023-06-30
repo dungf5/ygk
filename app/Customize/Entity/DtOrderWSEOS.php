@@ -365,6 +365,18 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
          * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'データ更新日時'")
          */
         private $update_date;
+//        /**
+//         * @var int
+//         *
+//         * @ORM\Column(name="shipping_num", type="integer", nullable=false, options={"default":0})
+//         */
+//        private $shipping_num;
+//        /**
+//         * @var string
+//         *
+//         * @ORM\Column(name="shipping_date",nullable=true, type="string", length=10, options={"comment":"出荷日"})
+//         */
+//        private $shipping_date;
 
         /**
          * @return mixed
@@ -1357,5 +1369,37 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
         {
             $this->order_import_day = $order_import_day;
         }
+
+//        /**
+//         * @return int
+//         */
+//        public function getShippingNum()
+//        {
+//            return $this->shipping_num;
+//        }
+//
+//        /**
+//         * @param $shipping_num
+//         */
+//        public function setShippingNum($shipping_num)
+//        {
+//            $this->shipping_num = $shipping_num;
+//        }
+//
+//        /**
+//         * @return string
+//         */
+//        public function getShippingDate()
+//        {
+//            return $this->shipping_date;
+//        }
+//
+//        /**
+//         * @param $shipping_date
+//         */
+//        public function setShippingDate($shipping_date)
+//        {
+//            $this->shipping_date = $shipping_date;
+//        }
     }
 }

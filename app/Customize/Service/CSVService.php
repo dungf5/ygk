@@ -102,6 +102,17 @@ class CSVService
                         ];
                     }
 
+                    if (str_contains($error_str, 'This file is unacquirable')) {
+                        $message = 'Get file FTP';
+                        $message .= '0526 This file is unacquirable.';
+                        $this->pushGoogleChat($message);
+
+                        return [
+                            'status' => -1,
+                            'message' => '0526 This file is unacquirable.',
+                        ];
+                    }
+
                     if (str_contains($error_str, 'Login failed') || str_contains($error_str, 'Login incorrect')) {
                         $message = 'Get file FTP';
                         $message .= '530 0508 Login incorrect.';

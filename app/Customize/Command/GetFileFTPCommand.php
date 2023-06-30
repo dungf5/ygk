@@ -74,6 +74,7 @@ class GetFileFTPCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+        log_info('---------------------------------------');
         log_info('Start Process Get File FTP');
 
         $param = $input->getArgument('arg1') ?? null;
@@ -97,68 +98,173 @@ class GetFileFTPCommand extends Command
     {
         switch ($param) {
             case 'ws-eos':
-                log_info('Start Get File Order WS-EOS');
-                /* Get files from FTP server*/
-                $file_from = !empty(getenv('FTP_DOWNLOAD_ORDER_FILE_NAME')) ? getenv('FTP_DOWNLOAD_ORDER_FILE_NAME') : 'HACHU-NEW.csv';
+                $this->WSEOS();
+                break;
 
-                if (!str_ends_with(trim($file_from), '.csv')) {
-                    log_error("{$file_from} is not a csv file");
-
-                    $this->pushGoogleChat("Get file FTP: {$file_from} is not a csv file");
-
-                    return;
-                }
-
-                $path_local = !empty(getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY')) ? getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') : '/html/download/';
-                $path_from = $path_local.'csv/hachu/';
-                $path_to = $path_local.'csv/order/';
-                $error_file = 'error.txt';
-                $file_to = date('YmdHis').'.csv';
-
-                $result = $this->csvService->transferFile($path_from, $path_to, $file_from, $file_to, $error_file);
-                log_info($result['message']);
-
-                // Send mail error
-                if ($result['status'] == -1) {
-                    log_info('[WS-EOS] Send Mail FTP.');
-                    $information = [
-                        'email' => getenv('EMAIL_WS_EOS') ?? '',
-                        'email_cc' => getenv('EMAILCC_WS_EOS') ?? '',
-                        'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
-                        'file_name' => 'Mail/ws_eos_ftp.twig',
-                        'status' => 0,
-                        'error_content' => $result['message'],
-                    ];
-
-                    try {
-                        $this->mailService->sendMailImportWSEOS($information);
-                    } catch (\Exception $e) {
-                        log_error($e->getMessage());
-                        $this->pushGoogleChat($e->getMessage());
-                    }
-                }
-
-                // Success
-                if ($result['status'] == 1) {
-                    // Save file information to DB
-                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-                    $insertDate = [
-                        'file_name' => $file_to,
-                        'directory' => $path_to.date('Y/m'),
-                        'message' => null,
-                        'is_sync' => 0,
-                        'is_error' => 0,
-                        'is_send_mail' => 0,
-                    ];
-
-                    $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
-                }
-
-                log_info('End Get File Order WS-EOS');
+            case 'nat-eos':
+                $this->NatEOS();
                 break;
 
             default:
                 break;
         }
+    }
+
+    private function WSEOS()
+    {
+        log_info('Start Get File Order WS-EOS');
+        /* Get files from FTP server*/
+        $file_from = !empty(getenv('FTP_DOWNLOAD_ORDER_FILE_NAME')) ? getenv('FTP_DOWNLOAD_ORDER_FILE_NAME') : 'HACHU-NEW.csv';
+
+        if (!str_ends_with(trim($file_from), '.csv')) {
+            log_error("{$file_from} is not a csv file");
+
+            $this->pushGoogleChat("Get file FTP: {$file_from} is not a csv file");
+
+            return;
+        }
+
+        $path_local = !empty(getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY')) ? getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') : '/html/download/';
+        $path_from = $path_local.'csv/hachu/';
+        $path_to = $path_local.'csv/order/';
+        $error_file = 'error.txt';
+        $file_to = date('YmdHis').'.csv';
+
+        $result = $this->csvService->transferFile($path_from, $path_to, $file_from, $file_to, $error_file);
+        log_info($result['message']);
+
+        // Send mail error
+        if ($result['status'] == -1) {
+            log_info('[WS-EOS] Send Mail FTP.');
+            $information = [
+                'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
+                'file_name' => 'Mail/ws_eos_ftp.twig',
+                'status' => 0,
+                'error_content' => $result['message'],
+            ];
+
+            try {
+                $this->mailService->sendMailImportWSEOS($information);
+            } catch (\Exception $e) {
+                log_error($e->getMessage());
+                $this->pushGoogleChat($e->getMessage());
+            }
+        }
+
+        // Success
+        if ($result['status'] == 1) {
+            // Save file information to DB
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            $insertDate = [
+                'file_name' => $file_to,
+                'directory' => $path_to.date('Y/m'),
+                'message' => null,
+                'is_sync' => 0,
+                'is_error' => 0,
+                'is_send_mail' => 1,
+            ];
+
+            $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
+
+            log_info('[WS-EOS] Send Mail FTP.');
+            $information = [
+                'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
+                'file_name' => 'Mail/ws_eos_ftp.twig',
+                'status' => 1,
+                'finish_time' => '('.$file_from.') '.date('Y/m/d H:i:s'),
+            ];
+
+            try {
+                $this->mailService->sendMailImportWSEOS($information);
+            } catch (\Exception $e) {
+                log_error($e->getMessage());
+                $this->pushGoogleChat($e->getMessage());
+            }
+        }
+
+        log_info('End Get File Order WS-EOS');
+    }
+
+    private function NatEOS()
+    {
+        log_info('Start Get File Nat EOS');
+        /* Get files from FTP server*/
+        $file_from = 'requestD_'.date('Ymd').'.csv';
+
+        if (!str_ends_with(trim($file_from), '.csv')) {
+            log_error("{$file_from} is not a csv file");
+
+            $this->pushGoogleChat("Get file FTP: {$file_from} is not a csv file");
+
+            return;
+        }
+
+        $path_local = !empty(getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY')) ? getenv('LOCAL_FTP_DOWNLOAD_DIRECTORY') : '/html/download/';
+        $path_from = $path_local.'csv/nat/';
+        $path_to = $path_local.'csv/nat/';
+        $error_file = 'error.txt';
+        $file_to = date('YmdHis').'.csv';
+
+        $result = $this->csvService->transferFile($path_from, $path_to, $file_from, $file_to, $error_file);
+        log_info($result['message']);
+
+        // Send mail error
+        if ($result['status'] == -1) {
+            log_info('[NAT-EOS] Send Mail FTP.');
+            $information = [
+                'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
+                'file_name' => 'Mail/nat_ftp.twig',
+                'status' => 0,
+                'error_content' => $result['message'],
+            ];
+
+            try {
+                $this->mailService->sendMailImportNatEOS($information);
+            } catch (\Exception $e) {
+                log_error($e->getMessage());
+                $this->pushGoogleChat($e->getMessage());
+            }
+        }
+
+        // Success
+        if ($result['status'] == 1) {
+            // Save file information to DB
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            $insertDate = [
+                'file_name' => $file_to,
+                'directory' => $path_to.date('Y/m'),
+                'message' => null,
+                'is_sync' => 0,
+                'is_error' => 0,
+                'is_send_mail' => 1,
+            ];
+
+            $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
+
+            log_info('[NAT-EOS] Send Mail FTP.');
+            $information = [
+                'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+                'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+                'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
+                'file_name' => 'Mail/nat_ftp.twig',
+                'status' => 1,
+                'finish_time' => '('.$file_from.') '.date('Y/m/d H:i:s'),
+            ];
+
+            try {
+                $this->mailService->sendMailImportNatEOS($information);
+            } catch (\Exception $e) {
+                log_error($e->getMessage());
+                $this->pushGoogleChat($e->getMessage());
+            }
+        }
+
+        log_info('End Get File Nat EOS');
     }
 }
