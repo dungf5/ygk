@@ -174,17 +174,27 @@
 						</tr>
 					</thead>
 					{% if pagination and pagination.totalItemCount > 0 %}
+						{% set index = 0 %}
 						<tbody>
 							{% for item in pagination %}
-								{% if item.returns_status_flag == 1 %}
-									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_receipt', { 'returns_no':item.returns_no } ) }}" method="GET">
-								{% elseif item.returns_status_flag == 2 or item.returns_status_flag == 3 or item.returns_status_flag == 4 %}
-									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_complete', { 'returns_no':item.returns_no } ) }}" method="GET">
+							{% set index = index + 1 %}
+								{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
+									{% if item.returns_status_flag == 1 %}
+										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_receipt', { 'returns_no':item.returns_no } ) }}" method="GET">
+									{% elseif item.returns_status_flag == 2 or item.returns_status_flag == 3 or item.returns_status_flag == 4 %}
+										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_complete', { 'returns_no':item.returns_no } ) }}" method="GET">
+									{% else %}
+										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_approve', { 'returns_no':item.returns_no } ) }}" method="GET">
+									{% endif %}
 								{% else %}
-									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_approve', { 'returns_no':item.returns_no } ) }}" method="GET">
+									<form id="return_create_{{index}}" action="{{ url('mypage_return_create') }}" method="GET">
 								{% endif %}
-									<tr 
-										ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >
+
+								{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
+									<tr ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >
+								{% else %}
+									<tr ondblclick="$('#return_create_{{index}}').submit()" >
+								{% endif %}
 										<td title="return_type">
 											<button type="submit" class="btn btn-warning" role="button">手続き</button> 
 										</td>
