@@ -324,4 +324,121 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         // die();
         return $qb;
     }
+
+    public function getShippingForReturn($paramSearch = [], $customer_code = '', $login_type = '')
+    {
+        switch ($login_type) {
+            case 'shipping_code':
+                $condition = 'order_status.shipping_code = :customer_code';
+                break;
+
+            case 'otodoke_code':
+                $condition = 'order_status.otodoke_code = :customer_code';
+                break;
+
+            default:
+                $condition = 'order_status.customer_code = :customer_code';
+                break;
+        }
+
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->from('Customize\Entity\DtOrderStatus', 'order_status');
+
+        $qb->innerJoin(
+            'Customize\Entity\MstProduct',
+            'product',
+            Join::WITH,
+            'product.product_code = order_status.product_code'
+        );
+
+        $qb->innerJoin(
+            'Customize\Entity\MstShipping',
+            'shipping',
+            Join::WITH,
+            'shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno'
+        );
+
+        $qb->leftJoin(
+            'Customize\Entity\MstProductReturnsInfo',
+            'product_returns_info',
+            Join::WITH,
+            'product_returns_info.shipping_no = shipping.shipping_no AND product_returns_info.product_code = shipping.product_code'
+        );
+
+        $qb->leftJoin(
+            'Customize\Entity\DtReturnsReson',
+            'returns_reson',
+            Join::WITH,
+            'returns_reson.returns_reson_id = product_returns_info.reason_returns_code');
+
+        $qb->where('shipping.shipping_status = 2')
+            ->andwhere('shipping.delete_flg IS NOT NULL AND shipping.delete_flg <> 0')
+            ->andWhere($condition)
+            ->andWhere('order_status.order_date >= :order_date')
+            ->setParameter(':customer_code', $customer_code)
+            ->setParameter(':order_date', date('Y-m-d', strtotime('-14 MONTH')));
+
+        $qb->addSelect(
+            'product_returns_info.returns_no',
+            'product_returns_info.returns_num',
+            'product_returns_info.returns_status_flag',
+            'product_returns_info.shipping_no',
+            'product_returns_info.shipping_date',
+            'product_returns_info.shipping_name',
+            'product_returns_info.otodoke_name',
+            'product_returns_info.jan_code',
+            'product_returns_info.returns_request_date',
+            'product.product_code',
+            'product.product_name',
+            'returns_reson.returns_reson',
+            'shipping.shipping_num'
+        );
+
+        if (!empty($paramSearch['returns_status_flag'])) {
+            $qb->andWhere('product_returns_info.returns_status_flag IN (:returns_status_flag)')
+                ->setParameter(':returns_status_flag', $paramSearch['returns_status_flag']);
+        }
+
+        if (!empty($paramSearch['search_jan_code'])) {
+            $qb->andWhere('product_returns_info.jan_code LIKE :search_jan_code')
+                ->setParameter(':search_jan_code', "%{$paramSearch['search_jan_code']}%");
+        }
+
+        if (!empty($paramSearch['search_shipping_date']) && $paramSearch['search_shipping_date'] != 0) {
+            $qb->andWhere('product_returns_info.shipping_date LIKE :search_shipping_date')
+                ->setParameter(':search_shipping_date', "{$paramSearch['search_shipping_date']}-%");
+        }
+
+        if (!empty($paramSearch['search_shipping']) && $paramSearch['search_shipping'] != '0') {
+            $qb->andWhere('product_returns_info.shipping_code = :search_shipping')
+                ->setParameter(':search_shipping', $paramSearch['search_shipping']);
+        }
+
+        if (!empty($paramSearch['search_otodoke']) && $paramSearch['search_otodoke'] != '0') {
+            $qb->andWhere('product_returns_info.otodoke_code = :search_otodoke')
+                ->setParameter(':search_otodoke', $paramSearch['search_otodoke']);
+        }
+
+        if (!empty($paramSearch['search_request_date']) && $paramSearch['search_request_date'] != 0) {
+            $qb->andWhere('product_returns_info.returns_request_date LIKE :search_request_date')
+                ->setParameter(':search_request_date', "{$paramSearch['search_request_date']}-%");
+        }
+
+        if (!empty($paramSearch['search_reason_return']) && $paramSearch['search_reason_return'] != '0') {
+            $qb->andWhere('product_returns_info.reason_returns_code = :search_reason_return')
+                ->setParameter(':search_reason_return', $paramSearch['search_reason_return']);
+        }
+
+        $qb->addGroupBy('shipping.cus_order_no');
+        $qb->addGroupBy('shipping.cus_order_lineno');
+
+        $qb->addOrderBy('order_status.order_date', 'DESC');
+        $qb->addOrderBy('order_status.cus_order_no', 'DESC');
+        $qb->addOrderBy('order_status.cus_order_lineno', 'asc');
+
+//         dump($qb->getQuery()->getSQL());
+//         dump($qb->getParameters());
+//         die();
+        return $qb;
+    }
 }
