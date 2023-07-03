@@ -926,7 +926,7 @@ class MypageController extends AbstractController
 
         //Params
         $param = [
-            'returns_status_flag' => [0, 1, 2, 3, 4],
+            'returns_status_flag' => '',
             'pageno' => $request->get('pageno', 1),
             'search_jan_code' => $request->get('search_jan_code', ''),
             'search_shipping_date' => $request->get('search_shipping_date', 0),
@@ -948,9 +948,7 @@ class MypageController extends AbstractController
                 $customer_code = $temp_customer_code['customer_code'];
             }
         }
-        $order_status = $my_common->getOrderStatus($customer_code, $login_type);
-
-        $qb = $this->mstProductReturnsInfoRepository->getReturnByCustomer($param, $customer_code);
+        $qb = $this->mstProductReturnsInfoRepository->getShippingForReturn($param, $customer_code, $login_type);
 
         $pagination = $paginator->paginate(
             $qb,
