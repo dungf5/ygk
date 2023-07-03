@@ -1052,11 +1052,11 @@ function updateDeliverydAdress(delivery_code) {
                     }
 
                     .shipping_destination_left {
-                        width: 130px
+                        width: 140px
                     }
 
                     .shipping_destination_left > div {
-                        width: 110px;
+                        width: 130px;
                         background-color: #c9b5b5;
                         text-align: center;
                         margin-right: 20px;
@@ -1219,7 +1219,7 @@ function updateDeliverydAdress(delivery_code) {
                     </div>
                     <div class="date_picker_row">
                         <div class="shipping_destination_left"></div>
-                        <div class="shipping_destination_right">
+                        <div>
                             <p class="date-picker-delivery-notify">倉庫状況によりご希望日に添えない場合がございます<br/>詳しくは各担当者までお問い合わせください<br/>配送確定はマイページの出荷履歴をご確認ください</p>
                             <p class="error_date" style="color: red;font-size: larger;font-weight: bold;"></p>
                         </div>
@@ -1268,7 +1268,43 @@ function updateDeliverydAdress(delivery_code) {
                 </div>
 
                 {# Remarks #}
-                <div class="col-md-12" style="display: inline-flex; padding: 0">
+                <div>
+                    <p>
+                        <span>▼</span>
+                        出荷案内書と納品書の備考に表示される項目（店名、オーダー番号、その他）
+                    </p>
+                </div>
+                <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
+                    <div class="shipping_destination_left">
+                        <div>発生書備考</div>
+                    </div>
+                    <div class="col-md-12" style="padding: 0">
+                        <input type="text" class="form-control" name="remarks3" id="remarks3" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks3 }} {% endif %}" onkeyup="updateRemarks(this)">
+                    </div>
+                </div>
+
+                <div>
+                    <p>
+                        <span>▼</span>
+                        発注に対するコメント
+                    </p>
+                </div>
+                <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
+                    <div class="shipping_destination_left">
+                        <div>発生書コメント</div>
+                    </div>
+                    <div class="col-md-12" style="padding: 0">
+                        <input type="text" class="form-control" name="remarks4" id="remarks4" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks4 }} {% endif %}" onkeyup="updateRemarks(this)">
+                    </div>
+                </div>
+
+                <div>
+                    <p>
+                        <span>▼</span>
+                        生産依頼項目（特注の仕様など）
+                    </p>
+                </div>
+                <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
                     <div class="shipping_destination_left">
                         <div> {{ 'front.shopping.remarks'|trans }}１</div>
                     </div>
@@ -1282,22 +1318,6 @@ function updateDeliverydAdress(delivery_code) {
                     </div>
                     <div class="col-md-12" style="padding: 0">
                         <input type="text" class="form-control" name="remarks2" id="remarks2" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks2 }} {% endif %}" onkeyup="updateRemarks(this)">
-                    </div>
-                </div>
-                <div class="col-md-12" style="display: inline-flex; padding: 0; margin-top: 10px">
-                    <div class="shipping_destination_left">
-                        <div>発注書宛先</div>
-                    </div>
-                    <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks3" id="remarks3" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks3 }} {% endif %}" onkeyup="updateRemarks(this)">
-                    </div>
-                </div>
-                <div class="col-md-12" style="display: inline-flex; padding: 0; margin-top: 10px">
-                    <div class="shipping_destination_left">
-                        <div>発注書備考</div>
-                    </div>
-                    <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks4" id="remarks4" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks4 }} {% endif %}" onkeyup="updateRemarks(this)">
                     </div>
                 </div>
                 {# End - Remarks#}
