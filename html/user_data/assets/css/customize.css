@@ -2357,8 +2357,7 @@ a { color: #07c; }
     padding: 0.5em;
   }
   .ec-mypageRole .myTable tbody tr td:nth-child(5) {
-    text-align: left!important;
-
+    /*text-align: left!important;*/
   }
   .ec-mypageRole .myTable tbody tr:nth-child(odd) td {
     background: #f8fcff;
