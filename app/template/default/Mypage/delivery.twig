@@ -95,8 +95,8 @@ file that was distributed with this source code.
             <table class="table myTable">
                 <thead>
                 <tr>
-                    <th title="delivery_no">{{ 'front.mypage.shipping.note_no'|trans| raw }}</th>
-                    <th title="shipping_date" style="max-width:100px">
+                    <th title="納品書№">{{ 'front.mypage.shipping.note_no'|trans| raw }}</th>
+                    <th title="出荷日" style="max-width:100px">
                         {{ 'front.mypage.shipping.date'|trans| raw }}
                         <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_shipping_date">
                             <span class="glyphicon glyphicon-triangle-bottom"></span>
@@ -109,7 +109,7 @@ file that was distributed with this source code.
                             {% endfor %}
                         </select>
                     </th>
-                    <th title="shipping_code otodoke_code" style="min-width: 150px">
+                    <th title="出荷先 届け先" style="min-width: 150px">
                         {{ 'front.mypage.shipping_code'|trans| raw }}
                         <a href="javascript:void(0)" style="color: red; {% if orderShippingOpt|length < 2 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_shipping" onclick="handleGetLastSelected()">
                             <span class="glyphicon glyphicon-triangle-bottom"></span>
@@ -135,7 +135,7 @@ file that was distributed with this source code.
                             {% endfor %}
                         </select>
                     </th>
-                    <th title="shipping_no">{{ 'front.mypage.shipping.delivery_no'|trans| raw }}</th>
+                    <th title="出荷指示№">{{ 'front.mypage.shipping.delivery_no'|trans| raw }}</th>
                 </tr>
                 </thead>
                 {% if pagination and pagination.totalItemCount > 0 %}
