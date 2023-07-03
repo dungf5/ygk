@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -21,6 +32,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
          * @ORM\Id
          */
         private $returns_no;
+
         /**
          * @return string
          */
@@ -28,6 +40,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             return $this->returns_no;
         }
+
         /**
          * @param string $returns_no
          */
@@ -42,6 +55,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
          * @ORM\Column(name="cus_image_url_path1", type="string")
          */
         private $cus_image_url_path1;
+
         /**
          * @return string
          */
@@ -49,6 +63,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             return $this->cus_image_url_path1;
         }
+
         /**
          * @param string $cus_image_url_path1
          */
@@ -63,6 +78,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
          * @ORM\Column(name="cus_image_url_path2", type="string")
          */
         private $cus_image_url_path2;
+
         /**
          * @return string
          */
@@ -70,6 +86,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             return $this->cus_image_url_path2;
         }
+
         /**
          * @param string $cus_image_url_path2
          */
@@ -84,6 +101,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
          * @ORM\Column(name="cus_image_url_path3", type="string")
          */
         private $cus_image_url_path3;
+
         /**
          * @return string
          */
@@ -91,6 +109,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             return $this->cus_image_url_path3;
         }
+
         /**
          * @param string $cus_image_url_path2
          */
@@ -105,6 +124,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
          * @ORM\Column(name="cus_image_url_path4", type="string")
          */
         private $cus_image_url_path4;
+
         /**
          * @return string
          */
@@ -112,6 +132,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             return $this->cus_image_url_path4;
         }
+
         /**
          * @param string $cus_image_url_path4
          */
@@ -126,6 +147,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
          * @ORM\Column(name="cus_image_url_path5", type="string")
          */
         private $cus_image_url_path5;
+
         /**
          * @return string
          */
@@ -133,6 +155,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             return $this->cus_image_url_path5;
         }
+
         /**
          * @param string $cus_image_url_path5
          */
@@ -147,6 +170,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
          * @ORM\Column(name="cus_image_url_path6", type="string")
          */
         private $cus_image_url_path6;
+
         /**
          * @return string
          */
@@ -154,6 +178,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             return $this->cus_image_url_path6;
         }
+
         /**
          * @param string $cus_image_url_path6
          */
@@ -168,6 +193,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
          * @ORM\Column(name="stock_image_url_path1", type="string")
          */
         private $stock_image_url_path1;
+
         /**
          * @return string
          */
@@ -175,6 +201,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             return $this->stock_image_url_path1;
         }
+
         /**
          * @param string $stock_image_url_path1
          */
@@ -182,13 +209,14 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             $this->stock_image_url_path1 = $stock_image_url_path1;
         }
-        
+
         /**
          * @var string
          *
          * @ORM\Column(name="stock_image_url_path2", type="string")
          */
         private $stock_image_url_path2;
+
         /**
          * @return string
          */
@@ -196,6 +224,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             return $this->stock_image_url_path2;
         }
+
         /**
          * @param string $stock_image_url_path2
          */
@@ -210,6 +239,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
          * @ORM\Column(name="stock_image_url_path3", type="string")
          */
         private $stock_image_url_path3;
+
         /**
          * @return string
          */
@@ -217,6 +247,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             return $this->stock_image_url_path3;
         }
+
         /**
          * @param string $stock_image_url_path3
          */
@@ -231,6 +262,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
          * @ORM\Column(name="stock_image_url_path4", type="string")
          */
         private $stock_image_url_path4;
+
         /**
          * @return string
          */
@@ -238,6 +270,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             return $this->stock_image_url_path4;
         }
+
         /**
          * @param string $stock_image_url_path4
          */
@@ -252,6 +285,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
          * @ORM\Column(name="stock_image_url_path5", type="string")
          */
         private $stock_image_url_path5;
+
         /**
          * @return string
          */
@@ -259,6 +293,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             return $this->stock_image_url_path5;
         }
+
         /**
          * @param string $stock_image_url_path5
          */
@@ -273,6 +308,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
          * @ORM\Column(name="stock_image_url_path6", type="string")
          */
         private $stock_image_url_path6;
+
         /**
          * @return string
          */
@@ -280,6 +316,7 @@ if (!class_exists('\Customize\Entity\DtReturnsImageInfo', false)) {
         {
             return $this->stock_image_url_path6;
         }
+
         /**
          * @param string $stock_image_url_path6
          */

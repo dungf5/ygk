@@ -15,7 +15,6 @@ namespace Customize\Repository;
 
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtOrder;
-use Customize\Service\Common\MyCommonService;
 use Customize\Service\CurlPost;
 use Doctrine\DBAL\Types\Type;
 use Eccube\Repository\AbstractRepository;

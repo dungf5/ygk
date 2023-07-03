@@ -424,7 +424,13 @@ SQL;
     }
 
     /**
+     * @param $loginType
+     * @param $customerId
      * @param MoreOrder $moreOrder
+     *
+     * @return array
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getMstShippingCustomer($loginType, $customerId, MoreOrder $moreOrder = null)
     {
@@ -583,6 +589,10 @@ SQL;
 
     /**
      * @param
+     *
+     * @return array|null
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getMstProductsOrderNo($order_no)
     {
@@ -644,7 +654,12 @@ SQL;
     }
 
     /**
-     * @param
+     * @param $myCart
+     * @param $customer_code
+     *
+     * @return array|null
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getdtPriceFromCart($myCart, $customer_code)
     {
@@ -939,10 +954,11 @@ SQL;
 
     /***
      * seikyu_code  noi nhan hoa don
-     * @param $customer_id
+     * @param $customer_code
+     * @param string $login_type
+     * @param string $login_code
      * @return array
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function getCustomerBillSeikyuCode($customer_code, $login_type = '', $login_code = '')
     {
@@ -951,6 +967,10 @@ SQL;
 
         if ($relationCus) {
             $seikyu_code = $relationCus['seikyu_code'];
+        }
+
+        if ($login_code == 'c1018' && !empty($shipping_code)) {
+            $seikyu_code = $shipping_code;
         }
 
         if (empty($seikyu_code)) {
@@ -1286,8 +1306,6 @@ SQL;
     /***
      * @param $shipping_code
      * @param $pre_order_id
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
      */
     public function saveTempCart($shipping_code, $pre_order_id)
     {
@@ -1511,10 +1529,8 @@ SQL;
     }
 
     /***
-     * @param $shipping_code
+     * @param $bill_code
      * @param $pre_order_id
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
      */
     public function saveTempCartBillSeiky($bill_code, $pre_order_id)
     {
@@ -1534,7 +1550,8 @@ SQL;
     }
 
     /**
-     * @param
+     * @return mixed|null
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getTaxInfo()
     {
@@ -1557,7 +1574,10 @@ SQL;
     }
 
     /**
-     * @param
+     * @param $customerId
+     * @param $pre_order_id
+     * @return mixed|null
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getMstShippingOrder($customerId, $pre_order_id)
     {
@@ -1585,6 +1605,8 @@ SQL;
 
     /**
      * @param
+     * @return array|null
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getMstProductsOrderCustomer($order_no)
     {
@@ -1701,6 +1723,8 @@ SQL;
 
     /**
      * @param
+     * @return mixed|null
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getMoreOrderCustomer($pre_order_id)
     {
@@ -2050,10 +2074,12 @@ SQL;
     }
 
     /***
-     * @param array $arProductCode
      * @param array $hsMstProductCodeCheckShow
-     * @var MyCommonService $commonS
-     * @var string $customer_code
+     * @param $commonS
+     * @param $customer_code
+     * @param string $login_type
+     * @param string $login_code
+     * @return array
      */
     public function setCartIndtPrice($hsMstProductCodeCheckShow, $commonS, $customer_code, $login_type = '', $login_code = '')
     {
@@ -2069,10 +2095,9 @@ SQL;
     }
 
     /***
-     * @param $shipping_code
      * @param $pre_order_id
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @param string $name
+     * @param string $value
      */
     public function saveTempCartRemarks($pre_order_id, $name = '', $value = '')
     {
@@ -2373,6 +2398,8 @@ SQL;
 
     /**
      * @param
+     * @return mixed|null
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getCustomerLocation($customer_code)
     {
@@ -3073,6 +3100,7 @@ SQL;
         try {
             $statement = $this->entityManager->getConnection()->prepare($sql);
             $result = $statement->executeQuery();
+
             return $result->fetchAllAssociative();
         } catch (Exception $e) {
             return [];
@@ -3100,6 +3128,7 @@ SQL;
         try {
             $statement = $this->entityManager->getConnection()->prepare($sql);
             $result = $statement->executeQuery();
+
             return $result->fetchAllAssociative();
         } catch (Exception $e) {
             return [];
@@ -3119,6 +3148,7 @@ SQL;
         try {
             $statement = $this->entityManager->getConnection()->prepare($sql);
             $result = $statement->executeQuery();
+
             return $result->fetchAllAssociative();
         } catch (Exception $e) {
             return [];
@@ -3148,7 +3178,6 @@ SQL;
             $row = $result->fetchAllAssociative();
 
             return $row[0] ?? [];
-
         } catch (Exception $e) {
             return [];
         }

@@ -36,8 +36,6 @@ use Eccube\Event\EventArgs;
 use Eccube\Form\Type\Front\CustomerLoginType;
 use Eccube\Repository\BaseInfoRepository;
 use Eccube\Repository\CustomerFavoriteProductRepository;
-use Eccube\Service\CartService;
-use Eccube\Service\PurchaseFlow\PurchaseFlow;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -106,9 +104,18 @@ class MypageController extends AbstractController
      *
      * @param OrderRepository $orderRepository
      * @param ProductImageRepository $productImageRepository
-     * @param CartService $cartService
+     * @param MstShippingRepository $mstShippingRepository
+     * @param MstProductReturnsInfoRepository $mstProductReturnsInfoRepository
+     * @param DtReturnsImageInfoRepository $dtReturnsImageInfoRepository
+     * @param OrderItemRepository $orderItemRepository
+     * @param \Twig_Environment $twig
+     * @param EntityManagerInterface $entityManager
      * @param BaseInfoRepository $baseInfoRepository
-     * @param PurchaseFlow $purchaseFlow
+     * @param CustomerFavoriteProductRepository $customerFavoriteProductRepository
+     * @param GlobalService $globalService
+     * @param MailService $mailService
+     *
+     * @throws \Exception
      */
     public function __construct(
         OrderRepository $orderRepository,
@@ -150,6 +157,10 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/shipping_list", name="shippingList", methods={"GET"})
      * @Template("/Mypage/shipping_list.twig")
+     *
+     * @param Request $request
+     *
+     * @return array
      */
     public function shippingList(Request $request)
     {
@@ -261,9 +272,12 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/", name="mypage", methods={"GET"})
      * @Template("/Mypage/index.twig")
+     *
      * @param Request $request
      * @param PaginatorInterface $paginator
+     *
      * @return array
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function index(Request $request, PaginatorInterface $paginator)
@@ -450,6 +464,11 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/login", name="mypage_login", methods={"GET", "POST"})
      * @Template("Mypage/login.twig")
+     *
+     * @param Request $request
+     * @param AuthenticationUtils $utils
+     *
+     * @return array|bool[]|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function login(Request $request, AuthenticationUtils $utils)
     {
@@ -562,6 +581,9 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/favorite", name="mypage_favorite", methods={"GET"})
      * @Template("Mypage/favorite.twig")
+     * @param Request $request
+     * @param PaginatorInterface $paginator
+     * @return array
      */
     public function favorite(Request $request, PaginatorInterface $paginator)
     {
@@ -599,6 +621,8 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/shipping/change", name="mypage_shipping", methods={"POST"})
      * @Template("Mypage/login.twig")
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function changeShippingCode(Request $request)
     {
@@ -635,6 +659,10 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/shipping/history", name="mypage_shipping_history", methods={"GET"})
      * @Template("Mypage/shipping.twig")
+     * @param Request $request
+     * @param PaginatorInterface $paginator
+     * @return array
+     * @throws \Doctrine\DBAL\Exception
      */
     public function shipping(Request $request, PaginatorInterface $paginator)
     {
@@ -849,6 +877,8 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/represent/change", name="mypage_represent", methods={"POST"})
      * @Template("Mypage/login.twig")
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function changeRepresentCode(Request $request)
     {

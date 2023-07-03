@@ -1,22 +1,22 @@
 <?php
 
-/**
- * Global Service
- * Get information at everywhere
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
-
 
 namespace Customize\Service;
 
-
-use Customize\Common\MyCommon;
-use Customize\Entity\Price;
 use Customize\Service\Common\MyCommonService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-
 
 class GlobalService
 {
@@ -43,15 +43,14 @@ class GlobalService
      *
      * @param EntityManagerInterface $entityManager
      */
-    public function __construct (
+    public function __construct(
         EntityManagerInterface $entityManager,
         ?ContainerInterface $container,
         MyCommonService $myCommon
-    )
-    {
-        $this->entityManager    = $entityManager;
-        $this->container        = $container;
-        $this->myCommon         = new $myCommon($entityManager);
+    ) {
+        $this->entityManager = $entityManager;
+        $this->container = $container;
+        $this->myCommon = new $myCommon($entityManager);
     }
 
     public function customerId()
@@ -62,87 +61,86 @@ class GlobalService
     public function customer()
     {
         if ($this->customerId() != '') {
-            return $this->myCommon->getMstCustomer( $this->customerId() );
+            return $this->myCommon->getMstCustomer($this->customerId());
         }
 
-        return  null;
+        return null;
     }
 
     public function customerCode()
     {
         if ($this->customerId() != '') {
-            $customerCode        = $this->myCommon->getMstCustomer($this->customerId())["customer_code"];
+            $customerCode = $this->myCommon->getMstCustomer($this->customerId())['customer_code'];
 
             return $customerCode ?? '';
         }
 
-        return  '';
+        return '';
     }
 
     public function customerName()
     {
         if ($this->customerId() != '') {
-            $cutomerName        = $this->myCommon->getMstCustomer($this->customerId())["name01"];
+            $cutomerName = $this->myCommon->getMstCustomer($this->customerId())['name01'];
 
             return $cutomerName ?? '';
         }
 
-        return  '';
+        return '';
     }
 
     public function companyName()
     {
         if ($this->customerId() != '') {
-            $companyName        = $this->myCommon->getMstCustomer($this->customerId())["company_name"];
+            $companyName = $this->myCommon->getMstCustomer($this->customerId())['company_name'];
 
             return $companyName ?? '';
         }
 
-        return  '';
+        return '';
     }
 
     public function shippingOption()
     {
         try {
             if ($this->customerId() != '') {
-                $arrShipping         = $this->myCommon->getMstShippingCustomer($this->getLoginType(), $this->customerId(), null);
-                $arrShipping         = $arrShipping ?? [];
+                $arrShipping = $this->myCommon->getMstShippingCustomer($this->getLoginType(), $this->customerId(), null);
+                $arrShipping = $arrShipping ?? [];
 
                 if (count($arrShipping) == 1 && isset($arrShipping[0]['shipping_no'])) {
-                    $_SESSION['s_shipping_code']    = $arrShipping[0]['shipping_no'] ?? '';
+                    $_SESSION['s_shipping_code'] = $arrShipping[0]['shipping_no'] ?? '';
                 }
 
                 return $arrShipping;
             }
 
             return [];
-
         } catch (\Exception $e) {
             return [];
         }
     }
 
-    public function otodokeOption ($customer_id = '', $shipping_code = '') {
+    public function otodokeOption($customer_id = '', $shipping_code = '')
+    {
         try {
             if ($customer_id != '' && $shipping_code != '') {
-                $arrOtodoke     = $this->myCommon->getCustomerOtodoke($this->getLoginType(), $customer_id, $shipping_code, null);
+                $arrOtodoke = $this->myCommon->getCustomerOtodoke($this->getLoginType(), $customer_id, $shipping_code, null);
 
                 return $arrOtodoke ?? [];
             }
 
             return [];
-
         } catch (\Exception $e) {
             return [];
         }
     }
 
-    public function getShippingCode ()
+    public function getShippingCode()
     {
         return $_SESSION['s_shipping_code'] ?? '';
     }
 
-    public function getOtodokeCode ()
+    public function getOtodokeCode()
     {
         return $_SESSION['s_otodoke_code'] ?? '';
     }
@@ -160,45 +158,44 @@ class GlobalService
     public function getPriceViewFlg()
     {
         if ($this->customerId() != '') {
-            $priceViewFlg       = $this->myCommon->getMstCustomer($this->customerId())["price_view_flg"];
+            $priceViewFlg = $this->myCommon->getMstCustomer($this->customerId())['price_view_flg'];
 
             return $priceViewFlg == 1 ? true : false;
         }
 
-        return  true;
+        return true;
     }
 
     public function getPLType()
     {
         if ($this->customerId() != '') {
-            $plType             = $this->myCommon->getMstCustomer($this->customerId())["pl_type"];
+            $plType = $this->myCommon->getMstCustomer($this->customerId())['pl_type'];
 
             return $plType ?? 0;
         }
 
-        return  0;
+        return 0;
     }
 
     public function getSpecialOrderFlg()
     {
         if ($this->customerId() != '') {
-            $SpecialOrderFlg    = $this->myCommon->getMstCustomer($this->customerId())["special_order_flg"];
+            $SpecialOrderFlg = $this->myCommon->getMstCustomer($this->customerId())['special_order_flg'];
 
             return $SpecialOrderFlg ?? 0;
         }
 
-        return  0;
+        return 0;
     }
 
     public function getLoginType()
     {
         try {
-            if (!empty($_SESSION["usc_" . $this->customerId()])) {
-                return $_SESSION["usc_" . $this->customerId()]['login_type'];
+            if (!empty($_SESSION['usc_'.$this->customerId()])) {
+                return $_SESSION['usc_'.$this->customerId()]['login_type'];
             }
 
             return '';
-
         } catch (\Exception $e) {
             return '';
         }
@@ -207,12 +204,11 @@ class GlobalService
     public function getLoginCode()
     {
         try {
-            if (!empty($_SESSION["usc_" . $this->customerId()])) {
-                return $_SESSION["usc_" . $this->customerId()]['login_code'];
+            if (!empty($_SESSION['usc_'.$this->customerId()])) {
+                return $_SESSION['usc_'.$this->customerId()]['login_code'];
             }
 
             return '';
-
         } catch (\Exception $e) {
             return '';
         }

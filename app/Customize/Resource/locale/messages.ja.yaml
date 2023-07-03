@@ -99,6 +99,8 @@ front.mypage.history.return_number: 返品数
 front.mypage.nav_delivery__print: 納品書印刷
 front.mypage.shipping.select: 選択
 front.mypage.shipping.sale_type: 伝票
+front.mypage.nav_return_product: 返品手続き
+front.mypage.nav_return_history_product: 返品履歴
 
 #login
 common.mail_address: ユーザーコード

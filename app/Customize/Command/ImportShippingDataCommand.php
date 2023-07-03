@@ -152,11 +152,6 @@ class ImportShippingDataCommand extends Command
                     $item->setShippingDate($shipping_date);
                     $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
                 }
-
-                //if ((int) $item->getShippingNum() == (int) $item->getOrderNum()) {
-                //    $item->setShippingSentFlg(1);
-                //    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
-                //}
             }
 
             log_info('End Handle Import Data To mst_shipping_ws_eos');
@@ -276,11 +271,6 @@ class ImportShippingDataCommand extends Command
                     $item->setShippingDate($shipping_date);
                     $this->entityManager->getRepository(DtOrderNatEOS::class)->save($item);
                 }
-
-                //if ((int) $item->getShippingNum() == (int) $item->getQty()) {
-                //    $item->setShippingSentFlg(1);
-                //    $this->entityManager->getRepository(DtOrderNatEOS::class)->save($item);
-                //}
             }
 
             log_info('End Handle Import Data To mst_shipping_nat_eos');

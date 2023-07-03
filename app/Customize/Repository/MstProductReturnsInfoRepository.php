@@ -1,11 +1,22 @@
 <?php
 
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Repository;
 
-use Eccube\Repository\AbstractRepository;
 use Customize\Entity\MstProductReturnsInfo;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Doctrine\ORM\Query\Expr\Join;
+use Eccube\Repository\AbstractRepository;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class MstProductReturnsInfoRepository extends AbstractRepository
 {
@@ -21,15 +32,17 @@ class MstProductReturnsInfoRepository extends AbstractRepository
 
     public function insertData($data = [])
     {
-        if (empty($data)) return;
+        if (empty($data)) {
+            return;
+        }
 
         try {
-            $object = $this->findOneBy([ 'returns_no' => $data['returns_no'] ]);
-            if( !$object ) {
+            $object = $this->findOneBy(['returns_no' => $data['returns_no']]);
+            if (!$object) {
                 $object = new MstProductReturnsInfo();
                 $object->setReturnsNo($data['returns_no']);
             }
-            
+
             $object->setCustomerCode($data['customer_code']);
             $object->setShippingCode($data['shipping_code']);
             $object->setShippingName($data['shipping_name']);
@@ -52,7 +65,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             $object->setCusImageUrlPath6($data['cus_image_url_path6']);
             $object->setReturnsStatusFlag($data['returns_status_flag']);
             $object->setReturnsRequestDate($data['returns_request_date']);
-            
+
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();
 
@@ -66,70 +79,74 @@ class MstProductReturnsInfoRepository extends AbstractRepository
 
     public function updadteData($returns_no, $data = [])
     {
-        if( empty($returns_no) || empty($data) ) return;
-        
+        if (empty($returns_no) || empty($data)) {
+            return;
+        }
+
         try {
-            $object = $this->findOneBy([ 'returns_no' => $returns_no ]);
-            if( !$object ) return;
-            
-            if( !empty( $data['returns_num'] ) ) {
+            $object = $this->findOneBy(['returns_no' => $returns_no]);
+            if (!$object) {
+                return;
+            }
+
+            if (!empty($data['returns_num'])) {
                 $object->setReturnsNum($data['returns_num']);
             }
-            if( !empty( $data['cus_reviews_flag'] ) ) {
+            if (!empty($data['cus_reviews_flag'])) {
                 $object->setCusReviewsFlag($data['cus_reviews_flag']);
             }
-            if( !empty( $data['shipping_fee'] ) ) {
+            if (!empty($data['shipping_fee'])) {
                 $object->setShippingFee($data['shipping_fee']);
             }
-            if( !empty( $data['aprove_comment_not_yet'] ) ) {
+            if (!empty($data['aprove_comment_not_yet'])) {
                 $object->setAproveCommentNotYet($data['aprove_comment_not_yet']);
             }
-            if( !empty( $data['returns_status_flag'] ) ) {
+            if (!empty($data['returns_status_flag'])) {
                 $object->setReturnsStatusFlag($data['returns_status_flag']);
             }
-            if( !empty( $data['aprove_date'] ) ) {
+            if (!empty($data['aprove_date'])) {
                 $object->setAproveDate($data['aprove_date']);
             }
-            if( !empty( $data['aprove_date_not_yet'] ) ) {
+            if (!empty($data['aprove_date_not_yet'])) {
                 $object->setAproveDateNotYet($data['aprove_date_not_yet']);
             }
-            if( !empty( $data['stock_image_url_path1'] ) ) {
+            if (!empty($data['stock_image_url_path1'])) {
                 $object->setStockImageUrlPath1($data['stock_image_url_path1']);
             }
-            if( !empty( $data['stock_image_url_path2'] ) ) {
+            if (!empty($data['stock_image_url_path2'])) {
                 $object->setStockImageUrlPath2($data['stock_image_url_path2']);
             }
-            if( !empty( $data['stock_image_url_path3'] ) ) {
+            if (!empty($data['stock_image_url_path3'])) {
                 $object->setStockImageUrlPath3($data['stock_image_url_path3']);
             }
-            if( !empty( $data['stock_image_url_path4'] ) ) {
+            if (!empty($data['stock_image_url_path4'])) {
                 $object->setStockImageUrlPath4($data['stock_image_url_path4']);
             }
-            if( !empty( $data['stock_image_url_path5'] ) ) {
+            if (!empty($data['stock_image_url_path5'])) {
                 $object->setStockImageUrlPath5($data['stock_image_url_path5']);
             }
-            if( !empty( $data['stock_image_url_path6'] ) ) {
+            if (!empty($data['stock_image_url_path6'])) {
                 $object->setStockImageUrlPath6($data['stock_image_url_path6']);
             }
-            if( !empty( $data['receipt_comment'] ) ) {
+            if (!empty($data['receipt_comment'])) {
                 $object->setReceiptComment($data['receipt_comment']);
             }
-            if( !empty( $data['product_receipt_date'] ) ) {
+            if (!empty($data['product_receipt_date'])) {
                 $object->setProductReceiptDate($data['product_receipt_date']);
             }
-            if( !empty( $data['receipt_not_yet_comment'] ) ) {
+            if (!empty($data['receipt_not_yet_comment'])) {
                 $object->setReceiptNotYetComment($data['receipt_not_yet_comment']);
             }
-            if( !empty( $data['product_receipt_date_not_yet'] ) ) {
+            if (!empty($data['product_receipt_date_not_yet'])) {
                 $object->setProductReceiptDateNotYet($data['product_receipt_date_not_yet']);
             }
-            if( !empty( $data['stock_reviews_flag'] ) ) {
+            if (!empty($data['stock_reviews_flag'])) {
                 $object->setStockReviewsFlag($data['stock_reviews_flag']);
             }
-            if( !empty( $data['xbj_reviews_flag'] ) ) {
+            if (!empty($data['xbj_reviews_flag'])) {
                 $object->setXbjReviewsFlag($data['xbj_reviews_flag']);
             }
-            if( !empty( $data['returned_date'] ) ) {
+            if (!empty($data['returned_date'])) {
                 $object->setReturnedDate($data['returned_date']);
             }
 
@@ -153,7 +170,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'Customize\Entity\MstProduct',
             'product',
             Join::WITH,
-            "product.product_code = product_returns_info.product_code"
+            'product.product_code = product_returns_info.product_code'
         );
 
         $qb->leftJoin(
@@ -162,11 +179,11 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             Join::WITH,
             'returns_reson.returns_reson_id=product_returns_info.reason_returns_code'
         );
-        
-        $qb->andWhere('product_returns_info.customer_code = :customer_code' )
+
+        $qb->andWhere('product_returns_info.customer_code = :customer_code')
             ->setParameter('customer_code', $customer_code);
         $qb->andWhere('product_returns_info.returns_request_date >= :returns_request_date')
-            ->setParameter('returns_request_date', date("Y-m-d", strtotime("-24 MONTH")));
+            ->setParameter('returns_request_date', date('Y-m-d', strtotime('-24 MONTH')));
         $qb->andWhere(
                 $qb->expr()->exists(
                     $this->getEntityManager()->createQueryBuilder()
@@ -202,38 +219,38 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             GROUP BY shipping1.shipping_code, shipping1.product_code
         ) AS shipping_num");
 
-        if ( !empty($paramSearch['returns_status_flag']) ) {
-            $qb->andWhere( 'product_returns_info.returns_status_flag IN (:returns_status_flag)' )
+        if (!empty($paramSearch['returns_status_flag'])) {
+            $qb->andWhere('product_returns_info.returns_status_flag IN (:returns_status_flag)')
             ->setParameter(':returns_status_flag', $paramSearch['returns_status_flag']);
         }
 
-        if ( !empty($paramSearch['search_jan_code']) ) {
-            $qb->andWhere( 'product_returns_info.jan_code LIKE :search_jan_code' )
+        if (!empty($paramSearch['search_jan_code'])) {
+            $qb->andWhere('product_returns_info.jan_code LIKE :search_jan_code')
                 ->setParameter(':search_jan_code', "%{$paramSearch['search_jan_code']}%");
         }
 
-        if ( !empty($paramSearch['search_shipping_date']) && $paramSearch['search_shipping_date'] != 0 ) {
-            $qb->andWhere( 'product_returns_info.shipping_date LIKE :search_shipping_date' )
+        if (!empty($paramSearch['search_shipping_date']) && $paramSearch['search_shipping_date'] != 0) {
+            $qb->andWhere('product_returns_info.shipping_date LIKE :search_shipping_date')
                 ->setParameter(':search_shipping_date', "{$paramSearch['search_shipping_date']}-%");
         }
 
-        if ( !empty($paramSearch['search_shipping']) && $paramSearch['search_shipping'] != '0' ) {
-            $qb->andWhere( 'product_returns_info.shipping_code = :search_shipping' )
+        if (!empty($paramSearch['search_shipping']) && $paramSearch['search_shipping'] != '0') {
+            $qb->andWhere('product_returns_info.shipping_code = :search_shipping')
                 ->setParameter(':search_shipping', $paramSearch['search_shipping']);
         }
 
-        if ( !empty($paramSearch['search_otodoke']) && $paramSearch['search_otodoke'] != '0' ) {
-            $qb->andWhere( 'product_returns_info.otodoke_code = :search_otodoke' )
+        if (!empty($paramSearch['search_otodoke']) && $paramSearch['search_otodoke'] != '0') {
+            $qb->andWhere('product_returns_info.otodoke_code = :search_otodoke')
                 ->setParameter(':search_otodoke', $paramSearch['search_otodoke']);
         }
-        
-        if ( !empty($paramSearch['search_request_date']) && $paramSearch['search_request_date'] != 0 ) {
-            $qb->andWhere( 'product_returns_info.returns_request_date LIKE :search_request_date' )
+
+        if (!empty($paramSearch['search_request_date']) && $paramSearch['search_request_date'] != 0) {
+            $qb->andWhere('product_returns_info.returns_request_date LIKE :search_request_date')
                 ->setParameter(':search_request_date', "{$paramSearch['search_request_date']}-%");
         }
 
-        if ( !empty($paramSearch['search_reason_return']) && $paramSearch['search_reason_return'] != '0' ) {
-            $qb->andWhere( 'product_returns_info.reason_returns_code = :search_reason_return' )
+        if (!empty($paramSearch['search_reason_return']) && $paramSearch['search_reason_return'] != '0') {
+            $qb->andWhere('product_returns_info.reason_returns_code = :search_reason_return')
                 ->setParameter(':search_reason_return', $paramSearch['search_reason_return']);
         }
 
@@ -256,7 +273,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         $qb->select('product_returns_info.returns_no');
         $qb->from('Customize\Entity\MstProductReturnsInfo', 'product_returns_info');
         $qb->leftJoin('Customize\Entity\DtReturnsReson', 'returns_reson', Join::WITH, 'returns_reson.returns_reson_id=product_returns_info.reason_returns_code');
-        
+
         $qb->addSelect(
             'product_returns_info.returns_request_date',
             'returns_reson.returns_reson',
@@ -269,29 +286,29 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'product_returns_info.shipping_num',
             'product_returns_info.returns_num',
         );
-        
+
         $qb->andWhere('product_returns_info.customer_code = :customer_code')
             ->setParameter('customer_code', $customer_id);
         $qb->andWhere('product_returns_info.returns_request_date >= :returns_request_date')
-            ->setParameter('returns_request_date', date("Y-m-d", strtotime("-14 MONTH")));
+            ->setParameter('returns_request_date', date('Y-m-d', strtotime('-14 MONTH')));
 
-        if ( $param['search_request_date'] != 0 ) {
-            $qb->andWhere( 'product_returns_info.returns_request_date LIKE :search_request_date' )
+        if ($param['search_request_date'] != 0) {
+            $qb->andWhere('product_returns_info.returns_request_date LIKE :search_request_date')
                 ->setParameter(':search_request_date', "{$param['search_request_date']}-%");
         }
 
-        if ( $param['search_reason_return'] != 0 ) {
-            $qb->andWhere( 'product_returns_info.reason_returns_code = :search_reason_return' )
+        if ($param['search_reason_return'] != 0) {
+            $qb->andWhere('product_returns_info.reason_returns_code = :search_reason_return')
                 ->setParameter(':search_reason_return', $param['search_reason_return']);
         }
 
-        if ( $param['search_shipping'] != 0 ) {
-            $qb->andWhere( 'product_returns_info.shipping_code = :search_shipping' )
+        if ($param['search_shipping'] != 0) {
+            $qb->andWhere('product_returns_info.shipping_code = :search_shipping')
                 ->setParameter(':search_shipping', $param['search_shipping']);
         }
 
-        if ( $param['search_otodoke'] != 0 ) {
-            $qb->andWhere( 'product_returns_info.otodoke_code = :search_otodoke' )
+        if ($param['search_otodoke'] != 0) {
+            $qb->andWhere('product_returns_info.otodoke_code = :search_otodoke')
                 ->setParameter(':search_otodoke', $param['search_otodoke']);
         }
 
