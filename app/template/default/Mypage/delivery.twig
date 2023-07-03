@@ -142,7 +142,7 @@ file that was distributed with this source code.
                     <tbody>
                     {% for Order in pagination %}
                         <tr>
-                            <td>
+                            <td title="納品書№ {{ Order.delivery_no }}-{{ Order.delivery_lineno }}, 御社注文№ {{ Order.order_no }}">
                                 {% if global_service.getPdfExportFlg %}
                                     <a target="_blank" href="/mypage/exportOrderPdf?delivery_no={{Order.delivery_no}}">
                                         {{ Order.delivery_no }}
