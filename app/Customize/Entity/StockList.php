@@ -29,6 +29,7 @@ if (!class_exists('\Customize\Entity\StockList', false)) {
         private $customer_code;
         /**
          * @ORM\Column(name="stock_location", type="string", length=10,options={"comment":"保管場所"}, nullable=false)
+         * @ORM\Id
          */
         private $stock_location;
         /**

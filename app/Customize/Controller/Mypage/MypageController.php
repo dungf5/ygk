@@ -23,6 +23,7 @@ use Customize\Repository\OrderRepository;
 use Customize\Repository\ProductImageRepository;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\GlobalService;
+use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Controller\AbstractController;
@@ -33,8 +34,6 @@ use Eccube\Event\EventArgs;
 use Eccube\Form\Type\Front\CustomerLoginType;
 use Eccube\Repository\BaseInfoRepository;
 use Eccube\Repository\CustomerFavoriteProductRepository;
-use Eccube\Service\CartService;
-use Eccube\Service\PurchaseFlow\PurchaseFlow;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -83,15 +82,26 @@ class MypageController extends AbstractController
      * @var GlobalService
      */
     protected $globalService;
+    /**
+     * @var MailService
+     */
+    protected $mailService;
 
     /**
      * MypageController constructor.
      *
      * @param OrderRepository $orderRepository
      * @param ProductImageRepository $productImageRepository
-     * @param CartService $cartService
+     * @param MstShippingRepository $mstShippingRepository
+     * @param OrderItemRepository $orderItemRepository
+     * @param \Twig_Environment $twig
+     * @param EntityManagerInterface $entityManager
      * @param BaseInfoRepository $baseInfoRepository
-     * @param PurchaseFlow $purchaseFlow
+     * @param CustomerFavoriteProductRepository $customerFavoriteProductRepository
+     * @param GlobalService $globalService
+     * @param MailService $mailService
+     *
+     * @throws \Exception
      */
     public function __construct(
         OrderRepository $orderRepository,
@@ -102,7 +112,8 @@ class MypageController extends AbstractController
         EntityManagerInterface $entityManager,
         BaseInfoRepository $baseInfoRepository,
         CustomerFavoriteProductRepository $customerFavoriteProductRepository,
-        GlobalService $globalService
+        GlobalService $globalService,
+        MailService $mailService
     ) {
         $this->orderRepository = $orderRepository;
         $this->productImageRepository = $productImageRepository;
@@ -112,6 +123,7 @@ class MypageController extends AbstractController
         $this->entityManager = $entityManager;
         $myCm = new MyCommonService($this->entityManager);
         $this->globalService = $globalService;
+        $this->mailService = $mailService;
 
         if ($this->twig->getGlobals()['app']->getUser() != null) {
             $MyDataMstCustomer = $myCm->getMstCustomer($this->globalService->customerId());
@@ -127,6 +139,10 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/shipping_list", name="shippingList", methods={"GET"})
      * @Template("/Mypage/shipping_list.twig")
+     *
+     * @param Request $request
+     *
+     * @return array
      */
     public function shippingList(Request $request)
     {
@@ -238,6 +254,13 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/", name="mypage", methods={"GET"})
      * @Template("/Mypage/index.twig")
+     *
+     * @param Request $request
+     * @param PaginatorInterface $paginator
+     *
+     * @return array
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
@@ -256,29 +279,12 @@ class MypageController extends AbstractController
         ];
 
         // paginator
-        $user_login = $this->twig->getGlobals()['app']->getUser();
+        $my_common = new MyCommonService($this->entityManager);
         $customer_id = $this->globalService->customerId();
         $login_type = $this->globalService->getLoginType();
-        $my_common = new MyCommonService($this->entityManager);
-        $customer_code = $user_login->getCustomerCode();
+        $customer_code = $my_common->getMstCustomer($customer_id)['customer_code'] ?? '';
 
-        if (!empty($_SESSION['usc_'.$customer_id]) && !empty($_SESSION['usc_'.$customer_id]['login_code'])) {
-            $represent_code = $_SESSION['usc_'.$customer_id]['login_code'];
-            $temp_customer_code = $my_common->getCustomerRelation($represent_code);
-
-            if (!empty($temp_customer_code)) {
-                $customer_code = $temp_customer_code['customer_code'];
-            }
-        }
-
-        $order_status = $my_common->getOrderStatus($customer_code, $login_type);
-
-        if (empty($order_status)) {
-            $pagination = [];
-            goto No_Data_Case;
-        }
-
-        $qb = $this->orderItemRepository->getQueryBuilderByCustomer($param, $order_status);
+        $qb = $this->orderItemRepository->getQueryBuilderByCustomer($param, $customer_code, $login_type);
 
         // Paginator
         $pagination = $paginator->paginate(
@@ -287,8 +293,6 @@ class MypageController extends AbstractController
             $this->eccubeConfig['eccube_search_pmax'],
             ['distinct' => false]
         );
-
-        No_Data_Case:
 
         $listItem = !is_array($pagination) ? $pagination->getItems() : [];
         $arProductId = [];
@@ -382,7 +386,7 @@ class MypageController extends AbstractController
         ];
 
         for ($i = 1; $i < 14; $i++) {
-            $date = date('Y-m', strtotime("- $i month"));
+            $date = date('Y-m', strtotime(date('Y-m-01')." -$i months"));
             $orderDateList[] = [
                 'key' => (string) $date,
                 'value' => (string) $date,
@@ -442,6 +446,11 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/login", name="mypage_login", methods={"GET", "POST"})
      * @Template("Mypage/login.twig")
+     *
+     * @param Request $request
+     * @param AuthenticationUtils $utils
+     *
+     * @return array|bool[]|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function login(Request $request, AuthenticationUtils $utils)
     {
@@ -554,6 +563,11 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/favorite", name="mypage_favorite", methods={"GET"})
      * @Template("Mypage/favorite.twig")
+     *
+     * @param Request $request
+     * @param PaginatorInterface $paginator
+     *
+     * @return array
      */
     public function favorite(Request $request, PaginatorInterface $paginator)
     {
@@ -591,6 +605,10 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/shipping/change", name="mypage_shipping", methods={"POST"})
      * @Template("Mypage/login.twig")
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function changeShippingCode(Request $request)
     {
@@ -627,17 +645,17 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/shipping/history", name="mypage_shipping_history", methods={"GET"})
      * @Template("Mypage/shipping.twig")
+     *
+     * @param Request $request
+     * @param PaginatorInterface $paginator
+     *
+     * @return array
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
     public function shipping(Request $request, PaginatorInterface $paginator)
     {
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-
-        // paginator
-        $customer_id = $this->globalService->customerId();
-        $user_login = $this->twig->getGlobals()['app']->getUser();
-        $login_type = $this->globalService->getLoginType();
-        $customer_code = $user_login->getCustomerCode();
-        $my_common = new MyCommonService($this->entityManager);
 
         $search_parameter = [
             'shipping_no' => $request->get('shipping_no', ''),
@@ -646,23 +664,13 @@ class MypageController extends AbstractController
             'order_otodoke' => $request->get('order_otodoke', '0'),
         ];
 
-        if (!empty($_SESSION['usc_'.$customer_id]) && !empty($_SESSION['usc_'.$customer_id]['login_code'])) {
-            $represent_code = $_SESSION['usc_'.$customer_id]['login_code'];
-            $temp_customer_code = $my_common->getCustomerRelation($represent_code);
+        // paginator
+        $my_common = new MyCommonService($this->entityManager);
+        $customer_id = $this->globalService->customerId();
+        $login_type = $this->globalService->getLoginType();
+        $customer_code = $my_common->getMstCustomer($customer_id)['customer_code'] ?? '';
+        $qb = $this->orderItemRepository->getShippingByCustomer($search_parameter, $customer_code, $login_type);
 
-            if (!empty($temp_customer_code)) {
-                $customer_code = $temp_customer_code['customer_code'];
-            }
-        }
-
-        $order_status = $my_common->getOrderStatus($customer_code, $login_type);
-
-        if (empty($order_status)) {
-            $pagination = [];
-            goto No_Data_Case;
-        }
-
-        $qb = $this->mstShippingRepository->getQueryBuilderByCustomer($search_parameter, $order_status);
         $pagination = $paginator->paginate(
             $qb,
             $request->get('pageno', 1),
@@ -715,8 +723,6 @@ class MypageController extends AbstractController
 
         $pagination->setItems($listItem);
 
-        No_Data_Case:
-
         $orderShippingList = [];
         $shippingList = $this->globalService->shippingOption();
         if (count($shippingList) > 1) {
@@ -740,7 +746,6 @@ class MypageController extends AbstractController
             }
         }
 
-        // var_dump($orderOtodeokeList);die;
         return [
             'pagination' => $pagination,
             'search_parameter' => $search_parameter,
@@ -755,6 +760,13 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/delivery/history", name="mypage_delivery_history", methods={"GET"})
      * @Template("Mypage/delivery.twig")
+     *
+     * @param Request $request
+     * @param PaginatorInterface $paginator
+     *
+     * @return array
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
     public function delivery(Request $request, PaginatorInterface $paginator)
     {
@@ -855,6 +867,10 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/represent/change", name="mypage_represent", methods={"POST"})
      * @Template("Mypage/login.twig")
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function changeRepresentCode(Request $request)
     {
@@ -889,83 +905,40 @@ class MypageController extends AbstractController
     }
 
     /**
-     * 返品手続き
+     * get product name.
      *
-     * @Route("/mypage/return", name="mypage_return", methods={"GET"})
-     * @Template("Mypage/return.twig")
+     * @Route("/mypage/product/name", name="mypage_product_name", methods={"GET"})
+     * @Template("")
      */
-    public function return(Request $request, PaginatorInterface $paginator)
+    public function getProductName(Request $request)
     {
-        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-        $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
-
-        //Params
-        $param = [
-            'pageno' => $request->get('pageno', 1),
-            'search_jan_code' => $request->get('jan_code', ''),
-            'search_shipping_date' => $request->get('search_shipping_date', 0),
+        $result = [
+            'status' => false,
         ];
 
-        // paginator
-        $user_login = $this->twig->getGlobals()['app']->getUser();
-        $customer_id = $this->globalService->customerId();
-        $login_type = $this->globalService->getLoginType();
-        $my_common = new MyCommonService($this->entityManager);
-        $customer_code = $user_login->getCustomerCode();
+        try {
+            $jan_code = $request->get('jan_code');
+            $shipping_no = $request->get('shipping_no');
 
-        if (!empty($_SESSION['usc_'.$customer_id]) && !empty($_SESSION['usc_'.$customer_id]['login_code'])) {
-            $represent_code = $_SESSION['usc_'.$customer_id]['login_code'];
-            $temp_customer_code = $my_common->getCustomerRelation($represent_code);
-            if (!empty($temp_customer_code)) {
-                $customer_code = $temp_customer_code['customer_code'];
-            }
-        }
-        $order_status = $my_common->getOrderStatus($customer_code, $login_type);
+            $my_common = new MyCommonService($this->entityManager);
+            $product_code = $my_common->getJanCodeToProductCode($jan_code);
 
-        $qb = $this->orderItemRepository->getQueryBuilderReturnByCustomer($param, $order_status);
+            $product_name = $my_common->getJanCodeToProductName($jan_code);
+            $delivered_num = $my_common->getDeliveredNum($shipping_no, $product_code);
+            $returned_num = $my_common->getReturnedNum($shipping_no, $product_code);
 
-        $pagination = $paginator->paginate(
-            $qb,
-            $request->get('pageno', 1),
-            $this->eccubeConfig['eccube_search_pmax'],
-            ['distinct' => false]
-        );
-
-        /*create list order date*/
-        $shipping_date_list = [];
-        for ($i = 0; $i < 24; $i++) {
-            $date = date('Y-m', strtotime("- $i month"));
-            $shipping_date_list[] = [
-                'key' => (string) $date,
-                'value' => (string) $date,
+            $result['data'] = [
+                'jan_code' => $jan_code,
+                'shipping_no' => $shipping_no,
+                'product_name' => $product_name,
+                'delivered_num' => $delivered_num,
+                'returned_num' => $returned_num,
             ];
+            $result['status'] = true;
+        } catch (\Exception $e) {
         }
 
-        return [
-            'pagination' => $pagination,
-            'param' => $param,
-            'shipping_date_list' => $shipping_date_list,
-        ];
-    }
-
-    /**
-     * 返品手続き
-     *
-     * @Route("/mypage/return/create", name="mypage_return_create", methods={"GET"})
-     * @Template("Mypage/return_create.twig")
-     */
-    public function returnCreate(Request $request)
-    {
-        $commonService = new MyCommonService($this->entityManager);
-        $login_type = $this->globalService->getLoginType();
-        $customer_id = $this->globalService->customerId();
-
-        $shippings = $commonService->getMstShippingCustomer($login_type, $customer_id);
-
-        return [
-            'customer_id' => $customer_id,
-            'shippings' => $shippings,
-        ];
+        return $this->json($result, 200);
     }
 
     /**

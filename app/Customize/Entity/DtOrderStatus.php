@@ -1,4 +1,16 @@
 <?php
+
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -170,15 +182,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return string
          */
-        public function getProductCode(): string
+        public function getProductCode()
         {
             return $this->product_code;
         }
 
         /**
-         * @param string $product_code
+         * @param $product_code
          */
-        public function setProductCode(string $product_code): void
+        public function setProductCode($product_code)
         {
             $this->product_code = $product_code;
         }
@@ -186,15 +198,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return string
          */
-        public function getShippingCode(): string
+        public function getShippingCode()
         {
             return $this->shipping_code;
         }
 
         /**
-         * @param string $shipping_code
+         * @param $shipping_code
          */
-        public function setShippingCode(string $shipping_code): void
+        public function setShippingCode($shipping_code)
         {
             $this->shipping_code = $shipping_code;
         }
@@ -202,15 +214,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return string
          */
-        public function getOtodokeCode(): string
+        public function getOtodokeCode()
         {
             return $this->otodoke_code;
         }
 
         /**
-         * @param string $otodoke_code
+         * @param $otodoke_code
          */
-        public function setOtodokeCode(string $otodoke_code): void
+        public function setOtodokeCode($otodoke_code)
         {
             $this->otodoke_code = $otodoke_code;
         }
@@ -226,7 +238,7 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @param mixed $customer_code
          */
-        public function setCustomerCode($customer_code): void
+        public function setCustomerCode($customer_code)
         {
             $this->customer_code = $customer_code;
         }
@@ -242,7 +254,7 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @param mixed $cus_order_lineno
          */
-        public function setCusOrderLineno($cus_order_lineno): void
+        public function setCusOrderLineno($cus_order_lineno)
         {
             $this->cus_order_lineno = $cus_order_lineno;
         }
@@ -250,15 +262,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return string
          */
-        public function getCusOrderNo(): string
+        public function getCusOrderNo()
         {
             return $this->cus_order_no;
         }
 
         /**
-         * @param string $cus_order_no
+         * @param $cus_order_no
          */
-        public function setCusOrderNo(string $cus_order_no): void
+        public function setCusOrderNo($cus_order_no)
         {
             $this->cus_order_no = $cus_order_no;
         }
@@ -266,15 +278,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return string
          */
-        public function getOrderNo(): string
+        public function getOrderNo()
         {
             return $this->order_no;
         }
 
         /**
-         * @param string $order_no
+         * @param $order_no
          */
-        public function setOrderNo(string $order_no): void
+        public function setOrderNo($order_no)
         {
             $this->order_no = $order_no;
         }
@@ -282,15 +294,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return string
          */
-        public function getOrderLineNo(): string
+        public function getOrderLineNo()
         {
             return $this->order_line_no;
         }
 
         /**
-         * @param string $order_line_no
+         * @param $order_line_no
          */
-        public function setOrderLineNo(string $order_line_no): void
+        public function setOrderLineNo($order_line_no)
         {
             $this->order_line_no = $order_line_no;
         }
@@ -306,7 +318,7 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @param mixed $order_status
          */
-        public function setOrderStatus($order_status): void
+        public function setOrderStatus($order_status)
         {
             $this->order_status = $order_status;
         }
@@ -314,15 +326,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return string
          */
-        public function getEcOrderNo(): string
+        public function getEcOrderNo()
         {
             return $this->ec_order_no;
         }
 
         /**
-         * @param string $ec_order_no
+         * @param $ec_order_no
          */
-        public function setEcOrderNo(string $ec_order_no): void
+        public function setEcOrderNo($ec_order_no)
         {
             $this->ec_order_no = $ec_order_no;
         }
@@ -330,15 +342,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return string
          */
-        public function getEcOrderLineno(): string
+        public function getEcOrderLineno()
         {
             return $this->ec_order_lineno;
         }
 
         /**
-         * @param string $ec_order_lineno
+         * @param $ec_order_lineno
          */
-        public function setEcOrderLineno(string $ec_order_lineno): void
+        public function setEcOrderLineno($ec_order_lineno)
         {
             $this->ec_order_lineno = $ec_order_lineno;
         }
@@ -354,7 +366,7 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @param mixed $reserve_stock_num
          */
-        public function setReserveStockNum($reserve_stock_num): void
+        public function setReserveStockNum($reserve_stock_num)
         {
             $this->reserve_stock_num = $reserve_stock_num;
         }
@@ -370,7 +382,7 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @param mixed $order_remain_num
          */
-        public function setOrderRemainNum($order_remain_num): void
+        public function setOrderRemainNum($order_remain_num)
         {
             $this->order_remain_num = $order_remain_num;
         }
@@ -378,15 +390,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return string
          */
-        public function getFlowType(): string
+        public function getFlowType()
         {
             return $this->flow_type;
         }
 
         /**
-         * @param string $flow_type
+         * @param $flow_type
          */
-        public function setFlowType(string $flow_type): void
+        public function setFlowType($flow_type)
         {
             $this->flow_type = $flow_type;
         }
@@ -394,15 +406,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return \DateTime
          */
-        public function getCreateDate(): \DateTime
+        public function getCreateDate()
         {
             return $this->create_date;
         }
 
         /**
-         * @param \DateTime $create_date
+         * @param $create_date
          */
-        public function setCreateDate(\DateTime $create_date): void
+        public function setCreateDate($create_date)
         {
             $this->create_date = $create_date;
         }
@@ -410,15 +422,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return \DateTime
          */
-        public function getUpdateDate(): \DateTime
+        public function getUpdateDate()
         {
             return $this->update_date;
         }
 
         /**
-         * @param \DateTime $update_date
+         * @param $update_date
          */
-        public function setUpdateDate(\DateTime $update_date): void
+        public function setUpdateDate($update_date)
         {
             $this->update_date = $update_date;
         }
@@ -428,7 +440,7 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
          *
          * @param \DateTime|null $orderDate
          */
-        public function setOrderDate(\DateTime $orderDate = null) : void
+        public function setOrderDate($orderDate = null)
         {
             $this->order_date = $orderDate;
         }
@@ -438,23 +450,23 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
          *
          * @return Date|null
          */
-        public function getOrderDate(): Date
+        public function getOrderDate()
         {
             return $this->order_date;
         }
 
         /**
-         * @return string | null
+         * @return string|null
          */
-        public function getEcType(): string
+        public function getEcType()
         {
             return $this->ec_type;
         }
 
         /**
-         * @param string | null $ec_type
+         * @param string|null $ec_type
          */
-        public function setEcType($ec_type = null): void
+        public function setEcType($ec_type = null)
         {
             $this->ec_type = $ec_type;
         }
@@ -542,15 +554,15 @@ if (!class_exists('\Customize\Entity\DtOrderStatus', false)) {
         /**
          * @return int
          */
-        public function getShippingNum(): int
+        public function getShippingNum()
         {
-            return (int)$this->shipping_num;
+            return (int) $this->shipping_num;
         }
 
         /**
          * @param int|null
          */
-        public function setShippingNum($shipping_num = null): void
+        public function setShippingNum($shipping_num = null)
         {
             $this->shipping_num = $shipping_num;
         }
