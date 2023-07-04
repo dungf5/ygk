@@ -15,6 +15,7 @@ namespace Customize\Controller;
 
 use Customize\Common\MyCommon;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\DtOrder;
 use Customize\Entity\MoreOrder;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\GlobalService;
@@ -686,15 +687,34 @@ class MyShoppingController extends AbstractShoppingController
                 $remarks2 = $moreOrder->getRemarks2();
                 $remarks3 = $moreOrder->getRemarks3();
                 $remarks4 = $moreOrder->getRemarks4();
+                $customer_order_no = $moreOrder->getCustomerOrderNo();
                 $location = $comS->getCustomerLocation($customerCode);
                 $reCustomer = $comS->getCustomerRelationFromUser($customerCode, $login_type, $login_code);
                 $fusrdec1 = ($comS->getMstCustomerCode($reCustomer['customer_code'] ?? ''))['fusrdec1'] ?? 0;
 
+                $item_index = 0;
+                if (!empty($customer_order_no)) {
+                    $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findOneBy([
+                        'customer_code' => trim($reCustomer['customer_code'] ?? ''),
+                        'order_no' => trim($customer_order_no),
+                    ], [
+                        'order_lineno' => 'DESC',
+                    ]);
+                }
+
+                if (!empty($dtOrder)) {
+                    $item_index = (int) $dtOrder['order_lineno'];
+                }
+
                 foreach ($itemList as $itemOr) {
                     if ($itemOr->isProduct()) {
+                        $item_index++;
+
                         $arEcLData[] = [
                             'ec_order_no' => $orderNo,
-                            'ec_order_lineno' => $itemOr->getId(),
+                            'ec_order_lineno' => $item_index,
+                            'order_no' => !empty($customer_order_no) ? trim($customer_order_no) : $orderNo,
+                            'order_lineno' => $item_index,
                             'product_code' => $hsArrEcProductCusProduct[$itemOr->getId()],
                             'customer_code' => $reCustomer['customer_code'] ?? '',
                             'shipping_code' => $ship_code,
@@ -749,7 +769,8 @@ class MyShoppingController extends AbstractShoppingController
             $this->cartService->clear();
 
             // 受注IDをセッションにセット
-            $this->session->set(OrderHelper::SESSION_ORDER_ID, $Order->getId());
+            // Change by task #1933
+            $this->session->set(OrderHelper::SESSION_ORDER_ID, !empty($customer_order_no) ? $customer_order_no : $Order->getId());
             $commonService = new MyCommonService($this->entityManager);
             $rate = $commonService->getTaxInfo()['tax_rate'];
             $tax = (float) $Order->getTotal() / (float) $rate;
@@ -1013,6 +1034,48 @@ class MyShoppingController extends AbstractShoppingController
             return $this->json(['status' => 1, 'msg' => ''], 200);
         } catch (\Exception $e) {
             return $this->json(['status' => 0, 'msg' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * Check Merge Order.
+     *
+     * @Route("/shopping/order/merge", name="check_merge_order", methods={"POST"})
+     */
+    public function checkMergeOrder(Request $request)
+    {
+        try {
+            if ('POST' === $request->getMethod()) {
+                $customer_order_no = $request->get('customer_order_no', '');
+
+                $commonService = new MyCommonService($this->entityManager);
+                $customer_id = $this->globalService->customerId();
+                $login_type = $this->globalService->getLoginType();
+                $login_code = $this->globalService->getLoginCode();
+                $arCusLogin = $commonService->getMstCustomer($customer_id);
+                $relationCus = $commonService->getCustomerRelationFromUser($arCusLogin['customer_code'], $login_type, $login_code);
+
+                // Get customer_code from dt_customer_relation
+                $customer_code = $relationCus['customer_code'] ?? '';
+
+                if (!empty($customer_code) && !empty($customer_order_no)) {
+                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                    $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findOneBy([
+                        'customer_code' => trim($customer_code),
+                        'order_no' => trim($customer_order_no),
+                    ], [
+                        'order_lineno' => 'DESC',
+                    ]);
+
+                    if (!empty($dtOrder)) {
+                        return $this->json(['status' => 1], 200);
+                    }
+                }
+            }
+
+            return $this->json(['status' => 0], 200);
+        } catch (\Exception $e) {
+            return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
         }
     }
 }

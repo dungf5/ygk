@@ -282,12 +282,6 @@ $(function () {
         let valbill_addressInput    = $("input[name='bill_address']").val();//leng =1
         let ishow2_addressInputOk   = 0;
 
-        //Check customer_order_no (客先発注番号)
-        let customer_order_no = $("input[name='customer_order_no']").val();
-        if (customer_order_no.trim() != '') {
-            isSubmit = handleConfirmMergeOrder(customer_order_no);
-        }
-
         if (valbill_addressInput!=null || valbill_addressInput!='' ) {
             ishow2_addressInputOk=1;
         }
@@ -342,17 +336,49 @@ $(function () {
             else {
                 $('.error_delivery_address').hide();
             }
-
-            if (checkDate() && isSubmit === 1) {
-                $('#shopping-form').submit();
-            }
         }
         else {
             $('.error_delivery_address').hide();
         }
 
         if (checkDate() && isSubmit === 1) {
-            $('#shopping-form').submit();
+            //Check customer_order_no (客先発注番号)
+            let customer_order_no = $("input[name='customer_order_no']").val();
+            if (customer_order_no.trim() != '') {
+                // swal({
+                //     text: "入力された客先発注番号＝画面.客先発注番号はすでに存在します\n"+
+                //         "現在の注文を客先発注番号＝画面.客先発注番号に追加しますか\n"+
+                //         "追加しない場合はキャンセル押下後、客先発注番号を\n"+
+                //         "変更して下さい\n",
+                //     type: 'info',
+                //     showCancelButton: true,
+                //     confirmButtonColor: '#3085d6',
+                //     cancelButtonColor: '#d33',
+                //     confirmButtonText: '追加',
+                //     cancelButtonText: "キャンセル",
+                // }).then(function(result) {
+                //     $('#shopping-form').submit();
+                // })
+
+                let isConfirm = confirm('入力された客先発注番号＝画面.客先発注番号はすでに存在します\n'+
+                '現在の注文を客先発注番号＝画面.客先発注番号に追加しますか\n'+
+                '追加しない場合はキャンセル押下後、客先発注番号を\n'+
+                '変更して下さい\n');
+
+                if (!isConfirm) {
+                    $("input[name='customer_order_no']").val('');
+                    handelUpdateTempOrder('customer_order_no', '');
+
+                    setTimeout(function() {
+                        $('#shopping-form').submit();
+                    }, 2000);
+
+                } else {
+                    $('#shopping-form').submit();
+                }
+            } else {
+                $('#shopping-form').submit();
+            }
         }
     });
     //end validate sumit
@@ -385,37 +411,6 @@ $(function () {
         updateShipingAddress('{{ Order.mstShips[0]["shipping_code"] }}');
     {% endif %}
 });
-
-function handleConfirmMergeOrder(customer_order_no) {
-    let status = 1;
-
-    status = confirm('入力された客先発注番号＝画面.客先発注番号はすでに存在します\n'+
-'現在の注文を客先発注番号＝画面.客先発注番号に追加しますか\n'+
-'追加しない場合はキャンセル押下後、客先発注番号を\n'+
-'変更して下さい\n');
-
-    $.ajax({
-        url: '{{ url('cart_save_temp') }}',
-        type: 'POST',
-        data: {
-            customer_order_no:customer_order_no ,
-            '_token':'{{ csrf_token('_token') }}',
-        }
-    })
-    .done(function(htmlRe, statusText, jqXHR) {
-
-    })
-    .fail(function(jqXHR, statusText, errorThrown) {
-        status = 0
-    });
-
-    if (!status) {
-        $("input[name='customer_order_no']").val('');
-        $("input[name='customer_order_no']").keyup();
-    }
-
-    return status;
-}
 
 function updateShipingAddress(shipping_code) {
     $('.error_delivery_address').hide();
@@ -682,6 +677,20 @@ function updateDeliverydAdress(delivery_code) {
         }, doneTypingInterval);
     }
 
+    function confirmMergeOrder(target) {
+        $("button.mySubmitConfirm").prop("disabled", true);
+        let name                = target['name'];
+        let value               = target['value'];
+
+        clearTimeout(typingRemarksTimer);
+        loadingOverlay('hide');
+
+        typingRemarksTimer      = setTimeout(function () {
+            handleConfirmMergeOrder(name, value);
+        }, doneTypingInterval);
+    }
+
+
     function handelUpdateTempOrder(name, value) {
         loadingOverlay();
         let remarks1    = $("input[name=remarks1]").val();
@@ -721,6 +730,32 @@ function updateDeliverydAdress(delivery_code) {
             $("button.mySubmitConfirm").prop("disabled", false);
         });
     }
+
+    function handleConfirmMergeOrder(name, value) {
+    let status = 0;
+    $.ajax({
+        url: '{{ url('check_merge_order') }}',
+        type: 'POST',
+        data: {
+            customer_order_no:value,
+            '_token':'{{ csrf_token('_token') }}',
+        }
+    })
+    .done(function(data) {
+        status = data.status;
+    })
+    .fail(function(data) {})
+    .always(function() {
+        if (status == 1) {
+            handelUpdateTempOrder(name, value);
+        } else {
+            $("input[name='customer_order_no']").val('');
+            handelUpdateTempOrder(name, '');
+        }
+
+        $("button.mySubmitConfirm").prop("disabled", false);
+    });
+}
 </script>
 {% endblock javascript %}
 
@@ -1313,7 +1348,7 @@ function updateDeliverydAdress(delivery_code) {
                         <div style="background-color: #ffdc00; font-weight: bold">客先発注番号</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="customer_order_no" id="customer_order_no" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.customer_order_no }} {% endif %}" onkeyup="updateTempOrder(this)" maxlength="20">
+                        <input type="text" class="form-control" name="customer_order_no" id="customer_order_no" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.customer_order_no }} {% endif %}" onkeyup="confirmMergeOrder(this)" maxlength="20">
                     </div>
                 </div>
                 {#Customer Order No#}
