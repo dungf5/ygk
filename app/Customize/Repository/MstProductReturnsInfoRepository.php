@@ -382,11 +382,9 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'product_returns_info.returns_no',
             'product_returns_info.returns_num',
             'product_returns_info.returns_status_flag',
-            'product_returns_info.shipping_no',
-            'product_returns_info.shipping_date',
-            'product_returns_info.shipping_name',
-            'product_returns_info.otodoke_name',
-            'product_returns_info.jan_code',
+            'shipping.shipping_no',
+            'shipping.shipping_date',
+            'product.jan_code',
             'product_returns_info.returns_request_date',
             'product.product_code',
             'product.product_name',
@@ -394,28 +392,31 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'shipping.shipping_num'
         );
 
+        $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = shipping.shipping_code) shipping_name')
+        ->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = shipping.otodoke_code) otodoke_name');
+
         if (!empty($paramSearch['returns_status_flag'])) {
             $qb->andWhere('product_returns_info.returns_status_flag IN (:returns_status_flag)')
                 ->setParameter(':returns_status_flag', $paramSearch['returns_status_flag']);
         }
 
         if (!empty($paramSearch['search_jan_code'])) {
-            $qb->andWhere('product_returns_info.jan_code LIKE :search_jan_code')
+            $qb->andWhere('product.jan_code LIKE :search_jan_code')
                 ->setParameter(':search_jan_code', "%{$paramSearch['search_jan_code']}%");
         }
 
         if (!empty($paramSearch['search_shipping_date']) && $paramSearch['search_shipping_date'] != 0) {
-            $qb->andWhere('product_returns_info.shipping_date LIKE :search_shipping_date')
+            $qb->andWhere('shipping.shipping_date LIKE :search_shipping_date')
                 ->setParameter(':search_shipping_date', "{$paramSearch['search_shipping_date']}-%");
         }
 
         if (!empty($paramSearch['search_shipping']) && $paramSearch['search_shipping'] != '0') {
-            $qb->andWhere('product_returns_info.shipping_code = :search_shipping')
+            $qb->andWhere('shipping.shipping_code = :search_shipping')
                 ->setParameter(':search_shipping', $paramSearch['search_shipping']);
         }
 
         if (!empty($paramSearch['search_otodoke']) && $paramSearch['search_otodoke'] != '0') {
-            $qb->andWhere('product_returns_info.otodoke_code = :search_otodoke')
+            $qb->andWhere('shipping.otodoke_code = :search_otodoke')
                 ->setParameter(':search_otodoke', $paramSearch['search_otodoke']);
         }
 
@@ -429,12 +430,14 @@ class MstProductReturnsInfoRepository extends AbstractRepository
                 ->setParameter(':search_reason_return', $paramSearch['search_reason_return']);
         }
 
-        $qb->addGroupBy('shipping.cus_order_no');
-        $qb->addGroupBy('shipping.cus_order_lineno');
+        $qb->addGroupBy('shipping.shipping_no');
+        $qb->addGroupBy('shipping.order_no');
+        $qb->addGroupBy('shipping.order_lineno');
 
-        $qb->addOrderBy('order_status.order_date', 'DESC');
-        $qb->addOrderBy('order_status.cus_order_no', 'DESC');
-        $qb->addOrderBy('order_status.cus_order_lineno', 'asc');
+        $qb->addOrderBy('shipping.shipping_date', 'DESC');
+        $qb->addOrderBy('shipping.shipping_no', 'DESC');
+        $qb->addOrderBy('shipping.order_no', 'DESC');
+        $qb->addOrderBy('shipping.order_lineno', 'ASC');
 
 //         dump($qb->getQuery()->getSQL());
 //         dump($qb->getParameters());

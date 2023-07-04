@@ -963,18 +963,17 @@ class MypageController extends AbstractController
             $shipping_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
         }
 
-        $shippings = $my_common->getMstShippingCustomer($login_type, $customer_id);
-        $otodokes = [];
-        if ($param['search_shipping'] > 0) {
-            $otodokes = $this->globalService->otodokeOption($customer_id, $param['search_shipping']);
-        }
+        $shippingList = $this->globalService->shippingOption();
+
+        $search_shipping = (isset($param['search_shipping']) && $param['search_shipping'] != '0') ? $param['search_shipping'] : ($this->globalService->getShippingCode());
+        $otodokes = $this->globalService->otodokeOption($customer_id, $search_shipping);
 
         return [
             'pagination' => $pagination,
             'customer_id' => $customer_id,
             'param' => $param,
             'shipping_date_list' => $shipping_date_list,
-            'shippings' => $shippings,
+            'shippings' => count($shippingList) > 1 ? $shippingList : [],
             'otodokes' => $otodokes,
         ];
     }
