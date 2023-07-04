@@ -195,13 +195,13 @@
 								{% else %}
 									<tr ondblclick="$('#return_create_{{index}}').submit()" >
 								{% endif %}
-										<td title="return_type">
+										<td title="手続き">
 											<button type="submit" class="btn btn-warning" role="button">手続き</button> 
 										</td>
-										<td title="return_number">
+										<td title={{ item.returns_num }}>
 											<input type="number" id="returns_num" name="returns_num" class="form-control" value="{{ item.returns_num }}"/>
 										</td>
-										<td title="return_status">
+										<td title={{ item.returns_status_flag  is empty ? "" : item.returns_status_flag }}>
 											{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
 												{% if item.returns_status_flag == 0 %}
 													<p class="text-nowrap">申請中</p>
@@ -220,21 +220,21 @@
 												<p class="text-nowrap"></p>
 											{% endif %}
 										</td>
-										<td title="shipping_no">
+										<td title={{ item.shipping_no }}>
 											<p class="text-nowrap">{{ item.shipping_no }}</p>
 										</td>
-										<td title="shipping_date">
+										<td title={{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}>
 											<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
 										</td>
-										<td title="shiping_code otodoke_code">
+										<td title='{{ item.shipping_name }} - {{ item.otodoke_name }}'>
 											<p class="text-nowrap">{{ item.shipping_name }}</p>
 											<p class="text-nowrap">{{ item.otodoke_name }}</p>
 										</td>
-										<td title="jan_code product_name">
+										<td title='{{ item.jan_code }} {{ item.product_name }}'>
 											<p class="text-nowrap">{{ item.jan_code }}</p>
 											<p class="text-nowrap">{{ item.product_name }}</p>
 										</td>
-										<td title="shipping_num">
+										<td title={{ item.shipping_num }}>
 											<p class="text-nowrap">{{ item.shipping_num }}</p>
 										</td>
 									</tr>
