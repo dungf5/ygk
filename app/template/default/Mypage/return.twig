@@ -202,18 +202,22 @@
 											<input type="number" id="returns_num" name="returns_num" class="form-control" value="{{ item.returns_num }}"/>
 										</td>
 										<td title="return_status">
-											{% if item.returns_status_flag == 1 %}
-												<p class="text-nowrap">承認</p>
-											{% elseif item.returns_status_flag == 2 %}
-												<p class="text-nowrap">未承認</p>
-											{% elseif item.returns_status_flag == 3 %}
-												<p class="text-nowrap">受取受理</p>
-											{% elseif item.returns_status_flag == 4 %}
-												<p class="text-nowrap">受取未受理</p>
-											{% elseif item.returns_status_flag == 5 %}
-												<p class="text-nowrap">返品完了</p>
+											{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
+												{% if item.returns_status_flag == 0 %}
+													<p class="text-nowrap">申請中</p>
+												{% elseif item.returns_status_flag == 1 %}
+													<p class="text-nowrap">承認</p>
+												{% elseif item.returns_status_flag == 2 %}
+													<p class="text-nowrap">未承認</p>
+												{% elseif item.returns_status_flag == 3 %}
+													<p class="text-nowrap">受取受理</p>
+												{% elseif item.returns_status_flag == 4 %}
+													<p class="text-nowrap">受取未受理</p>
+												{% elseif item.returns_status_flag == 5 %}
+													<p class="text-nowrap">返品完了</p>
+												{% endif %}
 											{% else %}
-												<p class="text-nowrap">申請中</p>
+												<p class="text-nowrap"></p>
 											{% endif %}
 										</td>
 										<td title="shipping_no">
