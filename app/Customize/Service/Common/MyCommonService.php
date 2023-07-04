@@ -2128,6 +2128,11 @@ SQL;
             $orderItem->setRemarks4($value);
         }
 
+        if ($name == 'customer_order_no') {
+            $orderItem->setPreOrderId($pre_order_id);
+            $orderItem->setCustomerOrderNo($value);
+        }
+
         $this->entityManager->persist($orderItem);
         $this->entityManager->flush();
     }
