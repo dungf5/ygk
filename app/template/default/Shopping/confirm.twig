@@ -375,6 +375,23 @@ file that was distributed with this source code.
                 </div>
             </div>
 
+            {#Customer Order No#}
+            <div class="shipping_destination">
+                <div class="shipping_destination_left">
+                    <div style="background-color: #ffdc00; font-weight: bold">客先発注番号</div>
+                </div>
+                <div class="shipping_destination_right">
+                    <div>
+                        <div>
+                            {% if Order.MoreOrder is defined %}
+                                {{ Order.MoreOrder.customer_order_no }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {#Customer Order No#}
+
             {# Remarks#}
             <div class="shipping_destination">
                 <p>
