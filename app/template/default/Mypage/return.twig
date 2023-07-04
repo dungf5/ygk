@@ -146,7 +146,7 @@
 									{% endfor %}
 								</select>
 								<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_shipping').select2('open')">
-									{{ "front.mypage.return.shiping_code" | trans | raw}} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+									{{ "front.mypage.return.shiping_code" | trans | raw}} <span class="glyphicon glyphicon-triangle-bottom" style="color: red; {% if shippings|length < 2 %} visibility: hidden; {% endif %}"></span>
 								</a>
 								<br/>
 								<select class="hidden" id="search_otodoke" name="search_otodoke">
@@ -220,7 +220,7 @@
 											<p class="text-nowrap">{{ item.shipping_no }}</p>
 										</td>
 										<td title="shipping_date">
-											<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y/m/d') }}</p>
+											<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
 										</td>
 										<td title="shiping_code otodoke_code">
 											<p class="text-nowrap">{{ item.shipping_name }}</p>
