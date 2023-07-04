@@ -1078,4 +1078,51 @@ class MyShoppingController extends AbstractShoppingController
             return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
         }
     }
+
+    /**
+     * 購入完了画面を表示する.
+     *
+     * @Route("/shopping/complete", name="shopping_complete", methods={"GET"})
+     * @Template("Shopping/complete.twig")
+     */
+    public function complete(Request $request)
+    {
+        log_info('[注文完了] 注文完了画面を表示します.');
+
+        // 受注IDを取得
+        $orderId = $this->session->get(OrderHelper::SESSION_ORDER_ID);
+
+        if (empty($orderId)) {
+            log_info('[注文完了] 受注IDを取得できないため, トップページへ遷移します.');
+
+            return $this->redirectToRoute('homepage');
+        }
+
+        $Order = $this->orderRepository->find($orderId);
+
+        $event = new EventArgs(
+            [
+                'Order' => $Order,
+            ],
+            $request
+        );
+        $this->eventDispatcher->dispatch(EccubeEvents::FRONT_SHOPPING_COMPLETE_INITIALIZE, $event);
+
+        if ($event->getResponse() !== null) {
+            return $event->getResponse();
+        }
+
+        log_info('[注文完了] 購入フローのセッションをクリアします. ');
+        $this->orderHelper->removeSession();
+
+        $hasNextCart = !empty($this->cartService->getCarts());
+
+        log_info('[注文完了] 注文完了画面を表示しました. ', [$hasNextCart]);
+
+        return [
+            'Order' => $Order,
+            'order_no' => $orderId,
+            'hasNextCart' => $hasNextCart,
+        ];
+    }
 }
