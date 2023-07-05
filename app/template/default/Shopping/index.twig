@@ -343,7 +343,7 @@ $(function () {
 
         if (checkDate() && isSubmit === 1) {
             //Check customer_order_no (客先発注番号)
-            let customer_order_no = $("input[name='customer_order_no']").val();
+            let customer_order_no = $("input[name='temp_customer_order_no']").val();
             if (customer_order_no.trim() != '') {
                 // swal({
                 //     text: "入力された客先発注番号＝画面.客先発注番号はすでに存在します\n"+
@@ -367,6 +367,7 @@ $(function () {
 
                 if (!isConfirm) {
                     $("input[name='customer_order_no']").val('');
+                    $("input[name='temp_customer_order_no']").val('');
                     handelUpdateTempOrder('customer_order_no', '');
 
                     setTimeout(function() {
@@ -747,9 +748,11 @@ function updateDeliverydAdress(delivery_code) {
     .fail(function(data) {})
     .always(function() {
         if (status == 1) {
+            $("input[name='temp_customer_order_no']").val(value);
             handelUpdateTempOrder(name, value);
         } else {
             // $("input[name='customer_order_no']").val('');
+            $("input[name='temp_customer_order_no']").val('');
             handelUpdateTempOrder(name, '');
         }
 
@@ -1349,6 +1352,7 @@ function updateDeliverydAdress(delivery_code) {
                     </div>
                     <div class="col-md-12" style="padding: 0">
                         <input type="text" class="form-control" name="customer_order_no" id="customer_order_no" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.customer_order_no }} {% endif %}" onkeyup="confirmMergeOrder(this)" maxlength="20">
+                        <input type="hidden" name="temp_customer_order_no" value="">
                     </div>
                 </div>
                 {#Customer Order No#}
