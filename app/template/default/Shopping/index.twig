@@ -1276,7 +1276,7 @@ function updateDeliverydAdress(delivery_code) {
                 </div>
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
                     <div class="shipping_destination_left">
-                        <div>発生書備考</div>
+                        <div>発注書備考</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
                         <input type="text" class="form-control" name="remarks3" id="remarks3" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks3 }} {% endif %}" onkeyup="updateRemarks(this)">
@@ -1291,7 +1291,7 @@ function updateDeliverydAdress(delivery_code) {
                 </div>
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
                     <div class="shipping_destination_left">
-                        <div>発生書コメント</div>
+                        <div>発注書コメント</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
                         <input type="text" class="form-control" name="remarks4" id="remarks4" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks4 }} {% endif %}" onkeyup="updateRemarks(this)">
