@@ -112,7 +112,7 @@
 								<label for="shipping_num">出荷数</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ delivered_num }}</p>
+								<p class="text-nowrap">{{ shipping_num }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -305,7 +305,7 @@
 	});
 	$.validator.addMethod('return_num', function(value, element, param) {
 		if( value <= 0 ) return false;
-		if( value > {{ delivered_num - returned_num }} ) return false;
+		if( value > {{ shipping_num - returned_num }} ) return false;
 		return true;
 	});
 	$( function() {	
