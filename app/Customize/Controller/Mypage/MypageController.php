@@ -981,7 +981,7 @@ class MypageController extends AbstractController
     /**
      * 返品手続き
      *
-     * @Route("/mypage/return/create", name="mypage_return_create", methods={"GET"})
+     * @Route("/mypage/return/create", name="mypage_return_create", methods={"GET", "POST"})
      * @Template("Mypage/return_create.twig")
      */
     public function returnCreate(Request $request)
@@ -1005,6 +1005,11 @@ class MypageController extends AbstractController
                 'return_status' => $request->get('return_status', 0),
                 'shipping_code' => $request->get('shipping_code', $customer_shipping_code),
                 'otodoke_code' => $request->get('otodoke_code', $customer_otodoke_code),
+                'return_num' => $request->get('return_num', ''),
+                'return_reason' => $request->get('return_reason', ''),
+                'customer_comment' => $request->get('customer_comment', ''),
+                'product_status' => $request->get('product_status', '1'),
+                'product_code' => $request->get('product_code', ''),
             ];
 
             $returns_reson = $commonService->getReturnsReson();
@@ -1064,7 +1069,7 @@ class MypageController extends AbstractController
             $return_status = $request->get('return_status', '');
             $return_reason = $request->get('return_reason', '');
             $customer_comment = $request->get('customer_comment', '');
-            $rerurn_num = $request->get('rerurn_num', '');
+            $return_num = $request->get('return_num', '');
             $product_status = $request->get('product_status', '');
             $cus_image_url_path = $request->get('cus_image_url_path', []);
 
@@ -1089,7 +1094,7 @@ class MypageController extends AbstractController
                 }
             }
             $product_name = $commonService->getJanCodeToProductName($jan_code);
-            $delivered_num = $commonService->getDeliveredNum($shipping_no, $product_code);
+            $shipping_num = $commonService->getDeliveredNum($shipping_no, $product_code);
             $returned_num = $commonService->getReturnedNum($shipping_no, $product_code);
 
             $images = $request->files->get('images', []);
@@ -1125,12 +1130,12 @@ class MypageController extends AbstractController
             if (empty($customer_comment)) {
                 $errors['customer_comment'] = '顧客コメントを入力してください。';
             }
-            if (empty($rerurn_num)) {
-                $errors['rerurn_num'] = '返品数を入力してください。';
+            if (empty($return_num)) {
+                $errors['return_num'] = '返品数を入力してください。';
             } else {
-                $cond = $delivered_num > $returned_num ? $delivered_num - $returned_num : $delivered_num;
-                if ($rerurn_num > $cond) {
-                    $errors['rerurn_num'] = '出荷数以上の数量は入力できません。';
+                $cond = $shipping_num > $returned_num ? $shipping_num - $returned_num : $shipping_num;
+                if ($return_num > $cond) {
+                    $errors['return_num'] = '出荷数以上の数量は入力できません。';
                 }
             }
             if (count($images) < 1) {
@@ -1149,7 +1154,7 @@ class MypageController extends AbstractController
                 'shipping_name' => $shipping_name,
                 'otodoke_code' => $otodoke_code,
                 'otodoke_name' => $otodoke_name,
-                'delivered_num' => $delivered_num,
+                'shipping_num' => $shipping_num,
                 'returned_num' => $returned_num,
                 'shipping_no' => $shipping_no,
                 'shipping_day' => $shipping_day,
@@ -1162,7 +1167,7 @@ class MypageController extends AbstractController
                 'returns_reson_text' => $returns_reson_text,
                 'return_reason' => $return_reason,
                 'customer_comment' => $customer_comment,
-                'rerurn_num' => $rerurn_num,
+                'return_num' => $return_num,
                 'product_status' => $product_status,
                 'cus_image_url_path' => $cus_image_url_path,
                 'errors' => $errors,
@@ -1178,7 +1183,7 @@ class MypageController extends AbstractController
      * 返却手続き保存
      *
      * @Route("/mypage/return/save", name="mypage_return_save", methods={"POST"})
-     * @Template("Mypage/return_save.twig")
+     * @Template("Mypage/return_create.twig")
      */
     public function returnSave(Request $request)
     {
@@ -1187,121 +1192,323 @@ class MypageController extends AbstractController
             $login_type = $this->globalService->getLoginType();
             $customer_id = $this->globalService->customerId();
             $customer_code = $this->globalService->customerCode();
-            $customer = $this->globalService->customer();
+            $company_name = $this->globalService->companyName();
+            $customer_shipping_code = $this->globalService->getShippingCode();
+            $customer_otodoke_code = $this->globalService->getOtodokeCode();
 
-            $returns_no = $request->get('returns_no');
-            $shipping_code = $request->get('shipping_code', '');
-            $otodoke_code = $request->get('otodoke_code', '');
-            $shipping_no = $request->get('shipping_no', '');
-            $shipping_day = $request->get('shipping_day', '');
-            $jan_code = $request->get('jan_code', '');
-            $product_code = $request->get('product_code', '');
-            $return_reason = $request->get('return_reason');
-            $customer_comment = $request->get('customer_comment', '');
-            $rerurn_num = $request->get('rerurn_num', '');
-            $product_status = $request->get('product_status', '');
-            $cus_image_url_path = $request->get('cus_image_url_path', []);
+            //Params
+            $param = [
+                'shipping_no' => $request->get('shipping_no', ''),
+                'shipping_day' => $request->get('shipping_day', ''),
+                'jan_code' => $request->get('jan_code', ''),
+                'product_name' => $request->get('product_name', ''),
+                'shipping_num' => $request->get('shipping_num', ''),
+                'return_status' => $request->get('return_status', 0),
+                'shipping_code' => $request->get('shipping_code', $customer_shipping_code),
+                'otodoke_code' => $request->get('otodoke_code', $customer_otodoke_code),
+                'return_num' => $request->get('return_num', ''),
+                'return_reason' => $request->get('return_reason', ''),
+                'customer_comment' => $request->get('customer_comment', ''),
+                'product_status' => $request->get('product_status', '1'),
+                'product_code' => $request->get('product_code', ''),
+            ];
 
+            $returns_reson = $commonService->getReturnsReson();
             $shippings = $commonService->getMstShippingCustomer($login_type, $customer_id);
-            $shipping_name = '';
-            foreach ($shippings as $shipping) {
-                if ($shipping['shipping_no'] == $shipping_code) {
-                    $shipping_name = "{$shipping['name01']} 〒 {$shipping['postal_code']} {$shipping['addr01']} {$shipping['addr03']} {$shipping['addr03']}";
+            $otodokes = [];
+            if (empty($param['shipping_code'])) {
+                $param['shipping_code'] = $shippings[0]['shipping_no'];
+            }
+
+            if (!empty($param['shipping_code'])) {
+                $otodokes = $this->globalService->otodokeOption($customer_id, $param['shipping_code']);
+                if (empty($param['otodoke_code'])) {
+                    $param['otodoke_code'] = $otodokes[0]['otodoke_code'];
                 }
             }
-            $otodokes = $this->globalService->otodokeOption($customer_id, $shipping_code);
-            $otodoke_name = '';
-            foreach ($otodokes as $otodoke) {
-                if ($otodoke['otodoke_code'] == $otodoke_code) {
-                    $otodoke_name = "{$otodoke['name01']} 〒 {$otodoke['postal_code']} {$otodoke['addr01']} {$otodoke['addr03']} {$otodoke['addr03']}";
+
+            $errors = [];
+            if (empty($param['shipping_no'])) {
+                $errors['shipping_no'] = '出荷指示№を入力してください。';
+            }
+
+            if (empty($param['jan_code'])) {
+                $errors['jan_code'] = 'JANコードを入力してください。';
+            }
+
+            if (empty($param['return_reason'])) {
+                $errors['return_reason'] = '返品理由を入力してください。';
+            }
+
+            if (empty($param['customer_comment'])) {
+                $errors['customer_comment'] = '顧客コメントを入力してください。';
+            }
+
+            if (empty($param['return_num'])) {
+                $errors['return_num'] = '返品数を入力してください。';
+            } else {
+                $cond = $param['shipping_num'] > $param['return_num'] ? $param['shipping_num'] - $param['return_num'] : $param['shipping_num'];
+                if ($param['return_num'] > $cond) {
+                    $errors['return_num'] = '出荷数以上の数量は入力できません。';
                 }
             }
 
             $images = $request->files->get('images', []);
-            if (is_array($images) && count($images) > 0) {
-                foreach ($images as $image) {
-                    $mimeType = $image->getMimeType();
-                    if (0 !== strpos($mimeType, 'image')) {
-                        break;
-                    }
 
-                    $extension = $image->getClientOriginalExtension();
-                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
-                        break;
-                    }
+            if (count($images) < 1) {
+                $errors['images'] = '商品画像をファイル添付より選択してください。';
+            }
+            if (count($images) > 6) {
+                $errors['images'] = '最大6枚の画像';
+            }
 
-                    $size = $image->getSize();
-                    if ($size / 1024 / 1024 > 7) {
-                        break;
-                    }
+            if (!empty($errors)) {
+                return [
+                    'customer_id' => $customer_id,
+                    'customer_code' => $customer_code,
+                    'company_name' => $company_name,
+                    'returns_reson' => $returns_reson,
+                    'shippings' => $shippings,
+                    'otodokes' => $otodokes,
+                    'customer_shipping_code' => $param['shipping_code'],
+                    'customer_otodoke_code' => $param['otodoke_code'],
+                    'param' => $param,
+                    'errors' => $errors,
+                ];
 
-                    $filename = date('ymdHis').uniqid('_').'.'.$extension;
-                    $path = $this->getParameter('eccube_return_image_dir');
-                    if ($image->move($this->getParameter('eccube_return_image_dir'), $filename)) {
-                        $cus_image_url_path[] = str_replace($this->getParameter('eccube_html_dir'), 'html', $path).'/'.$filename;
+            } else {
+                // Insert mst_product_returns_info
+                $returns_no = $commonService->getReturnsNo();
+
+                $shippings = $commonService->getMstShippingCustomer($login_type, $customer_id);
+                $shipping_name = '';
+                foreach ($shippings as $shipping) {
+                    if ($shipping['shipping_no'] == $param['shipping_code']) {
+                        $shipping_name = "{$shipping['name01']} 〒 {$shipping['postal_code']} {$shipping['addr01']} {$shipping['addr03']} {$shipping['addr03']}";
                     }
                 }
-            }
 
-            $returns_no = !empty($returns_no) ? $returns_no : $commonService->getReturnsNo();
-            $shipping_date = date('Y-m-d', strtotime(str_replace('/', '-', $shipping_day)));
-            $shipping_num = $commonService->getDeliveredNum($shipping_no, $product_code);
+                $otodokes = $this->globalService->otodokeOption($customer_id, $param['shipping_code']);
+                $otodoke_name = '';
+                foreach ($otodokes as $otodoke) {
+                    if ($otodoke['otodoke_code'] == $param['otodoke_code']) {
+                        $otodoke_name = "{$otodoke['name01']} 〒 {$otodoke['postal_code']} {$otodoke['addr01']} {$otodoke['addr03']} {$otodoke['addr03']}";
+                    }
+                }
 
-            $mst_product_returns_info = $this->mstProductReturnsInfoRepository->insertData([
-                'returns_no' => $returns_no,
-                'customer_code' => $customer_code,
-                'shipping_code' => $shipping_code,
-                'shipping_name' => $shipping_name,
-                'otodoke_code' => $otodoke_code,
-                'otodoke_name' => $otodoke_name,
-                'shipping_no' => $shipping_no,
-                'shipping_date' => $shipping_date,
-                'jan_code' => $jan_code,
-                'product_code' => $product_code,
-                'shipping_num' => $shipping_num,
-                'reason_returns_code' => $return_reason,
-                'customer_comment' => $customer_comment,
-                'rerurn_num' => $rerurn_num,
-                'cus_reviews_flag' => $product_status,
-                'cus_image_url_path1' => @$cus_image_url_path[0],
-                'cus_image_url_path2' => @$cus_image_url_path[1],
-                'cus_image_url_path3' => @$cus_image_url_path[2],
-                'cus_image_url_path4' => @$cus_image_url_path[3],
-                'cus_image_url_path5' => @$cus_image_url_path[4],
-                'cus_image_url_path6' => @$cus_image_url_path[5],
-                'returns_status_flag' => 0,
-                'returns_request_date' => date('Y-m-d H:i:s'),
-            ]);
-            if (count($cus_image_url_path) > 0) {
-                $this->dtReturnsImageInfoRepository->insertData([
-                    'returns_no' => $mst_product_returns_info->getReturnsNo(),
-                    'cus_image_url_path1' => $mst_product_returns_info->getCusImageUrlPath1(),
-                    'cus_image_url_path2' => $mst_product_returns_info->getCusImageUrlPath2(),
-                    'cus_image_url_path3' => $mst_product_returns_info->getCusImageUrlPath3(),
-                    'cus_image_url_path4' => $mst_product_returns_info->getCusImageUrlPath4(),
-                    'cus_image_url_path5' => $mst_product_returns_info->getCusImageUrlPath5(),
-                    'cus_image_url_path6' => $mst_product_returns_info->getCusImageUrlPath6(),
+                if (is_array($images) && count($images) > 0) {
+                    foreach ($images as $image) {
+                        $mimeType = $image->getMimeType();
+                        if (0 !== strpos($mimeType, 'image')) {
+                            break;
+                        }
+
+                        $extension = $image->getClientOriginalExtension();
+                        if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
+                            break;
+                        }
+
+                        $size = $image->getSize();
+                        if ($size / 1024 / 1024 > 7) {
+                            break;
+                        }
+
+                        $filename = date('ymdHis').uniqid('_').'.'.$extension;
+                        $path = $this->getParameter('eccube_return_image_dir');
+                        if ($image->move($this->getParameter('eccube_return_image_dir'), $filename)) {
+                            $cus_image_url_path[] = str_replace($this->getParameter('eccube_html_dir'), 'html', $path).'/'.$filename;
+                        }
+                    }
+                }
+
+                $mst_product_returns_info = $this->mstProductReturnsInfoRepository->insertData(
+                [
+                    'returns_no' => $returns_no,
+                    'customer_code' => $customer_code,
+                    'shipping_code' => $param['shipping_code'],
+                    'shipping_name' => $shipping_name,
+                    'otodoke_code' => $param['otodoke_code'],
+                    'otodoke_name' => $otodoke_name,
+                    'shipping_no' => $param['shipping_no'],
+                    'shipping_date' => $param['shipping_day'],
+                    'jan_code' => $param['jan_code'],
+                    'product_code' => $param['product_code'],
+                    'shipping_num' => $param['shipping_num'],
+                    'reason_returns_code' => $param['return_reason'],
+                    'customer_comment' => $param['customer_comment'],
+                    'return_num' => $param['return_num'],
+                    'cus_reviews_flag' => $param['product_status'],
+                    'cus_image_url_path1' => @$cus_image_url_path[0] ?? '',
+                    'cus_image_url_path2' => @$cus_image_url_path[1] ?? '',
+                    'cus_image_url_path3' => @$cus_image_url_path[2] ?? '',
+                    'cus_image_url_path4' => @$cus_image_url_path[3] ?? '',
+                    'cus_image_url_path5' => @$cus_image_url_path[4] ?? '',
+                    'cus_image_url_path6' => @$cus_image_url_path[5] ?? '',
+                    'returns_status_flag' => 0,
+                    'returns_request_date' => date('Y-m-d H:i:s'),
                 ]);
+
+                if (!empty($cus_image_url_path)) {
+                    $this->dtReturnsImageInfoRepository->insertData(
+                    [
+                        'returns_no' => $mst_product_returns_info->getReturnsNo(),
+                        'cus_image_url_path1' => $mst_product_returns_info->getCusImageUrlPath1(),
+                        'cus_image_url_path2' => $mst_product_returns_info->getCusImageUrlPath2(),
+                        'cus_image_url_path3' => $mst_product_returns_info->getCusImageUrlPath3(),
+                        'cus_image_url_path4' => $mst_product_returns_info->getCusImageUrlPath4(),
+                        'cus_image_url_path5' => $mst_product_returns_info->getCusImageUrlPath5(),
+                        'cus_image_url_path6' => $mst_product_returns_info->getCusImageUrlPath6(),
+                    ]);
+                }
+
+                return $this->redirectToRoute('mypage_return_save_complete');
             }
-
-            $customer = $commonService->getMstCustomerCode($customer_code);
-            $email = $customer['email'];
-            $url_preview = $this->generateUrl('mypage_return_preview', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
-            $this->mailService->sendMailReturnProductPreview($email, $url_preview);
-
-            $email = $customer['email'];
-            $url_approve = $this->generateUrl('mypage_return_approve', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
-            $this->mailService->sendMailReturnProductApprove($email, $url_approve);
-
-            return [
-                'save' => true,
-            ];
         } catch (\Exception $e) {
-            log_error('MypageController.php returnSave(): '.$e->getMessage());
+            log_error('MypageController.php returnCreate(): '.$e->getMessage());
 
             return $this->redirectToRoute('mypage_return');
         }
     }
+
+    /**
+     * 返却手続き保存
+     *
+     * @Route("/mypage/return/save/complete", name="mypage_return_save_complete", methods={"GET"})
+     * @Template("Mypage/return_save.twig")
+     */
+    public function returnSaveComplete(Request $request)
+    {
+        return [];
+    }
+
+//    /**
+//     * 返却手続き保存
+//     *
+//     * @Route("/mypage/return/save", name="mypage_return_save", methods={"POST"})
+//     * @Template("Mypage/return_save.twig")
+//     */
+//    public function returnSave(Request $request)
+//    {
+//        try {
+//            $commonService = new MyCommonService($this->entityManager);
+//            $login_type = $this->globalService->getLoginType();
+//            $customer_id = $this->globalService->customerId();
+//            $customer_code = $this->globalService->customerCode();
+//            $customer = $this->globalService->customer();
+//
+//            $returns_no = $request->get('returns_no');
+//            $shipping_code = $request->get('shipping_code', '');
+//            $otodoke_code = $request->get('otodoke_code', '');
+//            $shipping_no = $request->get('shipping_no', '');
+//            $shipping_day = $request->get('shipping_day', '');
+//            $jan_code = $request->get('jan_code', '');
+//            $product_code = $request->get('product_code', '');
+//            $return_reason = $request->get('return_reason');
+//            $customer_comment = $request->get('customer_comment', '');
+//            $return_num = $request->get('return_num', '');
+//            $product_status = $request->get('product_status', '');
+//            $cus_image_url_path = $request->get('cus_image_url_path', []);
+//
+//            $shippings = $commonService->getMstShippingCustomer($login_type, $customer_id);
+//            $shipping_name = '';
+//            foreach ($shippings as $shipping) {
+//                if ($shipping['shipping_no'] == $shipping_code) {
+//                    $shipping_name = "{$shipping['name01']} 〒 {$shipping['postal_code']} {$shipping['addr01']} {$shipping['addr03']} {$shipping['addr03']}";
+//                }
+//            }
+//            $otodokes = $this->globalService->otodokeOption($customer_id, $shipping_code);
+//            $otodoke_name = '';
+//            foreach ($otodokes as $otodoke) {
+//                if ($otodoke['otodoke_code'] == $otodoke_code) {
+//                    $otodoke_name = "{$otodoke['name01']} 〒 {$otodoke['postal_code']} {$otodoke['addr01']} {$otodoke['addr03']} {$otodoke['addr03']}";
+//                }
+//            }
+//
+//            $images = $request->files->get('images', []);
+//            if (is_array($images) && count($images) > 0) {
+//                foreach ($images as $image) {
+//                    $mimeType = $image->getMimeType();
+//                    if (0 !== strpos($mimeType, 'image')) {
+//                        break;
+//                    }
+//
+//                    $extension = $image->getClientOriginalExtension();
+//                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
+//                        break;
+//                    }
+//
+//                    $size = $image->getSize();
+//                    if ($size / 1024 / 1024 > 7) {
+//                        break;
+//                    }
+//
+//                    $filename = date('ymdHis').uniqid('_').'.'.$extension;
+//                    $path = $this->getParameter('eccube_return_image_dir');
+//                    if ($image->move($this->getParameter('eccube_return_image_dir'), $filename)) {
+//                        $cus_image_url_path[] = str_replace($this->getParameter('eccube_html_dir'), 'html', $path).'/'.$filename;
+//                    }
+//                }
+//            }
+//
+//            $returns_no = !empty($returns_no) ? $returns_no : $commonService->getReturnsNo();
+//            $shipping_date = date('Y-m-d', strtotime(str_replace('/', '-', $shipping_day)));
+//            $shipping_num = $commonService->getDeliveredNum($shipping_no, $product_code);
+//
+//            $mst_product_returns_info = $this->mstProductReturnsInfoRepository->insertData([
+//                'returns_no' => $returns_no,
+//                'customer_code' => $customer_code,
+//                'shipping_code' => $shipping_code,
+//                'shipping_name' => $shipping_name,
+//                'otodoke_code' => $otodoke_code,
+//                'otodoke_name' => $otodoke_name,
+//                'shipping_no' => $shipping_no,
+//                'shipping_date' => $shipping_date,
+//                'jan_code' => $jan_code,
+//                'product_code' => $product_code,
+//                'shipping_num' => $shipping_num,
+//                'reason_returns_code' => $return_reason,
+//                'customer_comment' => $customer_comment,
+//                'return_num' => $return_num,
+//                'cus_reviews_flag' => $product_status,
+//                'cus_image_url_path1' => @$cus_image_url_path[0],
+//                'cus_image_url_path2' => @$cus_image_url_path[1],
+//                'cus_image_url_path3' => @$cus_image_url_path[2],
+//                'cus_image_url_path4' => @$cus_image_url_path[3],
+//                'cus_image_url_path5' => @$cus_image_url_path[4],
+//                'cus_image_url_path6' => @$cus_image_url_path[5],
+//                'returns_status_flag' => 0,
+//                'returns_request_date' => date('Y-m-d H:i:s'),
+//            ]);
+//            if (count($cus_image_url_path) > 0) {
+//                $this->dtReturnsImageInfoRepository->insertData([
+//                    'returns_no' => $mst_product_returns_info->getReturnsNo(),
+//                    'cus_image_url_path1' => $mst_product_returns_info->getCusImageUrlPath1(),
+//                    'cus_image_url_path2' => $mst_product_returns_info->getCusImageUrlPath2(),
+//                    'cus_image_url_path3' => $mst_product_returns_info->getCusImageUrlPath3(),
+//                    'cus_image_url_path4' => $mst_product_returns_info->getCusImageUrlPath4(),
+//                    'cus_image_url_path5' => $mst_product_returns_info->getCusImageUrlPath5(),
+//                    'cus_image_url_path6' => $mst_product_returns_info->getCusImageUrlPath6(),
+//                ]);
+//            }
+//
+//            $customer = $commonService->getMstCustomerCode($customer_code);
+//            $email = $customer['email'];
+//            $url_preview = $this->generateUrl('mypage_return_preview', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+//            $this->mailService->sendMailReturnProductPreview($email, $url_preview);
+//
+//            $email = $customer['email'];
+//            $url_approve = $this->generateUrl('mypage_return_approve', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+//            $this->mailService->sendMailReturnProductApprove($email, $url_approve);
+//
+//            return [
+//                'save' => true,
+//            ];
+//        } catch (\Exception $e) {
+//            log_error('MypageController.php returnSave(): '.$e->getMessage());
+//
+//            return $this->redirectToRoute('mypage_return');
+//        }
+//    }
 
     /**
      * 返品手順の編集
@@ -1391,7 +1598,7 @@ class MypageController extends AbstractController
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
             $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
             $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
-            $delivered_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
+            $shipping_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
             $returned_num = $commonService->getReturnedNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
 
             $returns_reson = $commonService->getReturnsReson();
@@ -1399,7 +1606,7 @@ class MypageController extends AbstractController
             $returns_reson_text = $returns_reson[$product_returns_info->getReasonReturnsCode()];
 
             $returns_num = $request->get('returns_num', $product_returns_info->getReturnsNum());
-            $cond = $delivered_num > $returned_num ? $delivered_num - $returned_num : $delivered_num;
+            $cond = $shipping_num > $returned_num ? $shipping_num - $returned_num : $shipping_num;
             $returns_num = $returns_num > $cond ? $product_returns_info->getReturnsNum() : $returns_num;
 
             return [
@@ -1429,7 +1636,7 @@ class MypageController extends AbstractController
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
             $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
             $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
-            $delivered_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
+            $shipping_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
             $returned_num = $commonService->getReturnedNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
 
             $cus_reviews_flag = $request->get('cus_reviews_flag', '');
@@ -1442,7 +1649,7 @@ class MypageController extends AbstractController
             $returns_reson_text = $returns_reson[$product_returns_info->getReasonReturnsCode()];
 
             $returns_num = $request->get('returns_num', $product_returns_info->getReturnsNum());
-            $cond = $delivered_num > $returned_num ? $delivered_num - $returned_num : $delivered_num;
+            $cond = $shipping_num > $returned_num ? $shipping_num - $returned_num : $shipping_num;
             $returns_num = $returns_num > $cond ? $product_returns_info->getReturnsNum() : $returns_num;
 
             $generator = new \Picqer\Barcode\BarcodeGeneratorJPG();
@@ -1479,7 +1686,7 @@ class MypageController extends AbstractController
                 'product_returns_info' => $product_returns_info,
                 'customer' => $customer,
                 'product_name' => $product_name,
-                'delivered_num' => $delivered_num,
+                'shipping_num' => $shipping_num,
                 'returned_num' => $returned_num,
                 'returns_reson_text' => $returns_reson_text,
                 'barcode' => $barcode,
@@ -1504,7 +1711,7 @@ class MypageController extends AbstractController
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
             $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
             $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
-            $delivered_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
+            $shipping_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
             $returned_num = $commonService->getReturnedNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
 
             $returns_reson = $commonService->getReturnsReson();
@@ -1512,7 +1719,7 @@ class MypageController extends AbstractController
             $returns_reson_text = $returns_reson[$product_returns_info->getReasonReturnsCode()];
 
             $returns_num = $request->get('returns_num', $product_returns_info->getReturnsNum());
-            $cond = $delivered_num > $returned_num ? $delivered_num - $returned_num : $delivered_num;
+            $cond = $shipping_num > $returned_num ? $shipping_num - $returned_num : $shipping_num;
             $returns_num = $returns_num > $cond ? $product_returns_info->getReturnsNum() : $returns_num;
 
             return [
@@ -1542,7 +1749,7 @@ class MypageController extends AbstractController
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
             $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
             $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
-            $delivered_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
+            $shipping_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
             $returned_num = $commonService->getReturnedNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
 
             $receipt = $request->get('receipt', '');
@@ -1552,7 +1759,7 @@ class MypageController extends AbstractController
             $images = $request->files->get('images', []);
 
             $returns_num = $request->get('returns_num', $product_returns_info->getReturnsNum());
-            $cond = $delivered_num > $returned_num ? $delivered_num - $returned_num : $delivered_num;
+            $cond = $shipping_num > $returned_num ? $shipping_num - $returned_num : $shipping_num;
             $returns_num = $returns_num > $cond ? $product_returns_info->getReturnsNum() : $returns_num;
 
             $stock_image_url_path = [];
@@ -1797,14 +2004,15 @@ class MypageController extends AbstractController
             $product_code = $my_common->getJanCodeToProductCode($jan_code);
 
             $product_name = $my_common->getJanCodeToProductName($jan_code);
-            $delivered_num = $my_common->getDeliveredNum($shipping_no, $product_code);
+            $shipping_num = $my_common->getDeliveredNum($shipping_no, $product_code);
             $returned_num = $my_common->getReturnedNum($shipping_no, $product_code);
 
             $result['data'] = [
                 'jan_code' => $jan_code,
                 'shipping_no' => $shipping_no,
                 'product_name' => $product_name,
-                'delivered_num' => $delivered_num,
+                'product_code' => $product_code,
+                'shipping_num' => $shipping_num,
                 'returned_num' => $returned_num,
             ];
             $result['status'] = true;

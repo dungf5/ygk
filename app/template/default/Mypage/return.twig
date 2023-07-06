@@ -187,19 +187,20 @@
 										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_approve', { 'returns_no':item.returns_no } ) }}" method="GET">
 									{% endif %}
 								{% else %}
-									<form id="return_create_{{index}}" action="{{ url('mypage_return_create') }}" method="GET">
+									<form id="return_create_{{index}}" action="{{ url('mypage_return_create') }}" method="POST">
 								{% endif %}
 
-								{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
-									<tr ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >
-								{% else %}
-									<tr ondblclick="$('#return_create_{{index}}').submit()" >
-								{% endif %}
+{#								{% if item.returns_status_flag is defined and item.returns_status_flag != null %}#}
+{#									<tr ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >#}
+{#								{% else %}#}
+{#									<tr ondblclick="$('#return_create_{{index}}').submit()" >#}
+{#								{% endif %}#}
+									<tr>
 										<td title="手続き">
 											<button type="submit" class="btn btn-warning" role="button">手続き</button> 
 										</td>
 										<td title={{ item.returns_num }}>
-											<input type="number" name="returns_num" data-value='{{ item.returns_num }}' data-shipping='{{ item.shipping_num }}' class="form-control" value="{{ item.returns_num }}"/>
+											<input type="number" name="return_num" data-value='{{ item.returns_num }}' data-shipping='{{ item.shipping_num }}' class="form-control" value="{{ item.returns_num }}"/>
 										</td>
 										<td title={{ item.returns_status_flag  is empty ? "" : item.returns_status_flag }}>
 											{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
@@ -241,6 +242,7 @@
 										<input type="hidden" name="shipping_day" value="{{ item.shipping_date }}"/>
 										<input type="hidden" name="jan_code" value="{{ item.jan_code }}"/>
 										<input type="hidden" name="shipping_num" value="{{ item.shipping_num }}"/>
+										<input type="hidden" name="product_code" value="{{ item.product_code }}"/>
 										<input type="hidden" name="product_name" value="{{ item.product_name }}"/>
 									</tr>
 								</form>
@@ -316,7 +318,7 @@
 
 	var typingRemarksTimer;
     var doneTypingInterval = 1000;
-	$("input[name='returns_num']").keyup(function() {
+	$("input[name='return_num']").keyup(function() {
 		clearTimeout(typingRemarksTimer);
 		let element = $(this);
 		let previous_value = element.data('value');

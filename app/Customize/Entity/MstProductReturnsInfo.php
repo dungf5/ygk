@@ -295,9 +295,9 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         }
 
         /**
-         * @param string $reason_returns_code
+         * @param $reason_returns_code
          */
-        public function setReasonReturnsCode(string $reason_returns_code): void
+        public function setReasonReturnsCode($reason_returns_code)
         {
             $this->reason_returns_code = $reason_returns_code;
         }
