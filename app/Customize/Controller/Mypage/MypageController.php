@@ -1744,7 +1744,7 @@ class MypageController extends AbstractController
         $customer_id = $this->globalService->customerId();
         $login_type = $this->globalService->getLoginType();
         $customer_code = $this->globalService->customerCode();
-        $qb = $this->mstProductReturnsInfoRepository->getReturnByCustomer($param, $customer_code);
+        $qb = $this->mstProductReturnsInfoRepository->getReturnDataList($param, $customer_code);
 
         // Paginator
         $pagination = $paginator->paginate(
