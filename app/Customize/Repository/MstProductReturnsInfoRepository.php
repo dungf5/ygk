@@ -432,8 +432,9 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         }
 
         $qb->addGroupBy('shipping.shipping_no');
-        $qb->addGroupBy('shipping.order_no');
-        $qb->addGroupBy('shipping.order_lineno');
+        $qb->addGroupBy('product_returns_info.returns_no');
+//        $qb->addGroupBy('shipping.order_no');
+//        $qb->addGroupBy('shipping.order_lineno');
 
         $qb->addOrderBy('shipping.shipping_date', 'DESC');
         $qb->addOrderBy('shipping.shipping_no', 'DESC');
