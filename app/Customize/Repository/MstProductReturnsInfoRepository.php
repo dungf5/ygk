@@ -55,7 +55,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             $object->setShippingNum($data['shipping_num']);
             $object->setReasonReturnsCode($data['reason_returns_code']);
             $object->setCustomerComment($data['customer_comment']);
-            $object->setReturnsNum($data['rerurn_num']);
+            $object->setReturnsNum($data['return_num']);
             $object->setCusReviewsFlag($data['cus_reviews_flag']);
             $object->setCusImageUrlPath1($data['cus_image_url_path1']);
             $object->setCusImageUrlPath2($data['cus_image_url_path2']);
@@ -71,7 +71,8 @@ class MstProductReturnsInfoRepository extends AbstractRepository
 
             return $object;
         } catch (\Exception $e) {
-            dd($e);
+            log_error($e->getMessage());
+            return null;
         }
 
         return;
