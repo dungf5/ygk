@@ -31,10 +31,10 @@
 				<table class="table myTable">
 					<thead>
 						<tr>
-							<th title="return_no">
+							<th title={{ "front.mypage.history.return_no" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.mypage.history.return_no" | trans | raw }}</p>
 							</th>
-							<th title="return_request_date" style="min-width: 110px;">
+							<th title={{ "front.mypage.history.return_request_date" | trans | raw }} style="min-width: 110px;">
 								<select class="hidden" id="search_request_date" name="search_shipping_date">
 									<option value="0" {% if param.search_request_date == 0 %} selected {% endif %}>全て</option>
 									{% for request_date in request_date_list %}
@@ -45,7 +45,7 @@
 									{{ "front.mypage.history.return_request_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
 								</a>
 							</th>
-							<th title="reason_return">
+							<th title={{ "front.mypage.history.reason_return" | trans | raw }}>
 								<select class="hidden" id="search_reason_return" name="search_reason_return">
 									<option value="0" {% if param.search_reason_return == 0 %} selected {% endif %}>全て</option>
 									{% for returns_reson in returns_resons %}
@@ -60,16 +60,16 @@
 									{{ "front.mypage.history.reason_return" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
 								</a>
 							</th>
-							<th title="returns_status_flag">
+							<th title={{ "front.mypage.history.return_status" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.mypage.history.return_status" | trans | raw }}</p>
 							</th>
-							<th title="shipping_no">
+							<th title={{ "front.mypage.history.shipping_no" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.mypage.history.shipping_no" | trans | raw }}</p>
 							</th>
-							<th title="shipping_date">
+							<th title={{ "front.mypage.history.shipping_date" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.mypage.history.shipping_date" | trans | raw }}</p>
 							</th>
-							<th title="shiping_code | otodoke_code">
+							<th title='{{ "front.mypage.history.shiping_code" | trans | raw}} {{ "front.mypage.history.otodoke_code" | trans | raw }}'>
 								<select class="hidden" id="search_shipping" name="search_shipping">
 									<option value="0" {% if param.search_shipping == 0 %} selected {% endif %}>全て</option>
 									{% for shipping in shippings %}
@@ -100,14 +100,14 @@
 									{{ "front.mypage.history.otodoke_code" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
 								</a>
 							</th>
-							<th title="jan_code | product_name">
+							<th title='{{ "front.mypage.history.jan_code" | trans | raw }} {{ "front.mypage.history.product_name" | trans | raw }}'>
 								<p class="text-nowrap">{{ "front.mypage.history.jan_code" | trans | raw }}</p>
 								<p class="text-nowrap">{{ "front.mypage.history.product_name" | trans | raw }}</p>
 							</th>
-							<th title="shipping_num">
+							<th title={{ "front.mypage.history.shipping_num" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.mypage.history.shipping_num" | trans | raw }}</p>
 							</th>
-							<th title="return_number">
+							<th title={{ "front.mypage.history.return_number" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.mypage.history.return_number" | trans | raw }}</p>
 							</th>
 						</tr>
@@ -125,8 +125,24 @@
 									<td title="reason_return">
 										<p class="text-nowrap">{{ item.returns_reson }}</p>
 									</td>
-									<td title="returns_status_flag">
-										<p class="text-nowrap">返品完了</p>
+									<td title={{ item.returns_status_flag is empty ? "" : item.returns_status_flag }}>
+										{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
+											{% if item.returns_status_flag == 0 %}
+												<p class="text-nowrap">申請中</p>
+											{% elseif item.returns_status_flag == 1 %}
+												<p class="text-nowrap">承認</p>
+											{% elseif item.returns_status_flag == 2 %}
+												<p class="text-nowrap">未承認</p>
+											{% elseif item.returns_status_flag == 3 %}
+												<p class="text-nowrap">受取受理</p>
+											{% elseif item.returns_status_flag == 4 %}
+												<p class="text-nowrap">受取未受理</p>
+											{% elseif item.returns_status_flag == 5 %}
+												<p class="text-nowrap">返品完了</p>
+											{% endif %}
+										{% else %}
+											<p class="text-nowrap"></p>
+										{% endif %}
 									</td>
 									<td title="shipping_no">
 										<p class="text-nowrap">{{ item.shipping_no }}</p>
