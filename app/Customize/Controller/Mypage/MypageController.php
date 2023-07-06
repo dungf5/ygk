@@ -1128,7 +1128,7 @@ class MypageController extends AbstractController
 
             $errors = [];
             if (empty($return_reason)) {
-                $errors['return_reason'] = '顧客コメントを入力してください。';
+                $errors['return_reason'] = '返品理由を入力してください。';
             }
             if (empty($customer_comment)) {
                 $errors['customer_comment'] = '顧客コメントを入力してください。';
