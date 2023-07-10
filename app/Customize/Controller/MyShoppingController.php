@@ -382,6 +382,13 @@ class MyShoppingController extends AbstractShoppingController
      *
      * @Route("/shopping/confirm", name="shopping_confirm", methods={"POST"})
      * @Template("Shopping/confirm.twig")
+     *
+     * @param Request $request
+     *
+     * @return array|\Eccube\Service\PurchaseFlow\PurchaseFlowResult|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     *
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     public function confirm(Request $request)
     {
@@ -391,6 +398,9 @@ class MyShoppingController extends AbstractShoppingController
 
             return $this->redirectToRoute('shopping_login');
         }
+
+        //Request param
+        $customer_order_no = $request->get('customer_order_no', '');
 
         // 受注の存在チェック
         $preOrderId = $this->cartService->getPreOrderId();
@@ -520,7 +530,10 @@ class MyShoppingController extends AbstractShoppingController
 
             return [
                 'form' => $form->createView(),
-                'Order' => $Order, 'hsProductId' => $hsProductId, 'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
+                'Order' => $Order,
+                'hsProductId' => $hsProductId,
+                'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
+                'customer_order_no' => $customer_order_no,
             ];
         }
 
@@ -552,6 +565,7 @@ class MyShoppingController extends AbstractShoppingController
             'Order' => $Order,
             'hsProductId' => $hsProductId,
             'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
+            'customer_order_no' => $customer_order_no,
         ];
     }
 
@@ -1040,7 +1054,11 @@ class MyShoppingController extends AbstractShoppingController
     /**
      * Check Merge Order.
      *
-     * @Route("/shopping/order/merge", name="check_merge_order", methods={"POST"})
+     * @Route("/shopping/order/check_existed", name="check_order_existed", methods={"POST"})
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function checkMergeOrder(Request $request)
     {

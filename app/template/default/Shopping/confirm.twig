@@ -383,8 +383,8 @@ file that was distributed with this source code.
                 <div class="shipping_destination_right">
                     <div>
                         <div>
-                            {% if Order.MoreOrder is defined %}
-                                {{ Order.MoreOrder.customer_order_no }}
+                            {% if customer_order_no is defined %}
+                                {{ customer_order_no }}
                             {% endif %}
                         </div>
                     </div>
