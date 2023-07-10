@@ -574,7 +574,7 @@ function updateDeliverydAdress(delivery_code) {
         });
 
 
-        if (!isEmpty($("#customer_order_no").val())) {
+        if ($("#customer_order_no").val() != '') {
             handleCheckOrderNoExisted($("#customer_order_no").val());
         }
     });
