@@ -33,6 +33,19 @@ file that was distributed with this source code.
         .fail(function(jqXHR, statusText, errorThrown) {
         });
     });
+
+    $(document).ready(function() {
+        $("#back_to_order").click(function() {
+            let url = "{{ url('shopping') }}";
+            let customer_order_no = "{{ customer_order_no }}";
+
+            $('<form/>', { action: url, method: 'POST' })
+            .append(
+                $('<input>', {type: 'hidden', name: 'customer_order_no', value: customer_order_no}),
+            ).appendTo('body').submit();
+        });
+    })
+
 </script>
 
 {% endblock javascript %}
@@ -540,8 +553,8 @@ file that was distributed with this source code.
                 </div>
                 {% endif %}
                 <div class="ec-totalBox__btn">
-                    <button type="submit"  class="ec-blockBtn--action">{{ 'front.shopping.checkout'|trans }}</button>
-                    <a href="{{ url('shopping') }}" class="ec-blockBtn--cancel">{{ 'front.shopping.back_to_order'|trans }}</a>
+                    <button type="submit" class="ec-blockBtn--action">{{ 'front.shopping.checkout'|trans }}</button>
+                    <button type="button" id="back_to_order" class="ec-blockBtn--cancel">{{ 'front.shopping.back_to_order'|trans }}</button>
                 </div>
             </div>
         </div>
