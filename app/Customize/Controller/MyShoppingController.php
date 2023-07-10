@@ -33,7 +33,6 @@ use Eccube\Service\CartService;
 use Eccube\Service\OrderHelper;
 use Eccube\Service\Payment\PaymentDispatcher;
 use Eccube\Service\Payment\PaymentMethodInterface;
-use Eccube\Service\PurchaseFlow\PurchaseFlow;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -132,10 +131,17 @@ class MyShoppingController extends AbstractShoppingController
      *
      * purchaseFlowの集計処理実行後, warningがある場合はカートど同期をとるため, カートのPurchaseFlowを実行する.
      *
-     * @Route("/shopping", name="shopping", methods={"GET"})
+     * @Route("/shopping", name="shopping", methods={"GET", "POST"})
      * @Template("Shopping/index.twig")
+     *
+     * @param Request $request
+     *
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+     *
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function index(PurchaseFlow $cartPurchaseFlow)
+    public function index(Request $request)
     {
         // ログイン状態のチェック.
         $commonService = new MyCommonService($this->entityManager);
@@ -146,6 +152,9 @@ class MyShoppingController extends AbstractShoppingController
 
             return $this->redirectToRoute('shopping_login');
         }
+
+        //Request param
+        $customer_order_no = $request->get('customer_order_no', '');
 
         // カートチェック.
         $Cart = $this->cartService->getCart();
@@ -370,6 +379,7 @@ class MyShoppingController extends AbstractShoppingController
             'Order' => $Order,
             'hsProductId' => $hsProductId,
             'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
+            'customer_order_no' => $customer_order_no,
         ];
     }
 

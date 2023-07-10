@@ -1302,7 +1302,7 @@ function updateDeliverydAdress(delivery_code) {
                             <div style="background-color: #ffdc00; font-weight: bold">客先発注番号</div>
                         </div>
                         <div class="col-md-12" style="padding: 0">
-                            <input type="text" class="form-control" name="customer_order_no" id="customer_order_no" value="" onkeyup="checkOrderNoExisted(this)" maxlength="20">
+                            <input type="text" class="form-control" name="customer_order_no" id="customer_order_no" value="{% if customer_order_no is defined %}{{ customer_order_no }}{% endif %}" onkeyup="checkOrderNoExisted(this)" maxlength="20">
                         </div>
                     </div>
                     <p class="error_customer_order_no" style="color: red; font-size: larger; font-weight: bold; display: none">
