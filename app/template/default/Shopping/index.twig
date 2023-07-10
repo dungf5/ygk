@@ -572,6 +572,11 @@ function updateDeliverydAdress(delivery_code) {
                 }
             }
         });
+
+
+        if (!isEmpty($("#customer_order_no").val())) {
+            handleCheckOrderNoExisted($("#customer_order_no").val());
+        }
     });
 
     function updateDateDeli(dateChoose) {
@@ -648,7 +653,7 @@ function updateDeliverydAdress(delivery_code) {
         clearTimeout(typingRemarksTimer);
 
         typingRemarksTimer      = setTimeout(function () {
-            handleCheckOrderNoExisted(name, value);
+            handleCheckOrderNoExisted(value);
         }, 1000);
     }
 
@@ -692,7 +697,7 @@ function updateDeliverydAdress(delivery_code) {
         });
     }
 
-    function handleCheckOrderNoExisted(name, value) {
+    function handleCheckOrderNoExisted(value) {
     $.ajax({
         url: '{{ url('check_order_existed') }}',
         type: 'POST',
