@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -366,19 +377,18 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
          */
         private $update_date;
 
-//Tạm thời comment. Do chưa release
-//        /**
-//         * @var int
-//         *
-//         * @ORM\Column(name="shipping_num", type="integer", nullable=false, options={"default":0})
-//         */
-//        private $shipping_num;
-//        /**
-//         * @var string
-//         *
-//         * @ORM\Column(name="shipping_date",nullable=true, type="string", length=10, options={"comment":"出荷日"})
-//         */
-//        private $shipping_date;
+        /**
+         * @var int
+         *
+         * @ORM\Column(name="shipping_num", type="integer", nullable=false, options={"default":0})
+         */
+        private $shipping_num;
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="shipping_date",nullable=true, type="string", length=10, options={"comment":"出荷日"})
+         */
+        private $shipping_date;
 
         /**
          * @return mixed
@@ -1372,36 +1382,36 @@ if (!class_exists('\Customize\Entity\DtOrderWSEOS', false)) {
             $this->order_import_day = $order_import_day;
         }
 
-//        /**
-//         * @return int
-//         */
-//        public function getShippingNum()
-//        {
-//            return $this->shipping_num;
-//        }
-//
-//        /**
-//         * @param $shipping_num
-//         */
-//        public function setShippingNum($shipping_num)
-//        {
-//            $this->shipping_num = $shipping_num;
-//        }
-//
-//        /**
-//         * @return string
-//         */
-//        public function getShippingDate()
-//        {
-//            return $this->shipping_date;
-//        }
-//
-//        /**
-//         * @param $shipping_date
-//         */
-//        public function setShippingDate($shipping_date)
-//        {
-//            $this->shipping_date = $shipping_date;
-//        }
+        /**
+         * @return int
+         */
+        public function getShippingNum()
+        {
+            return $this->shipping_num;
+        }
+
+        /**
+         * @param $shipping_num
+         */
+        public function setShippingNum($shipping_num)
+        {
+            $this->shipping_num = $shipping_num;
+        }
+
+        /**
+         * @return string
+         */
+        public function getShippingDate()
+        {
+            return $this->shipping_date;
+        }
+
+        /**
+         * @param $shipping_date
+         */
+        public function setShippingDate($shipping_date)
+        {
+            $this->shipping_date = $shipping_date;
+        }
     }
 }

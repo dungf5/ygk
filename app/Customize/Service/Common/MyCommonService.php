@@ -3093,9 +3093,8 @@ SQL;
                     dowe.order_line_no = mswe.order_line_no
                 WHERE
                     mswe.shipping_send_flg = 1
--- Tạm thời comment. Do chưa release                     
---                 AND
---                     IFNULL(dowe.shipping_num, 0) > 0;
+                AND
+                    IFNULL(dowe.shipping_num, 0) > 0;
         ';
 
         try {

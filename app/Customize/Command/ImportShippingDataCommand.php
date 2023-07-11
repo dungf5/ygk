@@ -20,7 +20,6 @@ use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Entity\DtOrderNatEOS;
 use Customize\Entity\DtOrderWSEOS;
 use Customize\Entity\MstProduct;
-use Customize\Entity\MstShipping;
 use Customize\Entity\MstShippingNatEOS;
 use Customize\Entity\MstShippingWSEOS;
 use Customize\Service\Common\MyCommonService;
@@ -143,17 +142,15 @@ class ImportShippingDataCommand extends Command
                 $shipping_num = $result[0];
                 $shipping_date = $result[1];
 
-                //Tạm thời comment. Do chưa release
-                //if ((int) $shipping_num > 0) {
-                //    $item->setShippingNum((int) $item->getShippingNum() + (int) $shipping_num);
-                //    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
-                //}
+                if ((int) $shipping_num > 0) {
+                    $item->setShippingNum((int) $item->getShippingNum() + (int) $shipping_num);
+                    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
+                }
 
-                //Tạm thời comment. Do chưa release
-                //if (!empty($shipping_date)) {
-                //    $item->setShippingDate($shipping_date);
-                //    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
-                //}
+                if (!empty($shipping_date)) {
+                    $item->setShippingDate($shipping_date);
+                    $this->entityManager->getRepository(DtOrderWSEOS::class)->save($item);
+                }
             }
 
             log_info('End Handle Import Data To mst_shipping_ws_eos');
@@ -181,8 +178,6 @@ class ImportShippingDataCommand extends Command
             $data['cus_order_no'] = $data['order_no'];
             $data['cus_order_lineno'] = $data['order_line_no'];
 
-            //Tạm thời cho shipping_date = ''. Do chưa release
-            $data['shipping_date'] = '';
             $mstShipping = $this->commonService->getMstShippingImportEOS($data);
 
             if (empty($mstShipping)) {
@@ -229,7 +224,6 @@ class ImportShippingDataCommand extends Command
             }
 
             return [$shipping_num, $shipping_date];
-
         } catch (\Exception $e) {
             log_error($e->getMessage());
 

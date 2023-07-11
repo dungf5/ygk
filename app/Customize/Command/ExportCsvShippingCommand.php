@@ -277,9 +277,7 @@ class ExportCsvShippingCommand extends Command
                         'order_line_no' => $item['order_line_no'],
                     ]);
 
-                    //Tạm thời comment. Do chưa release
-                    //if (!empty($objWsEos) && (int) $objWsEos->getShippingNum() == (int) $objWsEos->getOrderNum()) {
-                    if (!empty($objWsEos)) {
+                    if (!empty($objWsEos) && (int) $objWsEos->getShippingNum() == (int) $objWsEos->getOrderNum()) {
                         $objWsEos->setShippingSentFlg(1);
                         $this->entityManager->getRepository(DtOrderWSEOS::class)->save($objWsEos);
                     }
