@@ -1747,7 +1747,7 @@ class MypageController extends AbstractController
     /**
      * 受け取った返品を完了する
      *
-     * @Route("/mypage/return/receipt/{returns_no}/finish", name="mypage_return_receipt_finish", methods={"POST"})
+     * @Route("/mypage/return/receipt/{returns_no}/finish", name="mypage_return_receipt_finish", methods={"GET", "POST"})
      * @Template("Mypage/return_receipt_finish.twig")
      */
     public function returnReceiptFinish(Request $request, string $returns_no)
