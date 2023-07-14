@@ -412,6 +412,9 @@
 					maxupload: 6,
 					maxsize: 7,
 				},
+				receipt_not_yet_comment: {
+					required: true,
+				},
 			},
 			messages: {
 				'images[]': {
@@ -419,6 +422,7 @@
 					maxupload: "最大6枚の画像",
 					maxsize: "7Mまでの画像",
 				},
+				receipt_not_yet_comment: "未受理コメントを入力してください。",
 			},
 			invalidHandler: function(event, validator) {
 				loadingOverlay("hide")
