@@ -269,6 +269,9 @@
 {% endblock %}
 
 {% block javascript %}
+<script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
+<script src="{{ asset('assets/jquery-ui/jquery-ui.min.js', 'user_data') }}"></script>
+<script src="{{ asset('assets/jquery-validation/jquery.validate.min.js', 'user_data') }}"></script>
 <script>
 $( function() {
 	$("#form_return_approve").validate({
