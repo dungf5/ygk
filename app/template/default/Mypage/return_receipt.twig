@@ -269,6 +269,7 @@
 						<div class="modal-dialog" style="overflow: initial; max-width: 350px;">
 							<div class="modal-content">
 								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
 									<h5 class="modal-title">良品・不良品識別 </h5>
 								</div>
 								<div class="modal-body">
@@ -416,6 +417,9 @@
 				receipt_not_yet_comment: {
 					required: true,
 				},
+				receipt_comment: {
+					required: true,
+				},
 			},
 			messages: {
 				'images[]': {
@@ -424,6 +428,7 @@
 					maxsize: "7Mまでの画像",
 				},
 				receipt_not_yet_comment: "未受理コメントを入力してください。",
+				receipt_comment: "コメントを入力してください。",
 			},
 			invalidHandler: function(event, validator) {
 				loadingOverlay("hide")
