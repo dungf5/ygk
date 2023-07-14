@@ -17,6 +17,10 @@
 		border-color: #ffc000;
 		font-weight: bold;
 	}
+	label.error {
+		color: #f00;
+		font-weight: inherit;
+	}
 </style>
 {% endblock stylesheet%}
 
@@ -271,8 +275,10 @@ $( function() {
 		ignore: null,
 		rules: {
 			aprove_comment_not_yet: {
-				required: true,
-				minlength: 1,
+				required: function(textarea) {
+					var editorcontent = textarea.value.replace(/<[^>]*>/gi, '');
+					return editorcontent.length === 0;
+				},
 			},
 		},
 		messages: {
