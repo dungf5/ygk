@@ -328,11 +328,15 @@
 
 
 		typingRemarksTimer = setTimeout(function () {
-			if (current_value <= 0) {
+			if (current_value == '') {
 				mess += "\n返品数を入力してください。";
 			}
 
-			if (current_value > shipping_num) {
+			if (current_value != '' && current_value <= 0) {
+				mess += "\n1以上で入力してください";
+			}
+
+			if (current_value != '' && current_value > shipping_num) {
 				mess += "\n出荷数以上の数量は入力できません。";
 			}
 

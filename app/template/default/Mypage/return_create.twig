@@ -390,11 +390,14 @@
 	$.validator.addMethod('maxupload', function(value, element, param) {
 		return element.files.length <= param;
 	});
-	$.validator.addMethod('return_num', function(value, element, param) {
+	$.validator.addMethod('return_num_min', function(value, element, param) {
+		if( value <= 0 ) return false;
+		return true;
+	});
+	$.validator.addMethod('return_num_max', function(value, element, param) {
 		let _shipping_num = parseInt( $("#shipping_num").val() );
 		let _returned_num = parseInt( $("#returned_num").val() );
 		let _cond = _shipping_num > _returned_num ? _shipping_num - _returned_num : _shipping_num;
-		if( value <= 0 ) return false;
 		if( value > _cond ) return false;
 		return true;
 	});
@@ -428,7 +431,8 @@
 				},
 				return_num: {
 					required: true,
-					return_num : true,
+					return_num_min : true,
+					return_num_max : true,
 				},
 				'images[]': {
 					minupload: 1,
@@ -443,7 +447,8 @@
 				customer_comment: "顧客コメントを入力してください。",
 				return_num      : {
 					required  : "返品数を入力してください。",
-					return_num: "出荷数以上の数量は入力できません。",
+					return_num_min: "1以上で入力してください",
+					return_num_max: "出荷数以上の数量は入力できません。",
 				},
 				'images[]': {
 					minupload: "商品画像をファイル添付より選択してください。",
