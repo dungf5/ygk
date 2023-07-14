@@ -1138,8 +1138,10 @@ class MypageController extends AbstractController
             if (empty($customer_comment)) {
                 $errors['customer_comment'] = '顧客コメントを入力してください。';
             }
-            if (empty($return_num)) {
+            if ($return_num == '') {
                 $errors['return_num'] = '返品数を入力してください。';
+            } elseif ($return_num <= 0) {
+                $errors['return_num'] = '1以上で入力してください';
             } else {
                 $cond = $shipping_num > $returned_num ? $shipping_num - $returned_num : $shipping_num;
                 if ($return_num > $cond) {
@@ -1252,8 +1254,10 @@ class MypageController extends AbstractController
                 $errors['customer_comment'] = '顧客コメントを入力してください。';
             }
 
-            if (empty($param['return_num'])) {
+            if ($param['return_num'] == '') {
                 $errors['return_num'] = '返品数を入力してください。';
+            } elseif ($param['return_num'] <= 0) {
+                $errors['return_num'] = '1以上で入力してください';
             } else {
                 $cond = $param['shipping_num'] > $param['return_num'] ? $param['shipping_num'] - $param['return_num'] : $param['shipping_num'];
                 if ($param['return_num'] > $cond) {
