@@ -394,7 +394,8 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         );
 
         $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = shipping.shipping_code) shipping_name')
-        ->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = shipping.otodoke_code) otodoke_name');
+        ->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = shipping.otodoke_code) otodoke_name')
+        ->addSelect('(SELECT SUM(IFNULL(mst_pri.returns_num, 0)) FROM Customize\Entity\MstProductReturnsInfo mst_pri WHERE mst_pri.shipping_no = shipping.shipping_no AND mst_pri.product_code = shipping.product_code) total_returns_num');
 
         if (!empty($paramSearch['returns_status_flag'])) {
             $qb->andWhere('product_returns_info.returns_status_flag IN (:returns_status_flag)')

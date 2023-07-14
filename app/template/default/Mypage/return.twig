@@ -197,7 +197,7 @@
 {#								{% endif %}#}
 									<tr>
 										<td title="手続き">
-											<button type="submit" class="btn btn-warning" role="button">手続き</button> 
+											<button type="submit" class="btn btn-warning" role="button" {% if item.total_returns_num >= item.shipping_num %}disabled{% endif %}>手続き</button>
 										</td>
 										<td title={{ item.returns_num }}>
 											<input type="number" name="return_num" data-value='{{ item.returns_num }}' data-shipping='{{ item.shipping_num }}' class="form-control" value="{{ item.returns_num }}"/>
