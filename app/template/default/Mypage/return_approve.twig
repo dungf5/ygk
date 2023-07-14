@@ -29,7 +29,7 @@
 		</div>
 		<div class="ec-mypageRole">
 			<div class="col-xs-12">
-				<form class="form-horizontal"  action="{{ url('mypage_return_approve_finish', { 'returns_no':product_returns_info.returns_no }) }}" method="POST" enctype="multipart/form-data">
+				<form id="form_return_approve" class="form-horizontal"  action="{{ url('mypage_return_approve_finish', { 'returns_no':product_returns_info.returns_no }) }}" method="POST" enctype="multipart/form-data">
 					<table class="table table-bordered">
 						<tr>
 							<td class="col-xs-2 text-right left_background">
@@ -265,5 +265,24 @@
 
 {% block javascript %}
 <script>
+$( function() {
+	$("#form_return_approve").validate({
+		ignore: null,
+		rules: {
+			aprove_comment_not_yet: {
+				required: true,
+			},
+		},
+		messages: {
+			aprove_comment_not_yet: "未承認コメントを入力してください。",
+		},
+		invalidHandler: function(event, validator) {
+			loadingOverlay("hide")
+		},
+		submitHandler: function(form) {
+			form.submit()
+		}
+	});
+})
 </script>
 {% endblock javascript%}
