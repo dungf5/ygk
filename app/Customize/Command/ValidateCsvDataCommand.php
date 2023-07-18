@@ -249,10 +249,11 @@ class ValidateCsvDataCommand extends Command
                 $object->setErrorContent10(null);
                 $object->setErrorType(0);
 
+                // Comment At 2023/07/18
                 // validate order_date
-                if (empty($object['order_date']) || date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d')) {
-                    $error['error_content1'] = '発注日付が過去日付になっています';
-                }
+                //if (empty($object['order_date']) || date('Y-m-d', strtotime($object['order_date'])) < date('Y-m-d')) {
+                //    $error['error_content1'] = '発注日付が過去日付になっています';
+                //}
 
                 // Validate customer
                 $dtCusRelation = $common->getDtCustomerRelation($this->customer_code, $this->shipping_code, $otodoke_code);
