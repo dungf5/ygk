@@ -100,7 +100,7 @@ file that was distributed with this source code.
                     <th title="{{ 'front.mypage.shipping.delivery_no'|trans| raw }}">
                         {{ 'front.mypage.shipping.delivery_no'|trans| raw }}
                     </th>
-                    <th title="{{ 'front.mypage.shipping.destination'|trans| raw }} {{ 'front.mypage.shipping.company_name'|trans| raw }}">
+                    <th title="{{ 'front.mypage.shipping.destination'|trans| raw }} | {{ 'front.mypage.shipping.company_name'|trans| raw }}">
                         {{ 'front.mypage.shipping.destination'|trans| raw }} <a href="javascript:void(0)" style="color: red; {% if orderShippingOpt|length < 2 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_shipping" onclick="handleGetLastSelected()">
                             <span class="glyphicon glyphicon-triangle-bottom"></span>
                         </a>
@@ -123,7 +123,7 @@ file that was distributed with this source code.
                             {% endfor %}
                         </select>
                     </th>
-                    <th title="{{ 'front.mypage.shipping.jan_code'|trans| raw }} {{ 'front.mypage.shipping.product_name'|trans| raw }}">
+                    <th title="{{ 'front.mypage.shipping.jan_code'|trans| raw }} | {{ 'front.mypage.shipping.product_name'|trans| raw }}">
                         {{ 'front.mypage.shipping.jan_code'|trans| raw }}
                         <br/>
                         {{ 'front.mypage.shipping.product_name'|trans| raw }}
@@ -155,8 +155,8 @@ file that was distributed with this source code.
                     <th title="{{ 'front.mypage.shipping.packing_slip'|trans| raw }}" style="min-width: 150px;" 111>
                         {{ 'front.mypage.shipping.packing_slip'|trans| raw }}
                     </th>
-                    <th title="{{ 'front.mypage.shipping.order_number'|trans| raw }}">
-                        {{ 'front.mypage.shipping.order_number'|trans| raw }}
+                    <th title="{{ 'front.order.order_no'|trans| raw }}">
+                        {{ 'front.order.order_no'|trans| raw }}
                     </th>
                     <th title="{{ 'front.mypage.shipping.detail'|trans| raw }}">
                         {{ 'front.mypage.shipping.detail'|trans| raw }}
