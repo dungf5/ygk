@@ -1538,110 +1538,111 @@ class MypageController extends AbstractController
 //     * @Route("/mypage/return/receipt/{returns_no}/finish", name="mypage_return_receipt_finish", methods={"POST"})
 //     * @Template("Mypage/return_receipt_finish.twig")
 //     */
-//    public function returnReceiptFinish(Request $request, string $returns_no)
-//    {
-//        try {
-//            $commonService = new MyCommonService($this->entityManager);
-//            $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
-//            $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
-//            $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
-//            $delivered_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
-//            $returned_num = $commonService->getReturnedNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
-//
-//            $receipt = $request->get('receipt', '');
-//            $stock_reviews_flag = $request->get('stock_reviews_flag', '');
-//            $receipt_comment = $request->get('receipt_comment', '');
-//            $receipt_not_yet_comment = $request->get('receipt_not_yet_comment', '');
-//            $images = $request->files->get('images', []);
-//
-//            $returns_num = $request->get('returns_num', $product_returns_info->getReturnsNum());
-//            $cond = $delivered_num > $returned_num ? $delivered_num - $returned_num : $delivered_num;
-//            $returns_num = $returns_num > $cond ? $product_returns_info->getReturnsNum() : $returns_num;
-//
-//            $stock_image_url_path = [];
-//            if (count($images) > 0) {
-//                foreach ($images as $image) {
-//                    $mimeType = $image->getMimeType();
-//                    if (0 !== strpos($mimeType, 'image')) {
-//                        break;
-//                    }
-//
-//                    $extension = $image->getClientOriginalExtension();
-//                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
-//                        break;
-//                    }
-//
-//                    $size = $image->getSize();
-//                    if ($size / 1024 / 1024 > 7) {
-//                        break;
-//                    }
-//
-//                    $filename = date('ymdHis').uniqid('_').'.'.$extension;
-//                    $path = $this->getParameter('eccube_return_image_dir');
-//                    if ($image->move($this->getParameter('eccube_return_image_dir'), $filename)) {
-//                        $stock_image_url_path[] = str_replace($this->getParameter('eccube_html_dir'), 'html', $path).'/'.$filename;
-//                    }
-//                }
-//            }
-//
-//            if ('POST' === $request->getMethod()) {
-//                $data = [
-//                    'returns_num' => $returns_num,
-//                    'stock_image_url_path1' => @$stock_image_url_path[0],
-//                    'stock_image_url_path2' => @$stock_image_url_path[1],
-//                    'stock_image_url_path3' => @$stock_image_url_path[2],
-//                    'stock_image_url_path4' => @$stock_image_url_path[3],
-//                    'stock_image_url_path5' => @$stock_image_url_path[4],
-//                    'stock_image_url_path6' => @$stock_image_url_path[5],
-//                ];
-//
-//                if ($receipt == 'yes') {
-//                    $data['returns_status_flag'] = 3;
-//                    $data['receipt_comment'] = $receipt_comment;
-//                    $data['product_receipt_date'] = date('Y-m-d H:i:s');
-//                    $data['stock_reviews_flag'] = $stock_reviews_flag;
-//                } else {
-//                    $data['returns_status_flag'] = 4;
-//                    $data['receipt_not_yet_comment'] = $receipt_not_yet_comment;
-//                    $data['product_receipt_date_not_yet'] = date('Y-m-d H:i:s');
-//                }
-//                $product_returns_info = $this->mstProductReturnsInfoRepository->updadteData($returns_no, $data);
-//                if (count($stock_image_url_path) > 0) {
-//                    $this->dtReturnsImageInfoRepository->insertData([
-//                        'returns_no' => $product_returns_info->getReturnsNo(),
-//                        'stock_image_url_path1' => $product_returns_info->getStockImageUrlPath1(),
-//                        'stock_image_url_path2' => $product_returns_info->getStockImageUrlPath2(),
-//                        'stock_image_url_path3' => $product_returns_info->getStockImageUrlPath3(),
-//                        'stock_image_url_path4' => $product_returns_info->getStockImageUrlPath4(),
-//                        'stock_image_url_path5' => $product_returns_info->getStockImageUrlPath5(),
-//                        'stock_image_url_path6' => $product_returns_info->getStockImageUrlPath6(),
-//                    ]);
-//                }
-//                $email = $customer['customer_email'] ?? $customer['email'];
-//                if ($receipt == 'yes') {
-//                    $url_return_receipt_finish = $this->generateUrl('mypage_return_receipt_finish', ['returns_no' => $product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
-//                    $this->mailService->sendMailReturnProductReceiptYes($email, $receipt_comment, $url_return_receipt_finish);
-//                } else {
-//                    $this->mailService->sendMailReturnProductReceiptNo($email, $receipt_not_yet_comment);
-//                }
-//            }
-//
-//            $returns_reson = $commonService->getReturnsReson();
-//            $returns_reson = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
-//            $returns_reson_text = $returns_reson[$product_returns_info->getReasonReturnsCode()];
-//
-//            return [
-//                'product_returns_info' => $product_returns_info,
-//                'customer' => $customer,
-//                'product_name' => $product_name,
-//                'returns_reson_text' => $returns_reson_text,
-//            ];
-//        } catch (\Exception $e) {
-//            log_error('MypageController.php returnReceipt(): '.$e->getMessage());
-//
-//            return $this->redirectToRoute('mypage_return');
-//        }
-//    }
+    public function returnReceiptFinish(Request $request, string $returns_no)
+    {
+        try {
+            $commonService = new MyCommonService($this->entityManager);
+            $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
+            $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
+            $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
+            $delivered_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
+            $returned_num = $commonService->getReturnedNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode(), $product_returns_info->getReturnsNo());
+
+            $receipt = $request->get('receipt', '');
+            $stock_reviews_flag = $request->get('stock_reviews_flag', '');
+            $receipt_comment = $request->get('receipt_comment', '');
+            $receipt_not_yet_comment = $request->get('receipt_not_yet_comment', '');
+            $images = $request->files->get('images', []);
+
+            $returns_num = $request->get('returns_num', $product_returns_info->getReturnsNum());
+            $cond = $delivered_num > $returned_num ? $delivered_num - $returned_num : $delivered_num;
+            $returns_num = $returns_num > $cond ? $product_returns_info->getReturnsNum() : $returns_num;
+
+            $stock_image_url_path = [];
+            if (count($images) > 0) {
+                foreach ($images as $image) {
+                    $mimeType = $image->getMimeType();
+                    if (0 !== strpos($mimeType, 'image')) {
+                        break;
+                    }
+
+                    $extension = $image->getClientOriginalExtension();
+                    if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
+                        break;
+                    }
+
+                    $size = $image->getSize();
+                    if ($size / 1024 / 1024 > 7) {
+                        break;
+                    }
+
+                    $filename = date('ymdHis').uniqid('_').'.'.$extension;
+                    $path = $this->getParameter('eccube_return_image_dir');
+                    if ($image->move($this->getParameter('eccube_return_image_dir'), $filename)) {
+                        $stock_image_url_path[] = str_replace($this->getParameter('eccube_html_dir'), 'html', $path).'/'.$filename;
+                    }
+                }
+            }
+
+            if ('POST' === $request->getMethod()) {
+                $data = [
+                    'returns_num' => $returns_num,
+                    'stock_image_url_path1' => @$stock_image_url_path[0],
+                    'stock_image_url_path2' => @$stock_image_url_path[1],
+                    'stock_image_url_path3' => @$stock_image_url_path[2],
+                    'stock_image_url_path4' => @$stock_image_url_path[3],
+                    'stock_image_url_path5' => @$stock_image_url_path[4],
+                    'stock_image_url_path6' => @$stock_image_url_path[5],
+                ];
+
+                if ($receipt == 'yes') {
+                    $data['returns_status_flag'] = 3;
+                    $data['receipt_comment'] = $receipt_comment;
+                    $data['product_receipt_date'] = date('Y-m-d H:i:s');
+                    $data['stock_reviews_flag'] = $stock_reviews_flag;
+                } else {
+                    $data['returns_status_flag'] = 4;
+                    $data['receipt_not_yet_comment'] = $receipt_not_yet_comment;
+                    $data['product_receipt_date_not_yet'] = date('Y-m-d H:i:s');
+                }
+                $product_returns_info = $this->mstProductReturnsInfoRepository->updadteData($returns_no, $data);
+                if (count($stock_image_url_path) > 0) {
+                    $this->dtReturnsImageInfoRepository->insertData([
+                        'returns_no' => $product_returns_info->getReturnsNo(),
+                        'stock_image_url_path1' => $product_returns_info->getStockImageUrlPath1(),
+                        'stock_image_url_path2' => $product_returns_info->getStockImageUrlPath2(),
+                        'stock_image_url_path3' => $product_returns_info->getStockImageUrlPath3(),
+                        'stock_image_url_path4' => $product_returns_info->getStockImageUrlPath4(),
+                        'stock_image_url_path5' => $product_returns_info->getStockImageUrlPath5(),
+                        'stock_image_url_path6' => $product_returns_info->getStockImageUrlPath6(),
+                    ]);
+                }
+                $email = $customer['customer_email'] ?? $customer['email'];
+                if ($receipt == 'yes') {
+                    $url_return_receipt_finish = $this->generateUrl('mypage_return_receipt_finish', ['returns_no' => $product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $cus_reviews_flag = $product_returns_info->getCusReviewsFlag() == 1 ? '良品' : ($product_returns_info->getCusReviewsFlag() == 2 ? '不良品' : '');
+                    $this->mailService->sendMailReturnProductReceiptYes($email, $receipt_comment, $url_return_receipt_finish, $cus_reviews_flag);
+                } else {
+                    $this->mailService->sendMailReturnProductReceiptNo($email, $receipt_not_yet_comment);
+                }
+            }
+
+            $returns_reson = $commonService->getReturnsReson();
+            $returns_reson = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
+            $returns_reson_text = $returns_reson[$product_returns_info->getReasonReturnsCode()];
+
+            return [
+                'product_returns_info' => $product_returns_info,
+                'customer' => $customer,
+                'product_name' => $product_name,
+                'returns_reson_text' => $returns_reson_text,
+            ];
+        } catch (\Exception $e) {
+            log_error('MypageController.php returnReceipt(): '.$e->getMessage());
+
+            return $this->redirectToRoute('mypage_return');
+        }
+    }
 //
 //    /**
 //     * 返品手続き完了
