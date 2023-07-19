@@ -943,7 +943,7 @@ class MailService
         log_info('[WS-EOS] Start Send Mail Validate Error.');
 
         // Information
-        $information['subject_mail'] = 'EOS注文データにエラーがありました';
+        $information['subject_mail'] = 'ワールドスポーツ様のEOS注文データにエラーがありました';
         $information['title_mail'] = '※本メールは自動配信メールです。';
         $information['error_title'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
         $information['content'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
