@@ -1144,10 +1144,10 @@ class MailService
             ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
             ->setTo([$email])
             ->setBody($body);
-        if( getenv('APP_IS_LOCAL') != 1
-            && getenv('EMAIL_RETURN_CC') ) {
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
             $email = getenv('EMAIL_RETURN_CC');
-            if( filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $message->setCc($email);
             }
         }
@@ -1169,13 +1169,14 @@ class MailService
             ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
             ->setTo([$email])
             ->setBody($body);
-        if( getenv('APP_IS_LOCAL') != 1
-            && getenv('EMAIL_RETURN_CC') ) {
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
             $email = getenv('EMAIL_RETURN_CC');
-            if( filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $message->setCc($email);
             }
         }
+
         return $this->mailer->send($message);
     }
 
@@ -1194,10 +1195,10 @@ class MailService
             ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
             ->setTo([$email])
             ->setBody($body);
-        if( getenv('APP_IS_LOCAL') != 1
-            && getenv('EMAIL_RETURN_CC') ) {
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
             $email = getenv('EMAIL_RETURN_CC');
-            if( filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $message->setCc($email);
             }
         }
@@ -1219,10 +1220,10 @@ class MailService
             ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
             ->setTo([$email])
             ->setBody($body);
-        if( getenv('APP_IS_LOCAL') != 1
-            && getenv('EMAIL_RETURN_CC') ) {
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
             $email = getenv('EMAIL_RETURN_CC');
-            if( filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $message->setCc($email);
             }
         }
@@ -1230,7 +1231,7 @@ class MailService
         return $this->mailer->send($message);
     }
 
-    public function sendMailReturnProductReceiptYes($email, $receipt_comment, $url_return_receipt_finish)
+    public function sendMailReturnProductReceiptYes($email, $receipt_comment, $url_return_receipt_finish, $cus_reviews_flag)
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return;
@@ -1239,16 +1240,17 @@ class MailService
         $body = $this->twig->render('Mail/return_product_receipt_yes.twig', [
             'receipt_comment' => $receipt_comment,
             'url_return_receipt_finish' => $url_return_receipt_finish,
+            'cus_reviews_flag' => $cus_reviews_flag,
         ]);
         $message = (new \Swift_Message())
             ->setSubject('[XBRAID JAPAN] 返品商品受取受理のご案内')
             ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
             ->setTo([$email])
             ->setBody($body);
-        if( getenv('APP_IS_LOCAL') != 1
-            && getenv('EMAIL_RETURN_CC') ) {
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
             $email = getenv('EMAIL_RETURN_CC');
-            if( filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $message->setCc($email);
             }
         }
@@ -1270,10 +1272,10 @@ class MailService
             ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
             ->setTo([$email])
             ->setBody($body);
-        if( getenv('APP_IS_LOCAL') != 1
-            && getenv('EMAIL_RETURN_CC') ) {
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
             $email = getenv('EMAIL_RETURN_CC');
-            if( filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $message->setCc($email);
             }
         }
@@ -1293,10 +1295,10 @@ class MailService
             ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
             ->setTo([$email])
             ->setBody($body);
-        if( getenv('APP_IS_LOCAL') != 1
-            && getenv('EMAIL_RETURN_CC') ) {
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
             $email = getenv('EMAIL_RETURN_CC');
-            if( filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $message->setCc($email);
             }
         }

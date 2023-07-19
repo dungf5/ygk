@@ -1828,7 +1828,8 @@ class MypageController extends AbstractController
                 $email = $customer['customer_email'] ?? $customer['email'];
                 if ($receipt == 'yes') {
                     $url_return_receipt_finish = $this->generateUrl('mypage_return_receipt_finish', ['returns_no' => $product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
-                    $this->mailService->sendMailReturnProductReceiptYes($email, $receipt_comment, $url_return_receipt_finish);
+                    $cus_reviews_flag = $product_returns_info->getCusReviewsFlag() == 1 ? '良品' : ($product_returns_info->getCusReviewsFlag() == 2 ? '不良品' : '');
+                    $this->mailService->sendMailReturnProductReceiptYes($email, $receipt_comment, $url_return_receipt_finish, $cus_reviews_flag);
                 } else {
                     $this->mailService->sendMailReturnProductReceiptNo($email, $receipt_not_yet_comment);
                 }
