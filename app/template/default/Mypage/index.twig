@@ -54,6 +54,30 @@ file that was distributed with this source code.
         button.multiselect {
             display: none;
         }
+        .myTable>thead>tr>th {
+            white-space: nowrap;
+        }
+        .disBg {
+            background: #A7A7A7;
+            border-color: #A7A7A7;
+        }
+        .actBg {
+            background: #0065ff;
+        }
+        .row {
+            padding-left: 15px;
+        }
+        .alert-search {
+            border: solid 1px #333;
+            background-color: #ccc;
+            border-radius: 8px;
+            width: fit-content;
+        }
+        .btn-search, .btn-search:hover, .btn-search:focus {
+            background-color: #000;
+            color: #fff;
+            border-radius: 8px;
+        }
     </style>
 
     <div class="ec-layoutRole__main">
@@ -63,31 +87,29 @@ file that was distributed with this source code.
             </div>
             {% include 'Mypage/navi.twig' %}
         </div>
-
-        <style>
-            .myTable>thead>tr>th {
-                white-space: nowrap;
-            }
-        </style>
-
         <iframe id="my_iframe" style="display:none;"></iframe>
         <script>
                 function Download(url) {
                     document.getElementById('my_iframe').src = url;
                 };
         </script>
-
-        <style>
-            .disBg {
-                background: #A7A7A7;
-                border-color: #A7A7A7;
-            }
-            .actBg {
-             background: #0065ff;
-            }
-        </style>
-
         <div class="ec-mypageRole">
+            <div class="row">
+                <div>
+                    <div class="alert alert-search" role="alert">
+                        <form class="form-inline" method="GET">
+                            <div class="form-group">
+                                <label for="search_order_no">{{ 'front.order.order_no'|trans| raw }}</label>
+                                <input type="text" class="form-control" id="search_order_no" name="search_order_no" value="{{ search_order_no }}">
+                            </div>
+                            <button type="submit" class="btn btn-search">
+                                <i class="fas fa-angle-double-right" style="color: #f00"></i> 絞り込み
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             {% if pagination and pagination.totalItemCount > 0 %}
                 <p class="ec-para-normal">{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}</p>
             {% endif %}
@@ -99,10 +121,10 @@ file that was distributed with this source code.
                         <th class="hide" title="update_date">{{ 'front.order.update_date'|trans| raw }}</th>
                         <th class="hide" title="shipping_date">{{ 'front.order.shipping_date'|trans| raw }}</th>
 
-                        <th title="order_no_type">{{ 'front.order.order_no_type'|trans| raw }}</th>
-                        <th title="order_no">{{ 'front.order.order_no'|trans| raw }}</th>
-                        <th title="order_lineno">{{ 'front.order.order_lineno'|trans| raw }}</th>
-                        <th title="order_date" style="max-width: 100px">
+                        <th title="{{ 'front.order.order_no_type'|trans| raw }}">{{ 'front.order.order_no_type'|trans| raw }}</th>
+                        <th title="{{ 'front.order.order_no'|trans| raw }}">{{ 'front.order.order_no'|trans| raw }}</th>
+                        <th title="{{ 'front.order.order_lineno'|trans| raw }}">{{ 'front.order.order_lineno'|trans| raw }}</th>
+                        <th title="{{ 'front.order.order_date'|trans| raw }}" style="max-width: 100px">
                             {{ 'front.order.order_date'|trans| raw }}
                             <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_order_date">
                                 <span class="glyphicon glyphicon-triangle-bottom"></span>
@@ -115,7 +137,7 @@ file that was distributed with this source code.
                                 {% endfor %}
                             </select>
                         </th>
-                        <th title="shipping_code otodoke_code" style="min-width: 150px">
+                        <th title="{{ 'front.mypage.shipping_code'|trans| raw }} | {{ 'front.mypage.otodoke_code'|trans| raw }}" style="min-width: 150px">
                             {{ 'front.mypage.shipping_code'|trans| raw }}
                             <a href="javascript:void(0)" style="color: red; {% if orderShippingOpt|length < 2 %} visibility: hidden; {% endif %}" class="multiselect dropdown-toggle search_order_shipping" onclick="handleGetLastSelected()">
                                 <span class="glyphicon glyphicon-triangle-bottom"></span>
@@ -141,16 +163,16 @@ file that was distributed with this source code.
                                 {% endfor %}
                             </select>
                         </th>
-                        <th title="image">{{ 'front.order.image'|trans| raw }}</th>
-                        <th style="text-align: left;" title="product_code product_name remarks1 remarks2 remarks3 remarks4">
+                        <th title="{{ 'front.order.image'|trans| raw }}">{{ 'front.order.image'|trans| raw }}</th>
+                        <th style="text-align: left;" title="{{ 'front.order.jan_code'|trans| raw }} | {{ 'front.order.product_name'|trans| raw }} | {{ 'front.mypage.remarks'|trans| raw }}１ | {{ 'front.mypage.remarks'|trans| raw }}２ | 発注書備考 | 発注書コメント">
                             {{ 'front.order.jan_code'|trans| raw }}<br/>
                             {{ 'front.order.product_name'|trans| raw }}<br/>
-                            {{ 'front.shopping.remarks'|trans| raw }}１<br/>
-                            {{ 'front.shopping.remarks'|trans| raw }}２<br/>
+                            {{ 'front.mypage.remarks'|trans| raw }}１<br/>
+                            {{ 'front.mypage.remarks'|trans| raw }}２<br/>
                             発注書備考<br/>
                             発注書コメント
                         </th>
-                        <th title="order_status" style="text-align: left; max-width: 100px">
+                        <th title="{{ 'front.order.order_status'|trans| raw }}" style="text-align: left; max-width: 100px">
                             {{ 'front.order.order_status'|trans| raw }}
                             <a href="javascript:void(0)" style="color: red;" class="multiselect dropdown-toggle search_order_status">
                                 <span class="glyphicon glyphicon-triangle-bottom"></span>
@@ -163,10 +185,10 @@ file that was distributed with this source code.
                                 {% endfor %}
                             </select>
                         </th>
-                        <th title="order_plus" style="text-align: right">{{ 'front.order.order_plus'|trans| raw }}</th>
-                        <th title="reserve_stock_num" style="text-align: right">{{ 'front.order.reserve_stock_num'|trans| raw }}</th>
-                        <th title="order_remain_num" style="text-align: right">{{ 'front.order.order_remain_num'|trans| raw }}</th>
-                        <th title="shipping_no">{{ 'front.mypage.shipping_no_no'|trans| raw }}</th>
+                        <th title="{{ 'front.order.order_plus'|trans| raw }}" style="text-align: right">{{ 'front.order.order_plus'|trans| raw }}</th>
+                        <th title="{{ 'front.order.reserve_stock_num'|trans| raw }}" style="text-align: right">{{ 'front.order.reserve_stock_num'|trans| raw }}</th>
+                        <th title="{{ 'front.order.order_remain_num'|trans| raw }}" style="text-align: right">{{ 'front.order.order_remain_num'|trans| raw }}</th>
+                        <th title="{{ 'front.mypage.shipping_no_no'|trans| raw }}">{{ 'front.mypage.shipping_no_no'|trans| raw }}</th>
                     </tr>
                 </thead>
                 {% if pagination and pagination.totalItemCount > 0 %}

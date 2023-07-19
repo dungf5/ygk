@@ -276,6 +276,7 @@ class MypageController extends AbstractController
             'search_order_status' => $request->get('order_status', ''),
             'search_order_shipping' => $request->get('order_shipping', '0'),
             'search_order_otodoke' => $request->get('order_otodoke', '0'),
+            'search_order_no' => $request->get('search_order_no', ''),
         ];
 
         // paginator
@@ -438,6 +439,7 @@ class MypageController extends AbstractController
             'search_order_status' => $param['search_order_status'],
             'search_order_shipping' => $param['search_order_shipping'],
             'search_order_otodoke' => $param['search_order_otodoke'],
+            'search_order_no' => $param['search_order_no'],
         ];
     }
 

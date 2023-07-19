@@ -1089,7 +1089,7 @@ function updateDeliverydAdress(delivery_code) {
                     }
 
                     .shipping_destination_left > div {
-                        width: 130px;
+                        width: 120px;
                         background-color: #c9b5b5;
                         text-align: center;
                         margin-right: 20px;
@@ -1355,7 +1355,7 @@ function updateDeliverydAdress(delivery_code) {
                 </div>
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
                     <div class="shipping_destination_left">
-                        <div> {{ 'front.shopping.remarks'|trans }}１</div>
+                        <div> {{ 'front.mypage.remarks'|trans }}１</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
                         <input type="text" class="form-control" name="remarks1" id="remarks1" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks1 }}{% endif %}" onkeyup="updateTempOrder(this)">
@@ -1363,7 +1363,7 @@ function updateDeliverydAdress(delivery_code) {
                 </div>
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-top: 10px">
                     <div class="shipping_destination_left">
-                        <div> {{ 'front.shopping.remarks'|trans }}２</div>
+                        <div> {{ 'front.mypage.remarks'|trans }}２</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
                         <input type="text" class="form-control" name="remarks2" id="remarks2" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks2 }}{% endif %}" onkeyup="updateTempOrder(this)">
