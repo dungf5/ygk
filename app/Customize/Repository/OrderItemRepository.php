@@ -416,6 +416,7 @@ class OrderItemRepository extends AbstractRepository
             'shipping.inquiry_no',
             'product.jan_code',
             'product.product_name',
+            'product.quantity',
             'delivery.delivery_no'
         );
 

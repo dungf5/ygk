@@ -184,7 +184,13 @@ file that was distributed with this source code.
                             </td>
                             <td>{{ Shipping.shipping_plan_date|date("Y-m-d") }}</td>
                             <td>{{ Shipping.shipping_date|date("Y-m-d") }}</td>
-                            <td>{{ Shipping.shipping_num }}</td>
+                            <td>
+                                {% if Shipping.quantity > 1 %}
+                                    {{ Shipping.quantity * Shipping.shipping_num }}
+                                {% else %}
+                                    {{ Shipping.shipping_num }}
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if Shipping.delivery_no is null %}
                                     －
