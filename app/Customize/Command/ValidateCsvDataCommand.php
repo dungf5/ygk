@@ -566,6 +566,12 @@ class ValidateCsvDataCommand extends Command
             'file_name' => 'Mail/eos_order_success.twig',
         ];
 
+        // Information
+        $information['subject_mail'] = 'ワールドスポーツの発注データ受信が完了しました';
+        $information['title_mail'] = 'この度はご注文いただき誠にありがとうございます。';
+        $information['content'] = '下記ご注文内容にお間違えがないかご確認下さい。';
+        $information['content2'] = 'お問い合わせは弊社営業担当者までご連絡くださいますようお願いいたします。';
+
         $order_success = [];
         foreach ($this->success as $key => $success) {
             $information['success_data'] = $success;
@@ -782,6 +788,13 @@ class ValidateCsvDataCommand extends Command
             'file_name' => 'Mail/nat_eos_validate_error.twig',
             'error_data' => $this->errors,
         ];
+
+        // Information
+        $information['subject_mail'] = 'ナチュラムの発注明細データにエラーがありました';
+        $information['title_mail'] = '※本メールは自動配信メールです。';
+        $information['error_title'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
+        $information['content'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+        $information['content2'] = '　ご連絡くださいますようお願いいたします。';
 
         try {
             log_info('[NAT-EOS] Send Mail Validate Error.');

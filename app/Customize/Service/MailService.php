@@ -943,7 +943,7 @@ class MailService
         log_info('[WS-EOS] Start Send Mail Validate Error.');
 
         // Information
-        $information['subject_mail'] = 'ワールドスポーツ様のEOS注文データにエラーがありました';
+        $information['subject_mail'] = 'ワールドスポーツの発注データにエラーがありました';
         $information['title_mail'] = '※本メールは自動配信メールです。';
         $information['error_title'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
         $information['content'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
@@ -1013,12 +1013,7 @@ class MailService
 
         log_info('[NAT-EOS] Start Send Mail Validate Error.');
 
-        // Information
-        $information['subject_mail'] = '発注データにエラーがありました';
-        $information['title_mail'] = '※本メールは自動配信メールです。';
-        $information['error_title'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
-        $information['content'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
-        $information['content2'] = '　ご連絡くださいますようお願いいたします。';
+
 
         $body = $this->twig->render($information['file_name'], [
             'information' => $information,
@@ -1083,12 +1078,6 @@ class MailService
         }
 
         log_info('[EOS] Start Send Mail Order Success.');
-
-        // Information
-        $information['subject_mail'] = 'ご注文ありがとうございます';
-        $information['title_mail'] = 'この度はご注文いただき誠にありがとうございます。';
-        $information['content'] = '下記ご注文内容にお間違えがないかご確認下さい。';
-        $information['content2'] = 'お問い合わせは弊社営業担当者までご連絡くださいますようお願いいたします。';
 
         $body = $this->twig->render($information['file_name'], [
             'information' => $information,
@@ -1331,7 +1320,7 @@ class MailService
 
         // Information successfully
         if ($information['status'] == 1) {
-            $information['subject_mail'] = 'EOS出荷データの送信が完了しました';
+            $information['subject_mail'] = 'ワールドスポーツへ出荷データ送信が完了しました';
             $information['title_mail'] = '※本メールは自動配信メールです。';
             $information['title_time'] = '送信完了日時';
             $information['content1'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
@@ -1340,7 +1329,7 @@ class MailService
 
         // Information error
         if ($information['status'] == 0) {
-            $information['subject_mail'] = 'EOS出荷データ送信にエラーが発生しました';
+            $information['subject_mail'] = 'ワールドスポーツへ出荷データ送信にエラーが発生しました';
             $information['title_mail'] = '※本メールは自動配信メールです。';
             $information['content1'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
             $information['content2'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
@@ -1413,7 +1402,7 @@ class MailService
 
         // Information successfully
         if ($information['status'] == 1) {
-            $information['subject_mail'] = '在庫データの送信が完了しました';
+            $information['subject_mail'] = 'ナチュラムへ在庫データ送信が完了しました';
             $information['title_mail'] = '※本メールは自動配信メールです。';
             $information['title_time'] = '送信完了日時';
             $information['content1'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
@@ -1422,7 +1411,7 @@ class MailService
 
         // Information error
         if ($information['status'] == 0) {
-            $information['subject_mail'] = '在庫データ送信にエラーが発生しました';
+            $information['subject_mail'] = 'ナチュラムへ在庫データ送信にエラーが発生しました';
             $information['title_mail'] = '※本メールは自動配信メールです。';
             $information['content1'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
             $information['content2'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
@@ -1495,7 +1484,7 @@ class MailService
 
         // Information successfully
         if ($information['status'] == 1) {
-            $information['subject_mail'] = 'EOS納品データの送信が完了しました';
+            $information['subject_mail'] = 'ナチュラムへ納品データ送信が完了しました';
             $information['title_mail'] = '※本メールは自動配信メールです。';
             $information['title_time'] = '送信完了日時';
             $information['content1'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
@@ -1504,7 +1493,7 @@ class MailService
 
         // Information error
         if ($information['status'] == 0) {
-            $information['subject_mail'] = 'EOS納品データ送信にエラーが発生しました';
+            $information['subject_mail'] = 'ナチュラムへ納品データ送信にエラーが発生しました';
             $information['title_mail'] = '※本メールは自動配信メールです。';
             $information['content1'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
             $information['content2'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
