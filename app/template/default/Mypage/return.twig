@@ -221,7 +221,13 @@
 											<p class="text-nowrap">{{ item.product_name }}</p>
 										</td>
 										<td title="shipping_num">
-											<p class="text-nowrap">{{ item.shipping_num }}</p>
+											<p class="text-nowrap">
+												{% if item.quantity > 1 %}
+													{{ item.shipping_num * item.quantity }}
+												{% else %}
+													{{ item.shipping_num }}
+												{% endif %}
+											</p>
 										</td>
 									</tr>
 								</form>
