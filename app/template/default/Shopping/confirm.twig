@@ -398,6 +398,7 @@ file that was distributed with this source code.
                         <div>
                             {% if customer_order_no is defined %}
                                 {{ customer_order_no }}
+                                <input type="hidden" name="customer_order_no" value="{{ customer_order_no }}">
                             {% endif %}
                         </div>
                     </div>
