@@ -156,10 +156,16 @@
 									</td>
 									<td title="jan_code | product_name">
 										<p class="text-nowrap">{{ item.jan_code }}</p>
-										<p class="text-nowrap">{{ item.product_code }}</p>
+										<p class="text-nowrap">{{ item.product_name }}</p>
 									</td>
 									<td title="shipping_num">
-										<p class="text-nowrap">{{ item.shipping_num }}</p>
+										<p class="text-nowrap">
+											{% if item.quantity > 1 %}
+												{{ item.shipping_num * item.quantity }}
+											{% else %}
+												{{ item.shipping_num }}
+											{% endif %}
+										</p>
 									</td>
 									<td title="return_number">
 										<p class="text-nowrap">{{ item.returns_num }}</p>
