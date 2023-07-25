@@ -390,6 +390,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'product_returns_info.returns_request_date',
             'product.product_code',
             'product.product_name',
+            'product.quantity',
             'returns_reson.returns_reson',
             'shipping.shipping_num'
         );
@@ -486,6 +487,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'product_returns_info.shipping_num',
             'product.product_code',
             'product.product_name',
+            'product.quantity',
             'returns_reson.returns_reson',
         );
 
