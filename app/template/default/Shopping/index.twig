@@ -341,6 +341,10 @@ $(function () {
             $('.error_delivery_address').hide();
         }
 
+        if ($("#customer_order_no").val().trim() != '' && $("#error_customer_order_no").text().trim() != '') {
+            isSubmit = 0;
+        }
+
         if (checkDate() && isSubmit === 1) {
             $('#shopping-form').submit();
         }
@@ -704,14 +708,21 @@ function updateDeliverydAdress(delivery_code) {
         data: {
             customer_order_no:value,
             '_token':'{{ csrf_token('_token') }}',
+        },
+        beforeSend: function(xhr, settings) {
+            loadingOverlay();
         }
     })
     .done(function(data) {
         if (data.status == 1) {
-            $(".error_customer_order_no").css('display', 'initial');
+            $("#error_customer_order_no").text('客先注文番号がすでに登録されています');
+            $("#error_customer_order_no").css('display', 'initial');
         } else {
-            $(".error_customer_order_no").css('display', 'none');
+            $("#error_customer_order_no").text('');
+            $("#error_customer_order_no").css('display', 'none');
         }
+    }).always(function() {
+        loadingOverlay('hide');
     });
 }
 </script>
@@ -1310,9 +1321,7 @@ function updateDeliverydAdress(delivery_code) {
                             <input type="text" class="form-control" name="customer_order_no" id="customer_order_no" value="{% if customer_order_no is defined %}{{ customer_order_no }}{% endif %}" onkeyup="checkOrderNoExisted(this)" maxlength="20">
                         </div>
                     </div>
-                    <p class="error_customer_order_no" style="color: red; font-size: larger; font-weight: bold; display: none">
-                        客先注文番号がすでに登録されています
-                    </p>
+                    <p id="error_customer_order_no" style="color: red; font-size: larger; font-weight: bold; display: none"></p>
                 </div>
                 {#Customer Order No#}
 

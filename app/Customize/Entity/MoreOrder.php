@@ -76,13 +76,6 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
         private $remarks4;
 
         /**
-         * @var string
-         *
-         * @ORM\Column(name="customer_order_no",nullable=true, type="string", length=20, options={"comment":"客先発注番号"})
-         */
-        private $customer_order_no;
-
-        /**
          * @return string
          */
         public function getPreOrderId()
@@ -275,22 +268,6 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
         public function getRemarks4()
         {
             return $this->remarks4;
-        }
-
-        /**
-         * @return string
-         */
-        public function getCustomerOrderNo()
-        {
-            return $this->customer_order_no;
-        }
-
-        /**
-         * @param $customer_order_no
-         */
-        public function setCustomerOrderNo($customer_order_no)
-        {
-            $this->customer_order_no = $customer_order_no;
         }
     }
 }

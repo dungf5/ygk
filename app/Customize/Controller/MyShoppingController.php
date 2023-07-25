@@ -711,23 +711,26 @@ class MyShoppingController extends AbstractShoppingController
                 $remarks2 = $moreOrder->getRemarks2();
                 $remarks3 = $moreOrder->getRemarks3();
                 $remarks4 = $moreOrder->getRemarks4();
-                $customer_order_no = $moreOrder->getCustomerOrderNo();
                 $location = $comS->getCustomerLocation($customerCode);
                 $reCustomer = $comS->getCustomerRelationFromUser($customerCode, $login_type, $login_code);
                 $fusrdec1 = ($comS->getMstCustomerCode($reCustomer['customer_code'] ?? ''))['fusrdec1'] ?? 0;
 
                 $item_index = 0;
+
+                $customer_order_no = $request->get('customer_order_no', '');
                 if (!empty($customer_order_no)) {
                     $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findOneBy([
-                        'customer_code' => trim($reCustomer['customer_code'] ?? ''),
                         'order_no' => trim($customer_order_no),
                     ], [
                         'order_lineno' => 'DESC',
                     ]);
-                }
 
-                if (!empty($dtOrder)) {
-                    $item_index = (int) $dtOrder['order_lineno'];
+                    if (!empty($dtOrder)) {
+                        $orderNo = $dtOrder['order_no'];
+                        $item_index = $dtOrder['order_lineno'];
+                    } else {
+                        $orderNo = $customer_order_no;
+                    }
                 }
 
                 foreach ($itemList as $itemOr) {
@@ -737,7 +740,7 @@ class MyShoppingController extends AbstractShoppingController
                         $arEcLData[] = [
                             'ec_order_no' => $orderNo,
                             'ec_order_lineno' => $item_index,
-                            'order_no' => !empty($customer_order_no) ? trim($customer_order_no) : $orderNo,
+                            'order_no' => $orderNo,
                             'order_lineno' => $item_index,
                             'product_code' => $hsArrEcProductCusProduct[$itemOr->getId()],
                             'customer_code' => $reCustomer['customer_code'] ?? '',
