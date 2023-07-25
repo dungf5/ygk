@@ -161,58 +161,60 @@ class NatSortCommand extends Command
         $result = $this->csvService->transferFile($path_from, $path_to, $file_from, $file_to, $error_file);
         log_info($result['message']);
 
+        // Cancel send mail by task #2084
         // Send mail error
-        if ($result['status'] == -1) {
-            log_info('[NAT-SORT] Send Mail FTP.');
-            $information = [
-                'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
-                'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
-                'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
-                'file_name' => 'Mail/nat_ftp.twig',
-                'status' => 0,
-                'error_content' => $result['message'],
-            ];
-
-            try {
-                $this->mailService->sendMailImportNatEOS($information);
-            } catch (\Exception $e) {
-                log_error($e->getMessage());
-                $this->pushGoogleChat($e->getMessage());
-            }
-        }
+//        if ($result['status'] == -1) {
+//            log_info('[NAT-SORT] Send Mail FTP.');
+//            $information = [
+//                'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+//                'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+//                'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
+//                'file_name' => 'Mail/nat_ftp.twig',
+//                'status' => 0,
+//                'error_content' => $result['message'],
+//            ];
+//
+//            try {
+//                $this->mailService->sendMailImportNatEOS($information);
+//            } catch (\Exception $e) {
+//                log_error($e->getMessage());
+//                $this->pushGoogleChat($e->getMessage());
+//            }
+//        }
 
         // Success
-        if ($result['status'] == 1) {
-            // Save file information to DB
-            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-            $insertDate = [
-                'file_name' => $file_to,
-                'directory' => $path_to.date('Y/m'),
-                'message' => null,
-                'is_sync' => 0,
-                'is_error' => 0,
-                'is_send_mail' => 1,
-            ];
-
-            $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
-
-            log_info('[NAT-SORT] Send Mail FTP.');
-            $information = [
-                'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
-                'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
-                'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
-                'file_name' => 'Mail/nat_ftp.twig',
-                'status' => 1,
-                'finish_time' => '('.$file_from.') '.date('Y/m/d H:i:s'),
-            ];
-
-            try {
-                $this->mailService->sendMailImportNatEOS($information);
-            } catch (\Exception $e) {
-                log_error($e->getMessage());
-                $this->pushGoogleChat($e->getMessage());
-            }
-        }
+//        if ($result['status'] == 1) {
+//            // Save file information to DB
+//            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+//            $insertDate = [
+//                'file_name' => $file_to,
+//                'directory' => $path_to.date('Y/m'),
+//                'message' => null,
+//                'is_sync' => 0,
+//                'is_error' => 0,
+//                'is_send_mail' => 1,
+//            ];
+//
+//            $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
+//
+//            log_info('[NAT-SORT] Send Mail FTP.');
+//            $information = [
+//                'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
+//                'email_cc' => !empty(getenv('EMAILCC_WS_EOS')) ? getenv('EMAILCC_WS_EOS') : '',
+//                'email_bcc' => !empty(getenv('EMAILBCC_WS_EOS')) ? getenv('EMAILBCC_WS_EOS') : '',
+//                'file_name' => 'Mail/nat_ftp.twig',
+//                'status' => 1,
+//                'finish_time' => '('.$file_from.') '.date('Y/m/d H:i:s'),
+//            ];
+//
+//            try {
+//                $this->mailService->sendMailImportNatEOS($information);
+//            } catch (\Exception $e) {
+//                log_error($e->getMessage());
+//                $this->pushGoogleChat($e->getMessage());
+//            }
+//        }
+        // End - Cancel send mail by task #2084
 
         log_info('End Get File Nat Sort');
     }

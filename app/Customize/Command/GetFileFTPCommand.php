@@ -146,7 +146,7 @@ class GetFileFTPCommand extends Command
             ];
 
             try {
-                $this->mailService->sendMailImportWSEOS($information);
+                $this->mailService->sendMailGetCsvWSEOS($information);
             } catch (\Exception $e) {
                 log_error($e->getMessage());
                 $this->pushGoogleChat($e->getMessage());
@@ -179,7 +179,7 @@ class GetFileFTPCommand extends Command
             ];
 
             try {
-                $this->mailService->sendMailImportWSEOS($information);
+                $this->mailService->sendMailGetCsvWSEOS($information);
             } catch (\Exception $e) {
                 log_error($e->getMessage());
                 $this->pushGoogleChat($e->getMessage());
@@ -225,7 +225,7 @@ class GetFileFTPCommand extends Command
             ];
 
             try {
-                $this->mailService->sendMailImportNatEOS($information);
+                $this->mailService->sendMailGetCSVNatEOS($information);
             } catch (\Exception $e) {
                 log_error($e->getMessage());
                 $this->pushGoogleChat($e->getMessage());
@@ -258,7 +258,7 @@ class GetFileFTPCommand extends Command
             ];
 
             try {
-                $this->mailService->sendMailImportNatEOS($information);
+                $this->mailService->sendMailGetCSVNatEOS($information);
             } catch (\Exception $e) {
                 log_error($e->getMessage());
                 $this->pushGoogleChat($e->getMessage());

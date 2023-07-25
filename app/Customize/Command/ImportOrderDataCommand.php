@@ -386,7 +386,7 @@ class ImportOrderDataCommand extends Command
         ];
 
         // Information
-        $information['subject_mail'] = 'ナチュラムの発注明細データ受信が完了しました';
+        $information['subject_mail'] = '【ナチュラム】ご注文ありがとうございます';
         $information['title_mail'] = 'この度はご注文いただき誠にありがとうございます。';
         $information['content'] = '下記ご注文内容にお間違えがないかご確認下さい。';
         $information['content2'] = 'お問い合わせは弊社営業担当者までご連絡くださいますようお願いいたします。';
