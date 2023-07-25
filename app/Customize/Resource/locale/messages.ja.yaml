@@ -76,7 +76,7 @@ front.mypage.shipping.order_number: 注文番号
 front.mypage.shipping.detail: 明細
 front.mypage.return.return_type: 返品
 front.mypage.return.return_number: 返品数
-front.mypage.return.return_status: 返品中
+front.mypage.return.return_status: 返品中数
 front.mypage.return.shipping_no: 出荷指示№
 front.mypage.return.shipping_date: 出荷日
 front.mypage.return.shiping_code: 出荷先
