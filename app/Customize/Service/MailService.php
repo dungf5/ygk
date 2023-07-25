@@ -765,7 +765,7 @@ class MailService
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function sendMailImportWSEOS($information = [])
+    public function sendMailGetCsvWSEOS($information = [])
     {
         if (empty($information)) {
             return;
@@ -779,7 +779,7 @@ class MailService
 
         // Information successfully
         if ($information['status'] == 1) {
-            $information['subject_mail'] = 'EOS注文データ受信が完了しました';
+            $information['subject_mail'] = 'ワールドスポーツの発注データ受信が完了しました';
             $information['title_mail'] = '※本メールは自動配信メールです。';
             $information['title_time'] = '受信完了日時';
             $information['content1'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
@@ -788,7 +788,7 @@ class MailService
 
         // Information error
         if ($information['status'] == 0) {
-            $information['subject_mail'] = 'EOS注文データ受信にエラーが発生しました';
+            $information['subject_mail'] = 'ワールドスポーツの発注文データ受信にエラーが発生しました';
             $information['title_mail'] = '※本メールは自動配信メールです。';
             $information['content1'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
             $information['content2'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
@@ -847,7 +847,7 @@ class MailService
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function sendMailImportNatEOS($information = [])
+    public function sendMailGetCSVNatEOS($information = [])
     {
         if (empty($information)) {
             return;
@@ -861,7 +861,7 @@ class MailService
 
         // Information successfully
         if ($information['status'] == 1) {
-            $information['subject_mail'] = '発注データ受信が完了しました';
+            $information['subject_mail'] = 'ナチュラムの発注明細データ受信が完了しました';
             $information['title_mail'] = '※本メールは自動配信メールです。';
             $information['title_time'] = '受信完了日時';
             $information['content1'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
@@ -870,7 +870,7 @@ class MailService
 
         // Information error
         if ($information['status'] == 0) {
-            $information['subject_mail'] = '発注データ受信にエラーが発生しました';
+            $information['subject_mail'] = 'ナチュラムの発注データ受信にエラーが発生しました';
             $information['title_mail'] = '※本メールは自動配信メールです。';
             $information['content1'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
             $information['content2'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
