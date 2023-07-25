@@ -1386,12 +1386,14 @@ SQL;
                 [
                     'order_no' => $itemSave['order_no'],
                     'order_lineno' => $itemSave['order_lineno'],
+                    'customer_code' => $itemSave['customer_code'],
                 ]
             );
             $orderItem = new DtOrder();
 
             if ($objRep !== null) {
-                $orderItem = $objRep;
+                log_error("Order {$itemSave['order_no']}-{$itemSave['order_lineno']} is existed");
+                continue;
             }
 
             $orderItem->setOrderLineno($itemSave['order_lineno']);
@@ -1444,6 +1446,7 @@ SQL;
                 [
                     'cus_order_no' => $itemSave['order_no'],
                     'cus_order_lineno' => $itemSave['order_lineno'],
+                    'customer_code' => $itemSave['customer_code'],
                 ]
             );
             $orderItem = new DtOrderStatus();
