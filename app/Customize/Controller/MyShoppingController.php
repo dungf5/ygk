@@ -719,18 +719,20 @@ class MyShoppingController extends AbstractShoppingController
 
                 $customer_order_no = $request->get('customer_order_no', '');
                 if (!empty($customer_order_no)) {
-                    $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findOneBy([
-                        'order_no' => trim($customer_order_no),
-                    ], [
-                        'order_lineno' => 'DESC',
-                    ]);
+//                    $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findOneBy([
+//                        'order_no' => trim($customer_order_no),
+//                    ], [
+//                        'order_lineno' => 'DESC',
+//                    ]);
+//
+//                    if (!empty($dtOrder)) {
+//                        $orderNo = $dtOrder['order_no'];
+//                        $item_index = $dtOrder['order_lineno'];
+//                    } else {
+//                        $orderNo = $customer_order_no;
+//                    }
 
-                    if (!empty($dtOrder)) {
-                        $orderNo = $dtOrder['order_no'];
-                        $item_index = $dtOrder['order_lineno'];
-                    } else {
-                        $orderNo = $customer_order_no;
-                    }
+                    $orderNo = $customer_order_no;
                 }
 
                 foreach ($itemList as $itemOr) {

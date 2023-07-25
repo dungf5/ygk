@@ -17,6 +17,7 @@ if (!class_exists('\Customize\Entity\DtOrder', false)) {
          * @var string
          *
          * @ORM\Column(name="customer_code",nullable=false, type="string", length=25, options={"comment":"顧客コード"})
+         * @ORM\Id
          */
         private $customer_code;
         /**
