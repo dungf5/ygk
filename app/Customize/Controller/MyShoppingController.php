@@ -677,6 +677,7 @@ class MyShoppingController extends AbstractShoppingController
                 //save more nvtrong
                 $comS = new MyCommonService($this->entityManager);
                 $orderNo = $Order->getOrderNo();
+                $ec_orderNo = $Order->getOrderNo();
                 $subTotal = $Order->getSubtotal();
                 $itemList = $Order->getItems()->toArray();
                 $arEcLData = [];
@@ -719,19 +720,6 @@ class MyShoppingController extends AbstractShoppingController
 
                 $customer_order_no = $request->get('customer_order_no', '');
                 if (!empty($customer_order_no)) {
-//                    $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findOneBy([
-//                        'order_no' => trim($customer_order_no),
-//                    ], [
-//                        'order_lineno' => 'DESC',
-//                    ]);
-//
-//                    if (!empty($dtOrder)) {
-//                        $orderNo = $dtOrder['order_no'];
-//                        $item_index = $dtOrder['order_lineno'];
-//                    } else {
-//                        $orderNo = $customer_order_no;
-//                    }
-
                     $orderNo = $customer_order_no;
                 }
 
@@ -740,7 +728,7 @@ class MyShoppingController extends AbstractShoppingController
                         $item_index++;
 
                         $arEcLData[] = [
-                            'ec_order_no' => $orderNo,
+                            'ec_order_no' => $ec_orderNo,
                             'ec_order_lineno' => $item_index,
                             'order_no' => $orderNo,
                             'order_lineno' => $item_index,
