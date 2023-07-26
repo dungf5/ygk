@@ -295,18 +295,6 @@ class MyCartController extends AbstractController
                 ];
             }
 
-            if (isset($customer_order_no)) {
-                $name = 'customer_order_no';
-                $commonService->saveTempCartRemarks($pre_order_id, $name, trim($customer_order_no));
-
-                $result = [
-                    'is_ok' => '1',
-                    'msg' => 'OK',
-                    'customer_order_no' => $customer_order_no,
-                    'pre_order_id' => $pre_order_id,
-                ];
-            }
-
             return $this->json($result, 200);
         }
 
