@@ -183,20 +183,21 @@ class NatSortCommand extends Command
 //        }
 
         // Success
-//        if ($result['status'] == 1) {
-//            // Save file information to DB
-//            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-//            $insertDate = [
-//                'file_name' => $file_to,
-//                'directory' => $path_to.date('Y/m'),
-//                'message' => null,
-//                'is_sync' => 0,
-//                'is_error' => 0,
-//                'is_send_mail' => 1,
-//            ];
-//
-//            $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
-//
+        if ($result['status'] == 1) {
+            // Save file information to DB
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            $insertDate = [
+                'file_name' => $file_to,
+                'directory' => $path_to.date('Y/m'),
+                'message' => null,
+                'is_sync' => 0,
+                'is_error' => 0,
+                'is_send_mail' => 1,
+            ];
+
+            $this->entityManager->getRepository(DtImportCSV::class)->insertData($insertDate);
+
+            // Cancel send mail by task #2084
 //            log_info('[NAT-SORT] Send Mail FTP.');
 //            $information = [
 //                'email' => !empty(getenv('EMAIL_WS_EOS')) ? getenv('EMAIL_WS_EOS') : 'order_support@xbraid.net',
@@ -213,8 +214,7 @@ class NatSortCommand extends Command
 //                log_error($e->getMessage());
 //                $this->pushGoogleChat($e->getMessage());
 //            }
-//        }
-        // End - Cancel send mail by task #2084
+        }
 
         log_info('End Get File Nat Sort');
     }
@@ -424,7 +424,6 @@ class NatSortCommand extends Command
                     ];
 
                     fputcsv($fp, $fields);
-
                 } catch (\Exception $e) {
                     log_error($e->getMessage());
                     $this->pushGoogleChat($e->getMessage());
