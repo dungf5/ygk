@@ -166,6 +166,15 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                 {#    return ;#}
                 {#}#}
 
+                // Check Product current type in cart
+                let current_product_type = "{{ global_service.getProductType }}";
+                let cart_product_type = "{{ global_service.getCartProductType }}";
+
+                if (cart_product_type != '' && current_product_type != cart_product_type) {
+                    swal("エラー", "通常品と特注品が混在しています", "error");
+                    return;
+                }
+
                 {% if form.classcategory_id1 is defined %}
                 // 規格1フォームの必須チェック
                 if ($('#classcategory_id1').val() == '__unselected' || $('#classcategory_id1').val() == '') {

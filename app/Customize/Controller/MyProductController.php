@@ -717,4 +717,28 @@ class MyProductController extends AbstractController
             return trans('front.product.all_products');
         }
     }
+
+    /**
+     * Change Otodoke Code.
+     *
+     * @Route("/products/type/change", name="products_type_change", methods={"POST"})
+     * @Template("Product/product_list.twig")
+     */
+    public function changeProductType(Request $request)
+    {
+        try {
+            if ('POST' === $request->getMethod()) {
+                $product_type = $request->get('product_type', 1);
+
+                //Nạp lại session product_type
+                $_SESSION['s_product_type'] = in_array($product_type, [1, 2]) ? $product_type : 1;
+
+                return $this->json(['status' => 1], 200);
+            }
+
+            return $this->json(['status' => 0, 'message' => 'Method not Allowed'], 400);
+        } catch (\Exception $e) {
+            return $this->json(['status' => -1, 'message' => $e->getMessage()], 400);
+        }
+    }
 }

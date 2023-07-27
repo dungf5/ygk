@@ -224,4 +224,20 @@ class GlobalService
 
         return 0;
     }
+
+    public function getProductType()
+    {
+        // 1. 通常品 (normal product)
+        // 2. 特注品 (special product)
+
+        return $_SESSION['s_product_type'] ?? 1;
+    }
+
+    public function getCartProductType()
+    {
+        // 1. 通常品 (normal product)
+        // 2. 特注品 (special product)
+
+        return $_SESSION['cart_product_type'] ?? '';
+    }
 }
