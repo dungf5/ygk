@@ -311,6 +311,7 @@ SQL;
                     c.ec_order_no,
                     c.ec_order_lineno,
                     b.product_name,
+                    b.quantity,
                     f.delivery_no,
                     c.inquiry_no,
                     c.shipping_no,
