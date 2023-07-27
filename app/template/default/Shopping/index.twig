@@ -345,6 +345,11 @@ $(function () {
             isSubmit = 0;
         }
 
+        if ("{{ global_service.getProductType }}" == 2 && $("#remarks1").val().trim() == '' && $("#remarks2").val().trim() == '') {
+            $('.error_remarks').show();
+            isSubmit = 0;
+        }
+
         if (checkDate() && isSubmit === 1) {
             $('#shopping-form').submit();
         }
@@ -1378,6 +1383,9 @@ function updateDeliverydAdress(delivery_code) {
                         <input type="text" class="form-control" name="remarks2" id="remarks2" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks2 }}{% endif %}" onkeyup="updateTempOrder(this)">
                     </div>
                 </div>
+                <p class="error_remarks" style="color: red;font-size: larger;font-weight: bold;display: none">
+                    生産依頼備考１または生産依頼備考２を入力してください
+                </p>
                 {# End - Remarks#}
             </div>
 
