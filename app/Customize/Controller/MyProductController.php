@@ -222,6 +222,15 @@ class MyProductController extends AbstractController
         $mstDeliveryPlan = null;
         $mstProduct = $this->mstProductRepository->getData($Product->getId());
 
+        //Check product type
+        if ($this->globalService->getProductType() == 2 && $this->globalService->getSpecialOrderFlg() == 1) {
+            if ($mstProduct->getSpecialOrderFlg() == null || strtolower($mstProduct->getSpecialOrderFlg()) != 'y') {
+                return $this->redirect($referer);
+            }
+        } elseif (strtolower($mstProduct->getSpecialOrderFlg()) == 'y') {
+            return $this->redirect($referer);
+        }
+
         if (
             empty($mstProduct) ||
             (!$this->globalService->getSpecialOrderFlg() && strtoupper($mstProduct->getSpecialOrderFlg()) == 'Y')
