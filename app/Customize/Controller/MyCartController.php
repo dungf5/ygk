@@ -23,6 +23,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
+use Eccube\Entity\Cart;
 use Eccube\Entity\ProductClass;
 use Eccube\Repository\BaseInfoRepository;
 use Eccube\Repository\ProductClassRepository;
@@ -180,7 +181,6 @@ class MyCartController extends AbstractController
             $remarks2 = $request->get('remarks2');
             $remarks3 = $request->get('remarks3');
             $remarks4 = $request->get('remarks4');
-            $customer_order_no = $request->get('customer_order_no');
 
             $result = [
                 'is_ok' => '1',
@@ -525,6 +525,11 @@ class MyCartController extends AbstractController
 //        $Carts = $this->cartService->getCarts();
 //        $this->execPurchaseFlow($Carts);
 
+        // Push session cart product type
+        if (!count($Carts)) {
+            unset($_SESSION['cart_product_type']);
+        }
+
         log_info('カート演算処理終了', ['operation' => $operation, 'product_class_id' => $productClassId]);
 
         return $this->redirectToRoute('cart');
@@ -534,5 +539,52 @@ class MyCartController extends AbstractController
 //            $cartId = $Carts[0]->getId();
 //            $totalNew = $myComS->getTotalItemCart($cartId);
 //        }
+    }
+
+    /**
+     * @Route("/block/cart", name="block_cart", methods={"GET"})
+     * @Route("/block/cart_sp", name="block_cart_sp", methods={"GET"})
+     */
+    public function addCart(Request $request)
+    {
+        // Push session cart product type
+        $cart_product_type = $this->globalService->getCartProductType();
+        if (empty($cart_product_type)) {
+            $_SESSION['cart_product_type'] = $this->globalService->getProductType();
+        }
+
+        $Carts = $this->cartService->getCarts();
+
+        // 二重に実行され, 注文画面でのエラーハンドリングができないので
+        // ここではpurchaseFlowは実行しない
+
+        $totalQuantity = array_reduce($Carts, function ($total, $Cart) {
+            /* @var Cart $Cart */
+            $total += $Cart->getTotalQuantity();
+
+            return $total;
+        }, 0);
+        $totalPrice = array_reduce($Carts, function ($total, $Cart) {
+            /* @var Cart $Cart */
+            $total += $Cart->getTotalPrice();
+
+            return $total;
+        }, 0);
+
+        $route = $request->attributes->get('_route');
+
+        if ($route == 'block_cart_sp') {
+            return $this->render('Block/nav_sp.twig', [
+                'totalQuantity' => $totalQuantity,
+                'totalPrice' => $totalPrice,
+                'Carts' => $Carts,
+            ]);
+        } else {
+            return $this->render('Block/cart.twig', [
+                'totalQuantity' => $totalQuantity,
+                'totalPrice' => $totalPrice,
+                'Carts' => $Carts,
+            ]);
+        }
     }
 }
