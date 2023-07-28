@@ -341,7 +341,7 @@ $(function () {
             $('.error_delivery_address').hide();
         }
 
-        if ("{{ global_service.getProductType }}" == 2 && $("#remarks1").val().trim() == '' && $("#remarks2").val().trim() == '') {
+        if ("{{ global_service.getCartProductType }}" == 2 && $("#remarks1").val().trim() == '' && $("#remarks2").val().trim() == '') {
              $('.error_remarks').show();
              isSubmit = 0;
         }
