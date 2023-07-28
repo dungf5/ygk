@@ -226,9 +226,15 @@ class MyProductController extends AbstractController
         if ($this->globalService->getProductType() == 2 && $this->globalService->getSpecialOrderFlg() == 1) {
             if ($mstProduct->getSpecialOrderFlg() == null || strtolower($mstProduct->getSpecialOrderFlg()) != 'y') {
                 return $this->redirect($referer);
+            } else {
+                // special product
+                $mstProduct->product_type = '2';
             }
         } elseif (strtolower($mstProduct->getSpecialOrderFlg()) == 'y') {
             return $this->redirect($referer);
+        } else {
+            // normal product
+            $mstProduct->product_type = '1';
         }
 
         if (
@@ -376,10 +382,6 @@ class MyProductController extends AbstractController
         $form = $builder->getForm();
         $form->handleRequest($request);
 
-        if (!$form->isValid()) {
-            throw new NotFoundHttpException();
-        }
-
         $addCartData = $form->getData();
 
         log_info(
@@ -388,8 +390,23 @@ class MyProductController extends AbstractController
                 'product_id' => $Product->getId(),
                 'product_class_id' => $addCartData['product_class_id'],
                 'quantity' => $addCartData['quantity'],
+                'product_type' => $request->get('product_type', 1),
             ]
         );
+
+        // Push session cart product type
+        $cart_product_type = $this->globalService->getCartProductType();
+        if (empty($cart_product_type)) {
+            $_SESSION['cart_product_type'] = $request->get('product_type', 1);
+        } else {
+            if ($cart_product_type != $request->get('product_type', 1)) {
+                return $this->json([
+                    'status' => 0,
+                    'message' => '通常品と特注品が混在しています',
+                ]);
+            }
+        }
+
         $carSession = MyCommon::getCarSession();
 
         //////////////////////////////check in cart
@@ -446,6 +463,7 @@ class MyProductController extends AbstractController
                 'product_id' => $Product->getId(),
                 'product_class_id' => $addCartData['product_class_id'],
                 'quantity' => $addCartData['quantity'],
+                'product_type' => $request->get('product_type', 1),
             ]
         );
 
@@ -484,6 +502,7 @@ class MyProductController extends AbstractController
             }
 
             return $this->json([
+                'status' => 1,
                 'done' => $done,
                 'messages' => $messages,
                 'totalNew' => $totalNew,
