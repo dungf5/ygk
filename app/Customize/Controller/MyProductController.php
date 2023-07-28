@@ -747,7 +747,7 @@ class MyProductController extends AbstractController
     }
 
     /**
-     * Change Otodoke Code.
+     * Change Product Type.
      *
      * @Route("/products/type/change", name="products_type_change", methods={"POST"})
      * @Template("Product/product_list.twig")
