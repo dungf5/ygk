@@ -525,7 +525,7 @@ class MyCartController extends AbstractController
 //        $Carts = $this->cartService->getCarts();
 //        $this->execPurchaseFlow($Carts);
 
-        // Push session cart product type
+        // Delete session cart product type
         if (!count($Carts)) {
             unset($_SESSION['cart_product_type']);
         }
@@ -547,12 +547,6 @@ class MyCartController extends AbstractController
      */
     public function addCart(Request $request)
     {
-        // Push session cart product type
-        $cart_product_type = $this->globalService->getCartProductType();
-        if (empty($cart_product_type)) {
-            $_SESSION['cart_product_type'] = $this->globalService->getProductType();
-        }
-
         $Carts = $this->cartService->getCarts();
 
         // 二重に実行され, 注文画面でのエラーハンドリングができないので

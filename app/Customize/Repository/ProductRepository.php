@@ -385,11 +385,14 @@ class ProductRepository extends AbstractRepository
         if ($this->globalService->getProductType() == 2) {
             if ($this->globalService->getSpecialOrderFlg() == 1) {
                 $qb->andWhere("(mstProduct.special_order_flg is not null AND mstProduct.special_order_flg = 'Y')");
+                $qb->addSelect("'2' AS product_type");
             } else {
-                $qb->andWhere("(mstProduct.special_order_flg = 'XXX')");
+                $qb->andWhere("(mstProduct.special_order_flg = 'xxx')");
+                $qb->addSelect("'xxx' AS product_type");
             }
         } else {
             $qb->andWhere("(mstProduct.special_order_flg <> 'Y' OR mstProduct.special_order_flg is null)");
+            $qb->addSelect("'1' AS product_type");
         }
 
         $qb->groupBy('mstProduct.product_code');

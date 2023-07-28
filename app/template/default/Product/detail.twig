@@ -166,15 +166,6 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                 {#    return ;#}
                 {#}#}
 
-                // Check Product current type in cart
-                let current_product_type = "{{ global_service.getProductType }}";
-                let cart_product_type = "{{ global_service.getCartProductType }}";
-
-                if (cart_product_type != '' && current_product_type != cart_product_type) {
-                    swal("エラー", "通常品と特注品が混在しています", "error");
-                    return;
-                }
-
                 {% if form.classcategory_id1 is defined %}
                 // 規格1フォームの必須チェック
                 if ($('#classcategory_id1').val() == '__unselected' || $('#classcategory_id1').val() == '') {
@@ -213,32 +204,40 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                         $('.add-cart').prop('disabled', true);
                     }
                 }).done(function(data) {
-                    // レスポンス内のメッセージをalertで表示
-                    $.each(data.messages, function() {
-                        $('#ec-modal-header').html(this);
-                    });
-                    //$.cookie(myStringArray[i] );
+                    if (!data.status) {
+                        // difference product type
+                        swal("エラー", data.message, "error");
+                        return;
 
-                    $('.ec-modal').show()
-                   $('.num>.fnDIN').html(data.totalNew);
+                    } else {
+                        // レスポンス内のメッセージをalertで表示
+                        $.each(data.messages, function() {
+                            $('#ec-modal-header').html(this);
+                        });
+                        //$.cookie(myStringArray[i] );
 
+                        $('.ec-modal').show()
+                        $('.num>.fnDIN').html(data.totalNew);
 
-                    //nvtrongxxx
-                let myValue =   $.cookie($('#product_id').val());
-                if( myValue!=undefined){
-                  $('#quantity').val(myValue);
-                 }
-                   $('.cart>a>.fnDIN').html(data.totalNew);
-                    let cartHtml ="<span class='fnDIN'>"+data.totalNew+"</span>";
-                    $('#emptyCart').html(cartHtml);
-                    // カートブロックを更新する
-                    $.ajax({
-                        url: "{{ url('block_cart') }}",
-                        type: 'GET',
-                        dataType: 'html'
-                    }).done(function(html) {
-                        $('.ec-headerRole__cart').html(html);
-                    });
+                        //nvtrongxxx
+                        let myValue =   $.cookie($('#product_id').val());
+                        if ( myValue!=undefined) {
+                            $('#quantity').val(myValue);
+                        }
+
+                        $('.cart>a>.fnDIN').html(data.totalNew);
+                        let cartHtml ="<span class='fnDIN'>"+data.totalNew+"</span>";
+                        $('#emptyCart').html(cartHtml);
+
+                        // カートブロックを更新する
+                        $.ajax({
+                            url: "{{ url('block_cart') }}",
+                            type: 'GET',
+                            dataType: 'html'
+                        }).done(function(html) {
+                            $('.ec-headerRole__cart').html(html);
+                        });
+                    }
                 }).fail(function(data) {
                     alert('{{ 'front.product.add_cart_error'|trans }}');
                 }).always(function(data) {
@@ -563,6 +562,9 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                                 {% endif %}
                             </div>
                             <div class="ec-productRole__btn" style="display: inline-flex">
+                                {#product type#}
+                                <input type="hidden" name="product_type" id="product_type" value="{{ MstProduct.product_type }}">
+
                                 <button type="button" class="ec-blockBtn--action add-cart">
                                     {{ 'front.product.add_cart'|trans }}
                                 </button>
