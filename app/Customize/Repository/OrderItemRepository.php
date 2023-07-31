@@ -133,8 +133,8 @@ class OrderItemRepository extends AbstractRepository
         }
 
         if ($paramSearch['search_order_no'] != '') {
-            $qb->andWhere('order_status.cus_order_no  = :search_order_no ')
-                ->setParameter(':search_order_no', $paramSearch['search_order_no']);
+            $qb->andWhere('order_status.cus_order_no  like :search_order_no ')
+                ->setParameter(':search_order_no', '%'.$paramSearch['search_order_no'].'%');
         }
 
         //group
