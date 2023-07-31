@@ -213,11 +213,11 @@ file that was distributed with this source code.
 
                                 <td>
                                     {% if Order.shipping_no %}
-                                        <a class=" btn btn-primary actBg " onclick="loadDataFor('all', '{{Order.ec_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest">
+                                        <a class=" btn btn-primary actBg " onclick="loadDataFor('all', '{{Order.cus_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest">
                                             出荷伝票状況
                                         </a>
                                         <br/><br/>
-                                        <a class=" btn btn-primary actBg " onclick="loadDataFor('one', '{{Order.ec_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest">
+                                        <a class=" btn btn-primary actBg " onclick="loadDataFor('one', '{{Order.cus_order_no}}','{{ Order.shipping_no }}', '{{Order.jan_code}}')" href="javascript:;"  data-toggle="modal" data-target="#flipFlopTest">
                                             出荷明細状況
                                         </a>
                                     {% else %}
@@ -256,13 +256,13 @@ file that was distributed with this source code.
     <script src="{{ asset('assets/js/bootstrap-multiselect.min.js') }}"></script>
 
     <script>
-        function updateShipingAddress(type, shipping_no, ec_order_no, jan_code) {
+        function updateShipingAddress(type, shipping_no, cus_order_no, jan_code) {
             $('.showbody').html("loading...");
 
             let dataSend    = {
                 type : type,
                 shipping_no:shipping_no,
-                order_no:ec_order_no,
+                order_no:cus_order_no,
                 jan_code:jan_code,
                 '_token':'{{ csrf_token('_token') }}',
             };
@@ -279,8 +279,8 @@ file that was distributed with this source code.
             });
         }
 
-        function loadDataFor(type, ec_order_no, shipping_no, jan_code) {
-            updateShipingAddress(type, shipping_no,ec_order_no, jan_code);
+        function loadDataFor(type, cus_order_no, shipping_no, jan_code) {
+            updateShipingAddress(type, shipping_no,cus_order_no, jan_code);
         }
 
         $('#search_order_date').multiselect({

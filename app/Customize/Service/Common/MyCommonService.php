@@ -308,8 +308,6 @@ SQL;
                     d.company_name as user_created_company_name,
                     b.jan_code,
                     f.order_no as deli_order_no,
-                    c.ec_order_no,
-                    c.ec_order_lineno,
                     b.product_name,
                     f.delivery_no,
                     c.inquiry_no,
@@ -345,8 +343,8 @@ SQL;
                 join mst_customer as d
                 on c.customer_code = d.customer_code
                 left join mst_customer AS cus2 ON  cus2.customer_code = c.shipping_code
-                left join mst_delivery  as f on concat(TRIM(c.ec_order_no), '-', TRIM(c.ec_order_lineno)) = TRIM(f.order_no)
-                where {$condition} and c.shipping_no = ? and a.ec_order_no = ? and delete_flg <> 0
+                left join mst_delivery  as f on concat(TRIM(c.cus_order_no), '-', TRIM(c.cus_order_lineno)) = TRIM(f.order_no)
+                where {$condition} and c.shipping_no = ? and a.cus_order_no = ? and delete_flg <> 0
             ";
 
         $param = [];
