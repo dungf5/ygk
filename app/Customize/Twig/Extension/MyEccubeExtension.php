@@ -136,7 +136,7 @@ class MyEccubeExtension extends AbstractExtension
 
     public function getWebRootUrl(){
 
-        return MyConstant::MY_WEB;
+        return env('APP_URL', '^127\\.0\\.0\\.1$,^localhost$');
     }
 
 }
