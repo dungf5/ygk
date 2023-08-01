@@ -243,7 +243,7 @@ class MypageController extends AbstractController
         $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
         FileUtil::makeDirectory($dirPdf);
         $arReturn = [
-            'myDatas' => array_chunk($arRe, 20),
+            'myDatas' => array_chunk($arRe, 15),
             'OrderTotal' => $totalaAmount,
             'totalTaxRe' => $totalTaxRe,
             'totalaAmountTax' => $totalaAmountTax,
@@ -1977,7 +1977,7 @@ class MypageController extends AbstractController
             $arRe[] = $arSpecial;
 
             $arReturn = [
-                'myDatas' => array_chunk($arRe, 20),
+                'myDatas' => array_chunk($arRe, 15),
                 'OrderTotal' => $totalaAmount,
                 'totalTaxRe' => $totalTaxRe,
                 'totalaAmountTax' => $totalaAmountTax,
