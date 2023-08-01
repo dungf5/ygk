@@ -1830,10 +1830,10 @@ class MypageController extends AbstractController
         $param = [
             'pageno' => $request->get('pageno', 1),
             'delivery_no' => $request->get('delivery_no'),
-            'search_shipping_date' => $request->get('shipping_date', 0),
-            'search_order_shipping' => $request->get('order_shipping', '0'),
-            'search_order_otodoke' => $request->get('order_otodoke', '0'),
-            'search_sale_type' => $request->get('sale_type', '0'),
+            'search_shipping_date' => $request->get('search_shipping_date', 0),
+            'search_order_shipping' => $request->get('search_order_shipping', '0'),
+            'search_order_otodoke' => $request->get('search_order_otodoke', '0'),
+            'search_sale_type' => $request->get('search_sale_type', '0'),
             'search_shipping_date_from' => $request->get('search_shipping_date_from', ''),
             'search_shipping_date_to' => $request->get('search_shipping_date_to', ''),
         ];
@@ -1929,10 +1929,10 @@ class MypageController extends AbstractController
         $preview = MyCommon::getPara('preview');
         $delivery_no = MyCommon::getPara('delivery_no');
         $params = [
-            'search_shipping_date' => MyCommon::getPara('shipping_date'),
-            'search_order_shipping' => MyCommon::getPara('order_shipping'),
-            'search_order_otodoke' => MyCommon::getPara('order_otodoke'),
-            'search_sale_type' => MyCommon::getPara('sale_type'),
+            'search_shipping_date' => MyCommon::getPara('search_shipping_date'),
+            'search_order_shipping' => MyCommon::getPara('search_order_shipping'),
+            'search_order_otodoke' => MyCommon::getPara('search_order_otodoke'),
+            'search_sale_type' => MyCommon::getPara('search_sale_type'),
             'search_shipping_date_from' => MyCommon::getPara('search_shipping_date_from'),
             'search_shipping_date_to' => MyCommon::getPara('search_shipping_date_to'),
         ];
@@ -1992,18 +1992,14 @@ class MypageController extends AbstractController
             $namePdf = 'ship_'.date('Ymd').'.pdf';
             $file = $dirPdf.'/'.$namePdf;
 
-            if (getenv('APP_IS_LOCAL') == 0) {
-                $htmlBody = $this->twig->render($htmlFileName, $arr_data);
-                MyCommon::converHtmlToPdf($dirPdf, $namePdf, $htmlBody);
-                header('Content-Description: File Transfer');
-                header('Content-Type: application/octet-stream');
-                header('Content-Disposition: attachment; filename="'.basename($file).'"');
-
-                readfile($file);
-                exit();
-            } else {
-                exec('"C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe" c:/wamp/www/test/pdf.html c:/wamp/www/test/pdf.pdf');
-            }
+            $html = $this->twig->render($htmlFileName, $arr_data);
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4');
+            $dompdf->render();
+            $dompdf->stream($file);
+            $output = $dompdf->output();
+            file_put_contents($file, $output);
         }
 
         if (!empty($arr_data)) {
