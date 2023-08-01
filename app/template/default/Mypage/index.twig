@@ -102,7 +102,7 @@ file that was distributed with this source code.
                                 <label for="search_order_no">{{ 'front.order.order_no'|trans| raw }}</label>
                                 <input type="text" class="form-control" id="search_order_no" name="search_order_no" value="{{ search_order_no }}">
                             </div>
-                            <button type="submit" class="btn btn-search">
+                            <button type="button" class="btn btn-search" onclick="handleSearch(this)">
                                 <i class="fas fa-angle-double-right" style="color: #f00"></i> 絞り込み
                             </button>
                         </form>
@@ -542,47 +542,76 @@ file that was distributed with this source code.
             let search              = window.location.search;
             pathname                += "?pageno=1";
 
-            if (name == 'search_order_date') {
-                clearTimeout(typingTimer);
-                loadingOverlay('hide');
+            clearTimeout(typingTimer);
+            loadingOverlay('hide');
 
-                typingTimer         = setTimeout(function () {
-                    loadingOverlay();
-                    handelChangeDate(origin, pathname, search);
-                }, doneTypingInterval);
-            }
-
-            if (name == 'search_order_status') {
-                clearTimeout(typingTimer);
-                loadingOverlay('hide');
-
-                typingTimer         = setTimeout(function () {
-                    loadingOverlay();
-                    handelChangeStatus(origin, pathname, search);
-                }, doneTypingInterval);
-            }
-
-            if (name == 'search_order_shipping') {
+            typingTimer = setTimeout(function () {
                 loadingOverlay();
-                let previousSelected    = $("input#last_order_shipping").val();
-                let lastSelected        = $("#search_order_shipping option:selected").last().val();
-
-                if (value == previousSelected) {
-                    value               = lastSelected;
+                if ($('#search_order_no').val().trim() != '') {
+                    pathname += '&search_order_no=' + $('#search_order_no').val().trim();
                 }
 
-                $('#search_order_shipping').multiselect('deselectAll');
+                if ($('#search_order_date').val() != '0') {
+                    pathname += '&search_order_date=' + $('#search_order_date').val();
+                }
 
-                setTimeout(function () {
-                    $('#search_order_shipping').multiselect('select', value);
-                    handelChangeShipping(origin, pathname);
-                }, 200);
-            }
+                if ($('#search_order_shipping').val() != '0') {
+                    pathname += '&search_order_shipping=' + $('#search_order_shipping').val();
+                }
 
-            if (name == 'search_order_otodoke') {
-                loadingOverlay();
-                handelChangeOtodoke(origin, pathname, search);
-            }
+                if ($('#search_order_otodoke').val() != '0') {
+                    pathname += '&search_order_otodoke=' + $('#search_order_otodoke').val();
+                }
+
+                if ($('#search_order_status').val() != '') {
+                    pathname += '&search_order_status=' + $('#search_order_status').val();
+                }
+
+                window.location.href = origin + pathname;
+
+            }, doneTypingInterval);
+
+            // if (name == 'search_order_date') {
+            //     clearTimeout(typingTimer);
+            //     loadingOverlay('hide');
+            //
+            //     typingTimer         = setTimeout(function () {
+            //         loadingOverlay();
+            //         handelChangeDate(origin, pathname, search);
+            //     }, doneTypingInterval);
+            // }
+            //
+            // if (name == 'search_order_status') {
+            //     clearTimeout(typingTimer);
+            //     loadingOverlay('hide');
+            //
+            //     typingTimer         = setTimeout(function () {
+            //         loadingOverlay();
+            //         handelChangeStatus(origin, pathname, search);
+            //     }, doneTypingInterval);
+            // }
+            //
+            // if (name == 'search_order_shipping') {
+            //     loadingOverlay();
+            //     let previousSelected    = $("input#last_order_shipping").val();
+            //     let lastSelected        = $("#search_order_shipping option:selected").last().val();
+            //
+            //     if (value == previousSelected) {
+            //         value               = lastSelected;
+            //     }
+            //
+            //     $('#search_order_shipping').multiselect('deselectAll');
+            //
+            //     setTimeout(function () {
+            //         $('#search_order_shipping').multiselect('select', value);
+            //         handelChangeShipping(origin, pathname);
+            //     }, 200);
+            // }
+            //
+            // if (name == 'search_order_otodoke') {
+            //     loadingOverlay();
+            //     handelChangeOtodoke(origin, pathname, search);
+            // }
         }
 
         function handleGetLastSelected() {
