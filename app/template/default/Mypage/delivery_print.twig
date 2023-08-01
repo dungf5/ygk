@@ -130,6 +130,7 @@ file that was distributed with this source code.
                 {# Task #1919, Hidden button#}
                 {#<button class="btn btn-danger btn-print-pdf" disabled onclick="handlePreviewPDF()">Preview & Print</button>#}
                 <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDF()">Download & Print</button>
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handleExportCsv()">Download CSV</button>
                 <input type="hidden" id="check-box-value-print-pdf" value=""/>
             </div>
 
@@ -777,6 +778,21 @@ file that was distributed with this source code.
             }
             
             let url = '/mypage/export_Pdf_multiple?delivery_no=' + $("#check-box-value-print-pdf").val() + path;
+            let a = document.createElement('a');
+            a.target = '_blank';
+            a.href = url;
+            a.click();
+        }
+
+        function handleExportCsv() {
+            path = '&search_shipping_date_from=' + $("#search_shipping_date_from").val();
+            path += '&search_shipping_date_to=' + $("#search_shipping_date_to").val();
+            path += "&sale_type=" + $("#search_sale_type").val();
+            path += "&shipping_date=" + $("#search_shipping_date").val();
+            path += "&order_shipping=" + $("#search_order_shipping").val();
+            path += "&order_otodoke=" + $("#search_order_otodoke").val();
+
+            let url = '/mypage/export_csv_multiple?delivery_no=' + $("#check-box-value-print-pdf").val() + path;
             let a = document.createElement('a');
             a.target = '_blank';
             a.href = url;

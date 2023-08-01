@@ -1199,7 +1199,7 @@ SQL;
         $subQuantity = ' CASE
                             WHEN mst_product.quantity > 1 THEN mst_product.quantity * mst_delivery.quanlity
                             ELSE mst_delivery.quanlity
-                            END AS quanlity
+                            END AS quantity
                         ';
 
         $subUnitPrice = '   CASE
@@ -1231,11 +1231,13 @@ SQL;
                             mst_delivery.addr01 ,
                             mst_delivery.addr02,
                             mst_delivery.addr03,
+                            mst_delivery.customer_code,
                             mst_delivery.company_name,
                             mst_delivery.department,
                             mst_delivery.delivery_lineno,
                             mst_delivery.sale_type,
-                            mst_product.jan_code as item_no,
+                            mst_delivery.item_no,
+                            mst_delivery.jan_code,
                             mst_delivery.item_name,
                             'PC' as unit,
                             mst_delivery.amount,
@@ -1244,8 +1246,10 @@ SQL;
                             mst_delivery.item_remark,
                             mst_delivery.total_amount,
                             mst_delivery.footer_remark1,
-                            mst_delivery.shiping_name as shiping_code,
-                            mst_delivery.otodoke_name  as otodoke_code,
+                            mst_delivery.shipping_code,
+                            mst_delivery.shiping_name,
+                            mst_delivery.otodoke_code,
+                            mst_delivery.otodoke_name,
                             mst_customer.department as deli_department_name,
                             mst_delivery.shipping_no
                         FROM

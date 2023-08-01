@@ -13,6 +13,7 @@
 
 namespace Customize\Controller\Mypage;
 
+use Customize\Config\CSVHeader;
 use Customize\Common\FileUtil;
 use Customize\Common\MyCommon;
 use Customize\Common\MyConstant;
@@ -44,6 +45,8 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class MypageController extends AbstractController
 {
+    use CSVHeader;
+
     /**
      * @var BaseInfo
      */
@@ -1133,5 +1136,98 @@ class MypageController extends AbstractController
         } else {
             return $this->redirectToRoute('mypage_delivery_print');
         }
+    }
+
+    /**
+     * マイページ.
+     *
+     * @Route("/mypage/export_csv_multiple", name="exportCsvMultiple", methods={"GET"})
+     */
+    public function exportCsvMultiple(Request $request)
+    {
+        $htmlFileName = 'Mypage/exportPdfMultiple.twig';
+        $delivery_no = MyCommon::getPara('delivery_no');
+        $params = [
+            'search_shipping_date' => MyCommon::getPara('shipping_date'),
+            'search_order_shipping' => MyCommon::getPara('order_shipping'),
+            'search_order_otodoke' => MyCommon::getPara('order_otodoke'),
+            'search_sale_type' => MyCommon::getPara('sale_type'),
+            'search_shipping_date_from' => MyCommon::getPara('search_shipping_date_from'),
+            'search_shipping_date_to' => MyCommon::getPara('search_shipping_date_to'),
+        ];
+
+        $comS = new MyCommonService($this->entityManager);
+        $customer_id = $this->globalService->customerId();
+        $login_type = $this->globalService->getLoginType();
+        $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
+
+        if (trim($delivery_no) == 'all') {
+            $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
+        } else {
+            $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
+        }
+
+        $arr_data = [];
+        foreach ($arr_delivery_no as $item_delivery_no) {
+            $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
+
+            if (!count($arRe)) {
+                continue;
+            }
+
+            $arr_data[] = $arRe;
+        }
+
+        $dir = MyCommon::getHtmluserDataDir().'/csv';
+        FileUtil::makeDirectory($dir);
+        $name = 'ship_'.date('YmdHis').'.csv';
+        $file = $dir.'/'.$name;
+
+        $fp = fopen(trim($file), 'w');
+
+        if ($fp) {
+            $headerFields = [];
+            foreach ($this->getDeliveryPrintExportHeader() as $header) {
+                $headerFields[] = mb_convert_encoding($header, 'Shift-JIS', 'UTF-8');
+            }
+            fputcsv($fp, $headerFields);
+
+            foreach ($arr_data as $data) {
+                foreach ($data as $item) {
+                    try {
+                        $fields = [
+                            mb_convert_encoding($item['delivery_no'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['delivery_lineno'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding(!empty($item['delivery_day']) ? date('Y/m/d', strtotime($item['delivery_day'])) : '', 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['customer_code'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['deli_company_name'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['shipping_code'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding(str_replace('㈱', '(株)', $item['shiping_name']), 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['otodoke_code'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding(str_replace('㈱', '(株)', $item['otodoke_name']), 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['sale_type'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['item_no'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['jan_code'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['item_name'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['quantity'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['unit'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['unit_price'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['amount'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['shipping_no'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['order_no'], 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding($item['footer_remark1'], 'Shift-JIS', 'UTF-8'),
+                        ];
+
+                        fputcsv($fp, $fields);
+                    } catch (\Exception $e) {
+                        log_error($e->getMessage());
+                    }
+                }
+            }
+
+            fclose($fp);
+        }
+
+        return $this->file($file);
     }
 }
