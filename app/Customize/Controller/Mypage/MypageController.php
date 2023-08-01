@@ -2080,7 +2080,7 @@ class MypageController extends AbstractController
                         $fields = [
                             mb_convert_encoding($item['delivery_no'], 'Shift-JIS', 'UTF-8'),
                             mb_convert_encoding($item['delivery_lineno'], 'Shift-JIS', 'UTF-8'),
-                            mb_convert_encoding(!empty($item['delivery_day']) ? date('Y/m/d', strtotime($item['delivery_day'])) : '', 'Shift-JIS', 'UTF-8'),
+                            mb_convert_encoding(!empty($item['delivery_date']) ? date('Y/m/d', strtotime($item['delivery_date'])) : '', 'Shift-JIS', 'UTF-8'),
                             mb_convert_encoding($item['customer_code'], 'Shift-JIS', 'UTF-8'),
                             mb_convert_encoding($item['deli_company_name'], 'Shift-JIS', 'UTF-8'),
                             mb_convert_encoding($item['shipping_code'], 'Shift-JIS', 'UTF-8'),
