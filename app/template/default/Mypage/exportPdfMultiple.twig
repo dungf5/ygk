@@ -265,7 +265,7 @@
                                 <td class="" title="dongia" style="text-align: center;">単価</td>
                                 <td class="" title="thanhtien" style="text-align: center;">金額</td>
                                 <td class=""  title="order_orderlineo" style="">注文番号</td>
-                                <td style="" title="item_remark" >備考</td>
+                                <td style="" title="item_remark" >発注書備考</td>
                             </tr>
 
                             {% for deli in myData %}
@@ -312,7 +312,7 @@
                                             <td style="text-align: right">（消費税については請求時に一括計算させて頂きます）</td>
                                         </tr>
                                         <tr>
-                                            <td>発注書備考: {{ myDatas[0][0].footer_remark1}} </td>
+                                            <td>備考: {{ myDatas[0][0].footer_remark1}} </td>
                                         </tr>
                                         <tr>
                                             <td>出荷先: {{ myDatas[0][0].shiping_name }}</td>
