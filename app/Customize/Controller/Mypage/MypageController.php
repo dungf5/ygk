@@ -1195,6 +1195,7 @@ class MypageController extends AbstractController
             foreach ($arr_data as $data) {
                 foreach ($data as $item) {
                     try {
+                        $item = trim($item);
                         $fields = [
                             mb_convert_encoding($item['delivery_no'], 'Shift-JIS', 'UTF-8'),
                             mb_convert_encoding($item['delivery_lineno'], 'Shift-JIS', 'UTF-8'),
