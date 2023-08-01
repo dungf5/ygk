@@ -26,6 +26,7 @@ use Customize\Service\GlobalService;
 use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
+use Dompdf\Dompdf;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
 use Eccube\Entity\Customer;
@@ -232,21 +233,16 @@ class MypageController extends AbstractController
 
         $namePdf = 'ship_'.$delivery_no.'.pdf';
         $file = $dirPdf.'/'.$namePdf;
+        $html = $this->twig->render($htmlFileName, $arReturn);
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4');
+        $dompdf->render();
+        $dompdf->stream($file);
+        $output = $dompdf->output();
+        file_put_contents($file, $output);
 
-        if (getenv('APP_IS_LOCAL') == 0) {
-            $htmlBody = $this->twig->render($htmlFileName, $arReturn);
-            MyCommon::converHtmlToPdf($dirPdf, $namePdf, $htmlBody);
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="'.basename($file).'"');
-
-            readfile($file);
-            exit();
-        } else {
-            exec('"C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe" c:/wamp/www/test/pdf.html c:/wamp/www/test/pdf.pdf');
-        }
-
-        return $arReturn;
+        return $this->file($file);
     }
 
     /**
