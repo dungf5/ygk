@@ -1994,9 +1994,10 @@ class MypageController extends AbstractController
             $file = $dirPdf.'/'.$namePdf;
 
             $html = $this->twig->render($htmlFileName, $arr_data);
-            $options = new Options();
-            $options->set('defaultFont', 'html/template/default/assets/fonts/MS-Gothic.ttf');
-            $dompdf = new Dompdf($options);
+            $dompdf = new Dompdf();
+            $options = $dompdf->getOptions();
+            $options->setDefaultFont('msgothic');
+            $dompdf->setOptions($options);
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4');
             $dompdf->render();
