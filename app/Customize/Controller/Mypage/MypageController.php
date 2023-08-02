@@ -1228,6 +1228,14 @@ class MypageController extends AbstractController
             fclose($fp);
         }
 
+        // Check file after put data
+        if (($fp = fopen(trim($file), 'r')) !== false) {
+            $getFileCSV = file_get_contents($file, (bool) FILE_USE_INCLUDE_PATH);
+            $getFileCSV = str_replace('"', '', $getFileCSV);
+            file_put_contents($file, $getFileCSV);
+            fclose($fp);
+        }
+
         return $this->file($file);
     }
 }
