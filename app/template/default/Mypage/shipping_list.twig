@@ -14,7 +14,7 @@
 
     <div>
         {% if global_service.getPdfExportFlg and myData|length > 0 and myData[0].deli_order_no %}
-            <a class=" btn btn-primary actBg"  target="_blank" href="/mypage/exportOrderPdf?order_no_line_no={{myData[0].ec_order_no}}-{{myData[0].ec_order_lineno}}&delivery_no={{myData[0].delivery_no}}">納品書</a>
+            <a class=" btn btn-primary actBg"  target="_blank" href="/mypage/exportOrderPdf?order_no_line_no={{myData[0].deli_order_no}}&delivery_no={{myData[0].delivery_no}}">納品書</a>
         {% else %}
             <div class=" btn btn-primary disabled disBg"> 納品書</div>
         {% endif %}

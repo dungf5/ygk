@@ -112,7 +112,7 @@ file that was distributed with this source code.
                                 <input type="text" class="form-control" id="search_shipping_date_from" name="search_shipping_date_from" value="{{ search_shipping_date_from }}" data-toggle="datetimepicker">
                                 <input type="text" class="form-control" id="search_shipping_date_to" name="search_shipping_date_to" value="{{ search_shipping_date_to }}">
                             </div>
-                            <button type="submit" class="btn btn-search">
+                            <button type="button" class="btn btn-search" onclick="handleSearch(this)">
                                 <i class="fas fa-angle-double-right" style="color: #f00"></i> 絞り込み
                             </button>
                         </form>
@@ -489,45 +489,77 @@ file that was distributed with this source code.
             let pathname            = window.location.pathname;
             let search              = window.location.search;
             pathname                += "?pageno=1";
-            pathname                += "&search_shipping_date_from=" + $("#search_shipping_date_from").val();
-            pathname                += "&search_shipping_date_to=" + $("#search_shipping_date_to").val();
 
-            if (name == 'search_shipping_date') {
-                clearTimeout(typingTimer);
-                loadingOverlay('hide');
+            clearTimeout(typingTimer);
+            loadingOverlay('hide');
 
-                typingTimer         = setTimeout(function () {
-                    loadingOverlay();
-                    handelChangeDate(origin, pathname, search);
-                }, doneTypingInterval);
-            }
-
-            if (name == 'search_order_shipping') {
+             typingTimer = setTimeout(function () {
                 loadingOverlay();
-                let previousSelected    = $("input#last_order_shipping").val();
-                let lastSelected        = $("#search_order_shipping option:selected").last().val();
 
-                if (value == previousSelected) {
-                    value               = lastSelected;
+                if ($("#search_shipping_date_from").val().trim() != '') {
+                    pathname += "&search_shipping_date_from=" + $("#search_shipping_date_from").val().trim();
                 }
 
-                $('#search_order_shipping').multiselect('deselectAll');
+                if ($("#search_shipping_date_to").val().trim() != '') {
+                    pathname += "&search_shipping_date_to=" + $("#search_shipping_date_to").val().trim();
+                }
 
-                setTimeout(function () {
-                    $('#search_order_shipping').multiselect('select', value);
-                    handelChangeShipping(origin, pathname);
-                }, 200);
-            }
+                if ($("#search_sale_type").val() != '0') {
+                    pathname += "&search_sale_type=" + $("#search_sale_type").val();
+                }
 
-            if (name == 'search_order_otodoke') {
-                loadingOverlay();
-                handelChangeOtodoke(origin, pathname, search);
-            }
+                if ($("#search_shipping_date").val() != '0') {
+                    pathname += "&search_shipping_date=" + $("#search_shipping_date").val();
+                }
 
-            if (name == 'search_sale_type') {
-                loadingOverlay();
-                handelChangeSaleType(origin, pathname, search);
-            }
+                if ($("#search_order_shipping").val() != '0') {
+                    pathname += "&search_order_shipping=" + $("#search_order_shipping").val();
+                }
+
+                if ($("#search_order_otodoke").val() != '0') {
+                    pathname += "&search_order_otodoke=" + $("#search_order_otodoke").val();
+                }
+
+                window.location.href = origin + pathname;
+
+            }, doneTypingInterval);
+
+            // if (name == 'search_shipping_date') {
+            //     clearTimeout(typingTimer);
+            //     loadingOverlay('hide');
+            //
+            //     typingTimer         = setTimeout(function () {
+            //         loadingOverlay();
+            //         handelChangeDate(origin, pathname, search);
+            //     }, doneTypingInterval);
+            // }
+            //
+            // if (name == 'search_order_shipping') {
+            //     loadingOverlay();
+            //     let previousSelected    = $("input#last_order_shipping").val();
+            //     let lastSelected        = $("#search_order_shipping option:selected").last().val();
+            //
+            //     if (value == previousSelected) {
+            //         value               = lastSelected;
+            //     }
+            //
+            //     $('#search_order_shipping').multiselect('deselectAll');
+            //
+            //     setTimeout(function () {
+            //         $('#search_order_shipping').multiselect('select', value);
+            //         handelChangeShipping(origin, pathname);
+            //     }, 200);
+            // }
+            //
+            // if (name == 'search_order_otodoke') {
+            //     loadingOverlay();
+            //     handelChangeOtodoke(origin, pathname, search);
+            // }
+            //
+            // if (name == 'search_sale_type') {
+            //     loadingOverlay();
+            //     handelChangeSaleType(origin, pathname, search);
+            // }
         }
 
         function handleGetLastSelected() {
@@ -718,13 +750,31 @@ file that was distributed with this source code.
             //        // a.click();
             //    }
             // });
+            let path = '';
 
-            path = '&search_shipping_date_from=' + $("#search_shipping_date_from").val();
-            path += '&search_shipping_date_to=' + $("#search_shipping_date_to").val();
-            path += "&sale_type=" + $("#search_sale_type").val();
-            path += "&shipping_date=" + $("#search_shipping_date").val();
-            path += "&order_shipping=" + $("#search_order_shipping").val();
-            path += "&order_otodoke=" + $("#search_order_otodoke").val();
+            if ($("#search_shipping_date_from").val().trim() != '') {
+                path += "&search_shipping_date_from=" + $("#search_shipping_date_from").val().trim();
+            }
+
+            if ($("#search_shipping_date_to").val().trim() != '') {
+                path += "&search_shipping_date_to=" + $("#search_shipping_date_to").val().trim();
+            }
+
+            if ($("#search_sale_type").val() != '0') {
+                path += "&search_sale_type=" + $("#search_sale_type").val();
+            }
+
+            if ($("#search_shipping_date").val() != '0') {
+                path += "&search_shipping_date=" + $("#search_shipping_date").val();
+            }
+
+            if ($("#search_order_shipping").val() != '0') {
+                path += "&search_order_shipping=" + $("#search_order_shipping").val();
+            }
+
+            if ($("#search_order_otodoke").val() != '0') {
+                path += "&search_order_otodoke=" + $("#search_order_otodoke").val();
+            }
             
             let url = '/mypage/export_Pdf_multiple?delivery_no=' + $("#check-box-value-print-pdf").val() + path;
             let a = document.createElement('a');
