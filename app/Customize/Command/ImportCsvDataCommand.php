@@ -499,7 +499,7 @@ class ImportCsvDataCommand extends Command
             // New handling import to dt_order_nat_eos
         }
 
-        // Send mail alert arror
+        // Send mail alert error
         $this->sendMailNatEOSError($reqcd_error_arr);
 
         log_info('End save/update data Order NAT EOS');
@@ -525,7 +525,7 @@ class ImportCsvDataCommand extends Command
         ];
 
         // Information
-        $information['subject_mail'] = '発注データにエラーがありました';
+        $information['subject_mail'] = 'ナチュラムの発注明細データにエラーがありました';
         $information['title_mail'] = '※本メールは自動配信メールです。';
         $information['error_title'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
         $information['content'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
