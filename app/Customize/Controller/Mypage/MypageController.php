@@ -29,6 +29,7 @@ use Customize\Service\MailService;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Dompdf\Dompdf;
+use Dompdf\Options;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
 use Eccube\Entity\Customer;
@@ -1993,7 +1994,9 @@ class MypageController extends AbstractController
             $file = $dirPdf.'/'.$namePdf;
 
             $html = $this->twig->render($htmlFileName, $arr_data);
-            $dompdf = new Dompdf();
+            $options = new Options();
+            $options->set('defaultFont', 'html/template/default/assets/fonts/MS-Gothic.ttf');
+            $dompdf = new Dompdf($options);
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4');
             $dompdf->render();
