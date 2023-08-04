@@ -4,9 +4,22 @@
             <h2 class="fnDIN">NEW ITEM</h2>
             <span>新商品</span>
         </div>
-
         <div class="ec-newItemRole">
             <div class="ec-newItemRole__list">
+                <div>
+                    <a href="/products/list?category_id=139" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
+                        <div class="item-image">
+                            <img src="/html/upload/save_image/X-BRAID XTENSIONER.jpg">
+                        </div>
+                        <p class="ec-newItemRole__listItemTitle">
+                            <span style="font-size:68.75%;">ｴｯｸｽﾌﾞﾚｲﾄﾞ ｴｯｸｽﾃﾝｼｮﾅｰ</span><br>
+                            X-BRAID XTENSIONER
+                        </p>
+                        {% if is_granted('ROLE_USER') %}
+                            <span class="btn01" style="margin: 1em auto 0;"><i class="fas fa-angle-double-right"></i>and more</span>
+                        {% endif %}
+                    </a>
+                </div>
                 <div>
                     <a href="/products/list?category_id=135" style="color:#07c;" {% if not is_granted('ROLE_USER') %} class="disabled" style="pointer-events: inherit;" {% endif %} >
                         <div class="item-image">
