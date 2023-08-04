@@ -37,25 +37,24 @@ class EccubeAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHan
             $response->setTargetUrl($request->getUriForPath('/'));
         }
 
-        $customerId = $_SESSION['customer_id'] ?? '';
+        $customerId     = $_SESSION["customer_id"] ?? '';
         if (!empty($customerId)) {
             try {
-                $loginType = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
+                $loginType  = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
 
-                if (!empty($loginType) && $loginType == 'supper_user') {
-                    $_SESSION['choose_represent'] = true;
-
+                if (!empty($loginType) && $loginType == "supper_user") {
+                    $_SESSION["choose_represent"]    = true;
                     return new RedirectResponse('/mypage/login');
                 }
 
-                if (!empty($loginType) && $loginType == 'represent_code') {
-                    $_SESSION['choose_shipping'] = true;
-
+                if (!empty($loginType) && $loginType == "represent_code") {
+                    $_SESSION["choose_shipping"]    = true;
                     return new RedirectResponse('/mypage/login');
                 }
-            } catch (\Exception $e) {
-            }
+
+            } catch (\Exception $e) {}
         }
+
 
         return $response;
     }

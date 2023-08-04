@@ -110,19 +110,22 @@
 				<table class="table myTable">
 					<thead>
 						<tr>
-							<th title={{ "front.mypage.return.return_type" | trans | raw }}>
+							<th title="{{ "front.mypage.return.return_type" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.return_type" | trans | raw }}</p>
 							</th>
-							<th title={{ "front.mypage.return.return_number" | trans | raw }} style="width: 75px;">
+							<th title="{{ "front.mypage.return.return_number" | trans | raw }}" style="width: 75px;">
 								<p class="text-nowrap">{{ "front.mypage.return.return_number" | trans | raw }}</p>
 							</th>
-							<th title={{ "front.mypage.return.return_status" | trans | raw }}>
+							<th title="{{ "front.mypage.return.return_number_request" | trans | raw }}">
+								<p class="text-nowrap">{{ "front.mypage.return.return_number_request" | trans | raw }}</p>
+							</th>
+							<th title="{{ "front.mypage.return.return_status" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.return_status" | trans | raw }}</p>
 							</th>
-							<th title={{ "front.mypage.return.shipping_no" | trans | raw }}>
+							<th title="{{ "front.mypage.return.shipping_no" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
 							</th>
-							<th title={{ "front.mypage.return.shipping_date" | trans | raw }}>
+							<th title="{{ "front.mypage.return.shipping_date" | trans | raw }}">
 								<select class="hidden" id="search_shipping_date" name="search_shipping_date">
 									<option value="0" {% if param.search_shipping_date == 0 %} selected {% endif %}>全て</option>
 									{% for shipping_date in shipping_date_list %}
@@ -168,7 +171,7 @@
 								<p class="text-nowrap">{{ "front.mypage.return.jan_code" | trans | raw }}</p>
 								<p class="text-nowrap">{{ "front.mypage.return.product_name" | trans | raw }}</p>
 							</th>
-							<th title={{ "front.mypage.return.shipping_num" | trans | raw }}>
+							<th title="{{ "front.mypage.return.shipping_num" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.shipping_num" | trans | raw }}</p>
 							</th>
 						</tr>
@@ -200,7 +203,10 @@
 											<button type="submit" class="btn btn-warning" role="button" {% if item.total_returns_num >= item.shipping_num %}disabled{% endif %}>手続き</button>
 										</td>
 										<td title={{ item.returns_num }}>
-											<input type="number" name="return_num" data-value='{{ item.returns_num }}' data-shipping='{{ item.shipping_num }}' class="form-control" value="{{ item.returns_num }}"/>
+											<input type="number" name="return_num" data-value='{{ item.returns_num }}' data-shipping='{{ item.shipping_num }}' data-total_returns='{{ item.total_returns_num }}' class="form-control" value="{{ item.returns_num }}"/>
+										</td>
+										<td title={{ item.total_returns_num }}>
+											<p class="text-nowrap">{{ item.total_returns_num }}</p>
 										</td>
 										<td title={{ item.returns_status_flag  is empty ? "" : item.returns_status_flag }}>
 											{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
@@ -257,7 +263,7 @@
 					{% else %}
 						<tbody>
 							<tr>
-								<td colspan="8">
+								<td colspan="9">
 									<p>返品対象の商品はありません。</p>
 								</td>
 							</tr>
@@ -329,6 +335,7 @@
 		let element = $(this);
 		let previous_value = element.data('value');
 		let shipping_num = element.data('shipping');
+		let total_returns = element.data('total_returns');
 		let current_value = element.val();
 		let mess = '';
 
@@ -344,6 +351,10 @@
 
 			if (current_value != '' && current_value > shipping_num) {
 				mess += "\n出荷数以上の数量は入力できません。";
+			}
+
+			if (current_value != '' && total_returns != '' && current_value > (shipping_num - total_returns)) {
+				mess += "\n出荷数以上の返品はできません。";
 			}
 
 			if (mess != '') {

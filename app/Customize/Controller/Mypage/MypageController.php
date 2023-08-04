@@ -1326,43 +1326,43 @@ class MypageController extends AbstractController
                 }
 
                 $mst_product_returns_info = $this->mstProductReturnsInfoRepository->insertData(
-                [
-                    'returns_no' => $returns_no,
-                    'customer_code' => $customer_code,
-                    'shipping_code' => $param['shipping_code'],
-                    'shipping_name' => $shipping_name,
-                    'otodoke_code' => $param['otodoke_code'],
-                    'otodoke_name' => $otodoke_name,
-                    'shipping_no' => $param['shipping_no'],
-                    'shipping_date' => $param['shipping_day'],
-                    'jan_code' => $param['jan_code'],
-                    'product_code' => $param['product_code'],
-                    'shipping_num' => $param['shipping_num'],
-                    'reason_returns_code' => $param['return_reason'],
-                    'customer_comment' => $param['customer_comment'],
-                    'return_num' => $param['return_num'],
-                    'cus_reviews_flag' => $param['product_status'],
-                    'cus_image_url_path1' => @$cus_image_url_path[0] ?? '',
-                    'cus_image_url_path2' => @$cus_image_url_path[1] ?? '',
-                    'cus_image_url_path3' => @$cus_image_url_path[2] ?? '',
-                    'cus_image_url_path4' => @$cus_image_url_path[3] ?? '',
-                    'cus_image_url_path5' => @$cus_image_url_path[4] ?? '',
-                    'cus_image_url_path6' => @$cus_image_url_path[5] ?? '',
-                    'returns_status_flag' => 0,
-                    'returns_request_date' => date('Y-m-d H:i:s'),
-                ]);
+                    [
+                        'returns_no' => $returns_no,
+                        'customer_code' => $customer_code,
+                        'shipping_code' => $param['shipping_code'],
+                        'shipping_name' => $shipping_name,
+                        'otodoke_code' => $param['otodoke_code'],
+                        'otodoke_name' => $otodoke_name,
+                        'shipping_no' => $param['shipping_no'],
+                        'shipping_date' => $param['shipping_day'],
+                        'jan_code' => $param['jan_code'],
+                        'product_code' => $param['product_code'],
+                        'shipping_num' => $param['shipping_num'],
+                        'reason_returns_code' => $param['return_reason'],
+                        'customer_comment' => $param['customer_comment'],
+                        'return_num' => $param['return_num'],
+                        'cus_reviews_flag' => $param['product_status'],
+                        'cus_image_url_path1' => @$cus_image_url_path[0] ?? '',
+                        'cus_image_url_path2' => @$cus_image_url_path[1] ?? '',
+                        'cus_image_url_path3' => @$cus_image_url_path[2] ?? '',
+                        'cus_image_url_path4' => @$cus_image_url_path[3] ?? '',
+                        'cus_image_url_path5' => @$cus_image_url_path[4] ?? '',
+                        'cus_image_url_path6' => @$cus_image_url_path[5] ?? '',
+                        'returns_status_flag' => 0,
+                        'returns_request_date' => date('Y-m-d H:i:s'),
+                    ]);
 
                 if (!empty($cus_image_url_path)) {
                     $this->dtReturnsImageInfoRepository->insertData(
-                    [
-                        'returns_no' => $mst_product_returns_info->getReturnsNo(),
-                        'cus_image_url_path1' => $mst_product_returns_info->getCusImageUrlPath1(),
-                        'cus_image_url_path2' => $mst_product_returns_info->getCusImageUrlPath2(),
-                        'cus_image_url_path3' => $mst_product_returns_info->getCusImageUrlPath3(),
-                        'cus_image_url_path4' => $mst_product_returns_info->getCusImageUrlPath4(),
-                        'cus_image_url_path5' => $mst_product_returns_info->getCusImageUrlPath5(),
-                        'cus_image_url_path6' => $mst_product_returns_info->getCusImageUrlPath6(),
-                    ]);
+                        [
+                            'returns_no' => $mst_product_returns_info->getReturnsNo(),
+                            'cus_image_url_path1' => $mst_product_returns_info->getCusImageUrlPath1(),
+                            'cus_image_url_path2' => $mst_product_returns_info->getCusImageUrlPath2(),
+                            'cus_image_url_path3' => $mst_product_returns_info->getCusImageUrlPath3(),
+                            'cus_image_url_path4' => $mst_product_returns_info->getCusImageUrlPath4(),
+                            'cus_image_url_path5' => $mst_product_returns_info->getCusImageUrlPath5(),
+                            'cus_image_url_path6' => $mst_product_returns_info->getCusImageUrlPath6(),
+                        ]);
                 }
 
                 return $this->redirectToRoute('mypage_return_save_complete');

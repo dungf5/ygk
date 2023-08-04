@@ -419,8 +419,8 @@ class OrderItemRepository extends AbstractRepository
             'delivery.delivery_no'
         );
 
-        $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = shipping.shipping_code) shipping_name')
-            ->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = shipping.otodoke_code) otodoke_name')
+        $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = order_status.shipping_code) shipping_name')
+            ->addSelect('(SELECT mst_cus2.company_name FROM Customize\Entity\MstCustomer mst_cus2 WHERE mst_cus2.customer_code = order_status.otodoke_code) otodoke_name')
             ->where('shipping.delete_flg IS NOT NULL AND shipping.delete_flg <> 0')
             ->andWhere('order_status.order_date >= :order_date')
             ->andWhere($condition)
@@ -444,23 +444,21 @@ class OrderItemRepository extends AbstractRepository
         }
 
         if ($paramSearch['order_shipping'] != '0') {
-            $qb->andWhere('shipping.shipping_code = :shipping_code')
+            $qb->andWhere('order_status.shipping_code = :shipping_code')
                 ->setParameter('shipping_code', $paramSearch['order_shipping']);
         }
 
         if ($paramSearch['order_otodoke'] != '0') {
-            $qb->andWhere('shipping.otodoke_code = :order_otodoke')
+            $qb->andWhere('order_status.otodoke_code = :order_otodoke')
                 ->setParameter(':order_otodoke', $paramSearch['order_otodoke']);
         }
 
-        $qb->addGroupBy('shipping.shipping_no');
-        $qb->addGroupBy('shipping.order_no');
-        $qb->addGroupBy('shipping.order_lineno');
+        $qb->addGroupBy('shipping.cus_order_no');
+        $qb->addGroupBy('shipping.cus_order_lineno');
 
-        $qb->addOrderBy('shipping.shipping_date', 'DESC');
-        $qb->addOrderBy('shipping.shipping_no', 'DESC');
-        $qb->addOrderBy('shipping.order_no', 'DESC');
-        $qb->addOrderBy('shipping.order_lineno', 'ASC');
+        $qb->addOrderBy('order_status.order_date', 'DESC');
+        $qb->addOrderBy('order_status.cus_order_no', 'DESC');
+        $qb->addOrderBy('order_status.cus_order_lineno', 'asc');
 
         //dump($qb->getQuery()->getSQL());
         //dump($qb->getParameters());
