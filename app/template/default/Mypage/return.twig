@@ -110,19 +110,22 @@
 				<table class="table myTable">
 					<thead>
 						<tr>
-							<th title="return_type">
+							<th title="{{ "front.mypage.return.return_type" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.return_type" | trans | raw }}</p>
 							</th>
-							<th title="return_number">
+							<th title="{{ "front.mypage.return.return_number" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.return_number" | trans | raw }}</p>
 							</th>
-							<th title="return_status">
+							<th title="{{ "front.mypage.return.return_number_request" | trans | raw }}">
+								<p class="text-nowrap">{{ "front.mypage.return.return_number_request" | trans | raw }}</p>
+							</th>
+							<th title="{{ "front.mypage.return.return_status" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.return_status" | trans | raw }}</p>
 							</th>
-							<th title="shipping_no">
+							<th title="{{ "front.mypage.return.shipping_no" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
 							</th>
-							<th title="shipping_date">
+							<th title="{{ "front.mypage.return.shipping_date" | trans | raw }}">
 								<select class="hidden" id="search_shipping_date" name="search_shipping_date">
 									<option value="0" {% if param.search_shipping_date == 0 %} selected {% endif %}>全て</option>
 									{% for shipping_date in shipping_date_list %}
@@ -133,7 +136,7 @@
 									{{ "front.mypage.return.shipping_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
 								</a>
 							</th>
-							<th title="shiping_code otodoke_code">
+							<th title="{{ "front.mypage.return.shiping_code" | trans | raw}} | {{ "front.mypage.return.otodoke_code" | trans | raw }}">
 								<select class="hidden" id="search_shipping" name="search_shipping">
 									<option value="0" {% if param.search_shipping == 0 %} selected {% endif %}>全て</option>
 									{% for shipping in shippings %}
@@ -164,11 +167,11 @@
 									{{ "front.mypage.return.otodoke_code" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
 								</a>
 							</th>
-							<th title="jan_code product_name">
+							<th title="{{ "front.mypage.return.jan_code" | trans | raw }} | {{ "front.mypage.return.product_name" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.jan_code" | trans | raw }}</p>
 								<p class="text-nowrap">{{ "front.mypage.return.product_name" | trans | raw }}</p>
 							</th>
-							<th title="shipping_num">
+							<th title="{{ "front.mypage.return.shipping_num" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.shipping_num" | trans | raw }}</p>
 							</th>
 						</tr>
@@ -185,13 +188,16 @@
 								{% endif %}
 									<tr 
 										ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >
-										<td title="return_type">
+										<td>
 											<button type="submit" class="btn btn-warning" role="button">手続き</button> 
 										</td>
-										<td title="return_number">
+										<td>
 											<input type="number" id="returns_num" name="returns_num" class="form-control" value="{{ item.returns_num }}"/>
 										</td>
-										<td title="return_status">
+										<td>
+											<p class="text-nowrap">{{ item.shipping_no }}</p>
+										</td>
+										<td>
 											{% if item.returns_status_flag == 1 %}
 												<p class="text-nowrap">承認</p>
 											{% elseif item.returns_status_flag == 2 %}
@@ -206,21 +212,21 @@
 												<p class="text-nowrap">申請中</p>
 											{% endif %}
 										</td>
-										<td title="shipping_no">
+										<td>
 											<p class="text-nowrap">{{ item.shipping_no }}</p>
 										</td>
-										<td title="shipping_date">
+										<td>
 											<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y/m/d') }}</p>
 										</td>
-										<td title="shiping_code otodoke_code">
+										<td>
 											<p class="text-nowrap">{{ item.shipping_name }}</p>
 											<p class="text-nowrap">{{ item.otodoke_name }}</p>
 										</td>
-										<td title="jan_code product_name">
+										<td>
 											<p class="text-nowrap">{{ item.jan_code }}</p>
 											<p class="text-nowrap">{{ item.product_name }}</p>
 										</td>
-										<td title="shipping_num">
+										<td>
 											<p class="text-nowrap">
 												{% if item.quantity > 1 %}
 													{{ item.shipping_num * item.quantity }}
