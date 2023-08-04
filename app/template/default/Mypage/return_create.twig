@@ -46,7 +46,7 @@
 				<label>※返品確定日は返品商品到着後となります</label>
 			</div>
 			<div class="col-xs-12">
-				<form class="form-horizontal" action="{{ url('mypage_return_confirm') }}" method="POST" enctype="multipart/form-data" id="form_return_create">
+				<form class="form-horizontal" action="{{ url('mypage_return_save') }}" method="POST" enctype="multipart/form-data" id="form_return_create">
 					<table class="table table-bordered">
 						<tr>
 							<td class="col-xs-3 text-right left_background">
@@ -96,6 +96,9 @@
 							</td>
 							<td class="col-xs-9 text-left">
 								<input type="text" class="form-control" id="shipping_no" name="shipping_no" value="{{ param.shipping_no }}" onchange="changeShippingNo()"/>
+								{% if  errors.shipping_no is defined %}
+									<label id="shipping_no-error" class="error" for="shipping_no">{{ errors.shipping_no }}</label>
+								{% endif %}
 							</td>
 						</tr>
 						<tr>
@@ -111,7 +114,10 @@
 								<label for="jan_code">JANコード</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<input type="text" class="form-control" id="jan_code" name="jan_code" value="{{ param.jan_code }}" onchange="getProduct()" />
+								<input type="text" class="form-control" id="jan_code" name="jan_code" value="{{ param.jan_code }}" onchange="getProduct()"/>
+								{% if  errors.jan_code is defined %}
+									<label id="jan_code-error" class="error" for="jan_code">{{ errors.jan_code }}</label>
+								{% endif %}
 							</td>
 						</tr>
 						<tr>
@@ -120,14 +126,16 @@
 							</td>
 							<td class="col-xs-9 text-left">
 								<input type="text" class="form-control" id="product_name" name="product_name" value="{{ param.product_name }}" />
+								<input type="hidden" id="product_code" name="product_code" value="{{ param.product_code }}" />
 							</td>
 						</tr>
 						<tr>
 							<td class="col-xs-3 text-right left_background">
-								<label for="delivered_num">出荷数</label>
+								<label for="shipping_num">出荷数</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<input type="text" class="form-control" id="delivered_num" name="delivered_num" value="" disabled/>
+								<input type="text" class="form-control" id="shipping_num"  value="{{ param.shipping_num }}" disabled/>
+								<input type="hidden" class="form-control" name="shipping_num" value="{{ param.shipping_num }}"/>
 							</td>
 						</tr>
 						<tr>
@@ -146,9 +154,12 @@
 								<select class="form-control" name="return_reason" id="return_reason">
 									<option selected disabled hidden>返品理由</option>
 									{% for reson in returns_reson %}
-										<option value="{{ reson.returns_reson_id }}">{{ reson.returns_reson }}</option>
+										<option {% if param.return_reason == reson.returns_reson_id %} selected {% endif %} value="{{ reson.returns_reson_id }}">{{ reson.returns_reson }}</option>
 									{% endfor %}
 								</select>
+								{% if  errors.return_reason is defined %}
+									<label id="return_reason-error" class="error" for="return_reason">{{ errors.return_reason }}</label>
+								{% endif %}
 							</td>
 						</tr>
 						<tr>
@@ -156,15 +167,21 @@
 								<label for="customer_comment">顧客コメント</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<textarea class="form-control" id="customer_comment" name="customer_comment" rows="3"></textarea>
+								<textarea class="form-control" id="customer_comment" name="customer_comment" rows="3">{{ param.customer_comment }}</textarea>
+								{% if  errors.customer_comment is defined %}
+									<label id="customer_comment-error" class="error" for="customer_comment">{{ errors.customer_comment }}</label>
+								{% endif %}
 							</td>
 						</tr>
 						<tr>
 							<td class="col-xs-3 text-right left_background">
-								<label for="rerurn_num">返品数</label>
+								<label for="return_num">返品数</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<input type="number" class="form-control col-xs-2" id="rerurn_num" name="rerurn_num"/>
+								<input type="number" class="form-control col-xs-2" id="return_num" name="return_num" value="{{ param.return_num }}"/>
+								{% if  errors.return_num is defined %}
+									<label id="return_num-error" class="error" for="return_num">{{ errors.return_num }}</label>
+								{% endif %}
 							</td>
 						</tr>
 						<tr>
@@ -173,10 +190,10 @@
 							</td>
 							<td class="col-xs-9 text-left">
 								<label class="radio-inline">
-									<input type="radio" name="product_status" id="product_status1" value="1" required checked> 良品
+									<input type="radio" name="product_status" id="product_status1" value="1" required {% if param.product_status == '1' %} checked {% endif %}> 良品
 								</label>
 								<label class="radio-inline">
-									<input type="radio" name="product_status" id="product_status2" value="2" required> 不良品
+									<input type="radio" name="product_status" id="product_status2" value="2" required {% if param.product_status == '2' %} checked {% endif %}> 不良品
 								</label>
 							</td>
 						</tr>
@@ -185,6 +202,9 @@
 								<p>商品画像</p>
 								<input type="file" class="hidden" id="images_input" accept="image/*" multiple onchange="imagesInputChange()" />
 								<input type="file" class="hidden" id="images" name="images[]" accept="image/*" multiple />
+								{% if  errors.images is defined %}
+									<label id="images-error" class="error" for="images">{{ errors.images }}</label>
+								{% endif %}
 							</td>
 						</tr>
 						<tr>
@@ -284,7 +304,8 @@
 	function changeShippingNo() {
 		$("#jan_code").val( null );
 		$("#product_name").val( null );
-		$("#delivered_num").val( null );
+		$("#product_code").val( null );
+		$("#shipping_num").val( null );
 		$("#returned_num").val( null );
 	}
 	
@@ -309,7 +330,9 @@
 			if( json.status ) {
 				let _data = json.data;
 				$("#product_name").val( json.data.product_name )
-				$("#delivered_num").val( json.data.delivered_num )
+				$("#product_code").val( json.data.product_code )
+				$("#shipping_num").val( json.data.shipping_num )
+				$("input[name='shipping_num']").val( json.data.shipping_num )
 				$("#returned_num").val( json.data.returned_num )
 			}
 		})
@@ -367,11 +390,14 @@
 	$.validator.addMethod('maxupload', function(value, element, param) {
 		return element.files.length <= param;
 	});
-	$.validator.addMethod('rerurn_num', function(value, element, param) {
-		let _delivered_num = parseInt( $("#delivered_num").val() );
-		let _returned_num = parseInt( $("#returned_num").val() );
-		let _cond = _delivered_num > _returned_num ? _delivered_num - _returned_num : _delivered_num;
+	$.validator.addMethod('return_num_min', function(value, element, param) {
 		if( value <= 0 ) return false;
+		return true;
+	});
+	$.validator.addMethod('return_num_max', function(value, element, param) {
+		let _shipping_num = parseInt( $("#shipping_num").val() );
+		let _returned_num = parseInt( $("#returned_num").val() );
+		let _cond = _shipping_num > _returned_num ? _shipping_num - _returned_num : _shipping_num;
 		if( value > _cond ) return false;
 		return true;
 	});
@@ -381,7 +407,7 @@
 			e.preventDefault();
 		});
 		
-		getProduct();
+		// getProduct();
 
 		$("#shipping_code").select2();
 		$("#otodoke_code").select2();
@@ -403,9 +429,10 @@
 				customer_comment: {
 					required: true
 				},
-				rerurn_num: {
+				return_num: {
 					required: true,
-					rerurn_num : true,
+					return_num_min : true,
+					return_num_max : true,
 				},
 				'images[]': {
 					minupload: 1,
@@ -416,11 +443,12 @@
 			messages: {
 				shipping_no     : "出荷指示№を入力してください。",
 				jan_code        : "JANコードを入力してください。",
-				return_reason   : "顧客コメントを入力してください。",
+				return_reason   : "返品理由を入力してください。",
 				customer_comment: "顧客コメントを入力してください。",
-				rerurn_num      : {
+				return_num      : {
 					required  : "返品数を入力してください。",
-					rerurn_num: "出荷数以上の数量は入力できません。",
+					return_num_min: "1以上で入力してください",
+					return_num_max: "出荷数以上の数量は入力できません。",
 				},
 				'images[]': {
 					minupload: "商品画像をファイル添付より選択してください。",

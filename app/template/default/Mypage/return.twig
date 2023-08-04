@@ -113,7 +113,7 @@
 							<th title="{{ "front.mypage.return.return_type" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.return_type" | trans | raw }}</p>
 							</th>
-							<th title="{{ "front.mypage.return.return_number" | trans | raw }}">
+							<th title="{{ "front.mypage.return.return_number" | trans | raw }}" style="width: 75px;">
 								<p class="text-nowrap">{{ "front.mypage.return.return_number" | trans | raw }}</p>
 							</th>
 							<th title="{{ "front.mypage.return.return_number_request" | trans | raw }}">
@@ -136,7 +136,7 @@
 									{{ "front.mypage.return.shipping_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
 								</a>
 							</th>
-							<th title="{{ "front.mypage.return.shiping_code" | trans | raw}} | {{ "front.mypage.return.otodoke_code" | trans | raw }}">
+							<th title='{{ "front.mypage.return.shiping_code" | trans | raw}}  {{ "front.mypage.return.otodoke_code" | trans | raw }}'>
 								<select class="hidden" id="search_shipping" name="search_shipping">
 									<option value="0" {% if param.search_shipping == 0 %} selected {% endif %}>全て</option>
 									{% for shipping in shippings %}
@@ -149,7 +149,7 @@
 									{% endfor %}
 								</select>
 								<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_shipping').select2('open')">
-									{{ "front.mypage.return.shiping_code" | trans | raw}} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+									{{ "front.mypage.return.shiping_code" | trans | raw}} <span class="glyphicon glyphicon-triangle-bottom" style="color: red; {% if shippings|length < 2 %} visibility: hidden; {% endif %}"></span>
 								</a>
 								<br/>
 								<select class="hidden" id="search_otodoke" name="search_otodoke">
@@ -167,7 +167,7 @@
 									{{ "front.mypage.return.otodoke_code" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
 								</a>
 							</th>
-							<th title="{{ "front.mypage.return.jan_code" | trans | raw }} | {{ "front.mypage.return.product_name" | trans | raw }}">
+							<th title='{{ "front.mypage.return.jan_code" | trans | raw }} {{ "front.mypage.return.product_name" | trans | raw }}'>
 								<p class="text-nowrap">{{ "front.mypage.return.jan_code" | trans | raw }}</p>
 								<p class="text-nowrap">{{ "front.mypage.return.product_name" | trans | raw }}</p>
 							</th>
@@ -177,56 +177,71 @@
 						</tr>
 					</thead>
 					{% if pagination and pagination.totalItemCount > 0 %}
+						{% set index = 0 %}
 						<tbody>
 							{% for item in pagination %}
-								{% if item.returns_status_flag == 1 %}
-									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_receipt', { 'returns_no':item.returns_no } ) }}" method="GET">
-								{% elseif item.returns_status_flag == 2 or item.returns_status_flag == 3 or item.returns_status_flag == 4 %}
-									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_complete', { 'returns_no':item.returns_no } ) }}" method="GET">
+							{% set index = index + 1 %}
+								{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
+									{% if item.returns_status_flag == 1 %}
+										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_receipt', { 'returns_no':item.returns_no } ) }}" method="GET">
+									{% elseif item.returns_status_flag == 2 or item.returns_status_flag == 3 or item.returns_status_flag == 4 %}
+										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_complete', { 'returns_no':item.returns_no } ) }}" method="GET">
+									{% else %}
+										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_approve', { 'returns_no':item.returns_no } ) }}" method="GET">
+									{% endif %}
 								{% else %}
-									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_approve', { 'returns_no':item.returns_no } ) }}" method="GET">
+									<form id="return_create_{{index}}" action="{{ url('mypage_return_create') }}" method="POST">
 								{% endif %}
-									<tr 
-										ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >
-										<td>
-											<button type="submit" class="btn btn-warning" role="button">手続き</button> 
+
+{#								{% if item.returns_status_flag is defined and item.returns_status_flag != null %}#}
+{#									<tr ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >#}
+{#								{% else %}#}
+{#									<tr ondblclick="$('#return_create_{{index}}').submit()" >#}
+{#								{% endif %}#}
+									<tr>
+										<td title="手続き">
+											<button type="submit" class="btn btn-warning" role="button" {% if item.total_returns_num >= item.shipping_num %}disabled{% endif %}>手続き</button>
 										</td>
-										<td>
-											<input type="number" id="returns_num" name="returns_num" class="form-control" value="{{ item.returns_num }}"/>
+										<td title={{ item.returns_num }}>
+											<input type="number" name="return_num" data-value='{{ item.returns_num }}' data-shipping='{{ item.shipping_num }}' data-total_returns='{{ item.total_returns_num }}' class="form-control" value="{{ item.returns_num }}"/>
 										</td>
-										<td>
-											<p class="text-nowrap">{{ item.shipping_no }}</p>
+										<td title={{ item.total_returns_num }}>
+											<p class="text-nowrap">{{ item.total_returns_num }}</p>
 										</td>
-										<td>
-											{% if item.returns_status_flag == 1 %}
-												<p class="text-nowrap">承認</p>
-											{% elseif item.returns_status_flag == 2 %}
-												<p class="text-nowrap">未承認</p>
-											{% elseif item.returns_status_flag == 3 %}
-												<p class="text-nowrap">受取受理</p>
-											{% elseif item.returns_status_flag == 4 %}
-												<p class="text-nowrap">受取未受理</p>
-											{% elseif item.returns_status_flag == 5 %}
-												<p class="text-nowrap">返品完了</p>
+										<td title={{ item.returns_status_flag  is empty ? "" : item.returns_status_flag }}>
+											{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
+												{% if item.returns_status_flag == 0 %}
+													<p class="text-nowrap">申請中</p>
+												{% elseif item.returns_status_flag == 1 %}
+													<p class="text-nowrap">承認</p>
+												{% elseif item.returns_status_flag == 2 %}
+													<p class="text-nowrap">未承認</p>
+												{% elseif item.returns_status_flag == 3 %}
+													<p class="text-nowrap">受取受理</p>
+												{% elseif item.returns_status_flag == 4 %}
+													<p class="text-nowrap">受取未受理</p>
+												{% elseif item.returns_status_flag == 5 %}
+													<p class="text-nowrap">返品完了</p>
+												{% endif %}
 											{% else %}
-												<p class="text-nowrap">申請中</p>
+												<p class="text-nowrap"></p>
 											{% endif %}
 										</td>
-										<td>
+										<td title={{ item.shipping_no }}>
 											<p class="text-nowrap">{{ item.shipping_no }}</p>
 										</td>
-										<td>
-											<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y/m/d') }}</p>
+										<td title={{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}>
+											<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
 										</td>
-										<td>
+										<td title='{{ item.shipping_name }} - {{ item.otodoke_name }}'>
 											<p class="text-nowrap">{{ item.shipping_name }}</p>
 											<p class="text-nowrap">{{ item.otodoke_name }}</p>
 										</td>
-										<td>
+										<td title='{{ item.jan_code }} {{ item.product_name }}'>
 											<p class="text-nowrap">{{ item.jan_code }}</p>
 											<p class="text-nowrap">{{ item.product_name }}</p>
 										</td>
-										<td>
+										<td title={{ item.shipping_num }}>
 											<p class="text-nowrap">
 												{% if item.quantity > 1 %}
 													{{ item.shipping_num * item.quantity }}
@@ -235,6 +250,12 @@
 												{% endif %}
 											</p>
 										</td>
+										<input type="hidden" name="shipping_no" value="{{ item.shipping_no }}"/>
+										<input type="hidden" name="shipping_day" value="{{ item.shipping_date }}"/>
+										<input type="hidden" name="jan_code" value="{{ item.jan_code }}"/>
+										<input type="hidden" name="shipping_num" value="{{ item.shipping_num }}"/>
+										<input type="hidden" name="product_code" value="{{ item.product_code }}"/>
+										<input type="hidden" name="product_name" value="{{ item.product_name }}"/>
 									</tr>
 								</form>
 							{% endfor %}
@@ -242,8 +263,8 @@
 					{% else %}
 						<tbody>
 							<tr>
-								<td colspan="8">
-									<p>返品手続きの履歴がありません。</p>
+								<td colspan="9">
+									<p>返品対象の商品はありません。</p>
 								</td>
 							</tr>
 						</tbody>
@@ -306,5 +327,42 @@
 			reload()
 		});
 	} );
+
+	var typingRemarksTimer;
+    var doneTypingInterval = 1000;
+	$("input[name='return_num']").keyup(function() {
+		clearTimeout(typingRemarksTimer);
+		let element = $(this);
+		let previous_value = element.data('value');
+		let shipping_num = element.data('shipping');
+		let total_returns = element.data('total_returns');
+		let current_value = element.val();
+		let mess = '';
+
+
+		typingRemarksTimer = setTimeout(function () {
+			if (current_value == '') {
+				mess += "\n返品数を入力してください。";
+			}
+
+			if (current_value != '' && current_value <= 0) {
+				mess += "\n1以上で入力してください";
+			}
+
+			if (current_value != '' && current_value > shipping_num) {
+				mess += "\n出荷数以上の数量は入力できません。";
+			}
+
+			if (current_value != '' && total_returns != '' && current_value > (shipping_num - total_returns)) {
+				mess += "\n出荷数以上の返品はできません。";
+			}
+
+			if (mess != '') {
+				alert(mess);
+				element.val(previous_value);
+			}
+
+		}, doneTypingInterval);
+	})
 </script>
 {% endblock %}

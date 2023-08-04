@@ -17,6 +17,10 @@
 		border-color: #ffc000;
 		font-weight: bold;
 	}
+	label.error {
+		color: #f00;
+		font-weight: inherit;
+	}
 </style>
 {% endblock stylesheet%}
 
@@ -29,7 +33,7 @@
 		</div>
 		<div class="ec-mypageRole">
 			<div class="col-xs-12">
-				<form class="form-horizontal"  action="{{ url('mypage_return_approve_finish', { 'returns_no':product_returns_info.returns_no }) }}" method="POST" enctype="multipart/form-data">
+				<form id="form_return_approve" class="form-horizontal"  action="{{ url('mypage_return_approve_finish', { 'returns_no':product_returns_info.returns_no }) }}" method="POST" enctype="multipart/form-data">
 					<table class="table table-bordered">
 						<tr>
 							<td class="col-xs-2 text-right left_background">
@@ -244,8 +248,8 @@
 						<div class="modal-dialog" style="overflow: initial; max-width: 350px;">
 							<div class="modal-content">
 								<div class="modal-header">
-									<h5 class="modal-title">未承認コメント入力</h5>
 									<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+									<h5 class="modal-title">未承認コメント入力</h5>
 								</div>
 								<div class="modal-body">
 									<textarea class="form-control" rows="3" id="aprove_comment_not_yet" name="aprove_comment_not_yet"></textarea>
@@ -264,6 +268,27 @@
 {% endblock %}
 
 {% block javascript %}
+<script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
+<script src="{{ asset('assets/jquery-ui/jquery-ui.min.js', 'user_data') }}"></script>
+<script src="{{ asset('assets/jquery-validation/jquery.validate.min.js', 'user_data') }}"></script>
 <script>
+$( function() {
+	$("#form_return_approve").validate({
+		rules: {
+			aprove_comment_not_yet: {
+				required: true,
+			},
+		},
+		messages: {
+			aprove_comment_not_yet: "未承認コメントを入力してください。",
+		},
+		invalidHandler: function(event, validator) {
+			loadingOverlay("hide")
+		},
+		submitHandler: function(form) {
+			form.submit()
+		}
+	});
+})
 </script>
 {% endblock javascript%}

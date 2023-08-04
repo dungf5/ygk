@@ -160,10 +160,10 @@
 						</tr>
 						<tr>
 							<td class="col-xs-3 text-right left_background">
-								<label for="rerurn_num">返品数</label>
+								<label for="return_num">返品数</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<input type="number" class="form-control" id="rerurn_num" name="rerurn_num" value="{{ returns_num }}" required/>
+								<input type="number" class="form-control" id="return_num" name="return_num" value="{{ returns_num }}" required/>
 							</td>
 						</tr>
 						<tr>
@@ -413,11 +413,13 @@
 	$.validator.addMethod('maxupload', function(value, element, param) {
 		return ( cus_image_url_path.length + element.files.length ) <= param;
 	});
-	$.validator.addMethod('rerurn_num', function(value, element, param) {
+	$.validator.addMethod('return_num_min', function(value, element, param) {
+		return value <= 0;
+	});
+	$.validator.addMethod('return_num_max', function(value, element, param) {
 		let _delivered_num = parseInt( $("#delivered_num").val() );
 		let _returned_num = parseInt( $("#returned_num").val() );
 		let _cond = _delivered_num > _returned_num ? _delivered_num - _returned_num : _delivered_num;
-		console.log(_cond)
 		return value <= _cond;
 	});
 
@@ -444,9 +446,10 @@
 				customer_comment: {
 					required: true
 				},
-				rerurn_num: {
+				return_num: {
 					required: true,
-					rerurn_num : true,
+					return_num_min : true,
+					return_num_max : true,
 				},
 				'images[]': {
 					minupload: 1,
@@ -456,11 +459,12 @@
 			messages: {
 				shipping_no     : "出荷指示№を入力してください。",
 				jan_code        : "JANコードを入力してください。",
-				return_reason   : "顧客コメントを入力してください。",
+				return_reason   : "返品理由を入力してください。",
 				customer_comment: "顧客コメントを入力してください。",
-				rerurn_num      : {
+				return_num      : {
 					required  : "返品数を入力してください。",
-					rerurn_num: "出荷数以上の数量は入力できません。",
+					return_num_min: "1以上で入力してください",
+					return_num_max: "出荷数以上の数量は入力できません。",
 				},
 				'images[]': {
 					minupload: "商品画像をファイル添付より選択してください。",

@@ -112,7 +112,7 @@
 								<label for="shipping_num">出荷数</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ delivered_num }}</p>
+								<p class="text-nowrap">{{ shipping_num }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -151,12 +151,12 @@
 						</tr>
 						<tr>
 							<td class="col-xs-3 text-right left_background">
-								<label for="rerurn_num">返品数</label>
+								<label for="return_num">返品数</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<input type="number" class="form-control" id="rerurn_num" name="rerurn_num" value="{{ rerurn_num }}" required/>
-								{% if  errors.rerurn_num is defined %}
-									<label id="rerurn_num-error" class="error" for="rerurn_num">{{ errors.rerurn_num }}</label>
+								<input type="number" class="form-control" id="return_num" name="return_num" value="{{ return_num }}" required/>
+								{% if  errors.return_num is defined %}
+									<label id="return_num-error" class="error" for="return_num">{{ errors.return_num }}</label>
 								{% endif %}
 							</td>
 						</tr>
@@ -172,7 +172,7 @@
 									<input type="radio" name="product_status" id="product_status2" value="2" required {% if product_status == 2 %}checked{% endif %}> 不良品
 								</label>
 								{% if  errors.product_status is defined %}
-									<label id="rerurn_num-error" class="error" for="rerurn_num">{{ errors.rerurn_num }}</label>
+									<label id="return_num-error" class="error" for="return_num">{{ errors.return_num }}</label>
 								{% endif %}
 							</td>
 						</tr>
@@ -303,9 +303,12 @@
 	$.validator.addMethod('maxupload', function(value, element, param) {
 		return ( cus_image_url_path.length + element.files.length ) <= param;
 	});
-	$.validator.addMethod('rerurn_num', function(value, element, param) {
+	$.validator.addMethod('return_num_min', function(value, element, param) {
 		if( value <= 0 ) return false;
-		if( value > {{ delivered_num - returned_num }} ) return false;
+		return true;
+	});
+	$.validator.addMethod('return_num_max', function(value, element, param) {
+		if( value > {{ shipping_num - returned_num }} ) return false;
 		return true;
 	});
 	$( function() {	
@@ -322,9 +325,10 @@
 				customer_comment: {
 					required: true
 				},
-				rerurn_num: {
+				return_num: {
 					required: true,
-					rerurn_num : true,
+					return_num_min : true,
+					return_num_max : true,
 				},
 				'images[]': {
 					minupload: 1,
@@ -335,9 +339,10 @@
 			messages: {
 				return_reason   : "顧客コメントを入力してください。",
 				customer_comment: "顧客コメントを入力してください。",
-				rerurn_num      : {
+				return_num      : {
 					required  : "返品数を入力してください。",
-					rerurn_num: "出荷数以上の数量は入力できません。",
+					return_num_min: "1以上で入力してください",
+					return_num_max: "出荷数以上の数量は入力できません。",
 				},
 				'images[]': {
 					minupload: "商品画像をファイル添付より選択してください。",
