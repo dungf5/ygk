@@ -322,7 +322,13 @@ function updateOne(objThis){
                         <div class="ec-cartTable">
                             <ol class="ec-cartHeader">
                                 <li class="ec-cartHeader__label">{{ 'front.cart.delete'|trans }}</li>
-                                <li class="ec-cartHeader__label">{{ 'front.cart.product'|trans }}</li>
+                                <li class="ec-cartHeader__label">
+                                    {% if global_service.getCartProductType == 2%}
+                                        {{ 'front.cart.product'|trans }} {{ 'front.cart.special_product'|trans }}
+                                    {% else %}
+                                        {{ 'front.cart.product'|trans }}
+                                    {% endif %}
+                                </li>
                                 <li class="ec-cartHeader__label">{{ 'common.quantity'|trans }}</li>
                                 <li class="ec-cartHeader__label">{{ 'common.subtotal'|trans }}</li>
                             </ol>

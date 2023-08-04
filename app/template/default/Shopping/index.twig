@@ -1021,6 +1021,9 @@ function updateDeliverydAdress(delivery_code) {
                                     {% set MstProduct = hsProductId[orderItem.Product.id] %}
                                     {% set classShow=hsMstProductCodeCheckShow[MstProduct.product_code] -%}
                                     <li>
+                                        {% if global_service.getCartProductType == 2%}
+                                            <p><strong>{{ 'front.cart.special_product'|trans }}</strong></p>
+                                        {% endif %}
                                         <div class="ec-imageGrid">
                                             <div class="ec-imageGrid__img"><img
                                                     src="{{ asset((orderItem.product is null ? null : orderItem.product.MainListImage)|no_image_product, 'save_image') }}"
