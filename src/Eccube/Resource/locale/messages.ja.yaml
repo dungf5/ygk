@@ -324,6 +324,7 @@ front.cart.divide_cart: 同時購入できない商品がカートに含まれ�
 front.cart.delete: 削除
 front.cart.delete__confirm: カートから商品を削除してよろしいですか？
 front.cart.product: 商品内容
+front.cart.special_product: 特注品
 front.cart.checkout: レジに進む
 front.cart.continue: お買い物を続ける
 front.cart.no_items: 現在カート内に商品はございません。
