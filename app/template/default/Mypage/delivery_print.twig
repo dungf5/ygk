@@ -736,51 +736,55 @@ file that was distributed with this source code.
         }
 
         function handlePrintPDF() {
-            // let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
-            // let handled = {};
-            //
-            // $.each(arr_print_pdf_value, function( index, value ) {
-            //    if (value && !handled[value]) {
-            //        handled[value] = true;
-            //
-            //        // let url = '/mypage/export_Pdf_multiple?delivery_no=' + value;
-            //        // let a = document.createElement('a');
-            //        // a.target = '_blank';
-            //        // a.href = url;
-            //        // a.click();
-            //    }
-            // });
-            let path = '';
+            if ($("#check-box-value-print-pdf").val().trim() == 'all') {
+                let path = '';
 
-            if ($("#search_shipping_date_from").val().trim() != '') {
-                path += "&search_shipping_date_from=" + $("#search_shipping_date_from").val().trim();
-            }
+                if ($("#search_shipping_date_from").val().trim() != '') {
+                    path += "&search_shipping_date_from=" + $("#search_shipping_date_from").val().trim();
+                }
 
-            if ($("#search_shipping_date_to").val().trim() != '') {
-                path += "&search_shipping_date_to=" + $("#search_shipping_date_to").val().trim();
-            }
+                if ($("#search_shipping_date_to").val().trim() != '') {
+                    path += "&search_shipping_date_to=" + $("#search_shipping_date_to").val().trim();
+                }
 
-            if ($("#search_sale_type").val() != '0') {
-                path += "&search_sale_type=" + $("#search_sale_type").val();
-            }
+                if ($("#search_sale_type").val() != '0') {
+                    path += "&search_sale_type=" + $("#search_sale_type").val();
+                }
 
-            if ($("#search_shipping_date").val() != '0') {
-                path += "&search_shipping_date=" + $("#search_shipping_date").val();
-            }
+                if ($("#search_shipping_date").val() != '0') {
+                    path += "&search_shipping_date=" + $("#search_shipping_date").val();
+                }
 
-            if ($("#search_order_shipping").val() != '0') {
-                path += "&search_order_shipping=" + $("#search_order_shipping").val();
-            }
+                if ($("#search_order_shipping").val() != '0') {
+                    path += "&search_order_shipping=" + $("#search_order_shipping").val();
+                }
 
-            if ($("#search_order_otodoke").val() != '0') {
-                path += "&search_order_otodoke=" + $("#search_order_otodoke").val();
+                if ($("#search_order_otodoke").val() != '0') {
+                    path += "&search_order_otodoke=" + $("#search_order_otodoke").val();
+                }
+
+                let url = '/mypage/export_Pdf_multiple?delivery_no=' + $("#check-box-value-print-pdf").val().trim() + path;
+                let a = document.createElement('a');
+                a.target = '_blank';
+                a.href = url;
+                a.click();
+
+            } else {
+                let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+                let handled = {};
+
+                $.each(arr_print_pdf_value, function( index, value ) {
+                   if (value && !handled[value]) {
+                       handled[value] = true;
+
+                       let url = '/mypage/export_Pdf_multiple?delivery_no=' + value;
+                       let a = document.createElement('a');
+                       a.target = '_blank';
+                       a.href = url;
+                       a.click();
+                   }
+                });
             }
-            
-            let url = '/mypage/export_Pdf_multiple?delivery_no=' + $("#check-box-value-print-pdf").val() + path;
-            let a = document.createElement('a');
-            a.target = '_blank';
-            a.href = url;
-            a.click();
         }
     </script>
 {% endblock %}
