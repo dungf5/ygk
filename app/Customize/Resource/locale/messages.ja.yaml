@@ -96,7 +96,7 @@ front.mypage.history.jan_code: JANコード
 front.mypage.history.product_name: 商品名
 front.mypage.history.shipping_num: 出荷数
 front.mypage.history.return_number: 返品数
-front.mypage.nav_delivery__print: 納品書印刷
+front.mypage.nav_delivery__print: 納品書ダウンロード
 front.mypage.shipping.select: 選択
 front.mypage.shipping.sale_type: 伝票
 front.mypage.nav_return_product: 返品手続き

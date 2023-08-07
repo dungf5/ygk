@@ -1927,11 +1927,115 @@ class MypageController extends AbstractController
     /**
      * マイページ.
      *
-     * @Route("/mypage/export_Pdf_multiple", name="exportPdfMultiple", methods={"GET"})
+     * @Route("/mypage/export_pdf_one_file", name="exportPdfOneFile", methods={"GET"})
+     * @Template("/Mypage/exportPdfMultiple.twig")
+     */
+    public function exportPdfOneFile(Request $request)
+    {
+        set_time_limit(0);
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 0);
+
+        $htmlFileName = 'Mypage/exportPdfMultiple.twig';
+        $preview = MyCommon::getPara('preview');
+        $delivery_no = MyCommon::getPara('delivery_no');
+        $params = [
+            'search_shipping_date' => MyCommon::getPara('shipping_date'),
+            'search_order_shipping' => MyCommon::getPara('order_shipping'),
+            'search_order_otodoke' => MyCommon::getPara('order_otodoke'),
+            'search_sale_type' => MyCommon::getPara('sale_type'),
+            'search_shipping_date_from' => MyCommon::getPara('search_shipping_date_from'),
+            'search_shipping_date_to' => MyCommon::getPara('search_shipping_date_to'),
+        ];
+
+        $comS = new MyCommonService($this->entityManager);
+        $customer_id = $this->globalService->customerId();
+        $login_type = $this->globalService->getLoginType();
+        $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
+
+        if (trim($delivery_no) == 'all') {
+            $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
+        } else {
+            $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
+        }
+
+        $arr_data = [];
+        foreach ($arr_delivery_no as $item_delivery_no) {
+            $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
+
+            if (!count($arRe)) {
+                continue;
+            }
+
+            //add special line
+            $totalTax = 0;
+            $totalaAmount = 0;
+            $inCr = 0;
+            $totalTaxRe = 0;
+
+            foreach ($arRe as &$item) {
+                $inCr++;
+                $totalTax = $totalTax + $item['tax'];
+                $totalaAmount = $totalaAmount + $item['amount'];
+                $totalTaxRe = $totalTaxRe + (10 / 100) * (int) $item['amount'];
+                $item['is_total'] = 0;
+                $item['autoIncr'] = $inCr;
+                $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
+            }
+
+            $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
+            $arSpecial = ['is_total' => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
+            $arRe[] = $arSpecial;
+
+            $arReturn = [
+                'myDatas' => array_chunk($arRe, 20),
+                'OrderTotal' => $totalaAmount,
+                'totalTaxRe' => $totalTaxRe,
+                'totalaAmountTax' => $totalaAmountTax,
+            ];
+
+            $arr_data['data'][] = $arReturn;
+        }
+
+        if (!$preview) {
+            $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
+            FileUtil::makeDirectory($dirPdf);
+            $namePdf = 'ship_'.date('Ymd').'.pdf';
+            $file = $dirPdf.'/'.$namePdf;
+
+            if (getenv('APP_IS_LOCAL') == 0) {
+                $htmlBody = $this->twig->render($htmlFileName, $arr_data);
+                MyCommon::converHtmlToPdf($dirPdf, $namePdf, $htmlBody);
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="'.basename($file).'"');
+
+                readfile($file);
+                exit();
+            } else {
+                exec('"C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe" c:/wamp/www/test/pdf.html c:/wamp/www/test/pdf.pdf');
+            }
+        }
+
+        if (!empty($arr_data)) {
+            return $arr_data;
+        } else {
+            return $this->redirectToRoute('mypage_delivery_print');
+        }
+    }
+
+    /**
+     * マイページ.
+     *
+     * @Route("/mypage/export_pdf_multi_file", name="exportPdfMultiFile", methods={"GET"})
      * @Template("/Mypage/exportPdfMultiple.twig")
      */
     public function exportPdfMultiple(Request $request)
     {
+        set_time_limit(0);
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 0);
+
         $htmlFileName = 'Mypage/exportPdfMultiple.twig';
         $preview = MyCommon::getPara('preview');
         $delivery_no = MyCommon::getPara('delivery_no');
