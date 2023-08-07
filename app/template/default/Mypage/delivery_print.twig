@@ -809,20 +809,27 @@ file that was distributed with this source code.
                 a.click();
 
             } else {
-                let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
-                let handled = {};
+                let str_delivery_no = $("#check-box-value-print-pdf").val().trim();
+                let url = '/mypage/export_pdf_multi_file?delivery_no=' + str_delivery_no;
+                let a = document.createElement('a');
+                a.target = '_blank';
+                a.href = url;
+                a.click();
 
-                $.each(arr_print_pdf_value, function( index, value ) {
-                   if (value && !handled[value]) {
-                       handled[value] = true;
+                //let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+                //let handled = {};
 
-                       let url = '/mypage/export_pdf_multi_file?delivery_no=' + value;
-                       let a = document.createElement('a');
-                       a.target = '_blank';
-                       a.href = url;
-                       a.click();
-                   }
-                });
+                //$.each(arr_print_pdf_value, function( index, value ) {
+                //   if (value && !handled[value]) {
+                //       handled[value] = true;
+
+                //       let url = '/mypage/export_pdf_multi_file?delivery_no=' + value;
+                //       let a = document.createElement('a');
+                //       a.target = '_blank';
+                //       a.href = url;
+                //       a.click();
+                //   }
+                //});
             }
         }
 

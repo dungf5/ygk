@@ -13,6 +13,7 @@
 
 namespace Customize\Controller\Mypage;
 
+use Composer\Package\Archiver\ZipArchiver;
 use Customize\Config\CSVHeader;
 use Customize\Common\FileUtil;
 use Customize\Common\MyCommon;
@@ -2025,7 +2026,7 @@ class MypageController extends AbstractController
      * マイページ.
      *
      * @Route("/mypage/export_pdf_multi_file", name="exportPdfMultiFile", methods={"GET"})
-     * @Template("/Mypage/exportPdfMultiple.twig")
+     * @Template("/Mypage/exportOrderPdf.twig")
      */
     public function exportPdfMultiFile(Request $request)
     {
@@ -2033,8 +2034,7 @@ class MypageController extends AbstractController
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', 0);
 
-        $htmlFileName = 'Mypage/exportPdfMultiple.twig';
-        $preview = MyCommon::getPara('preview');
+        $htmlFileName = 'Mypage/exportOrderPdf.twig';
         $delivery_no = MyCommon::getPara('delivery_no');
         $params = [
             'search_shipping_date' => MyCommon::getPara('search_shipping_date'),
@@ -2056,10 +2056,23 @@ class MypageController extends AbstractController
             $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
         }
 
-        $arr_data = [];
-        foreach ($arr_delivery_no as $item_delivery_no) {
-            $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
+        if (empty($arr_delivery_no)) {
+            return $this->redirectToRoute('mypage_delivery_print');
+        }
 
+        $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
+        FileUtil::makeDirectory($dirPdf);
+
+        $zipName = 'ship_'.date('Ymd').'.zip';
+        $zipName = $dirPdf.'/'.$zipName;
+
+        $zip = new ZipArchiver();
+        $zip->open($zipName, \ZipArchive::OVERWRITE);
+
+        foreach ($arr_delivery_no as $item_delivery_no) {
+            log_info($item_delivery_no);
+            $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
+            log_info(json_encode($arRe));
             if (!count($arRe)) {
                 continue;
             }
@@ -2091,30 +2104,24 @@ class MypageController extends AbstractController
                 'totalaAmountTax' => $totalaAmountTax,
             ];
 
-            $arr_data['data'][] = $arReturn;
-        }
-
-        if (!$preview) {
-            $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
-            FileUtil::makeDirectory($dirPdf);
-            $namePdf = 'ship_'.date('Ymd').'.pdf';
+            $namePdf = 'ship_'.$item_delivery_no.'.pdf';
             $file = $dirPdf.'/'.$namePdf;
+            log_info($file);
 
-            $html = $this->twig->render($htmlFileName, $arr_data);
+            $html = $this->twig->render($htmlFileName, $arReturn);
             $dompdf = new Dompdf();
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4');
             $dompdf->render();
-            $dompdf->stream($file);
             $output = $dompdf->output();
             file_put_contents($file, $output);
+
+            $zip->addFile($file);
         }
 
-        if (!empty($arr_data)) {
-            return $arr_data;
-        } else {
-            return $this->redirectToRoute('mypage_delivery_print');
-        }
+        $zip->close();
+
+        return $this->file($zipName);
     }
 
     /**
