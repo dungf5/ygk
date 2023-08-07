@@ -738,61 +738,43 @@ file that was distributed with this source code.
 
         function handlePrintPDF() {
             if ($("#check-box-value-print-pdf").val().trim() == 'all') {
-                // Call ajax get list delivery no
-                let data = {};
+                let path = '';
 
                 if ($("#search_shipping_date_from").val().trim() != '') {
-                    data.search_shipping_date_from = $("#search_shipping_date_from").val().trim();
+                    path += "&search_shipping_date_from=" + $("#search_shipping_date_from").val().trim();
                 }
 
                 if ($("#search_shipping_date_to").val().trim() != '') {
-                    data.search_shipping_date_to = $("#search_shipping_date_to").val().trim();
+                    path += "&search_shipping_date_to=" + $("#search_shipping_date_to").val().trim();
                 }
 
                 if ($("#search_sale_type").val() != '0') {
-                    data.search_sale_type = $("#search_sale_type").val();
+                    path += "&search_sale_type=" + $("#search_sale_type").val();
                 }
 
                 if ($("#search_shipping_date").val() != '0') {
-                    data.search_shipping_date = $("#search_shipping_date").val();
+                    path += "&search_shipping_date=" + $("#search_shipping_date").val();
                 }
 
                 if ($("#search_order_shipping").val() != '0') {
-                    data.search_order_shipping = $("#search_order_shipping").val();
+                    path += "&search_order_shipping=" + $("#search_order_shipping").val();
                 }
 
                 if ($("#search_order_otodoke").val() != '0') {
-                    data.search_order_otodoke = $("#search_order_otodoke").val();
+                    path += "&search_order_otodoke=" + $("#search_order_otodoke").val();
                 }
 
-                $.ajax({
-                    url: "{{ url('getDeliveryNoPrintAllPDF') }}",
-                    type: 'POST',
-                    data: data,
-                    dataType: 'json'
-                })
-                .done(function(data) {
-                    if (data.status == '1') {
-                        printPDF(data.delivery_no);
-
-                    } else {
-                        console.log(data.message);
-                    }
-                })
-                .fail(function(error) {
-                    console.log(error);
-                });
+                let url = '/mypage/export_Pdf_multiple?delivery_no=' + $("#check-box-value-print-pdf").val().trim() + path;
+                let a = document.createElement('a');
+                a.target = '_blank';
+                a.href = url;
+                a.click();
 
             } else {
                 let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
-                printPDF(arr_print_pdf_value);
-            }
-        }
+                let handled = {};
 
-        function printPDF($arr_delivery_no) {
-          let handled = {};
-
-                $.each($arr_delivery_no, function( index, value ) {
+                $.each(arr_print_pdf_value, function( index, value ) {
                    if (value && !handled[value]) {
                        handled[value] = true;
 
@@ -803,6 +785,7 @@ file that was distributed with this source code.
                        a.click();
                    }
                 });
+            }
         }
 
         function handleExportCsv() {
