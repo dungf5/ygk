@@ -100,6 +100,9 @@ file that was distributed with this source code.
             .actBg {
                 background: #0065ff;
             }
+            .btn-print-pdf {
+                min-height: 54px;
+            }
         </style>
 
         <div class="ec-mypageRole">
@@ -129,8 +132,17 @@ file that was distributed with this source code.
             <div class="row">
                 {# Task #1919, Hidden button#}
                 {#<button class="btn btn-danger btn-print-pdf" disabled onclick="handlePreviewPDF()">Preview & Print</button>#}
-                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDF()">Download & Print</button>
-                <button class="btn btn-danger btn-print-pdf" disabled onclick="handleExportCsv()">Download CSV</button>
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDFOneFile()">
+                    納品書ダウンロード<br>
+                    （1PDF）
+                </button>
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDFMultiFile()">
+                    納品書ダウンロード<br>
+                    （複数PDF）
+                </button>
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handleExportCsv()">
+                    納品書ダウンロード<br>
+                </button>
                 <input type="hidden" id="check-box-value-print-pdf" value=""/>
             </div>
 
@@ -736,7 +748,65 @@ file that was distributed with this source code.
             a.click();
         }
 
-        function handlePrintPDF() {
+        function handlePrintPDFOneFile() {
+            if ($("#check-box-value-print-pdf").val().trim() == 'all') {
+                let path = '';
+
+                if ($("#search_shipping_date_from").val().trim() != '') {
+                    path += "&search_shipping_date_from=" + $("#search_shipping_date_from").val().trim();
+                }
+
+                if ($("#search_shipping_date_to").val().trim() != '') {
+                    path += "&search_shipping_date_to=" + $("#search_shipping_date_to").val().trim();
+                }
+
+                if ($("#search_sale_type").val() != '0') {
+                    path += "&search_sale_type=" + $("#search_sale_type").val();
+                }
+
+                if ($("#search_shipping_date").val() != '0') {
+                    path += "&search_shipping_date=" + $("#search_shipping_date").val();
+                }
+
+                if ($("#search_order_shipping").val() != '0') {
+                    path += "&search_order_shipping=" + $("#search_order_shipping").val();
+                }
+
+                if ($("#search_order_otodoke").val() != '0') {
+                    path += "&search_order_otodoke=" + $("#search_order_otodoke").val();
+                }
+
+                let url = '/mypage/export_pdf_one_file?delivery_no=' + $("#check-box-value-print-pdf").val() + path;
+                let a = document.createElement('a');
+                a.target = '_blank';
+                a.href = url;
+                a.click();
+
+            } else {
+                let str_delivery_no = $("#check-box-value-print-pdf").val().trim();
+                let url = '/mypage/export_pdf_one_file?delivery_no=' + str_delivery_no;
+                let a = document.createElement('a');
+                a.target = '_blank';
+                a.href = url;
+                a.click();
+
+                //let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+                //let handled = {};
+                //$.each(arr_print_pdf_value, function( index, value ) {
+                //   if (value && !handled[value]) {
+                //       handled[value] = true;
+
+                //       let url = '/mypage/export_Pdf_one_file?delivery_no=' + value;
+                //       let a = document.createElement('a');
+                //       a.target = '_blank';
+                //       a.href = url;
+                //       a.click();
+                //   }
+                //});
+            }
+        }
+
+        function handlePrintPDFMultiFile() {
             if ($("#check-box-value-print-pdf").val().trim() == 'all') {
                 let path = '';
 
