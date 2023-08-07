@@ -1141,6 +1141,40 @@ class MypageController extends AbstractController
     /**
      * マイページ.
      *
+     * @Route("/mypage/get_delivery_no_print_all_pdf", name="getDeliveryNoPrintAllPDF", methods={"POST"})
+     */
+    public function getDeliveryNoPrintAllPDF(Request $request)
+    {
+        try {
+            if ('POST' === $request->getMethod()) {
+                $params = [
+                    'search_shipping_date' => MyCommon::getPara('search_shipping_date'),
+                    'search_order_shipping' => MyCommon::getPara('search_order_shipping'),
+                    'search_order_otodoke' => MyCommon::getPara('search_order_otodoke'),
+                    'search_sale_type' => MyCommon::getPara('search_sale_type'),
+                    'search_shipping_date_from' => MyCommon::getPara('search_shipping_date_from'),
+                    'search_shipping_date_to' => MyCommon::getPara('search_shipping_date_to'),
+                ];
+
+                $comS = new MyCommonService($this->entityManager);
+                $customer_id = $this->globalService->customerId();
+                $login_type = $this->globalService->getLoginType();
+                $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
+
+                $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
+
+                return $this->json(['status' => 1, 'count' => count($arr_delivery_no), 'delivery_no' => $arr_delivery_no], 200);
+            }
+
+            return $this->json(['status' => 0, 'message' => 'Method is not allowed'], 400);
+        } catch (\Exception $e) {
+            return $this->json(['status' => -1, 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * マイページ.
+     *
      * @Route("/mypage/export_csv_multiple", name="exportCsvMultiple", methods={"GET"})
      */
     public function exportCsvMultiple(Request $request)
