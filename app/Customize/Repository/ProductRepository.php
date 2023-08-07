@@ -190,12 +190,14 @@ class ProductRepository extends AbstractRepository
 
                 $categoryJoin = true;
             }
-        } else {
-            $qb->leftJoin('p.ProductCategories', 'pct')
-                ->leftJoin('pct.Category', 'c');
-
-            $categoryJoin = true;
         }
+
+//        else {
+//            $qb->innerJoin('p.ProductCategories', 'pct')
+//                ->innerJoin('pct.Category', 'c');
+//
+//            $categoryJoin = true;
+//        }
 
         $newComs = new MyCommonService($this->getEntityManager());
 
@@ -299,12 +301,14 @@ class ProductRepository extends AbstractRepository
 
             $qb->orderBy('p.create_date', 'DESC');
             $qb->addOrderBy('p.id', 'DESC');
-        } else {
-            if ($categoryJoin === false) {
-                $qb
-                    ->leftJoin('p.ProductCategories', 'pct')
-                    ->leftJoin('pct.Category', 'c');
-            }
+        }
+
+        else {
+//            if ($categoryJoin === false) {
+//                $qb
+//                    ->leftJoin('p.ProductCategories', 'pct')
+//                    ->leftJoin('pct.Category', 'c');
+//            }
 
             // 新着順 orderby=0
             if (!$user) {
