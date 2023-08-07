@@ -191,8 +191,8 @@ class ProductRepository extends AbstractRepository
                 $categoryJoin = true;
             }
         } else {
-            $qb->innerJoin('p.ProductCategories', 'pct')
-                ->innerJoin('pct.Category', 'c');
+            $qb->leftJoin('p.ProductCategories', 'pct')
+                ->leftJoin('pct.Category', 'c');
 
             $categoryJoin = true;
         }
