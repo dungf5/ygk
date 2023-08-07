@@ -2030,7 +2030,7 @@ class MypageController extends AbstractController
      * @Route("/mypage/export_pdf_multi_file", name="exportPdfMultiFile", methods={"GET"})
      * @Template("/Mypage/exportPdfMultiple.twig")
      */
-    public function exportPdfMultiple(Request $request)
+    public function exportPdfMultiFile(Request $request)
     {
         set_time_limit(0);
         ini_set('memory_limit', '-1');

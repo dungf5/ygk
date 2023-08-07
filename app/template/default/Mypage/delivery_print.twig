@@ -802,7 +802,7 @@ file that was distributed with this source code.
                     path += "&search_order_otodoke=" + $("#search_order_otodoke").val();
                 }
 
-                let url = '/mypage/export_Pdf_multiple?delivery_no=' + $("#check-box-value-print-pdf").val() + path;
+                let url = '/mypage/export_pdf_multi_file?delivery_no=' + $("#check-box-value-print-pdf").val() + path;
                 let a = document.createElement('a');
                 a.target = '_blank';
                 a.href = url;
@@ -816,7 +816,7 @@ file that was distributed with this source code.
                    if (value && !handled[value]) {
                        handled[value] = true;
 
-                       let url = '/mypage/export_Pdf_multiple?delivery_no=' + value;
+                       let url = '/mypage/export_pdf_multi_file?delivery_no=' + value;
                        let a = document.createElement('a');
                        a.target = '_blank';
                        a.href = url;
