@@ -13,7 +13,6 @@
 
 namespace Customize\Controller\Mypage;
 
-use Composer\Package\Archiver\ZipArchiver;
 use Customize\Common\FileUtil;
 use Customize\Common\MyCommon;
 use Customize\Common\MyConstant;
@@ -1187,8 +1186,8 @@ class MypageController extends AbstractController
         $zipName = 'ship_'.date('Ymd').'.zip';
         $zipName = $dirPdf.'/'.$zipName;
 
-        $zip = new ZipArchiver();
-        $zip->open($zipName, \ZipArchive::OVERWRITE);
+        $zip = new \ZipArchive();
+        $zip->open($zipName, \ZIPARCHIVE::CREATE | \ZIPARCHIVE::OVERWRITE);
 
         foreach ($arr_delivery_no as $item_delivery_no) {
             $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
@@ -1234,7 +1233,7 @@ class MypageController extends AbstractController
             $output = $dompdf->output();
             file_put_contents($file, $output);
 
-            $zip->addFile($file);
+            $zip->addFile($file, $namePdf);
         }
 
         $zip->close();
