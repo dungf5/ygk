@@ -169,12 +169,12 @@ class OrderItemRepository extends AbstractRepository
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('shipping.shipping_no');
         $qb->from('Customize\Entity\DtOrderStatus', 'order_status');
-        $qb->innerJoin(
-            'Customize\Entity\MstProduct',
-            'product',
-            Join::WITH,
-            'product.product_code = order_status.product_code'
-        );
+        //$qb->innerJoin(
+        //    'Customize\Entity\MstProduct',
+        //    'product',
+        //    Join::WITH,
+        //    'product.product_code = order_status.product_code'
+        //);
         $qb->innerJoin(
             'Customize\Entity\MstShipping',
             'shipping',
