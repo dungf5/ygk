@@ -13,11 +13,10 @@
 
 namespace Customize\Controller\Mypage;
 
-use ZipArchive;
-use Customize\Config\CSVHeader;
 use Customize\Common\FileUtil;
 use Customize\Common\MyCommon;
 use Customize\Common\MyConstant;
+use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Repository\MstShippingRepository;
 use Customize\Repository\OrderItemRepository;
@@ -37,13 +36,14 @@ use Eccube\Event\EventArgs;
 use Eccube\Form\Type\Front\CustomerLoginType;
 use Eccube\Repository\BaseInfoRepository;
 use Eccube\Repository\CustomerFavoriteProductRepository;
-use http\Client\Response;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use ZipArchive;
 
 class MypageController extends AbstractController
 {
@@ -1261,9 +1261,9 @@ class MypageController extends AbstractController
             $zip->close();
 
             $response = new Response(file_get_contents($zipName));
-            $response->addHeader('Content-Type', 'application/zip');
-            $response->addHeader('Content-Disposition', 'attachment;filename="'.$zipName.'"');
-            $response->addHeader('Content-length', filesize($zipName));
+            $response->headers->set('Content-Type', 'application/zip');
+            $response->headers->set('Content-Disposition', 'attachment;filename="'.$zipName.'"');
+            $response->headers->set('Content-length', filesize($zipName));
 
             @unlink($zipName);
 
