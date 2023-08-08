@@ -18,6 +18,8 @@ use Customize\Common\MyCommon;
 use Customize\Common\MyConstant;
 use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Repository\DtReturnsImageInfoRepository;
+use Customize\Repository\MstProductReturnsInfoRepository;
 use Customize\Repository\MstShippingRepository;
 use Customize\Repository\OrderItemRepository;
 use Customize\Repository\OrderRepository;
@@ -1130,13 +1132,6 @@ class MypageController extends AbstractController
                 $file = $dirPdf.'/'.$namePdf;
 
                 $html = $this->twig->render($htmlFileName, $arr_data);
-                //$dompdf = new Dompdf();
-                //$dompdf->loadHtml($html);
-                //$dompdf->setPaper('A4');
-                //$dompdf->render();
-                //$output = $dompdf->output();
-                //file_put_contents($file, $output);
-                //$dompdf->stream($file);
 
                 if (env('APP_IS_LOCAL', 1) != 1) {
                     MyCommon::converHtmlToPdf($dirPdf, $namePdf, $html);
@@ -1149,6 +1144,14 @@ class MypageController extends AbstractController
                     unlink(str_replace('.pdf', '.html', $file));
 
                     return;
+                } else {
+                    $dompdf = new Dompdf();
+                    $dompdf->loadHtml($html);
+                    $dompdf->setPaper('A4');
+                    $dompdf->render();
+                    $output = $dompdf->output();
+                    file_put_contents($file, $output);
+                    $dompdf->stream($file);
                 }
             }
 
@@ -1258,8 +1261,6 @@ class MypageController extends AbstractController
                 file_put_contents($file, $output);
 
                 $zip->addFile($file, $namePdf);
-
-                unlink($file);
             }
 
             $zip->close();
@@ -1269,6 +1270,111 @@ class MypageController extends AbstractController
             log_error($e->getMessage());
 
             return $this->redirectToRoute('mypage_delivery_print');
+        }
+    }
+
+    /**
+     * マイページ.
+     *
+     * @Route("/mypage/export_pdf_multi_file_ajax", name="exportPdfMultiFileAjax", methods={"POST"})
+     */
+    public function exportPdfMultiFileAjax(Request $request)
+    {
+        try {
+            set_time_limit(0);
+            ini_set('memory_limit', '9072M');
+            ini_set('max_execution_time', '0');
+            ini_set('max_input_time', '-1');
+
+            $htmlFileName = 'Mypage/exportOrderPdf.twig';
+            $delivery_no = MyCommon::getPara('delivery_no');
+            $params = [
+                'search_shipping_date' => MyCommon::getPara('search_shipping_date'),
+                'search_order_shipping' => MyCommon::getPara('search_order_shipping'),
+                'search_order_otodoke' => MyCommon::getPara('search_order_otodoke'),
+                'search_sale_type' => MyCommon::getPara('search_sale_type'),
+                'search_shipping_date_from' => MyCommon::getPara('search_shipping_date_from'),
+                'search_shipping_date_to' => MyCommon::getPara('search_shipping_date_to'),
+            ];
+
+            $comS = new MyCommonService($this->entityManager);
+            $customer_id = $this->globalService->customerId();
+            $login_type = $this->globalService->getLoginType();
+            $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
+
+            if (trim($delivery_no) == 'all') {
+                $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
+            } else {
+                $arr_delivery_no = array_values(array_diff(explode(',', $delivery_no), ['']));
+            }
+
+            if (empty($arr_delivery_no)) {
+                return $this->json(['status' => 0, 'message' => 'Data empty'], 400);
+            }
+
+            $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
+            FileUtil::makeDirectory($dirPdf);
+
+            $zipName = 'ship_'.date('YmdHis').'.zip';
+            $zipPath = $dirPdf.'/'.$zipName;
+
+            $zip = new ZipArchive();
+            $zip->open($zipPath, \ZIPARCHIVE::CREATE);
+
+            foreach ($arr_delivery_no as $item_delivery_no) {
+                $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
+                if (!count($arRe)) {
+                    continue;
+                }
+
+                //add special line
+                $totalTax = 0;
+                $totalaAmount = 0;
+                $inCr = 0;
+                $totalTaxRe = 0;
+
+                foreach ($arRe as &$item) {
+                    $inCr++;
+                    $totalTax = $totalTax + $item['tax'];
+                    $totalaAmount = $totalaAmount + $item['amount'];
+                    $totalTaxRe = $totalTaxRe + (10 / 100) * (int) $item['amount'];
+                    $item['is_total'] = 0;
+                    $item['autoIncr'] = $inCr;
+                    $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
+                }
+
+                $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
+                $arSpecial = ['is_total' => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
+                $arRe[] = $arSpecial;
+
+                $arReturn = [
+                    'myDatas' => array_chunk($arRe, 15),
+                    'OrderTotal' => $totalaAmount,
+                    'totalTaxRe' => $totalTaxRe,
+                    'totalaAmountTax' => $totalaAmountTax,
+                ];
+
+                $namePdf = $item_delivery_no.'.pdf';
+                $file = $dirPdf.'/'.$namePdf;
+
+                $html = $this->twig->render($htmlFileName, $arReturn);
+                $dompdf = new Dompdf();
+                $dompdf->loadHtml($html);
+                $dompdf->setPaper('A4');
+                $dompdf->render();
+                $output = $dompdf->output();
+                file_put_contents($file, $output);
+
+                $zip->addFile($file, $namePdf);
+            }
+
+            $zip->close();
+
+            return $this->json(['status' => 1, 'message' => '/html/user_data/pdf/'.$zipName], 200);
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            return $this->json(['status' => -1, 'message' => $e->getMessage()], 400);
         }
     }
 
