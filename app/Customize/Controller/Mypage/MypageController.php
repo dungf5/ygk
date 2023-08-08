@@ -13,14 +13,11 @@
 
 namespace Customize\Controller\Mypage;
 
-use ZipArchive;
-use Customize\Config\CSVHeader;
 use Customize\Common\FileUtil;
 use Customize\Common\MyCommon;
 use Customize\Common\MyConstant;
+use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
-use Customize\Repository\DtReturnsImageInfoRepository;
-use Customize\Repository\MstProductReturnsInfoRepository;
 use Customize\Repository\MstShippingRepository;
 use Customize\Repository\OrderItemRepository;
 use Customize\Repository\OrderRepository;
@@ -42,10 +39,11 @@ use Eccube\Repository\CustomerFavoriteProductRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use ZipArchive;
 
 class MypageController extends AbstractController
 {
@@ -1935,8 +1933,10 @@ class MypageController extends AbstractController
     public function exportPdfOneFile(Request $request)
     {
         try {
+            set_time_limit(0);
             ini_set('memory_limit', '9072M');
-            ini_set('MAX_EXECUTION_TIME', '-1');
+            ini_set('max_execution_time', '0');
+            ini_set('max_input_time', '-1');
 
             $htmlFileName = 'Mypage/exportPdfMultiple.twig';
             $preview = MyCommon::getPara('preview');
@@ -1990,7 +1990,7 @@ class MypageController extends AbstractController
                 $arRe[] = $arSpecial;
 
                 $arReturn = [
-                    'myDatas' => array_chunk($arRe, 15),
+                    'myDatas' => array_chunk($arRe, 20),
                     'OrderTotal' => $totalaAmount,
                     'totalTaxRe' => $totalTaxRe,
                     'totalaAmountTax' => $totalaAmountTax,
@@ -2021,6 +2021,7 @@ class MypageController extends AbstractController
                     header('Content-Disposition: attachment; filename="'.basename($file).'"');
 
                     readfile($file);
+
                     return;
                 }
             }
@@ -2030,7 +2031,6 @@ class MypageController extends AbstractController
             } else {
                 return $this->redirectToRoute('mypage_delivery_print');
             }
-
         } catch (\Exception $e) {
             log_error($e->getMessage());
 
@@ -2047,8 +2047,10 @@ class MypageController extends AbstractController
     public function exportPdfMultiFile(Request $request)
     {
         try {
+            set_time_limit(0);
             ini_set('memory_limit', '9072M');
-            ini_set('MAX_EXECUTION_TIME', '-1');
+            ini_set('max_execution_time', '0');
+            ini_set('max_input_time', '-1');
 
             $htmlFileName = 'Mypage/exportOrderPdf.twig';
             $delivery_no = MyCommon::getPara('delivery_no');
@@ -2082,8 +2084,8 @@ class MypageController extends AbstractController
             $zipName = 'ship_'.date('YmdHis').'.zip';
             $zipName = $dirPdf.'/'.$zipName;
 
-            $zip = new \ZipArchive();
-            $zip->open($zipName, \ZIPARCHIVE::CREATE | \ZIPARCHIVE::OVERWRITE);
+            $zip = new ZipArchive();
+            $zip->open($zipName, \ZIPARCHIVE::CREATE);
 
             foreach ($arr_delivery_no as $item_delivery_no) {
                 $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
@@ -2122,24 +2124,21 @@ class MypageController extends AbstractController
                 $file = $dirPdf.'/'.$namePdf;
 
                 $html = $this->twig->render($htmlFileName, $arReturn);
-                //$dompdf = new Dompdf();
-                //$dompdf->loadHtml($html);
-                //$dompdf->setPaper('A4');
-                //$dompdf->render();
-                //$output = $dompdf->output();
-                //file_put_contents($file, $output);
-
-                if (env('APP_IS_LOCAL', 1) != 1) {
-                    MyCommon::converHtmlToPdf($dirPdf, $namePdf, $html);
-                }
+                $dompdf = new Dompdf();
+                $dompdf->loadHtml($html);
+                $dompdf->setPaper('A4');
+                $dompdf->render();
+                $output = $dompdf->output();
+                file_put_contents($file, $output);
 
                 $zip->addFile($file, $namePdf);
+
+                unlink($file);
             }
 
             $zip->close();
 
             return $this->file($zipName);
-
         } catch (\Exception $e) {
             log_error($e->getMessage());
 
