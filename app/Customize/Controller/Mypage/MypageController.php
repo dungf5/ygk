@@ -1123,7 +1123,7 @@ class MypageController extends AbstractController
             if (!$preview) {
                 $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
                 FileUtil::makeDirectory($dirPdf);
-                $namePdf = 'ship_'.date('Ymd').'.pdf';
+                $namePdf = 'ship_'.date('YmdHis').'.pdf';
                 $file = $dirPdf.'/'.$namePdf;
 
                 $html = $this->twig->render($htmlFileName, $arr_data);
@@ -1187,7 +1187,7 @@ class MypageController extends AbstractController
             $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
             FileUtil::makeDirectory($dirPdf);
 
-            $zipName = 'ship_'.date('Ymd').'.zip';
+            $zipName = 'ship_'.date('YmdHis').'.zip';
             $zipName = $dirPdf.'/'.$zipName;
 
             $zip = new \ZipArchive();
