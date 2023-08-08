@@ -136,7 +136,7 @@ file that was distributed with this source code.
                     納品書ダウンロード<br>
                     （1PDF）
                 </button>
-                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDFMultiFile()">
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDFMultiFileAjax()">
                     納品書ダウンロード<br>
                     （複数PDF）
                 </button>
@@ -831,6 +831,66 @@ file that was distributed with this source code.
                 //   }
                 //});
             }
+        }
+
+        function handlePrintPDFMultiFileAjax() {
+            loadingOverlay();
+            let data = {};
+            data.delivery_no = $("#check-box-value-print-pdf").val().trim();
+
+            if ($("#check-box-value-print-pdf").val().trim() == 'all') {
+                if ($("#search_shipping_date_from").val().trim() != '') {
+                    data.search_shipping_date_from = $("#search_shipping_date_from").val().trim();
+                }
+
+                if ($("#search_shipping_date_to").val().trim() != '') {
+                    data.search_shipping_date_to = $("#search_shipping_date_to").val().trim();
+                }
+
+                if ($("#search_sale_type").val() != '0') {
+                    data.search_sale_type = $("#search_sale_type").val();
+                }
+
+                if ($("#search_shipping_date").val() != '0') {
+                    data.search_shipping_date = $("#search_shipping_date").val();
+                }
+
+                if ($("#search_order_shipping").val() != '0') {
+                    data.search_order_shipping = $("#search_order_shipping").val();
+                }
+
+                if ($("#search_order_otodoke").val() != '0') {
+                    data.search_order_otodoke = $("#search_order_otodoke").val();
+                }
+            }
+
+            $.ajax({
+                url: "{{ url('exportPdfMultiFileAjax') }}",
+                timeout: 300000, //300 second timeout
+                type: 'POST',
+                data: data,
+                dataType: 'json'
+            })
+            .done(function(data) {
+                if (data.status == '1') {
+                    let fileName = data.message;
+                    let url = window.location.origin;
+                    downloadFile(url + fileName);
+                }
+            })
+            .fail(function(error) {
+                console.log(error)
+            })
+            .always(function(data) {
+                loadingOverlay('hide');
+            });
+        }
+
+        function downloadFile(filePath) {
+            let link = document.createElement('a');
+            link.href = filePath;
+            link.download = filePath.substr(filePath.lastIndexOf('/') + 1);
+            link.click();
         }
 
         function handleExportCsv() {
