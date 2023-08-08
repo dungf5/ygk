@@ -13,10 +13,11 @@
 
 namespace Customize\Controller\Mypage;
 
+use ZipArchive;
+use Customize\Config\CSVHeader;
 use Customize\Common\FileUtil;
 use Customize\Common\MyCommon;
 use Customize\Common\MyConstant;
-use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Repository\MstShippingRepository;
 use Customize\Repository\OrderItemRepository;
@@ -1055,9 +1056,8 @@ class MypageController extends AbstractController
     public function exportPdfOneFile(Request $request)
     {
         try {
-            set_time_limit(0);
-            ini_set('memory_limit', '-1');
-            ini_set('max_execution_time', 0);
+            ini_set('memory_limit', '9072M');
+            ini_set('MAX_EXECUTION_TIME', '-1');
 
             $htmlFileName = 'Mypage/exportPdfMultiple.twig';
             $preview = MyCommon::getPara('preview');
@@ -1079,7 +1079,7 @@ class MypageController extends AbstractController
             if (trim($delivery_no) == 'all') {
                 $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
             } else {
-                $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
+                $arr_delivery_no = array_values(array_diff(explode(',', $delivery_no), ['']));
             }
 
             $arr_data = [];
@@ -1123,17 +1123,27 @@ class MypageController extends AbstractController
             if (!$preview) {
                 $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
                 FileUtil::makeDirectory($dirPdf);
-                $namePdf = 'ship_'.date('YmdHis').'.pdf';
+                $namePdf = count($arr_delivery_no) == 1 ? $arr_delivery_no[0].'.pdf' : 'ship_'.date('YmdHis').'.pdf';
                 $file = $dirPdf.'/'.$namePdf;
 
                 $html = $this->twig->render($htmlFileName, $arr_data);
-                $dompdf = new Dompdf();
-                $dompdf->loadHtml($html);
-                $dompdf->setPaper('A4');
-                $dompdf->render();
-                $output = $dompdf->output();
-                file_put_contents($file, $output);
-                $dompdf->stream($file);
+                //$dompdf = new Dompdf();
+                //$dompdf->loadHtml($html);
+                //$dompdf->setPaper('A4');
+                //$dompdf->render();
+                //$output = $dompdf->output();
+                //file_put_contents($file, $output);
+                //$dompdf->stream($file);
+
+                if (env('APP_IS_LOCAL', 1) != 1) {
+                    MyCommon::converHtmlToPdf($dirPdf, $namePdf, $html);
+                    header('Content-Description: File Transfer');
+                    header('Content-Type: application/octet-stream');
+                    header('Content-Disposition: attachment; filename="'.basename($file).'"');
+
+                    readfile($file);
+                    return;
+                }
             }
 
             if (!empty($arr_data)) {
@@ -1158,6 +1168,9 @@ class MypageController extends AbstractController
     public function exportPdfMultiFile(Request $request)
     {
         try {
+            ini_set('memory_limit', '9072M');
+            ini_set('MAX_EXECUTION_TIME', '-1');
+
             $htmlFileName = 'Mypage/exportOrderPdf.twig';
             $delivery_no = MyCommon::getPara('delivery_no');
             $params = [
@@ -1177,7 +1190,7 @@ class MypageController extends AbstractController
             if (trim($delivery_no) == 'all') {
                 $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
             } else {
-                $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
+                $arr_delivery_no = array_values(array_diff(explode(',', $delivery_no), ['']));
             }
 
             if (empty($arr_delivery_no)) {

@@ -13,8 +13,6 @@
 
 namespace Customize\Common;
 
-
-
 use Faker\Provider\Uuid;
 
 class MyCommon
@@ -27,153 +25,149 @@ class MyCommon
     {
         return $_SERVER['DOCUMENT_ROOT'];
     }
+
     public static function getHtmluserDataDir()
     {
-
         return MyCommon::getRootDir().'/html/user_data';
     }
-    public static function getDayWeekend(){
-        $numberofdays = 35;//find in 15 days
-        $startdate1 = date("Y-m-d");//'2022-09-23';//
-        $dayText = date('Y-m-d', strtotime($startdate1 . ' +1 day'));//ignore today
-        $startdate = $dayText;//'2022-09-23';
 
-        $d = new \DateTime( $startdate );
+    public static function getDayWeekend()
+    {
+        $numberofdays = 35; //find in 15 days
+        $startdate1 = date('Y-m-d'); //'2022-09-23';//
+        $dayText = date('Y-m-d', strtotime($startdate1.' +1 day')); //ignore today
+        $startdate = $dayText; //'2022-09-23';
+
+        $d = new \DateTime($startdate);
         $t = $d->getTimestamp();
-        $arSatSun =[];
+        $arSatSun = [];
         // loop for X days
-        for($i=0; $i<$numberofdays; $i++){
-
+        for ($i = 0; $i < $numberofdays; $i++) {
             // add 1 day to timestamp
             $addDay = 86400;
 
             // get what day it is next day
-            $nextDay = date('w', ($t+$addDay));
+            $nextDay = date('w', ($t + $addDay));
 
             // if it's Saturday or Sunday get $i-1
-            if($nextDay == 0 || $nextDay == 6) {
-                $t1 = $t+$addDay;
-                $arSatSun[]=  date('Y-m-d', $t1);
+            if ($nextDay == 0 || $nextDay == 6) {
+                $t1 = $t + $addDay;
+                $arSatSun[] = date('Y-m-d', $t1);
                 $i--;
             }
 
             // modify timestamp, add 1 day
-            $t = $t+$addDay;
+            $t = $t + $addDay;
         }
 
         $d->setTimestamp($t);
+
         return $arSatSun;
     }
-    public static function get3DayAfterDayOff($dayOfAr){
 
-        $startdate1 = date("Y-m-d");//'2022-09-23';//
-        $dayText = $startdate1;//date('Y-m-d', strtotime($startdate1 . ' +1 day'));//ignore today
-        $dayStart = new \DateTime( $dayText );
+    public static function get3DayAfterDayOff($dayOfAr)
+    {
+        $startdate1 = date('Y-m-d'); //'2022-09-23';//
+        $dayText = $startdate1; //date('Y-m-d', strtotime($startdate1 . ' +1 day'));//ignore today
+        $dayStart = new \DateTime($dayText);
         $timeStart = $dayStart->getTimestamp();
         $numberDayWant = 3;
-        $numberDayGet =0;
+        $numberDayGet = 0;
         $addDay = 86400;
-        $dayTextOk="";
-        while (true){
-
+        $dayTextOk = '';
+        while (true) {
             // get what day it is next day
-            $timeStart = $timeStart+$addDay;
+            $timeStart = $timeStart + $addDay;
             $dayText = date('Y-m-d', $timeStart);
 
-            if(in_array($dayText,$dayOfAr)){
-
+            if (in_array($dayText, $dayOfAr)) {
                 continue;
-            }else{
+            } else {
                 $dayTextOk = date('Y-m-d', $timeStart);
-                $numberDayGet ++;
+                $numberDayGet++;
             }
-            if($numberDayGet == $numberDayWant){
+            if ($numberDayGet == $numberDayWant) {
                 break;
             }
         }
 
-
         return $dayTextOk;
-
     }
-    public static function getValidDate($dayText,$dayOfArWeekEnd,$dayOf){
 
-
-        $dayStart = new \DateTime( $dayText );
+    public static function getValidDate($dayText, $dayOfArWeekEnd, $dayOf)
+    {
+        $dayStart = new \DateTime($dayText);
         $timeStart = $dayStart->getTimestamp();
         $numberDayWant = 3;
-        $numberDayGet =0;
+        $numberDayGet = 0;
         $addDay = 86400;
-        $dayTextOk="";
+        $dayTextOk = '';
         $lenAr = count($dayOfArWeekEnd);
-        while ($lenAr){
+        while ($lenAr) {
             $lenAr--;
             $dayText = date('Y-m-d', $timeStart);
-            if(in_array($dayText,$dayOfArWeekEnd)){
-                $timeStart = $timeStart+$addDay;
+            if (in_array($dayText, $dayOfArWeekEnd)) {
+                $timeStart = $timeStart + $addDay;
                 $dayTextOk = date('Y-m-d', $timeStart);
                 continue;
-            }else{
-
+            } else {
                 break;
             }
         }
-        if($dayTextOk==""){
+        if ($dayTextOk == '') {
             $dayTextOk = $dayText;
         }
-        //
-        $dayStart = new \DateTime( $dayTextOk );
+
+        $dayStart = new \DateTime($dayTextOk);
         $timeStart = $dayStart->getTimestamp();
         $lenArOf = count($dayOf);
-        while ($lenArOf){
+        while ($lenArOf) {
             $lenArOf--;
             $dayText = date('Y-m-d', $timeStart);
-            if(in_array($dayText,$dayOf)){
-                $timeStart = $timeStart+$addDay;
+            if (in_array($dayText, $dayOf)) {
+                $timeStart = $timeStart + $addDay;
                 $dayTextOk = date('Y-m-d', $timeStart);
                 continue;
-            }else{
-
+            } else {
                 break;
             }
         }
-        if($dayTextOk==""){
+        if ($dayTextOk == '') {
             $dayTextOk = $dayText;
         }
-        return $dayTextOk;
 
+        return $dayTextOk;
     }
 
-
-    public static function getNextDayNoWeekend(){
-        $startdate = date("Y-m-d");//'2022-09-23';
+    public static function getNextDayNoWeekend()
+    {
+        $startdate = date('Y-m-d'); //'2022-09-23';
 
         $numberofdays = 1;
 
-        $d = new \DateTime( $startdate );
+        $d = new \DateTime($startdate);
         $t = $d->getTimestamp();
 
         // loop for X days
-        for($i=0; $i<$numberofdays; $i++){
-
+        for ($i = 0; $i < $numberofdays; $i++) {
             // add 1 day to timestamp
             $addDay = 86400;
 
             // get what day it is next day
-            $nextDay = date('w', ($t+$addDay));
+            $nextDay = date('w', ($t + $addDay));
 
             // if it's Saturday or Sunday get $i-1
-            if($nextDay == 0 || $nextDay == 6) {
+            if ($nextDay == 0 || $nextDay == 6) {
                 $i--;
             }
 
             // modify timestamp, add 1 day
-            $t = $t+$addDay;
+            $t = $t + $addDay;
         }
 
         $d->setTimestamp($t);
 
-        return $d->format( 'Y-m-d' );
+        return $d->format('Y-m-d');
     }
 
     /***
@@ -181,23 +175,20 @@ class MyCommon
      * @param $dayAr orderby asc
      * @return false|string
      */
-    public static function getDayAfterDayOff($dayText,$dayAr){
-
-
-        if(count($dayAr)==0){
-            return  $dayText;
+    public static function getDayAfterDayOff($dayText, $dayAr)
+    {
+        if (count($dayAr) == 0) {
+            return $dayText;
         }
-        foreach ($dayAr as $itemDay){
-            if($itemDay==$dayText){
-                $dayText = date('Y-m-d', strtotime($dayText . ' +1 day'));
-            }else{
+        foreach ($dayAr as $itemDay) {
+            if ($itemDay == $dayText) {
+                $dayText = date('Y-m-d', strtotime($dayText.' +1 day'));
+            } else {
                 break;
             }
-
         }
 
         return $dayText;
-
     }
 
     public static function getPara($key)
@@ -208,35 +199,42 @@ class MyCommon
 
         return '';
     }
+
     public static function getSession($key)
     {
-
         if (isset($_SESSION[$key])) {
-           return $_SESSION[$key];
+            return $_SESSION[$key];
         }
 
         return null;
     }
-    public static function setSession($key,$val)
+
+    public static function setSession($key, $val)
     {
         $_SESSION[$key] = $val;
     }
 
-    public static function genRanDom(){
+    public static function genRanDom()
+    {
         return Uuid::uuid();
     }
-    public static function getCarSession(){
-        if(static::getSession("CART_SESSION")==null){
-            static::setSession("CART_SESSION",static::genRanDom());
-        }
-        return static::getSession("CART_SESSION");
 
+    public static function getCarSession()
+    {
+        if (static::getSession('CART_SESSION') == null) {
+            static::setSession('CART_SESSION', static::genRanDom());
+        }
+
+        return static::getSession('CART_SESSION');
     }
-    public static function deleteCarSession(){
-        static::setSession("CART_SESSION",null);
-        $_SESSION["CART_SESSION"]=null;
-        unset($_SESSION["CART_SESSION"]);
+
+    public static function deleteCarSession()
+    {
+        static::setSession('CART_SESSION', null);
+        $_SESSION['CART_SESSION'] = null;
+        unset($_SESSION['CART_SESSION']);
     }
+
     public static function checkExistText($source, $key)
     {
         if (strpos($source, $key) !== false) {
@@ -254,14 +252,11 @@ class MyCommon
         $fullPathPdf = $pathSave.'/'.$nameFile;
         FileUtil::writeFileFull($fullPathHtml, $htmlPdfContent);
         $outArr = [];
-        if(getenv("APP_IS_LOCAL")!==0){
-            $pathRun = "/usr/bin/wkhtmltopdf/bin/wkhtmltopdf --margin-top {$marginTop} --margin-bottom {$marginBottom} --margin-left {$margin_left} --margin-right {$margin_right} --encoding utf-8 --custom-header 'meta' 'charset=utf-8'";
+
+        if (env('APP_IS_LOCAL', 1) != 1) {
+            $pathRun = "/usr/bin/wkhtmltopdf/bin/wkhtmltopdf --margin-top {$marginTop} --margin-bottom {$marginBottom} --margin-left {$margin_left} --margin-right {$margin_right} --encoding 'Shift_JIS' --header-font-name 'msgothic' --custom-header 'meta' 'charset=Shift_JIS'";
             exec("{$pathRun} {$fullPathHtml} {$fullPathPdf}", $outArr);
-        }else{
-
         }
-
-
     }
 
     public static function isEmptyOrNull($source)
