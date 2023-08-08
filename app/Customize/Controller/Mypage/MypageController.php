@@ -37,6 +37,7 @@ use Eccube\Event\EventArgs;
 use Eccube\Form\Type\Front\CustomerLoginType;
 use Eccube\Repository\BaseInfoRepository;
 use Eccube\Repository\CustomerFavoriteProductRepository;
+use http\Client\Response;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -1057,7 +1058,7 @@ class MypageController extends AbstractController
     {
         try {
             ini_set('memory_limit', '9072M');
-            ini_set('MAX_EXECUTION_TIME', '-1');
+            ini_set('MAX_EXECUTION_TIME', '0');
 
             $htmlFileName = 'Mypage/exportPdfMultiple.twig';
             $preview = MyCommon::getPara('preview');
@@ -1142,6 +1143,7 @@ class MypageController extends AbstractController
                     header('Content-Disposition: attachment; filename="'.basename($file).'"');
 
                     readfile($file);
+
                     return;
                 }
             }
@@ -1151,7 +1153,6 @@ class MypageController extends AbstractController
             } else {
                 return $this->redirectToRoute('mypage_delivery_print');
             }
-
         } catch (\Exception $e) {
             log_error($e->getMessage());
 
@@ -1169,7 +1170,7 @@ class MypageController extends AbstractController
     {
         try {
             ini_set('memory_limit', '9072M');
-            ini_set('MAX_EXECUTION_TIME', '-1');
+            ini_set('MAX_EXECUTION_TIME', '0');
 
             $htmlFileName = 'Mypage/exportOrderPdf.twig';
             $delivery_no = MyCommon::getPara('delivery_no');
@@ -1203,7 +1204,7 @@ class MypageController extends AbstractController
             $zipName = 'ship_'.date('YmdHis').'.zip';
             $zipName = $dirPdf.'/'.$zipName;
 
-            $zip = new \ZipArchive();
+            $zip = new ZipArchive();
             $zip->open($zipName, \ZIPARCHIVE::CREATE | \ZIPARCHIVE::OVERWRITE);
 
             foreach ($arr_delivery_no as $item_delivery_no) {
@@ -1259,8 +1260,14 @@ class MypageController extends AbstractController
 
             $zip->close();
 
-            return $this->file($zipName);
+            $response = new Response(file_get_contents($zipName));
+            $response->addHeader('Content-Type', 'application/zip');
+            $response->addHeader('Content-Disposition', 'attachment;filename="'.$zipName.'"');
+            $response->addHeader('Content-length', filesize($zipName));
 
+            @unlink($zipName);
+
+            return $response;
         } catch (\Exception $e) {
             log_error($e->getMessage());
 
