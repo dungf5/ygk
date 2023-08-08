@@ -1059,7 +1059,8 @@ class MypageController extends AbstractController
         try {
             set_time_limit(0);
             ini_set('memory_limit', '9072M');
-            ini_set('MAX_EXECUTION_TIME', '0');
+            ini_set('max_execution_time', '0');
+            ini_set('max_input_time', '-1');
 
             $htmlFileName = 'Mypage/exportPdfMultiple.twig';
             $preview = MyCommon::getPara('preview');
@@ -1144,6 +1145,7 @@ class MypageController extends AbstractController
                     header('Content-Disposition: attachment; filename="'.basename($file).'"');
 
                     readfile($file);
+                    unlink($file);
 
                     return;
                 }
@@ -1208,7 +1210,7 @@ class MypageController extends AbstractController
             $zipName = $dirPdf.'/'.$zipName;
 
             $zip = new ZipArchive();
-            $zip->open($zipName, \ZIPARCHIVE::CREATE | \ZIPARCHIVE::OVERWRITE);
+            $zip->open($zipName, \ZIPARCHIVE::CREATE);
 
             foreach ($arr_delivery_no as $item_delivery_no) {
                 $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
@@ -1247,18 +1249,16 @@ class MypageController extends AbstractController
                 $file = $dirPdf.'/'.$namePdf;
 
                 $html = $this->twig->render($htmlFileName, $arReturn);
-                //$dompdf = new Dompdf();
-                //$dompdf->loadHtml($html);
-                //$dompdf->setPaper('A4');
-                //$dompdf->render();
-                //$output = $dompdf->output();
-                //file_put_contents($file, $output);
-
-                if (env('APP_IS_LOCAL', 1) != 1) {
-                    MyCommon::converHtmlToPdf($dirPdf, $namePdf, $html);
-                }
+                $dompdf = new Dompdf();
+                $dompdf->loadHtml($html);
+                $dompdf->setPaper('A4');
+                $dompdf->render();
+                $output = $dompdf->output();
+                file_put_contents($file, $output);
 
                 $zip->addFile($file, $namePdf);
+
+                unlink($file);
             }
 
             $zip->close();
