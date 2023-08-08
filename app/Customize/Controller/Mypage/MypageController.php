@@ -1126,7 +1126,7 @@ class MypageController extends AbstractController
             if (!$preview) {
                 $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
                 FileUtil::makeDirectory($dirPdf);
-                $namePdf = count($arr_delivery_no) == 1 ? $arr_delivery_no[0].'.pdf' : 'ship_'.date('YmdHis').'.pdf';
+                $namePdf = count($arr_delivery_no) == 1 ? 'ship_'.$arr_delivery_no[0].'.pdf' : 'ship_'.date('YmdHis').'.pdf';
                 $file = $dirPdf.'/'.$namePdf;
 
                 $html = $this->twig->render($htmlFileName, $arr_data);
