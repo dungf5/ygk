@@ -1113,7 +1113,7 @@ class MypageController extends AbstractController
                 $arRe[] = $arSpecial;
 
                 $arReturn = [
-                    'myDatas' => array_chunk($arRe, 15),
+                    'myDatas' => array_chunk($arRe, 20),
                     'OrderTotal' => $totalaAmount,
                     'totalTaxRe' => $totalTaxRe,
                     'totalaAmountTax' => $totalaAmountTax,
