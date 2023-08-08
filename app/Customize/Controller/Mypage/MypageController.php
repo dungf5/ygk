@@ -18,6 +18,8 @@ use Customize\Common\MyCommon;
 use Customize\Common\MyConstant;
 use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Repository\DtReturnsImageInfoRepository;
+use Customize\Repository\MstProductReturnsInfoRepository;
 use Customize\Repository\MstShippingRepository;
 use Customize\Repository\OrderItemRepository;
 use Customize\Repository\OrderRepository;
@@ -2002,7 +2004,7 @@ class MypageController extends AbstractController
             if (!$preview) {
                 $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
                 FileUtil::makeDirectory($dirPdf);
-                $namePdf = count($arr_delivery_no) == 1 ? $arr_delivery_no[0].'.pdf' : 'ship_'.date('YmdHis').'.pdf';
+                $namePdf = count($arr_delivery_no) == 1 ? 'ship_'.$arr_delivery_no[0].'.pdf' : 'ship_'.date('YmdHis').'.pdf';
                 $file = $dirPdf.'/'.$namePdf;
 
                 $html = $this->twig->render($htmlFileName, $arr_data);
@@ -2021,6 +2023,8 @@ class MypageController extends AbstractController
                     header('Content-Disposition: attachment; filename="'.basename($file).'"');
 
                     readfile($file);
+                    unlink($file);
+                    unlink(str_replace('.pdf', '.html', $file));
 
                     return;
                 }
