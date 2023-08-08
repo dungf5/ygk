@@ -1057,6 +1057,7 @@ class MypageController extends AbstractController
     public function exportPdfOneFile(Request $request)
     {
         try {
+            set_time_limit(0);
             ini_set('memory_limit', '9072M');
             ini_set('MAX_EXECUTION_TIME', '0');
 
@@ -1169,6 +1170,7 @@ class MypageController extends AbstractController
     public function exportPdfMultiFile(Request $request)
     {
         try {
+            set_time_limit(0);
             ini_set('memory_limit', '9072M');
             ini_set('MAX_EXECUTION_TIME', '0');
 
@@ -1260,14 +1262,7 @@ class MypageController extends AbstractController
 
             $zip->close();
 
-            $response = new Response(file_get_contents($zipName));
-            $response->headers->set('Content-Type', 'application/zip');
-            $response->headers->set('Content-Disposition', 'attachment;filename="'.$zipName.'"');
-            $response->headers->set('Content-length', filesize($zipName));
-
-            @unlink($zipName);
-
-            return $response;
+            return $this->file($zipName);
         } catch (\Exception $e) {
             log_error($e->getMessage());
 
