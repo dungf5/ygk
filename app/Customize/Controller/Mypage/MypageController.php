@@ -1239,16 +1239,20 @@ class MypageController extends AbstractController
                     'totalaAmountTax' => $totalaAmountTax,
                 ];
 
-                $namePdf = 'ship_'.$item_delivery_no.'.pdf';
+                $namePdf = $item_delivery_no.'.pdf';
                 $file = $dirPdf.'/'.$namePdf;
 
                 $html = $this->twig->render($htmlFileName, $arReturn);
-                $dompdf = new Dompdf();
-                $dompdf->loadHtml($html);
-                $dompdf->setPaper('A4');
-                $dompdf->render();
-                $output = $dompdf->output();
-                file_put_contents($file, $output);
+                //$dompdf = new Dompdf();
+                //$dompdf->loadHtml($html);
+                //$dompdf->setPaper('A4');
+                //$dompdf->render();
+                //$output = $dompdf->output();
+                //file_put_contents($file, $output);
+
+                if (env('APP_IS_LOCAL', 1) != 1) {
+                    MyCommon::converHtmlToPdf($dirPdf, $namePdf, $html);
+                }
 
                 $zip->addFile($file, $namePdf);
             }
