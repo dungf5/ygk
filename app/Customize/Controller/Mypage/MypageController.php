@@ -1146,6 +1146,7 @@ class MypageController extends AbstractController
 
                     readfile($file);
                     unlink($file);
+                    unlink(str_replace('.pdf', '.html', $file));
 
                     return;
                 }
