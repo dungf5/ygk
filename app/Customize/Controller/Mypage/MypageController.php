@@ -2016,13 +2016,13 @@ class MypageController extends AbstractController
 
                     return;
                 } else {
-                    $dompdf = new Dompdf();
-                    $dompdf->loadHtml($html);
-                    $dompdf->setPaper('A4');
-                    $dompdf->render();
-                    $output = $dompdf->output();
-                    file_put_contents($file, $output);
-                    $dompdf->stream($file);
+                    //$dompdf = new Dompdf();
+                    //$dompdf->loadHtml($html);
+                    //$dompdf->setPaper('A4');
+                    //$dompdf->render();
+                    //$output = $dompdf->output();
+                    //file_put_contents($file, $output);
+                    //$dompdf->stream($file);
                 }
             }
 
