@@ -834,7 +834,6 @@ file that was distributed with this source code.
         }
 
         function handlePrintPDFMultiFileAjax() {
-            loadingOverlay();
             let data = {};
             data.delivery_no = $("#check-box-value-print-pdf").val().trim();
 
@@ -869,19 +868,73 @@ file that was distributed with this source code.
                 timeout: 300000, //300 second timeout
                 type: 'POST',
                 data: data,
-                dataType: 'json'
+                dataType: 'json',
+                beforeSend: function() {
+                    loadingOverlay();
+                },
             })
             .done(function(data) {
-                if (data.status == '1') {
+                if (data.status == '2') {
+                    let zip_name = data.message;
+                    let delivery_no_list = data.arr_delivery_no;
+                    let step = 0;
+
+                    $.each(delivery_no_list, function( index, value ) {
+                        if (index == delivery_no_list.length - 1) {
+                            step = '-1';
+                        } else {
+                            step = index;
+                        }
+                        console.log(step);
+
+                        handlePrintPDFMultiFileAjaxByStep(zip_name, step, value.toString().trim());
+                    });
+                }
+
+                if (data.status == '0' || data.status == '-1') {
+                    console.log(data.message);
+                }
+            })
+            .fail(function(error) {
+                console.log(error);
+            })
+            .always(function() {
+                loadingOverlay('hide');
+            });
+        }
+
+        function handlePrintPDFMultiFileAjaxByStep(zip_name, step, delivery_no) {
+            let data = {};
+            data.zip_name = zip_name;
+            data.step = step;
+            data.delivery_no = delivery_no;
+
+            $.ajax({
+                url: "{{ url('exportPdfMultiFileAjax') }}",
+                timeout: 300000, //300 second timeout
+                async: false,
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                beforeSend: function() {
+                    loadingOverlay();
+                },
+            })
+            .done(function(data) {
+                if (data.status == '1' && data.step == '-1') { // step = -1 is the last time
                     let fileName = data.message;
                     let url = window.location.origin;
                     downloadFile(url + fileName);
                 }
+
+                if (data.status == '0' || data.status == '-1') {
+                    console.log(data.message);
+                }
             })
             .fail(function(error) {
-                console.log(error)
+                console.log(error);
             })
-            .always(function(data) {
+            .always(function() {
                 loadingOverlay('hide');
             });
         }
