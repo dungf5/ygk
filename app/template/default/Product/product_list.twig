@@ -293,7 +293,9 @@ $(function() {
             </div>
             <div class="ec-searchnavRole__infos">
                 <input type="radio" name="rd_product_type" id="normal_product" value="1" {% if global_service.getProductType == 1 %}checked{% endif %} style="margin-bottom: 5px;"><label for="normal_product" style="padding-left: 10px; cursor: pointer; margin-bottom: 0;">通常品</label>
-                <input type="radio" name="rd_product_type" id="special_product" value="2" {% if global_service.getProductType == 2 %}checked{% endif %} style="margin-left: 20px; margin-bottom: 5px;"><label for="special_product" style="padding-left: 10px; cursor: pointer; margin-bottom: 0;">特注品</label>
+                {% if global_service.getSpecialOrderFlg == 1 %}
+                    <input type="radio" name="rd_product_type" id="special_product" value="2" {% if global_service.getProductType == 2 %}checked{% endif %} style="margin-left: 20px; margin-bottom: 5px;"><label for="special_product" style="padding-left: 10px; cursor: pointer; margin-bottom: 0;">特注品</label>
+                {% endif %}
             </div>
         </div>
         <div class="ec-shelfRole">
