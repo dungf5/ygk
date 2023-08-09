@@ -1287,6 +1287,8 @@ class MypageController extends AbstractController
             ini_set('max_input_time', '-1');
 
             $htmlFileName = 'Mypage/exportOrderPdf.twig';
+            $step = MyCommon::getPara('step', 0);
+            $zip_name = MyCommon::getPara('zip_name');
             $delivery_no = MyCommon::getPara('delivery_no');
             $params = [
                 'search_shipping_date' => MyCommon::getPara('search_shipping_date'),
@@ -1315,11 +1317,18 @@ class MypageController extends AbstractController
             $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
             FileUtil::makeDirectory($dirPdf);
 
-            $zipName = 'ship_'.date('YmdHis').'.zip';
+            if (empty($zip_name)) {
+                $zipName = 'ship_'.date('YmdHis').'.zip';
+                $arr_delivery_no = array_chunk($arr_delivery_no, 2);
+                return $this->json(['status' => 2, 'message' => $zipName, 'arr_delivery_no' => $arr_delivery_no], 200);
+            }
+
+            $zipName = trim($zip_name);
             $zipPath = $dirPdf.'/'.$zipName;
 
+
             $zip = new ZipArchive();
-            $zip->open($zipPath, \ZIPARCHIVE::CREATE);
+            $zip->open($zipPath, \ZipArchive::CREATE);
 
             foreach ($arr_delivery_no as $item_delivery_no) {
                 $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
@@ -1370,7 +1379,8 @@ class MypageController extends AbstractController
 
             $zip->close();
 
-            return $this->json(['status' => 1, 'message' => '/html/user_data/pdf/'.$zipName], 200);
+            return $this->json(['status' => 1, 'step' => $step,  'message' => '/html/user_data/pdf/'.$zipName], 200);
+
         } catch (\Exception $e) {
             log_error($e->getMessage());
 
