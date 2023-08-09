@@ -230,6 +230,10 @@ class GlobalService
         // 1. 通常品 (normal product)
         // 2. 特注品 (special product)
 
+        if ($this->getSpecialOrderFlg() != 1) {
+            $_SESSION['s_product_type'] = 1;
+        }
+
         return $_SESSION['s_product_type'] ?? 1;
     }
 
