@@ -2266,7 +2266,6 @@ class MypageController extends AbstractController
      */
     public function exportCsvMultiple(Request $request)
     {
-        $htmlFileName = 'Mypage/exportPdfMultiple.twig';
         $delivery_no = MyCommon::getPara('delivery_no');
         $params = [
             'search_shipping_date' => MyCommon::getPara('shipping_date'),
