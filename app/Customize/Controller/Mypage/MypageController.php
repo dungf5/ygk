@@ -1319,7 +1319,7 @@ class MypageController extends AbstractController
 
             if (empty($zip_name)) {
                 $zipName = 'ship_'.date('YmdHis').'.zip';
-                $arr_delivery_no = array_chunk($arr_delivery_no, 2);
+                $arr_delivery_no = array_chunk($arr_delivery_no, 30);
                 return $this->json(['status' => 2, 'message' => $zipName, 'arr_delivery_no' => $arr_delivery_no], 200);
             }
 
