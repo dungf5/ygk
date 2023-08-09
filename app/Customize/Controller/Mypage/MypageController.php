@@ -18,8 +18,6 @@ use Customize\Common\MyCommon;
 use Customize\Common\MyConstant;
 use Customize\Config\CSVHeader;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
-use Customize\Repository\DtReturnsImageInfoRepository;
-use Customize\Repository\MstProductReturnsInfoRepository;
 use Customize\Repository\MstShippingRepository;
 use Customize\Repository\OrderItemRepository;
 use Customize\Repository\OrderRepository;
@@ -41,7 +39,6 @@ use Eccube\Repository\CustomerFavoriteProductRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -1320,12 +1317,12 @@ class MypageController extends AbstractController
             if (empty($zip_name)) {
                 $zipName = 'ship_'.date('YmdHis').'.zip';
                 $arr_delivery_no = array_chunk($arr_delivery_no, 30);
+
                 return $this->json(['status' => 2, 'message' => $zipName, 'arr_delivery_no' => $arr_delivery_no], 200);
             }
 
             $zipName = trim($zip_name);
             $zipPath = $dirPdf.'/'.$zipName;
-
 
             $zip = new ZipArchive();
             $zip->open($zipPath, \ZipArchive::CREATE);
@@ -1380,7 +1377,6 @@ class MypageController extends AbstractController
             $zip->close();
 
             return $this->json(['status' => 1, 'step' => $step,  'message' => '/html/user_data/pdf/'.$zipName], 200);
-
         } catch (\Exception $e) {
             log_error($e->getMessage());
 
