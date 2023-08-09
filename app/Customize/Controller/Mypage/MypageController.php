@@ -412,8 +412,8 @@ class MypageController extends AbstractController
         $orderStatusList = [];
         $orderStatusList[] = ['key' => '0', 'value' => '調査要'];
         $orderStatusList[] = ['key' => '1', 'value' => '未確保'];
-        $orderStatusList[] = ['key' => '2', 'value' => '一部確保'];
-        $orderStatusList[] = ['key' => '3', 'value' => '確保済み'];
+        $orderStatusList[] = ['key' => '2', 'value' => '一部確保済'];
+        $orderStatusList[] = ['key' => '3', 'value' => '確保済'];
         $orderStatusList[] = ['key' => '4', 'value' => 'キャンセル'];
         $orderStatusList[] = ['key' => '9', 'value' => '注文完了'];
 
@@ -827,8 +827,8 @@ class MypageController extends AbstractController
         $orderStatusList = [];
         $orderStatusList[] = ['key' => '0', 'value' => '調査要'];
         $orderStatusList[] = ['key' => '1', 'value' => '未確保'];
-        $orderStatusList[] = ['key' => '2', 'value' => '一部確保'];
-        $orderStatusList[] = ['key' => '3', 'value' => '確保済み'];
+        $orderStatusList[] = ['key' => '2', 'value' => '一部確保済'];
+        $orderStatusList[] = ['key' => '3', 'value' => '確保済'];
         $orderStatusList[] = ['key' => '4', 'value' => 'キャンセル'];
         $orderStatusList[] = ['key' => '9', 'value' => '注文完了'];
 
@@ -1873,8 +1873,8 @@ class MypageController extends AbstractController
         $orderStatusList = [];
         $orderStatusList[] = ['key' => '0', 'value' => '調査要'];
         $orderStatusList[] = ['key' => '1', 'value' => '未確保'];
-        $orderStatusList[] = ['key' => '2', 'value' => '一部確保'];
-        $orderStatusList[] = ['key' => '3', 'value' => '確保済み'];
+        $orderStatusList[] = ['key' => '2', 'value' => '一部確保済'];
+        $orderStatusList[] = ['key' => '3', 'value' => '確保済'];
         $orderStatusList[] = ['key' => '4', 'value' => 'キャンセル'];
         $orderStatusList[] = ['key' => '9', 'value' => '注文完了'];
 
