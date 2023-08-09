@@ -1145,13 +1145,13 @@ class MypageController extends AbstractController
 
                     return;
                 } else {
-                    $dompdf = new Dompdf();
-                    $dompdf->loadHtml($html);
-                    $dompdf->setPaper('A4');
-                    $dompdf->render();
-                    $output = $dompdf->output();
-                    file_put_contents($file, $output);
-                    $dompdf->stream($file);
+                    //$dompdf = new Dompdf();
+                    //$dompdf->loadHtml($html);
+                    //$dompdf->setPaper('A4');
+                    //$dompdf->render();
+                    //$output = $dompdf->output();
+                    //file_put_contents($file, $output);
+                    //$dompdf->stream($file);
                 }
             }
 
@@ -1395,7 +1395,6 @@ class MypageController extends AbstractController
      */
     public function exportCsvMultiple(Request $request)
     {
-        $htmlFileName = 'Mypage/exportPdfMultiple.twig';
         $delivery_no = MyCommon::getPara('delivery_no');
         $params = [
             'search_shipping_date' => MyCommon::getPara('shipping_date'),

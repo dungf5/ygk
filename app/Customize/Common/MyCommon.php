@@ -254,7 +254,7 @@ class MyCommon
         $outArr = [];
 
         if (env('APP_IS_LOCAL', 1) != 1) {
-            $pathRun = "/usr/bin/wkhtmltopdf/bin/wkhtmltopdf --margin-top {$marginTop} --margin-bottom {$marginBottom} --margin-left {$margin_left} --margin-right {$margin_right} --encoding 'Shift_JIS' --header-font-name 'msgothic' --custom-header 'meta' 'charset=Shift_JIS'";
+            $pathRun = "/usr/bin/wkhtmltopdf/bin/wkhtmltopdf --page-size A4 --margin-top {$marginTop} --margin-bottom {$marginBottom} --margin-left {$margin_left} --margin-right {$margin_right} --encoding 'Shift_JIS' --header-font-name 'msgothic' --custom-header 'meta' 'charset=Shift_JIS'";
             exec("{$pathRun} {$fullPathHtml} {$fullPathPdf}", $outArr);
         }
     }
