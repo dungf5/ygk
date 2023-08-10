@@ -169,7 +169,7 @@ class ProductRepository extends AbstractRepository
                 AS hidden orderPrice
         ';
 
-        $sqlColmnsP = 'p.id, p.description_list, p.free_area';
+        $sqlColmnsP = 'p.id';
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb = $qb->andWhere('p.Status = 1');
 
