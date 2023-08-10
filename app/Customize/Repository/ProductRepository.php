@@ -301,9 +301,7 @@ class ProductRepository extends AbstractRepository
 
             $qb->orderBy('p.create_date', 'DESC');
             $qb->addOrderBy('p.id', 'DESC');
-        }
-
-        else {
+        } else {
 //            if ($categoryJoin === false) {
 //                $qb
 //                    ->leftJoin('p.ProductCategories', 'pct')
@@ -332,7 +330,8 @@ class ProductRepository extends AbstractRepository
 
         $curentDate = date('Y-m-d');
         $stringCon = ' price.product_code = mstProduct.product_code AND price.customer_code = :customer_code AND price.shipping_no = :shipping_code ';
-        $stringCon .= " and '$curentDate' >= price.valid_date AND '$curentDate' <= price.expire_date ";
+        //$stringCon .= " and '$curentDate' >= price.valid_date AND '$curentDate' <= price.expire_date ";
+        $stringCon .= " and price.tanka_number = (SELECT max(price_2.tanka_number) from Customize\Entity\Price as price_2 where price_2.product_code = mstProduct.product_code AND price_2.customer_code = :customer_code AND price_2.shipping_no = :shipping_code AND '$curentDate' >= price_2.valid_date AND '$curentDate' <= price_2.expire_date Order by price_2.tanka_number DESC)";
 
         if (count($arProductCodeInDtPrice) > 0) {
             $stringCon .= ' and price.product_code in (:product_code) ';
@@ -401,7 +400,8 @@ class ProductRepository extends AbstractRepository
 
         $qb->groupBy('mstProduct.product_code');
 
-        //dd( $qb->getQuery()->getSQL(), $searchData, $user, $customer_code, $shippingCode, $arProductCodeInDtPrice, $arTanakaNumber, $location);
+        //dd($qb->getQuery()->getSQL(), $searchData, $user, $customer_code, $shippingCode, $arProductCodeInDtPrice, $arTanakaNumber, $location);
+
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 }

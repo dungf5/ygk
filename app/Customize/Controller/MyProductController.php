@@ -594,12 +594,13 @@ class MyProductController extends AbstractController
                 $shippingCode = $this->globalService->getShippingCode();
             }
 
-            $arPriceAndTanaka = $commonService->getPriceFromDtPriceOfCusV2($customerCode, $shippingCode);
-            $arProductCodeInDtPrice = $arPriceAndTanaka[0];
-            $arTanakaNumber = $arPriceAndTanaka[1];
+            //$arPriceAndTanaka = $commonService->getPriceFromDtPriceOfCusV2($customerCode, $shippingCode);
+            //$arProductCodeInDtPrice = $arPriceAndTanaka[0];
+            //$arTanakaNumber = $arPriceAndTanaka[1];
         }
 
-        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customerCode, $shippingCode, $arProductCodeInDtPrice, $arTanakaNumber);
+        //$qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customerCode, $shippingCode, $arProductCodeInDtPrice, $arTanakaNumber);
+        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customerCode, $shippingCode, [], []);
 
         $event = new EventArgs(
             [
