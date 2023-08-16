@@ -2,10 +2,6 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <style>
-        @font-face {
-            font-family: 'msgothic';
-            src: url("{{getWebRootUrl()}}/html/template/default/assets/fonts/MS-Gothic.ttf") format("truetype");
-        }
         * {
             font-family: 'msgothic';
             margin: 0;
@@ -176,7 +172,7 @@
             left: 0;
         }
         .header1_right{
-            margin-left: 400px;
+            margin-left: 500px;
         }
         .text_right_header{
             text-align: left;
@@ -242,7 +238,7 @@
                         <div>{{ myDatas[0][0].deli_addr03 }}</div>
                         <div>{{ myDatas[0][0].deli_company_name }}  御中</div>
                         <div>{{ myDatas[0][0].deli_department_name }}</div>
-                        <div style="margin-top: 40px;">届け先: {{ myDatas[0][0].otodoke_code }}</div>
+                        <div style="margin-top: 40px;">届け先: {{ myDatas[0][0].otodoke_name }}</div>
                     </div>
                         <div class="header1_right">
                             <div class="text_right_header">
@@ -281,8 +277,8 @@
                                         <td class="" style="" >
                                             {{ deli.sale_type }}
                                         </td>
-                                        <td class="" style="">{{ deli.item_no }}<br />{{ deli.item_name }}</td>
-                                        <td class="" title="quantity" style="text-align: right;">{{ deli.quanlity }}</td>
+                                        <td class="" style="">{{ deli.jan_code }}<br />{{ deli.item_name }}</td>
+                                        <td class="" title="quantity" style="text-align: right;">{{ deli.quantity }}</td>
                                         <td class="" style="">{{ deli.unit }}</td>
                                         <td class="" title="price" style="text-align: right;">{{ roundPrice(deli.unit_price) }}</td>
                                         <td class="" title="amount" style="text-align: right;">{{ roundPrice(deli.amount) }}</td>
@@ -319,7 +315,7 @@
                                             <td>備考: {{ myDatas[0][0].footer_remark1}} </td>
                                         </tr>
                                         <tr>
-                                            <td>出荷先: {{ myDatas[0][0].shiping_code }}</td>
+                                            <td>出荷先: {{ myDatas[0][0].shiping_name }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

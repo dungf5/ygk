@@ -100,6 +100,9 @@ file that was distributed with this source code.
             .actBg {
                 background: #0065ff;
             }
+            .btn-print-pdf {
+                min-height: 54px;
+            }
         </style>
 
         <div class="ec-mypageRole">
@@ -129,7 +132,17 @@ file that was distributed with this source code.
             <div class="row">
                 {# Task #1919, Hidden button#}
                 {#<button class="btn btn-danger btn-print-pdf" disabled onclick="handlePreviewPDF()">Preview & Print</button>#}
-                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDF()">Download & Print</button>
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDFOneFile()">
+                    納品書ダウンロード<br>
+                    （1PDF）
+                </button>
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handlePrintPDFMultiFileAjax()">
+                    納品書ダウンロード<br>
+                    （複数PDF）
+                </button>
+                <button class="btn btn-danger btn-print-pdf" disabled onclick="handleExportCsv()">
+                    納品書データダウンロード<br>
+                </button>
                 <input type="hidden" id="check-box-value-print-pdf" value=""/>
             </div>
 
@@ -735,6 +748,108 @@ file that was distributed with this source code.
             a.click();
         }
 
+        function handlePrintPDFOneFile() {
+            if ($("#check-box-value-print-pdf").val().trim() == 'all') {
+                let path = '';
+
+                if ($("#search_shipping_date_from").val().trim() != '') {
+                    path += "&search_shipping_date_from=" + $("#search_shipping_date_from").val().trim();
+                }
+
+                if ($("#search_shipping_date_to").val().trim() != '') {
+                    path += "&search_shipping_date_to=" + $("#search_shipping_date_to").val().trim();
+                }
+
+                if ($("#search_sale_type").val() != '0') {
+                    path += "&search_sale_type=" + $("#search_sale_type").val();
+                }
+
+                if ($("#search_shipping_date").val() != '0') {
+                    path += "&search_shipping_date=" + $("#search_shipping_date").val();
+                }
+
+                if ($("#search_order_shipping").val() != '0') {
+                    path += "&search_order_shipping=" + $("#search_order_shipping").val();
+                }
+
+                if ($("#search_order_otodoke").val() != '0') {
+                    path += "&search_order_otodoke=" + $("#search_order_otodoke").val();
+                }
+
+                let url = '/mypage/export_pdf_one_file?delivery_no=' + $("#check-box-value-print-pdf").val() + path;
+                let a = document.createElement('a');
+                a.target = '_blank';
+                a.href = url;
+                a.click();
+
+            } else {
+                let str_delivery_no = $("#check-box-value-print-pdf").val().trim();
+                let url = '/mypage/export_pdf_one_file?delivery_no=' + str_delivery_no;
+                let a = document.createElement('a');
+                a.target = '_blank';
+                a.href = url;
+                a.click();
+
+                //let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+                //let handled = {};
+                //$.each(arr_print_pdf_value, function( index, value ) {
+                //   if (value && !handled[value]) {
+                //       handled[value] = true;
+
+                //       let url = '/mypage/export_Pdf_one_file?delivery_no=' + value;
+                //       let a = document.createElement('a');
+                //       a.target = '_blank';
+                //       a.href = url;
+                //       a.click();
+                //   }
+                //});
+            }
+        }
+
+        function handlePrintPDFMultiFile() {
+            if ($("#check-box-value-print-pdf").val().trim() == 'all') {
+                let path = '';
+
+                if ($("#search_shipping_date_from").val().trim() != '') {
+                    path += "&search_shipping_date_from=" + $("#search_shipping_date_from").val().trim();
+                }
+
+                if ($("#search_shipping_date_to").val().trim() != '') {
+                    path += "&search_shipping_date_to=" + $("#search_shipping_date_to").val().trim();
+                }
+
+                if ($("#search_sale_type").val() != '0') {
+                    path += "&search_sale_type=" + $("#search_sale_type").val();
+                }
+
+                if ($("#search_shipping_date").val() != '0') {
+                    path += "&search_shipping_date=" + $("#search_shipping_date").val();
+                }
+
+                if ($("#search_order_shipping").val() != '0') {
+                    path += "&search_order_shipping=" + $("#search_order_shipping").val();
+                }
+
+                if ($("#search_order_otodoke").val() != '0') {
+                    path += "&search_order_otodoke=" + $("#search_order_otodoke").val();
+                }
+
+                let url = '/mypage/export_pdf_multi_file?delivery_no=' + $("#check-box-value-print-pdf").val() + path;
+                let a = document.createElement('a');
+                a.target = '_blank';
+                a.href = url;
+                a.click();
+
+            } else {
+                let str_delivery_no = $("#check-box-value-print-pdf").val().trim();
+                let url = '/mypage/export_pdf_multi_file?delivery_no=' + str_delivery_no;
+                let a = document.createElement('a');
+                a.target = '_blank';
+                a.href = url;
+                a.click();
+            }
+        }
+
         function handlePrintPDF() {
             if ($("#check-box-value-print-pdf").val().trim() == 'all') {
                 let path = '';
@@ -768,23 +883,149 @@ file that was distributed with this source code.
                 a.target = '_blank';
                 a.href = url;
                 a.click();
+                //let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
+                //let handled = {};
 
-            } else {
-                let arr_print_pdf_value = $("#check-box-value-print-pdf").val().split(',');
-                let handled = {};
+                //$.each(arr_print_pdf_value, function( index, value ) {
+                //   if (value && !handled[value]) {
+                //       handled[value] = true;
 
-                $.each(arr_print_pdf_value, function( index, value ) {
-                   if (value && !handled[value]) {
-                       handled[value] = true;
-
-                       let url = '/mypage/export_Pdf_multiple?delivery_no=' + value;
-                       let a = document.createElement('a');
-                       a.target = '_blank';
-                       a.href = url;
-                       a.click();
-                   }
-                });
+                //       let url = '/mypage/export_pdf_multi_file?delivery_no=' + value;
+                //       let a = document.createElement('a');
+                //       a.target = '_blank';
+                //       a.href = url;
+                //       a.click();
+                //   }
+                //});
             }
+        }
+
+        function handlePrintPDFMultiFileAjax() {
+            let data = {};
+            data.delivery_no = $("#check-box-value-print-pdf").val().trim();
+
+            if ($("#check-box-value-print-pdf").val().trim() == 'all') {
+                if ($("#search_shipping_date_from").val().trim() != '') {
+                    data.search_shipping_date_from = $("#search_shipping_date_from").val().trim();
+                }
+
+                if ($("#search_shipping_date_to").val().trim() != '') {
+                    data.search_shipping_date_to = $("#search_shipping_date_to").val().trim();
+                }
+
+                if ($("#search_sale_type").val() != '0') {
+                    data.search_sale_type = $("#search_sale_type").val();
+                }
+
+                if ($("#search_shipping_date").val() != '0') {
+                    data.search_shipping_date = $("#search_shipping_date").val();
+                }
+
+                if ($("#search_order_shipping").val() != '0') {
+                    data.search_order_shipping = $("#search_order_shipping").val();
+                }
+
+                if ($("#search_order_otodoke").val() != '0') {
+                    data.search_order_otodoke = $("#search_order_otodoke").val();
+                }
+            }
+
+            $.ajax({
+                url: "{{ url('exportPdfMultiFileAjax') }}",
+                timeout: 300000, //300 second timeout
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                beforeSend: function() {
+                    loadingOverlay();
+                },
+            })
+            .done(function(data) {
+                if (data.status == '2') {
+                    let zip_name = data.message;
+                    let delivery_no_list = data.arr_delivery_no;
+                    let step = 0;
+
+                    $.each(delivery_no_list, function( index, value ) {
+                        if (index == delivery_no_list.length - 1) {
+                            step = '-1';
+                        } else {
+                            step = index;
+                        }
+                        console.log(step);
+
+                        handlePrintPDFMultiFileAjaxByStep(zip_name, step, value.toString().trim());
+                    });
+                }
+
+                if (data.status == '0' || data.status == '-1') {
+                    console.log(data.message);
+                }
+            })
+            .fail(function(error) {
+                console.log(error);
+            })
+            .always(function() {
+                loadingOverlay('hide');
+            });
+        }
+
+        function handlePrintPDFMultiFileAjaxByStep(zip_name, step, delivery_no) {
+            let data = {};
+            data.zip_name = zip_name;
+            data.step = step;
+            data.delivery_no = delivery_no;
+
+            $.ajax({
+                url: "{{ url('exportPdfMultiFileAjax') }}",
+                timeout: 300000, //300 second timeout
+                async: false,
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                beforeSend: function() {
+                    loadingOverlay();
+                },
+            })
+            .done(function(data) {
+                if (data.status == '1' && data.step == '-1') { // step = -1 is the last time
+                    let fileName = data.message;
+                    let url = window.location.origin;
+                    downloadFile(url + fileName);
+                }
+
+                if (data.status == '0' || data.status == '-1') {
+                    console.log(data.message);
+                }
+            })
+            .fail(function(error) {
+                console.log(error);
+            })
+            .always(function() {
+                loadingOverlay('hide');
+            });
+        }
+
+        function downloadFile(filePath) {
+            let link = document.createElement('a');
+            link.href = filePath;
+            link.download = filePath.substr(filePath.lastIndexOf('/') + 1);
+            link.click();
+        }
+
+        function handleExportCsv() {
+            path = '&search_shipping_date_from=' + $("#search_shipping_date_from").val();
+            path += '&search_shipping_date_to=' + $("#search_shipping_date_to").val();
+            path += "&sale_type=" + $("#search_sale_type").val();
+            path += "&shipping_date=" + $("#search_shipping_date").val();
+            path += "&order_shipping=" + $("#search_order_shipping").val();
+            path += "&order_otodoke=" + $("#search_order_otodoke").val();
+
+            let url = '/mypage/export_csv_multiple?delivery_no=' + $("#check-box-value-print-pdf").val() + path;
+            let a = document.createElement('a');
+            a.target = '_blank';
+            a.href = url;
+            a.click();
         }
     </script>
 {% endblock %}
