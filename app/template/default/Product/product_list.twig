@@ -48,7 +48,7 @@ $(function() {
 
         {#// 個数フォームのチェック#}
         var $quantity = $form.parent().find('.quantity');
-                let idProduct = $quantity.attr('myid');
+        let idProduct = $quantity.attr('myid');
         var $checkQuantity = $form.parent().find('.checkQuantity');
         let rsCheck = checkInput('quantity'+idProduct);
         if(rsCheck==false){
@@ -66,31 +66,39 @@ $(function() {
                 $('.add-cart').prop('disabled', true);
             }
         }).done(function(data) {
-            // レスポンス内のメッセージをalertで表示
-            $.each(data.messages, function() {
-                $('#ec-modal-header').html(this);
-            });
+            if (!data.status) {
+                // difference product type
+                swal("エラー", data.message, "error");
+                return;
 
-            $('.ec-modal').show();
+            } else {
+                // Normal
+                // レスポンス内のメッセージをalertで表示
+                $.each(data.messages, function() {
+                    $('#ec-modal-header').html(this);
+                });
 
-                   $('a>.fnDIN').html(data.totalNew);
+                $('.ec-modal').show();
 
-                   let cartHtml ="<span class='fnDIN'>"+data.totalNew+"</span>";
-                    $('#emptyCart').html(cartHtml);
-                     //nvtrongxxx
+                       $('a>.fnDIN').html(data.totalNew);
 
-                    let myValue =   $.cookie(idProduct);
-                    if( myValue!=undefined){
-                      $('#quantity'+idProduct).val(myValue);
-                     }
-            // カートブロックを更新する
-            $.ajax({
-                url: '{{ url('block_cart') }}',
-                type: 'GET',
-                dataType: 'html'
-            }).done(function(html) {
-                $('.ec-headerRole__cart').html(html);
-            });
+                       let cartHtml ="<span class='fnDIN'>"+data.totalNew+"</span>";
+                        $('#emptyCart').html(cartHtml);
+                         //nvtrongxxx
+
+                        let myValue =   $.cookie(idProduct);
+                        if( myValue!=undefined){
+                          $('#quantity'+idProduct).val(myValue);
+                         }
+                // カートブロックを更新する
+                $.ajax({
+                    url: '{{ url('block_cart') }}',
+                    type: 'GET',
+                    dataType: 'html'
+                }).done(function(html) {
+                    $('.ec-headerRole__cart').html(html);
+                });
+            }
         }).fail(function(data) {
             alert('{{ 'front.product.add_cart_error'|trans }}');
         }).always(function(data) {
@@ -98,6 +106,30 @@ $(function() {
             $('.add-cart').prop('disabled', false);
         });
     });
+
+    $("input[name='rd_product_type']").change(function() {
+        loadingOverlay();
+        let value = $(this).val();
+
+        $.ajax({
+            url: '/products/type/change',
+            type: 'POST',
+            dataType: "json",
+            timeout: 1000,
+            async:false,
+            data: {
+                'product_type': value,
+                '_token':'{{ csrf_token('_token') }}',
+            }
+        }).done(function(data) {
+            if (data.status == 1) {
+                window.location.reload();
+            } else {
+                console.log(data.message);
+            }
+        }).fail(function(jqXHR, statusText, errorThrown) {
+        });
+    })
 });
 
 $('.ec-modal-wrap').on('click', function(e) {
@@ -207,6 +239,9 @@ $(function() {
         .good_price{
             color: #FF0000;
         }
+        .swal-modal {
+            width: 500px;
+        }
     </style>
     {% if search_form.category_id.vars.errors|length > 0 %}
         <div class="ec-searchnavRole">
@@ -254,6 +289,12 @@ $(function() {
                             {{ form_widget(order_by_form, {'id': 'order_by_form', 'attr': {'class': 'order-by'}}) }}
                         </div>
                     </div>
+                {% endif %}
+            </div>
+            <div class="ec-searchnavRole__infos">
+                <input type="radio" name="rd_product_type" id="normal_product" value="1" {% if global_service.getProductType == 1 %}checked{% endif %} style="margin-bottom: 5px;"><label for="normal_product" style="padding-left: 10px; cursor: pointer; margin-bottom: 0;">通常品</label>
+                {% if global_service.getSpecialOrderFlg == 1 %}
+                    <input type="radio" name="rd_product_type" id="special_product" value="2" {% if global_service.getProductType == 2 %}checked{% endif %} style="margin-left: 20px; margin-bottom: 5px;"><label for="special_product" style="padding-left: 10px; cursor: pointer; margin-bottom: 0;">特注品</label>
                 {% endif %}
             </div>
         </div>
@@ -417,12 +458,14 @@ $(function() {
                                                 {{ form_errors(form.quantity) }}
                                             </div>
                                             <input type="hidden" id="checkQuantity{{ Product.id }}" class="checkQuantity"  value="{{ Product.mst_quantity }}">
+
+                                            {#product type#}
+                                            <input type="hidden" name="product_type" value="{{ Product.product_type }}">
                                         </div>
                                         {{ form_rest(form) }}
                                     </form>
 
                                     <div class="ec-productRole__btn">
-
                                         <button type="button" class="ec-blockBtn--action add-cart" data-cartid="{{ Product.id }}" form="productForm{{ Product.id }}">
                                             {{ 'front.product.add_cart'|trans }}
                                         </button>

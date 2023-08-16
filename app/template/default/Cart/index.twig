@@ -12,149 +12,149 @@ file that was distributed with this source code.
 
 {% set body_class = 'cart_page' %}
 {% block javascript %}
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script >
     function  previewUrl() {
         let urlBack = document.referrer;
-        if(urlBack==''){
+        if (urlBack == '') {
             window.location.href = '/';
-        }else{
-            if(urlBack.indexOf('products/list')>-1){
+        } else {
+            if (urlBack.indexOf('products/list') > -1) {
                 window.location.href = urlBack;
-            }else{
+            } else {
                 window.location.href = '/products/list';
             }
-
         }
     }
-function checkInput(idQuantity){
+
+    function checkInput(idQuantity) {
+        var valInput = $('#'+idQuantity).val().trim();
+        let mymst_quantity = $('#'+idQuantity).attr('mymst_quantity');
+        let input1 =document.getElementById(idQuantity);
+        input1.setCustomValidity('');
+        if (valInput == "") {
 
 
-    var valInput = $('#'+idQuantity).val().trim();
-    let mymst_quantity = $('#'+idQuantity).attr('mymst_quantity');
-    let input1 =document.getElementById(idQuantity);
-    input1.setCustomValidity('');
-    if (valInput == "") {
+            input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+                        input1.reportValidity();
+                        return false;
+                  }
 
+                 if ( (valInput == 0) && (1 == mymst_quantity) ){
 
-        input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
-                    input1.reportValidity();
-                    return false;
-              }
+                        input1.setCustomValidity(mymst_quantity+'{{ 'front.product.invalid_quantity'|trans }}');
+                        input1.reportValidity();
+                        return false;
+                  }
 
-             if ( (valInput == 0) && (1 == mymst_quantity) ){
-
-                    input1.setCustomValidity(mymst_quantity+'{{ 'front.product.invalid_quantity'|trans }}');
-                    input1.reportValidity();
-                    return false;
-              }
-
-            if ( (valInput == 0) && (1 != mymst_quantity) ){
-                   //%number%
-                   let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
-                   msgShow = msgShow.replace('%number%',mymst_quantity);
-                    input1.setCustomValidity(msgShow);
-                    input1.reportValidity();
-                    return false;
-              }
-             if(valInput % mymst_quantity  !== 0) {
-                   let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
-                   msgShow = msgShow.replace('%number%',mymst_quantity);
-                    $('#'+idQuantity)[0].setCustomValidity(msgShow);
-                    $('#'+idQuantity)[0].reportValidity();
-                     return false;
-             }
-                $.cookie( idQuantity,valInput, { path: '/' });
-             return true;
-        }
-$('.inputCart').keyup(function(e) {
-
-     if( e.key != "Enter"){
-         if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);
-           clearTimeout($.data(this, 'timer'));
-          var wait = setTimeout(checkInputFirst, 500,this);
-          $(this).data('timer', wait);
-     }
-
-});
-$('.inputCart').click(function(e) {
-
-    let oldvalue = $(this).attr('oldvalue');
-    if( $(this).val()!=oldvalue){
-           clearTimeout($.data(this, 'timer'));
-          var wait = setTimeout(checkInputFirst, 500,this);
-          $(this).data('timer', wait);
-    }
-
-
-});
-    function checkInputFirst(objT){
-
-        //var objT = this;
-    var isFail = false;
-
-    //quantity1421
-    let quantityId = "quantity"+$(objT).attr('myid');
-
-    let input1 =document.getElementById(objT.id);
-    //
-    input1.setCustomValidity('');
-    let mymst_quantity= $(objT).attr('mymst_quantity');
-    let resultCheck = checkInput(quantityId);
-
-        if(resultCheck==true){
-
-              updateOne(objT);
-         }
-
-      }
-
-// $('.inputCart').on("input", function(ev) {
-//
-// checkInputFirst(this);
-//
-// });
-
-function updateOne(objThis){
-
-
-            let quantityId = "quantity"+$(objThis).attr('myid');
-            let productIdEc = $(objThis).attr('myid');
-            let valInput = $('#'+quantityId).val().trim();
-            let productClassId = $(objThis).attr('productclassid');
-            let resultCheck = checkInput(quantityId);
-
-            if(resultCheck==true){
-
-            }else{
-             let newUrl = "javascript:;";
-              $('#objNext').attr('href',newUrl);
+                if ( (valInput == 0) && (1 != mymst_quantity) ){
+                       //%number%
+                       let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                       msgShow = msgShow.replace('%number%',mymst_quantity);
+                        input1.setCustomValidity(msgShow);
+                        input1.reportValidity();
+                        return false;
+                  }
+                 if(valInput % mymst_quantity  !== 0) {
+                       let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                       msgShow = msgShow.replace('%number%',mymst_quantity);
+                        $('#'+idQuantity)[0].setCustomValidity(msgShow);
+                        $('#'+idQuantity)[0].reportValidity();
+                         return false;
+                 }
+                    $.cookie( idQuantity,valInput, { path: '/' });
+                 return true;
             }
 
-             $.ajax({
-                        url: '/cart/update_cart',
-                        type: 'POST',
-                        dataType: "json",
-                        timeout: 1000,
-                        async:false,
-                        data: {
-                            'quantity': valInput,
-                            '_token':'{{ csrf_token('_token') }}',
-                            'product_id':productIdEc,
-                            'productClassId':productClassId,
-                            'oneCartId':'{{ oneCartId }}',
-                            'is_update':1
+    $('.inputCart').keyup(function(e) {
+        loadingOverlay();
+        $(".ec-blockBtn--action").attr('disabled', true);
+        $(".ec-blockBtn--action").css('pointer-events', 'none');
+        $(".ec-blockBtn--cancel").attr('disabled', true);
+        $(".ec-blockBtn--cancel").css('pointer-events', 'none');
 
-                        }
-                    }).done(function(htmlRe, statusText, jqXHR) {
-                        window.location.reload();
+        if (e.key != "Enter") {
+            if (this.value.length > this.maxLength) {
+                this.value = this.value.slice(0, this.maxLength);
+            }
 
-                    }).fail(function(jqXHR, statusText, errorThrown) {
+            clearTimeout($.data(this, 'timer'));
+            var wait = setTimeout(checkInputFirst, 500,this);
+            $(this).data('timer', wait);
+        }
+    });
 
-                });
+    $('.inputCart').click(function(e) {
+        loadingOverlay();
+        $(".ec-blockBtn--action").attr('disabled', true);
+        $(".ec-blockBtn--action").css('pointer-events', 'none');
+        $(".ec-blockBtn--cancel").attr('disabled', true);
+        $(".ec-blockBtn--cancel").css('pointer-events', 'none');
 
-}
+        let oldvalue = $(this).attr('oldvalue');
+        if ($(this).val()!=oldvalue) {
+            clearTimeout($.data(this, 'timer'));
+            var wait = setTimeout(checkInputFirst, 500,this);
+            $(this).data('timer', wait);
+        }
+    });
+
+    function checkInputFirst(objT) {
+        var isFail = false;
+        let quantityId = "quantity"+$(objT).attr('myid');
+        let input1 =document.getElementById(objT.id);
+        input1.setCustomValidity('');
+        let mymst_quantity = $(objT).attr('mymst_quantity');
+        let resultCheck = checkInput(quantityId);
+
+        if (resultCheck == true) {
+            updateOne(objT);
+        }
+
+        setTimeout(function () {
+            loadingOverlay('hide');
+            $(".ec-blockBtn--action").attr('disabled', false);
+            $(".ec-blockBtn--action").css('pointer-events', 'auto');
+            $(".ec-blockBtn--cancel").attr('disabled', false);
+            $(".ec-blockBtn--cancel").css('pointer-events', 'auto');
+        }, 1000);
+    }
+
+    function updateOne(objThis) {
+        let quantityId = "quantity"+$(objThis).attr('myid');
+        let productIdEc = $(objThis).attr('myid');
+        let valInput = $('#'+quantityId).val().trim();
+        let productClassId = $(objThis).attr('productclassid');
+        let resultCheck = checkInput(quantityId);
+
+        if (resultCheck == true) {
+
+        } else {
+            let newUrl = "javascript:;";
+            $('#objNext').attr('href',newUrl);
+        }
+
+        $.ajax({
+            url: '/cart/update_cart',
+            type: 'POST',
+            dataType: "json",
+            timeout: 1000,
+            async:false,
+            data: {
+                'quantity': valInput,
+                '_token':'{{ csrf_token('_token') }}',
+                'product_id':productIdEc,
+                'productClassId':productClassId,
+                'oneCartId':'{{ oneCartId }}',
+                'is_update':1
+            }
+        })
+        .done(function(htmlRe, statusText, jqXHR) {
+            window.location.reload();
+        })
+        .fail(function(jqXHR, statusText, errorThrown) {
+        });
+    }
 
     $('.ec-blockBtn--action').click(function() {
         let objNext =this;
@@ -183,11 +183,32 @@ function updateOne(objThis){
 
     });
 
-  $(function() {
-                    $(document).on("keydown", "input", function(event) {
-                       return event.key != "Enter";
-                     });
-  })
+    $('.ec-blockBtn--cancel').click(function() {
+        let objNext =this;
+        let is_valid = true;
+
+          $( ".inputCart" ).each(function( index ) {
+            let quantityId = "quantity"+$(this).attr('myid');
+            let productIdEc = $(this).attr('myid');
+            let valInput = $('#'+quantityId).val().trim();
+            let productClassId = $(this).attr('productclassid');
+            let resultCheck = checkInput(quantityId);
+            if(resultCheck == false){
+                is_valid = false;
+                return;
+            }
+          });
+
+          if (is_valid == true) {
+              previewUrl();
+          }
+    });
+
+    $(function() {
+        $(document).on("keydown", "input", function(event) {
+           return event.key != "Enter";
+        });
+    })
 </script>
 {% endblock javascript %}
 {% block main %}
@@ -322,7 +343,13 @@ function updateOne(objThis){
                         <div class="ec-cartTable">
                             <ol class="ec-cartHeader">
                                 <li class="ec-cartHeader__label">{{ 'front.cart.delete'|trans }}</li>
-                                <li class="ec-cartHeader__label">{{ 'front.cart.product'|trans }}</li>
+                                <li class="ec-cartHeader__label">
+                                    {% if global_service.getCartProductType == 2%}
+                                        {{ 'front.cart.product'|trans }} {{ 'front.cart.special_product'|trans }}
+                                    {% else %}
+                                        {{ 'front.cart.product'|trans }}
+                                    {% endif %}
+                                </li>
                                 <li class="ec-cartHeader__label">{{ 'common.quantity'|trans }}</li>
                                 <li class="ec-cartHeader__label">{{ 'common.subtotal'|trans }}</li>
                             </ol>
@@ -427,7 +454,7 @@ function updateOne(objThis){
                         </div>
                         <a class="ec-blockBtn--action" href="javascript:;">{{ 'front.cart.checkout'|trans }}</a>
                         {% if loop.last %}
-                            <a class="ec-blockBtn--cancel" href="javascript:previewUrl()">{{ 'front.cart.continue'|trans }}</a>
+                            <a class="ec-blockBtn--cancel" href="javascript:;">{{ 'front.cart.continue'|trans }}</a>
                         {% endif %}
                     </div>
                 {% endfor %}

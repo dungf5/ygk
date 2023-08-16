@@ -101,6 +101,9 @@ file that was distributed with this source code.
             height: 0;
         }
 
+        .swal-modal {
+            width: 500px;
+        }
     </style>
 {% endblock %}
 
@@ -204,32 +207,40 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                         $('.add-cart').prop('disabled', true);
                     }
                 }).done(function(data) {
-                    // レスポンス内のメッセージをalertで表示
-                    $.each(data.messages, function() {
-                        $('#ec-modal-header').html(this);
-                    });
-                    //$.cookie(myStringArray[i] );
+                    if (!data.status) {
+                        // difference product type
+                        swal("エラー", data.message, "error");
+                        return;
 
-                    $('.ec-modal').show()
-                   $('.num>.fnDIN').html(data.totalNew);
+                    } else {
+                        // レスポンス内のメッセージをalertで表示
+                        $.each(data.messages, function() {
+                            $('#ec-modal-header').html(this);
+                        });
+                        //$.cookie(myStringArray[i] );
 
+                        $('.ec-modal').show()
+                        $('.num>.fnDIN').html(data.totalNew);
 
-                    //nvtrongxxx
-                let myValue =   $.cookie($('#product_id').val());
-                if( myValue!=undefined){
-                  $('#quantity').val(myValue);
-                 }
-                   $('.cart>a>.fnDIN').html(data.totalNew);
-                    let cartHtml ="<span class='fnDIN'>"+data.totalNew+"</span>";
-                    $('#emptyCart').html(cartHtml);
-                    // カートブロックを更新する
-                    $.ajax({
-                        url: "{{ url('block_cart') }}",
-                        type: 'GET',
-                        dataType: 'html'
-                    }).done(function(html) {
-                        $('.ec-headerRole__cart').html(html);
-                    });
+                        //nvtrongxxx
+                        let myValue =   $.cookie($('#product_id').val());
+                        if ( myValue!=undefined) {
+                            $('#quantity').val(myValue);
+                        }
+
+                        $('.cart>a>.fnDIN').html(data.totalNew);
+                        let cartHtml ="<span class='fnDIN'>"+data.totalNew+"</span>";
+                        $('#emptyCart').html(cartHtml);
+
+                        // カートブロックを更新する
+                        $.ajax({
+                            url: "{{ url('block_cart') }}",
+                            type: 'GET',
+                            dataType: 'html'
+                        }).done(function(html) {
+                            $('.ec-headerRole__cart').html(html);
+                        });
+                    }
                 }).fail(function(data) {
                     alert('{{ 'front.product.add_cart_error'|trans }}');
                 }).always(function(data) {
@@ -554,6 +565,9 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                                 {% endif %}
                             </div>
                             <div class="ec-productRole__btn" style="display: inline-flex">
+                                {#product type#}
+                                <input type="hidden" name="product_type" id="product_type" value="{{ MstProduct.product_type }}">
+
                                 <button type="button" class="ec-blockBtn--action add-cart">
                                     {{ 'front.product.add_cart'|trans }}
                                 </button>

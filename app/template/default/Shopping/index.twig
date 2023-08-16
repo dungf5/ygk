@@ -336,13 +336,14 @@ $(function () {
             else {
                 $('.error_delivery_address').hide();
             }
-
-            if (checkDate() && isSubmit === 1) {
-                $('#shopping-form').submit();
-            }
         }
         else {
             $('.error_delivery_address').hide();
+        }
+
+        if ("{{ global_service.getCartProductType }}" == 2 && $("#remarks1").val().trim() == '' && $("#remarks2").val().trim() == '') {
+             $('.error_remarks').show();
+             isSubmit = 0;
         }
 
         if (checkDate() && isSubmit === 1) {
@@ -972,6 +973,9 @@ function updateDeliverydAdress(delivery_code) {
                                     {% set MstProduct = hsProductId[orderItem.Product.id] %}
                                     {% set classShow=hsMstProductCodeCheckShow[MstProduct.product_code] -%}
                                     <li>
+                                        {% if global_service.getCartProductType == 2%}
+                                            <p><strong>{{ 'front.cart.special_product'|trans }}</strong></p>
+                                        {% endif %}
                                         <div class="ec-imageGrid">
                                             <div class="ec-imageGrid__img"><img
                                                     src="{{ asset((orderItem.product is null ? null : orderItem.product.MainListImage)|no_image_product, 'save_image') }}"
@@ -1279,7 +1283,7 @@ function updateDeliverydAdress(delivery_code) {
                         <div>発注書備考</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks3" id="remarks3" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks3 }} {% endif %}" onkeyup="updateRemarks(this)">
+                        <input type="text" class="form-control" name="remarks3" id="remarks3" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks3 }}{% endif %}" onkeyup="updateRemarks(this)">
                     </div>
                 </div>
 
@@ -1294,7 +1298,7 @@ function updateDeliverydAdress(delivery_code) {
                         <div>発注書コメント</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks4" id="remarks4" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks4 }} {% endif %}" onkeyup="updateRemarks(this)">
+                        <input type="text" class="form-control" name="remarks4" id="remarks4" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks4 }}{% endif %}" onkeyup="updateRemarks(this)">
                     </div>
                 </div>
 
@@ -1309,7 +1313,7 @@ function updateDeliverydAdress(delivery_code) {
                         <div> {{ 'front.shopping.remarks'|trans }}１</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks1" id="remarks1" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks1 }} {% endif %}" onkeyup="updateRemarks(this)">
+                        <input type="text" class="form-control" name="remarks1" id="remarks1" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks1 }}{% endif %}" onkeyup="updateRemarks(this)">
                     </div>
                 </div>
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-top: 10px">
@@ -1317,9 +1321,12 @@ function updateDeliverydAdress(delivery_code) {
                         <div> {{ 'front.shopping.remarks'|trans }}２</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks2" id="remarks2" value="{% if Order.moreOrder is defined %} {{ Order.moreOrder.remarks2 }} {% endif %}" onkeyup="updateRemarks(this)">
+                        <input type="text" class="form-control" name="remarks2" id="remarks2" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks2 }}{% endif %}" onkeyup="updateRemarks(this)">
                     </div>
                 </div>
+                <p class="error_remarks" style="color: red;font-size: larger;font-weight: bold;display: none">
+                    生産依頼備考１または生産依頼備考２を入力してください
+                </p>
                 {# End - Remarks#}
             </div>
 
