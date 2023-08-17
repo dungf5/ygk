@@ -171,7 +171,7 @@ class ProductRepository extends AbstractRepository
                 AS hidden orderPrice
         ';
 
-        $sqlColmnsP = 'p.id';
+        $sqlColmnsP = 'p.id, p.description_list, p.free_area';
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb = $qb->andWhere('p.Status = 1');
 
@@ -309,14 +309,13 @@ class ProductRepository extends AbstractRepository
         $curentDateTime = date('Y-m-d H:i:s');
 
         $qb->innerJoin('Customize\Entity\MstProduct', 'mstProduct', Join::WITH, 'mstProduct.ec_product_id = p.id');
-        //$qb->andWhere('(mstProduct.jan_code is not null)');
-        //$qb->andWhere("(mstProduct.jan_code <> '')");
+        $qb->andWhere('(mstProduct.jan_code is not null)');
+        $qb->andWhere("(mstProduct.jan_code <> '')");
         $qb->andWhere("( DATE_FORMAT(IFNULL(mstProduct.discontinued_date, '9999-12-31 00:00:00'), '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT('$curentDateTime', '%Y-%m-%d %H:%i:%s') )");
 
         $curentDate = date('Y-m-d');
         $stringCon = ' price.product_code = mstProduct.product_code AND price.customer_code = :customer_code AND price.shipping_no = :shipping_code ';
         $stringCon .= " and '$curentDate' >= price.valid_date AND '$curentDate' <= price.expire_date ";
-        //$stringCon .= " and price.tanka_number = (SELECT max(price_2.tanka_number) from Customize\Entity\Price as price_2 where price_2.product_code = mstProduct.product_code AND price_2.customer_code = :customer_code AND price_2.shipping_no = :shipping_code AND '$curentDate' >= price_2.valid_date AND '$curentDate' <= price_2.expire_date Order by price_2.tanka_number DESC)";
 
         if (count($arProductCodeInDtPrice) > 0) {
             $stringCon .= ' and price.product_code in (:product_code) ';
@@ -383,10 +382,9 @@ class ProductRepository extends AbstractRepository
             $qb->addSelect("'1' AS product_type");
         }
 
-        //$qb->groupBy('mstProduct.product_code');
+        $qb->groupBy('mstProduct.product_code');
 
-        //dd($qb->getQuery()->getSQL(), $searchData, $user, $customer_code, $shippingCode, $arProductCodeInDtPrice, $arTanakaNumber, $location);
-
+        //dd( $qb->getQuery()->getSQL(), $searchData, $user, $customer_code, $shippingCode, $arProductCodeInDtPrice, $arTanakaNumber, $location);
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 }
