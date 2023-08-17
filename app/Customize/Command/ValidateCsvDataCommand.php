@@ -329,7 +329,7 @@ class ValidateCsvDataCommand extends Command
 
         $information = [
             'email' => getenv('EMAIL_WS_EOS') ?? '',
-            'email_cc' => ['n-tsuboi@world-s.jp', 'd-mutou@world-s.jp', getenv('EMAILCC_WS_EOS') ?? ''],
+            'email_cc' => ['n-tsuboi@world-s.jp', 'd-mutou@world-s.jp'],
             'email_bcc' => getenv('EMAILBCC_WS_EOS') ?? '',
             'file_name' => 'Mail/ws_eos_validate_error.twig',
             'error_data' => $this->errors,
