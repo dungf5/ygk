@@ -329,8 +329,9 @@
 	} );
 
 	var typingRemarksTimer;
-    var doneTypingInterval = 1000;
+    var doneTypingInterval = 500;
 	$("input[name='return_num']").keyup(function() {
+		loadingOverlay();
 		clearTimeout(typingRemarksTimer);
 		let element = $(this);
 		let previous_value = element.data('value');
@@ -361,6 +362,8 @@
 				alert(mess);
 				element.val(previous_value);
 			}
+
+			loadingOverlay("hide");
 
 		}, doneTypingInterval);
 	})
