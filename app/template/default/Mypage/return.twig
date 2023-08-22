@@ -119,9 +119,9 @@
 							<th title="{{ "front.mypage.return.return_number_request" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.return_number_request" | trans | raw }}</p>
 							</th>
-							<th title="{{ "front.mypage.return.return_status" | trans | raw }}">
-								<p class="text-nowrap">{{ "front.mypage.return.return_status" | trans | raw }}</p>
-							</th>
+{#							<th title="{{ "front.mypage.return.return_status" | trans | raw }}">#}
+{#								<p class="text-nowrap">{{ "front.mypage.return.return_status" | trans | raw }}</p>#}
+{#							</th>#}
 							<th title="{{ "front.mypage.return.shipping_no" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
 							</th>
@@ -181,17 +181,19 @@
 						<tbody>
 							{% for item in pagination %}
 							{% set index = index + 1 %}
-								{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
-									{% if item.returns_status_flag == 1 %}
-										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_receipt', { 'returns_no':item.returns_no } ) }}" method="GET">
-									{% elseif item.returns_status_flag == 2 or item.returns_status_flag == 3 or item.returns_status_flag == 4 %}
-										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_complete', { 'returns_no':item.returns_no } ) }}" method="GET">
-									{% else %}
-										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_approve', { 'returns_no':item.returns_no } ) }}" method="GET">
-									{% endif %}
-								{% else %}
-									<form id="return_create_{{index}}" action="{{ url('mypage_return_create') }}" method="POST">
-								{% endif %}
+{#								{% if item.returns_status_flag is defined and item.returns_status_flag != null %}#}
+{#									{% if item.returns_status_flag == 1 %}#}
+{#										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_receipt', { 'returns_no':item.returns_no } ) }}" method="GET">#}
+{#									{% elseif item.returns_status_flag == 2 or item.returns_status_flag == 3 or item.returns_status_flag == 4 %}#}
+{#										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_complete', { 'returns_no':item.returns_no } ) }}" method="GET">#}
+{#									{% else %}#}
+{#										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_approve', { 'returns_no':item.returns_no } ) }}" method="GET">#}
+{#									{% endif %}#}
+{#								{% else %}#}
+{#									<form id="return_create_{{index}}" action="{{ url('mypage_return_create') }}" method="POST">#}
+{#								{% endif %}#}
+
+								<form id="return_create_{{index}}" action="{{ url('mypage_return_create') }}" method="POST">
 
 {#								{% if item.returns_status_flag is defined and item.returns_status_flag != null %}#}
 {#									<tr ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >#}
@@ -200,7 +202,7 @@
 {#								{% endif %}#}
 									<tr>
 										<td title="手続き">
-											<button type="submit" class="btn btn-warning" role="button" {% if item.total_returns_num >= item.shipping_num and item.returns_status_flag >= 5 %}disabled{% endif %}>手続き</button>
+											<button type="submit" class="btn btn-warning" role="button" {% if item.total_returns_num >= item.shipping_num %}disabled{% endif %}>手続き</button>
 										</td>
 										<td title={{ item.returns_num }}>
 											<input type="number" name="return_num" data-value='{{ item.returns_num }}' data-shipping='{{ item.shipping_num }}' data-total_returns='{{ item.total_returns_num }}' class="form-control" value="{{ item.returns_num }}"/>
@@ -208,25 +210,25 @@
 										<td title={{ item.total_returns_num }}>
 											<p class="text-nowrap">{{ item.total_returns_num }}</p>
 										</td>
-										<td title={{ item.returns_status_flag  is empty ? "" : item.returns_status_flag }}>
-											{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
-												{% if item.returns_status_flag == 0 %}
-													<p class="text-nowrap">申請中</p>
-												{% elseif item.returns_status_flag == 1 %}
-													<p class="text-nowrap">承認</p>
-												{% elseif item.returns_status_flag == 2 %}
-													<p class="text-nowrap">未承認</p>
-												{% elseif item.returns_status_flag == 3 %}
-													<p class="text-nowrap">受取受理</p>
-												{% elseif item.returns_status_flag == 4 %}
-													<p class="text-nowrap">受取未受理</p>
-												{% elseif item.returns_status_flag == 5 %}
-													<p class="text-nowrap">返品完了</p>
-												{% endif %}
-											{% else %}
-												<p class="text-nowrap"></p>
-											{% endif %}
-										</td>
+{#										<td title={{ item.returns_status_flag  is empty ? "" : item.returns_status_flag }}>#}
+{#											{% if item.returns_status_flag is defined and item.returns_status_flag != null %}#}
+{#												{% if item.returns_status_flag == 0 %}#}
+{#													<p class="text-nowrap">申請中</p>#}
+{#												{% elseif item.returns_status_flag == 1 %}#}
+{#													<p class="text-nowrap">承認</p>#}
+{#												{% elseif item.returns_status_flag == 2 %}#}
+{#													<p class="text-nowrap">未承認</p>#}
+{#												{% elseif item.returns_status_flag == 3 %}#}
+{#													<p class="text-nowrap">受取受理</p>#}
+{#												{% elseif item.returns_status_flag == 4 %}#}
+{#													<p class="text-nowrap">受取未受理</p>#}
+{#												{% elseif item.returns_status_flag == 5 %}#}
+{#													<p class="text-nowrap">返品完了</p>#}
+{#												{% endif %}#}
+{#											{% else %}#}
+{#												<p class="text-nowrap"></p>#}
+{#											{% endif %}#}
+{#										</td>#}
 										<td title={{ item.shipping_no }}>
 											<p class="text-nowrap">{{ item.shipping_no }}</p>
 										</td>
