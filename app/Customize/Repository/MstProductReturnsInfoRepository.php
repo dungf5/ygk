@@ -517,7 +517,6 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         }
 
         // // Order By
-        $qb->addOrderBy('product_returns_info.shipping_date', 'DESC');
         $qb->addOrderBy('product_returns_info.returns_no', 'DESC');
 
         // dump($qb->getQuery()->getSQL());
