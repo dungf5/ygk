@@ -43,6 +43,7 @@ class OrderItemRepository extends AbstractRepository
      * @param array $paramSearch
      * @param string $customer_code
      * @param string $login_type
+     *
      * @return QueryBuilder
      */
     public function getQueryBuilderByCustomer($paramSearch = [], $customer_code = '', $login_type = '')
@@ -452,9 +453,6 @@ class OrderItemRepository extends AbstractRepository
             $qb->andWhere('order_status.otodoke_code = :order_otodoke')
                 ->setParameter(':order_otodoke', $paramSearch['order_otodoke']);
         }
-
-        $qb->addGroupBy('shipping.cus_order_no');
-        $qb->addGroupBy('shipping.cus_order_lineno');
 
         $qb->addOrderBy('order_status.order_date', 'DESC');
         $qb->addOrderBy('order_status.cus_order_no', 'DESC');

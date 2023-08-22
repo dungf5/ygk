@@ -1944,7 +1944,6 @@ class MypageController extends AbstractController
 
         //Params
         $param = [
-            'returns_status_flag' => [5],
             'search_request_date' => $request->get('search_request_date', 0),
             'search_reason_return' => $request->get('search_reason_return', 0),
             'search_shipping' => $request->get('search_shipping', 0),
