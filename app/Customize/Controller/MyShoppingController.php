@@ -143,6 +143,11 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function index(Request $request)
     {
+        $remarks1 = $this->globalService->getRemarks1();
+        $remarks2 = $this->globalService->getRemarks2();
+        $remarks3 = $this->globalService->getRemarks3();
+        $remarks4 = $this->globalService->getRemarks4();
+
         // ログイン状態のチェック.
         $commonService = new MyCommonService($this->entityManager);
 
@@ -380,6 +385,10 @@ class MyShoppingController extends AbstractShoppingController
             'hsProductId' => $hsProductId,
             'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
             'customer_order_no' => $customer_order_no,
+            'remarks1' => $remarks1,
+            'remarks2' => $remarks2,
+            'remarks3' => $remarks3,
+            'remarks4' => $remarks4,
         ];
     }
 
@@ -402,6 +411,11 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function confirm(Request $request)
     {
+        $remarks1 = $request->get('remarks1', '');
+        $remarks2 = $request->get('remarks2', '');
+        $remarks3 = $request->get('remarks3', '');
+        $remarks4 = $request->get('remarks4', '');
+
         // ログイン状態のチェック.
         if ($this->orderHelper->isLoginRequired()) {
             log_info('[注文確認] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
@@ -537,6 +551,17 @@ class MyShoppingController extends AbstractShoppingController
             $customer_id = $this->globalService->customerId();
             $customer_code = $comSer->getMstCustomer($customer_id)['customer_code'] ?? '';
             $hsMstProductCodeCheckShow = $comSer->setCartIndtPrice($hsMstProductCodeCheckShow, $comSer, $customer_code, $login_type, $login_code);
+
+            $Order->remarks1 = $remarks1;
+            $Order->remarks2 = $remarks2;
+            $Order->remarks3 = $remarks3;
+            $Order->remarks4 = $remarks4;
+
+            //Push Session
+            $_SESSION['remarks1'] = $remarks1;
+            $_SESSION['remarks2'] = $remarks2;
+            $_SESSION['remarks3'] = $remarks3;
+            $_SESSION['remarks4'] = $remarks4;
 
             return [
                 'form' => $form->createView(),
@@ -708,10 +733,10 @@ class MyShoppingController extends AbstractShoppingController
                 $seikyu_code = $moreOrder->getSeikyuCode();
                 $shipping_plan_date = $moreOrder->getDateWantDelivery();
                 $otodoke_code = $moreOrder->getOtodokeCode();
-                $remarks1 = $moreOrder->getRemarks1();
-                $remarks2 = $moreOrder->getRemarks2();
-                $remarks3 = $moreOrder->getRemarks3();
-                $remarks4 = $moreOrder->getRemarks4();
+                $remarks1 = $this->globalService->getRemarks1();
+                $remarks2 = $this->globalService->getRemarks2();
+                $remarks3 = $this->globalService->getRemarks3();
+                $remarks4 = $this->globalService->getRemarks4();
                 $location = $comS->getCustomerLocation($customerCode);
                 $reCustomer = $comS->getCustomerRelationFromUser($customerCode, $login_type, $login_code);
                 $fusrdec1 = ($comS->getMstCustomerCode($reCustomer['customer_code'] ?? ''))['fusrdec1'] ?? 0;
@@ -1135,6 +1160,10 @@ class MyShoppingController extends AbstractShoppingController
 
         log_info('[注文完了] 購入フローのセッションをクリアします. ');
         $this->orderHelper->removeSession();
+        unset($_SESSION['remarks1']);
+        unset($_SESSION['remarks2']);
+        unset($_SESSION['remarks3']);
+        unset($_SESSION['remarks4']);
 
         $hasNextCart = !empty($this->cartService->getCarts());
 
