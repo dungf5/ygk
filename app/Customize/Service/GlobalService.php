@@ -244,4 +244,24 @@ class GlobalService
 
         return $_SESSION['cart_product_type'] ?? '';
     }
+
+    public function getRemarks1()
+    {
+        return $_SESSION['remarks1'] ?? '';
+    }
+
+    public function getRemarks2()
+    {
+        return $_SESSION['remarks2'] ?? '';
+    }
+
+    public function getRemarks3()
+    {
+        return $_SESSION['remarks3'] ?? '';
+    }
+
+    public function getRemarks4()
+    {
+        return $_SESSION['remarks4'] ?? '';
+    }
 }

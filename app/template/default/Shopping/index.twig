@@ -1283,7 +1283,7 @@ function updateDeliverydAdress(delivery_code) {
                         <div>発注書備考</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks3" id="remarks3" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks3 }}{% endif %}" onkeyup="updateRemarks(this)">
+                        <input type="text" class="form-control" name="remarks3" id="remarks3" value="{{ remarks3 }}">
                     </div>
                 </div>
 
@@ -1298,7 +1298,7 @@ function updateDeliverydAdress(delivery_code) {
                         <div>発注書コメント</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks4" id="remarks4" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks4 }}{% endif %}" onkeyup="updateRemarks(this)">
+                        <input type="text" class="form-control" name="remarks4" id="remarks4" value="{{ remarks4 }}">
                     </div>
                 </div>
 
@@ -1313,7 +1313,7 @@ function updateDeliverydAdress(delivery_code) {
                         <div> {{ 'front.shopping.remarks'|trans }}１</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks1" id="remarks1" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks1 }}{% endif %}" onkeyup="updateRemarks(this)">
+                        <input type="text" class="form-control" name="remarks1" id="remarks1" value="{{ remarks1 }}">
                     </div>
                 </div>
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-top: 10px">
@@ -1321,7 +1321,7 @@ function updateDeliverydAdress(delivery_code) {
                         <div> {{ 'front.shopping.remarks'|trans }}２</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks2" id="remarks2" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks2 }}{% endif %}" onkeyup="updateRemarks(this)">
+                        <input type="text" class="form-control" name="remarks2" id="remarks2" value="{{ remarks2 }}">
                     </div>
                 </div>
                 <p class="error_remarks" style="color: red;font-size: larger;font-weight: bold;display: none">
