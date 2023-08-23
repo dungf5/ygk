@@ -115,84 +115,62 @@
 					{% if pagination and pagination.totalItemCount > 0 %}
 						<tbody>
 							{% for item in pagination %}
-							{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
-								{% if item.returns_status_flag in [0] %}
-									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_approve', { 'returns_no':item.returns_no } ) }}" method="GET">
-								{% elseif item.returns_status_flag in [1] %}
-									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_receipt', { 'returns_no':item.returns_no } ) }}" method="GET">
-								{% elseif item.returns_status_flag in [2, 3, 4] %}
-									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_complete', { 'returns_no':item.returns_no } ) }}" method="GET">
-								{% elseif item.returns_status_flag in [5] %}
-									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_preview', { 'returns_no':item.returns_no } ) }}" method="GET">
-								{% else %}
-									<form>
-								{% endif %}
-							{% else %}
-								<form>
-							{% endif %}
-
-								{% if item.returns_status_flag is defined and item.returns_status_flag != null and item.returns_status_flag in [0, 1, 2, 3, 4, 5] %}
-									<tr ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >
-								{% else %}
-									<tr>
-								{% endif %}
-
-										<td title="return_no">
-											<p class="text-nowrap">{{ item.returns_no }}</p>
-										</td>
-										<td title="return_request_date">
-											<p class="text-nowrap">{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}</p>
-										</td>
-										<td title="reason_return">
-											<p class="text-nowrap">{{ item.returns_reson }}</p>
-										</td>
-										<td title={{ item.returns_status_flag is empty ? "" : item.returns_status_flag }}>
-											{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
-												{% if item.returns_status_flag == 0 %}
-													<p class="text-nowrap">申請中</p>
-												{% elseif item.returns_status_flag == 1 %}
-													<p class="text-nowrap">承認</p>
-												{% elseif item.returns_status_flag == 2 %}
-													<p class="text-nowrap">未承認</p>
-												{% elseif item.returns_status_flag == 3 %}
-													<p class="text-nowrap">受取受理</p>
-												{% elseif item.returns_status_flag == 4 %}
-													<p class="text-nowrap">受取未受理</p>
-												{% elseif item.returns_status_flag == 5 %}
-													<p class="text-nowrap">返品完了</p>
-												{% endif %}
-											{% else %}
-												<p class="text-nowrap"></p>
+								<tr>
+									<td title="return_no">
+										<p class="text-nowrap">{{ item.returns_no }}</p>
+									</td>
+									<td title="return_request_date">
+										<p class="text-nowrap">{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}</p>
+									</td>
+									<td title="reason_return">
+										<p class="text-nowrap">{{ item.returns_reson }}</p>
+									</td>
+									<td title={{ item.returns_status_flag is empty ? "" : item.returns_status_flag }}>
+										{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
+											{% if item.returns_status_flag == 0 %}
+												<p class="text-nowrap">申請中</p>
+											{% elseif item.returns_status_flag == 1 %}
+												<p class="text-nowrap">承認</p>
+											{% elseif item.returns_status_flag == 2 %}
+												<p class="text-nowrap">未承認</p>
+											{% elseif item.returns_status_flag == 3 %}
+												<p class="text-nowrap">受取受理</p>
+											{% elseif item.returns_status_flag == 4 %}
+												<p class="text-nowrap">受取未受理</p>
+											{% elseif item.returns_status_flag == 5 %}
+												<p class="text-nowrap">返品完了</p>
 											{% endif %}
-										</td>
-										<td title="shipping_no">
-											<p class="text-nowrap">{{ item.shipping_no }}</p>
-										</td>
-										<td title="shipping_date">
-											<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
-										</td>
-										<td title="shiping_code | otodoke_code">
-											<p class="text-nowrap">{{ item.shipping_name }}</p>
-											<p class="text-nowrap">{{ item.otodoke_name }}</p>
-										</td>
-										<td title="jan_code | product_name">
-											<p class="text-nowrap">{{ item.jan_code }}</p>
-											<p class="text-nowrap">{{ item.product_name }}</p>
-										</td>
-										<td title="shipping_num">
-											<p class="text-nowrap">
-												{% if item.quantity > 1 %}
-													{{ item.shipping_num * item.quantity }}
-												{% else %}
-													{{ item.shipping_num }}
-												{% endif %}
-											</p>
-										</td>
-										<td title="return_number">
-											<p class="text-nowrap">{{ item.returns_num }}</p>
-										</td>
-									</tr>
-								</form>
+										{% else %}
+											<p class="text-nowrap"></p>
+										{% endif %}
+									</td>
+									<td title="shipping_no">
+										<p class="text-nowrap">{{ item.shipping_no }}</p>
+									</td>
+									<td title="shipping_date">
+										<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
+									</td>
+									<td title="shiping_code | otodoke_code">
+										<p class="text-nowrap">{{ item.shipping_name }}</p>
+										<p class="text-nowrap">{{ item.otodoke_name }}</p>
+									</td>
+									<td title="jan_code | product_name">
+										<p class="text-nowrap">{{ item.jan_code }}</p>
+										<p class="text-nowrap">{{ item.product_name }}</p>
+									</td>
+									<td title="shipping_num">
+										<p class="text-nowrap">
+											{% if item.quantity > 1 %}
+												{{ item.shipping_num * item.quantity }}
+											{% else %}
+												{{ item.shipping_num }}
+											{% endif %}
+										</p>
+									</td>
+									<td title="return_number">
+										<p class="text-nowrap">{{ item.returns_num }}</p>
+									</td>
+								</tr>
 							{% endfor %}
 						</tbody>
 					{% else %}
