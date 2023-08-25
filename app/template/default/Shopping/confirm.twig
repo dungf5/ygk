@@ -33,19 +33,6 @@ file that was distributed with this source code.
         .fail(function(jqXHR, statusText, errorThrown) {
         });
     });
-
-    $(document).ready(function() {
-        $("#back_to_order").click(function() {
-            let url = "{{ url('shopping') }}";
-            let customer_order_no = "{{ customer_order_no }}";
-
-            $('<form/>', { action: url, method: 'POST' })
-            .append(
-                $('<input>', {type: 'hidden', name: 'customer_order_no', value: customer_order_no}),
-            ).appendTo('body').submit();
-        });
-    })
-
 </script>
 
 {% endblock javascript %}
@@ -399,10 +386,7 @@ file that was distributed with this source code.
                 <div class="shipping_destination_right">
                     <div>
                         <div>
-                            {% if customer_order_no is defined %}
-                                {{ customer_order_no }}
-                                <input type="hidden" name="customer_order_no" value="{{ customer_order_no }}">
-                            {% endif %}
+                            {{ Order.customer_order_no }}
                         </div>
                     </div>
                 </div>
@@ -554,7 +538,7 @@ file that was distributed with this source code.
                 {% endif %}
                 <div class="ec-totalBox__btn">
                     <button type="submit" class="ec-blockBtn--action">{{ 'front.shopping.checkout'|trans }}</button>
-                    <button type="button" id="back_to_order" class="ec-blockBtn--cancel">{{ 'front.shopping.back_to_order'|trans }}</button>
+                    <a href="{{ url('shopping') }}" data-method="post" class="ec-blockBtn--cancel">{{ 'front.shopping.back_to_order'|trans }}</a>
                 </div>
             </div>
         </div>

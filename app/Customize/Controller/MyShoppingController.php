@@ -148,6 +148,7 @@ class MyShoppingController extends AbstractShoppingController
         $remarks3 = $this->globalService->getRemarks3();
         $remarks4 = $this->globalService->getRemarks4();
         $delivery_date = $this->globalService->getDeliveryDate();
+        $customer_order_no = $this->globalService->getCustomerOrderNo();
 
         // ログイン状態のチェック.
         $commonService = new MyCommonService($this->entityManager);
@@ -158,9 +159,6 @@ class MyShoppingController extends AbstractShoppingController
 
             return $this->redirectToRoute('shopping_login');
         }
-
-        //Request param
-        $customer_order_no = $request->get('customer_order_no', '');
 
         // カートチェック.
         $Cart = $this->cartService->getCart();
@@ -389,11 +387,13 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function confirm(Request $request)
     {
+        //Request param
         $remarks1 = $request->get('remarks1', '');
         $remarks2 = $request->get('remarks2', '');
         $remarks3 = $request->get('remarks3', '');
         $remarks4 = $request->get('remarks4', '');
         $delivery_date = $request->get('date_picker_delivery', '');
+        $customer_order_no = $request->get('customer_order_no', '');
 
         // ログイン状態のチェック.
         if ($this->orderHelper->isLoginRequired()) {
@@ -401,9 +401,6 @@ class MyShoppingController extends AbstractShoppingController
 
             return $this->redirectToRoute('shopping_login');
         }
-
-        //Request param
-        $customer_order_no = $request->get('customer_order_no', '');
 
         // 受注の存在チェック
         $preOrderId = $this->cartService->getPreOrderId();
@@ -532,6 +529,7 @@ class MyShoppingController extends AbstractShoppingController
             $Order->remarks2 = $remarks2;
             $Order->remarks3 = $remarks3;
             $Order->remarks4 = $remarks4;
+            $Order->customer_order_no = $customer_order_no;
 
             //Push Session
             $_SESSION['remarks1'] = $remarks1;
@@ -539,13 +537,13 @@ class MyShoppingController extends AbstractShoppingController
             $_SESSION['remarks3'] = $remarks3;
             $_SESSION['remarks4'] = $remarks4;
             $_SESSION['delivery_date'] = $delivery_date;
+            $_SESSION['customer_order_no'] = $customer_order_no;
 
             return [
                 'form' => $form->createView(),
                 'Order' => $Order,
                 'hsProductId' => $hsProductId,
                 'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
-                'customer_order_no' => $customer_order_no,
             ];
         }
 
@@ -720,7 +718,7 @@ class MyShoppingController extends AbstractShoppingController
 
                 $item_index = 0;
 
-                $customer_order_no = $request->get('customer_order_no', '');
+                $customer_order_no = $this->globalService->getCustomerOrderNo();
                 if (!empty($customer_order_no)) {
                     $orderNo = $customer_order_no;
                 }
@@ -1142,6 +1140,7 @@ class MyShoppingController extends AbstractShoppingController
         unset($_SESSION['remarks3']);
         unset($_SESSION['remarks4']);
         unset($_SESSION['delivery_date']);
+        unset($_SESSION['customer_order_no']);
 
         $hasNextCart = !empty($this->cartService->getCarts());
 
