@@ -224,4 +224,9 @@ class GlobalService
 
         return 0;
     }
+
+    public function getCustomerOrderNo()
+    {
+        return $_SESSION['customer_order_no'] ?? '';
+    }
 }

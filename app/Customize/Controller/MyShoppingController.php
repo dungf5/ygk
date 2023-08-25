@@ -143,6 +143,8 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function index(Request $request)
     {
+        $customer_order_no = $this->globalService->getCustomerOrderNo();
+
         // ログイン状態のチェック.
         $commonService = new MyCommonService($this->entityManager);
 
@@ -152,9 +154,6 @@ class MyShoppingController extends AbstractShoppingController
 
             return $this->redirectToRoute('shopping_login');
         }
-
-        //Request param
-        $customer_order_no = $request->get('customer_order_no', '');
 
         // カートチェック.
         $Cart = $this->cartService->getCart();
@@ -402,15 +401,15 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function confirm(Request $request)
     {
+        //Request param
+        $customer_order_no = $request->get('customer_order_no', '');
+
         // ログイン状態のチェック.
         if ($this->orderHelper->isLoginRequired()) {
             log_info('[注文確認] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
 
             return $this->redirectToRoute('shopping_login');
         }
-
-        //Request param
-        $customer_order_no = $request->get('customer_order_no', '');
 
         // 受注の存在チェック
         $preOrderId = $this->cartService->getPreOrderId();
@@ -538,12 +537,16 @@ class MyShoppingController extends AbstractShoppingController
             $customer_code = $comSer->getMstCustomer($customer_id)['customer_code'] ?? '';
             $hsMstProductCodeCheckShow = $comSer->setCartIndtPrice($hsMstProductCodeCheckShow, $comSer, $customer_code, $login_type, $login_code);
 
+            $Order->customer_order_no = $customer_order_no;
+
+            //Push Session
+            $_SESSION['customer_order_no'] = $customer_order_no;
+
             return [
                 'form' => $form->createView(),
                 'Order' => $Order,
                 'hsProductId' => $hsProductId,
                 'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
-                'customer_order_no' => $customer_order_no,
             ];
         }
 
@@ -718,7 +721,7 @@ class MyShoppingController extends AbstractShoppingController
 
                 $item_index = 0;
 
-                $customer_order_no = $request->get('customer_order_no', '');
+                $customer_order_no = $this->globalService->getCustomerOrderNo();
                 if (!empty($customer_order_no)) {
                     $orderNo = $customer_order_no;
                 }
@@ -1135,6 +1138,7 @@ class MyShoppingController extends AbstractShoppingController
 
         log_info('[注文完了] 購入フローのセッションをクリアします. ');
         $this->orderHelper->removeSession();
+        unset($_SESSION['customer_order_no']);
 
         $hasNextCart = !empty($this->cartService->getCarts());
 
