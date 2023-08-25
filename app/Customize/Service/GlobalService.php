@@ -264,4 +264,9 @@ class GlobalService
     {
         return $_SESSION['remarks4'] ?? '';
     }
+
+    public function getDeliveryDate()
+    {
+        return $_SESSION['delivery_date'] ?? '';
+    }
 }
