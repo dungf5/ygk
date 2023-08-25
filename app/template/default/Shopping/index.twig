@@ -568,9 +568,9 @@ function updateDeliverydAdress(delivery_code) {
             if (e.date != undefined) {
                 let dateChoose  = e.date.format('YYYY-MM-DD');
 
-                // if (checkDate()) {
-                //     updateDateDeli(dateChoose);
-                // }
+                if (checkDate()) {
+                    updateDateDeli(dateChoose);
+                }
             }
         });
     });
