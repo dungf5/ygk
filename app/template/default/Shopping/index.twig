@@ -522,11 +522,7 @@ function updateDeliverydAdress(delivery_code) {
     $( document ).ready(function() {
         var maxDate         = "{{ getNext3Month() }}";
         var minDate         = "{{ getMinDate() }}";
-        let defaultDate     = '';
-
-        {% if Order.hasMoreOrder == 1 %}
-            defaultDate     = '{{ Order.moreOrder.date_want_delivery }}';
-        {% endif %}
+        let defaultDate     = "{{ delivery_date }}";
 
         $('#date_picker_delivery').datetimepicker({
             locale: 'ja',
@@ -572,9 +568,9 @@ function updateDeliverydAdress(delivery_code) {
             if (e.date != undefined) {
                 let dateChoose  = e.date.format('YYYY-MM-DD');
 
-                if (checkDate()) {
-                    updateDateDeli(dateChoose);
-                }
+                // if (checkDate()) {
+                //     updateDateDeli(dateChoose);
+                // }
             }
         });
     });

@@ -140,6 +140,7 @@ class MyShoppingController extends AbstractShoppingController
         $remarks2 = $this->globalService->getRemarks2();
         $remarks3 = $this->globalService->getRemarks3();
         $remarks4 = $this->globalService->getRemarks4();
+        $delivery_date = $this->globalService->getDeliveryDate();
 
         // ログイン状態のチェック.
         $commonService = new MyCommonService($this->entityManager);
@@ -256,14 +257,6 @@ class MyShoppingController extends AbstractShoppingController
             //Nếu $moreOrder not empty => pre_order_id có tồn tại. Nạp Sesssion
             $_SESSION['s_pre_order_id'] = $Order->getPreOrderId() ?? '';
 
-            if (MyCommon::isEmptyOrNull($moreOrder['date_want_delivery'])) {
-                $moreOrder['date_want_delivery'] = '';
-            }
-
-            if (MyCommon::isEmptyOrNull($moreOrder['date_want_delivery'])) {
-                $moreOrder['date_want_delivery'] = '';
-            }
-
             if (MyCommon::isEmptyOrNull($moreOrder['seikyu_code'])) {
                 $moreOrder['seikyu_code'] = '';
             }
@@ -274,22 +267,6 @@ class MyShoppingController extends AbstractShoppingController
 
             if (MyCommon::isEmptyOrNull($moreOrder['otodoke_code'])) {
                 $moreOrder['otodoke_code'] = '';
-            }
-
-            if (MyCommon::isEmptyOrNull($moreOrder['remarks1'])) {
-                $moreOrder['remarks1'] = null;
-            }
-
-            if (MyCommon::isEmptyOrNull($moreOrder['remarks2'])) {
-                $moreOrder['remarks2'] = null;
-            }
-
-            if (MyCommon::isEmptyOrNull($moreOrder['remarks3'])) {
-                $moreOrder['remarks3'] = null;
-            }
-
-            if (MyCommon::isEmptyOrNull($moreOrder['remarks4'])) {
-                $moreOrder['remarks4'] = null;
             }
 
             $moreOrder->setShippingCode($this->globalService->getShippingCode() ?? '');
@@ -378,6 +355,7 @@ class MyShoppingController extends AbstractShoppingController
             'remarks2' => $remarks2,
             'remarks3' => $remarks3,
             'remarks4' => $remarks4,
+            'delivery_date' => $delivery_date,
         ];
     }
 
@@ -397,6 +375,7 @@ class MyShoppingController extends AbstractShoppingController
         $remarks2 = $request->get('remarks2', '');
         $remarks3 = $request->get('remarks3', '');
         $remarks4 = $request->get('remarks4', '');
+        $delivery_date = $request->get('date_picker_delivery', '');
 
         // ログイン状態のチェック.
         if ($this->orderHelper->isLoginRequired()) {
@@ -463,18 +442,6 @@ class MyShoppingController extends AbstractShoppingController
             $paymentTotal = (int) $Order->getTotal() + (int) ((float) $Order->getTotal() / (float) $rate);
             $moreOrder = $commonService->getMoreOrder($Order->getPreOrderId());
 
-            //add default day delivery
-            if ($moreOrder->getDateWantDelivery() == null || $moreOrder->getDateWantDelivery() == '') {
-                $comS = new MyCommonService($this->entityManager);
-                $arrDayOff = $comS->getDayOff();
-                $dayOffSatSun = MyCommon::getDayWeekend();
-                $arrDayOff = array_merge($arrDayOff, $dayOffSatSun);
-                $newDate = MyCommon::get3DayAfterDayOff($arrDayOff);
-
-                $moreOrder->setDateWantDelivery($newDate);
-                $this->entityManager->persist($moreOrder);
-                $this->entityManager->flush();
-            }
             $login_type = $this->globalService->getLoginType();
             $login_code = $this->globalService->getLoginCode();
             $customer_id = $this->globalService->customerId();
@@ -531,6 +498,15 @@ class MyShoppingController extends AbstractShoppingController
             $customer_code = $comSer->getMstCustomer($customer_id)['customer_code'] ?? '';
             $hsMstProductCodeCheckShow = $comSer->setCartIndtPrice($hsMstProductCodeCheckShow, $comSer, $customer_code, $login_type, $login_code);
 
+            //add default day delivery
+            if (empty($delivery_date)) {
+                $arrDayOff = $comSer->getDayOff();
+                $dayOffSatSun = MyCommon::getDayWeekend();
+                $arrDayOff = array_merge($arrDayOff, $dayOffSatSun);
+                $delivery_date = MyCommon::get3DayAfterDayOff($arrDayOff);
+            }
+
+            $Order->delivery_date = $delivery_date;
             $Order->remarks1 = $remarks1;
             $Order->remarks2 = $remarks2;
             $Order->remarks3 = $remarks3;
@@ -541,6 +517,7 @@ class MyShoppingController extends AbstractShoppingController
             $_SESSION['remarks2'] = $remarks2;
             $_SESSION['remarks3'] = $remarks3;
             $_SESSION['remarks4'] = $remarks4;
+            $_SESSION['delivery_date'] = $delivery_date;
 
             return [
                 'form' => $form->createView(),
@@ -705,7 +682,7 @@ class MyShoppingController extends AbstractShoppingController
                 $moreOrder = $comS->getMoreOrder($Order->getPreOrderId());
                 $ship_code = $moreOrder->getShippingCode();
                 $seikyu_code = $moreOrder->getSeikyuCode();
-                $shipping_plan_date = $moreOrder->getDateWantDelivery();
+                $shipping_plan_date = $this->globalService->getDeliveryDate();
                 $otodoke_code = $moreOrder->getOtodokeCode();
                 $remarks1 = $this->globalService->getRemarks1();
                 $remarks2 = $this->globalService->getRemarks2();
@@ -1080,6 +1057,7 @@ class MyShoppingController extends AbstractShoppingController
         unset($_SESSION['remarks2']);
         unset($_SESSION['remarks3']);
         unset($_SESSION['remarks4']);
+        unset($_SESSION['delivery_date']);
 
         $hasNextCart = !empty($this->cartService->getCarts());
 
