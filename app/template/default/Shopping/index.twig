@@ -346,6 +346,10 @@ $(function () {
              isSubmit = 0;
         }
 
+        if ($("#customer_order_no").val().trim() != '' && $("#error_customer_order_no").text().trim() != '') {
+            isSubmit = 0;
+        }
+
         if (checkDate() && isSubmit === 1) {
             $('#shopping-form').submit();
         }
@@ -577,6 +581,11 @@ function updateDeliverydAdress(delivery_code) {
                 }
             }
         });
+
+
+        if ($("#customer_order_no").val() != '') {
+            handleCheckOrderNoExisted($("#customer_order_no").val());
+        }
     });
 
     function updateDateDeli(dateChoose) {
@@ -633,7 +642,7 @@ function updateDeliverydAdress(delivery_code) {
 
     var typingRemarksTimer;
     var doneTypingInterval      = 2000;
-    function updateRemarks(target) {
+    function updateTempOrder(target) {
         $("button.mySubmitConfirm").prop("disabled", true);
         let name                = target['name'];
         let value               = target['value'];
@@ -642,21 +651,34 @@ function updateDeliverydAdress(delivery_code) {
         loadingOverlay('hide');
 
         typingRemarksTimer      = setTimeout(function () {
-            handelUpdateRemarks(name, value);
+            handelUpdateTempOrder(name, value);
         }, doneTypingInterval);
     }
 
-    function handelUpdateRemarks(name, value) {
+    function checkOrderNoExisted(target) {
+        let name                = target['name'];
+        let value               = target['value'];
+
+        clearTimeout(typingRemarksTimer);
+
+        typingRemarksTimer      = setTimeout(function () {
+            handleCheckOrderNoExisted(value);
+        }, 1000);
+    }
+
+    function handelUpdateTempOrder(name, value) {
         loadingOverlay();
         let remarks1    = $("input[name=remarks1]").val();
         let remarks2    = $("input[name=remarks2]").val();
         let remarks3    = $("input[name=remarks3]").val();
         let remarks4    = $("input[name=remarks4]").val();
+        let customer_order_no    = $("input[name=customer_order_no]").val();
 
         if (name == 'remarks1') remarks1    = value;
         if (name == 'remarks2') remarks2    = value;
         if (name == 'remarks3') remarks3    = value;
         if (name == 'remarks4') remarks4    = value;
+        if (name == 'customer_order_no') customer_order_no    = value;
 
         $.ajax({
             url: '{{ url('cart_save_temp_order') }}',
@@ -667,6 +689,7 @@ function updateDeliverydAdress(delivery_code) {
                 'remarks2': remarks2,
                 'remarks3': remarks3,
                 'remarks4': remarks4,
+                'customer_order_no': customer_order_no,
                 'pre_order_id':'{{ Order.pre_order_id }}',
                 'customer_id':'{{ Order.Customer.id }}'
             }
@@ -682,6 +705,31 @@ function updateDeliverydAdress(delivery_code) {
             $("button.mySubmitConfirm").prop("disabled", false);
         });
     }
+
+    function handleCheckOrderNoExisted(value) {
+    $.ajax({
+        url: '{{ url('check_order_existed') }}',
+        type: 'POST',
+        data: {
+            customer_order_no:value,
+            '_token':'{{ csrf_token('_token') }}',
+        },
+        beforeSend: function(xhr, settings) {
+            loadingOverlay();
+        }
+    })
+    .done(function(data) {
+        if (data.status == 1) {
+            $("#error_customer_order_no").text('客先注文番号がすでに登録されています');
+            $("#error_customer_order_no").css('display', 'initial');
+        } else {
+            $("#error_customer_order_no").text('');
+            $("#error_customer_order_no").css('display', 'none');
+        }
+    }).always(function() {
+        loadingOverlay('hide');
+    });
+}
 </script>
 {% endblock javascript %}
 
@@ -1060,7 +1108,7 @@ function updateDeliverydAdress(delivery_code) {
                     }
 
                     .shipping_destination_left > div {
-                        width: 130px;
+                        width: 120px;
                         background-color: #c9b5b5;
                         text-align: center;
                         margin-right: 20px;
@@ -1271,8 +1319,22 @@ function updateDeliverydAdress(delivery_code) {
                     </div>
                 </div>
 
-                {# Remarks #}
+                {#Customer Order No#}
                 <div>
+                    <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
+                        <div class="shipping_destination_left">
+                            <div style="background-color: #ffdc00; font-weight: bold">客先発注番号</div>
+                        </div>
+                        <div class="col-md-12" style="padding: 0">
+                            <input type="text" class="form-control" name="customer_order_no" id="customer_order_no" value="{% if customer_order_no is defined %}{{ customer_order_no }}{% endif %}" onkeyup="checkOrderNoExisted(this)" maxlength="20">
+                        </div>
+                    </div>
+                    <p id="error_customer_order_no" style="color: red; font-size: larger; font-weight: bold; display: none"></p>
+                </div>
+                {#Customer Order No#}
+
+                {# Remarks #}
+                <div style="padding-top: 15px;">
                     <p>
                         <span>▼</span>
                         出荷案内書と納品書の備考に表示される項目（店名、オーダー番号、その他）
@@ -1283,7 +1345,7 @@ function updateDeliverydAdress(delivery_code) {
                         <div>発注書備考</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks3" id="remarks3" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks3 }}{% endif %}" onkeyup="updateRemarks(this)">
+                        <input type="text" class="form-control" name="remarks3" id="remarks3" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks3 }}{% endif %}" onkeyup="updateTempOrder(this)">
                     </div>
                 </div>
 
@@ -1298,7 +1360,7 @@ function updateDeliverydAdress(delivery_code) {
                         <div>発注書コメント</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks4" id="remarks4" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks4 }}{% endif %}" onkeyup="updateRemarks(this)">
+                        <input type="text" class="form-control" name="remarks4" id="remarks4" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks4 }}{% endif %}" onkeyup="updateTempOrder(this)">
                     </div>
                 </div>
 
@@ -1310,18 +1372,18 @@ function updateDeliverydAdress(delivery_code) {
                 </div>
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
                     <div class="shipping_destination_left">
-                        <div> {{ 'front.shopping.remarks'|trans }}１</div>
+                        <div> {{ 'front.mypage.remarks'|trans }}１</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks1" id="remarks1" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks1 }}{% endif %}" onkeyup="updateRemarks(this)">
+                        <input type="text" class="form-control" name="remarks1" id="remarks1" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks1 }}{% endif %}" onkeyup="updateTempOrder(this)">
                     </div>
                 </div>
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-top: 10px">
                     <div class="shipping_destination_left">
-                        <div> {{ 'front.shopping.remarks'|trans }}２</div>
+                        <div> {{ 'front.mypage.remarks'|trans }}２</div>
                     </div>
                     <div class="col-md-12" style="padding: 0">
-                        <input type="text" class="form-control" name="remarks2" id="remarks2" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks2 }}{% endif %}" onkeyup="updateRemarks(this)">
+                        <input type="text" class="form-control" name="remarks2" id="remarks2" value="{% if Order.moreOrder is defined %}{{ Order.moreOrder.remarks2 }}{% endif %}" onkeyup="updateTempOrder(this)">
                     </div>
                 </div>
                 <p class="error_remarks" style="color: red;font-size: larger;font-weight: bold;display: none">

@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -73,9 +84,9 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
         }
 
         /**
-         * @param string $pre_order_id
+         * @param $pre_order_id
          */
-        public function setPreOrderId(string $pre_order_id): void
+        public function setPreOrderId($pre_order_id)
         {
             $this->pre_order_id = $pre_order_id;
         }
@@ -89,9 +100,9 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
         }
 
         /**
-         * @param string $order_no
+         * @param $order_no
          */
-        public function setOrderNo(string $order_no): void
+        public function setOrderNo($order_no)
         {
             $this->order_no = $order_no;
         }
@@ -105,9 +116,9 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
         }
 
         /**
-         * @param string $seikyu_code
+         * @param $seikyu_code
          */
-        public function setSeikyuCode(string $seikyu_code): void
+        public function setSeikyuCode($seikyu_code)
         {
             $this->seikyu_code = $seikyu_code;
         }
@@ -121,9 +132,9 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
         }
 
         /**
-         * @param string $shipping_code
+         * @param $shipping_code
          */
-        public function setShippingCode(string $shipping_code): void
+        public function setShippingCode($shipping_code)
         {
             $this->shipping_code = $shipping_code;
         }
@@ -137,13 +148,12 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
         }
 
         /**
-         * @param string $otodoke_code
+         * @param $otodoke_code
          */
-        public function setOtodokeCode(string $otodoke_code): void
+        public function setOtodokeCode($otodoke_code)
         {
             $this->otodoke_code = $otodoke_code;
         }
-
 
         /**
          * @var string
@@ -165,9 +175,6 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
          */
         private $date_want_delivery;
 
-        /**
-         *
-         */
         public function getDateWantDelivery()
         {
             return $this->date_want_delivery;
@@ -175,9 +182,10 @@ if (!class_exists('\Customize\Entity\MoreOrder', false)) {
 
         /**
          * field new save
-         * @param string $date_want_delivery
+         *
+         * @param $date_want_delivery
          */
-        public function setDateWantDelivery(string $date_want_delivery): void
+        public function setDateWantDelivery($date_want_delivery)
         {
             $this->date_want_delivery = $date_want_delivery;
         }

@@ -1384,23 +1384,23 @@ SQL;
 
     public function savedtOrder($arEcLData)
     {
-        $total = count($arEcLData);
-
         foreach ($arEcLData as $itemSave) {
-            $cusOrderLineno = $total;
-            $total--;
-            $ec_order = $itemSave['ec_order_no'];
-            $ec_order_lineno = $cusOrderLineno; //$itemSave['ec_order_lineno'];
-            $keyFind = ['order_no' => $ec_order, 'order_lineno' => $ec_order_lineno];
-            $objRep = $this->entityManager->getRepository(DtOrder::class)->findOneBy($keyFind);
+            $objRep = $this->entityManager->getRepository(DtOrder::class)->findOneBy(
+                [
+                    'order_no' => $itemSave['order_no'],
+                    'order_lineno' => $itemSave['order_lineno'],
+                    'customer_code' => $itemSave['customer_code'],
+                ]
+            );
             $orderItem = new DtOrder();
 
             if ($objRep !== null) {
-                $orderItem = $objRep;
+                log_error("Order {$itemSave['order_no']}-{$itemSave['order_lineno']} is existed");
+                continue;
             }
 
-            $orderItem->setOrderLineno($ec_order_lineno);
-            $orderItem->setOrderNo($ec_order);
+            $orderItem->setOrderLineno($itemSave['order_lineno']);
+            $orderItem->setOrderNo($itemSave['order_no']);
             $orderItem->setShippingCode($itemSave['shipping_code']);
             $orderItem->setSeikyuCode($itemSave['seikyu_code'] ?? '');
             $orderItem->setShipingPlanDate($itemSave['shipping_plan_date'] ?? '');
@@ -1424,7 +1424,7 @@ SQL;
             $orderItem->setDynaModelSeg2($itemSave['dyna_model_seg2']);                                     // ・ダイナ規格セグメント02←EC注文番号
             $orderItem->setDynaModelSeg3($itemSave['dyna_model_seg3']);
             $orderItem->setDynaModelSeg4($itemSave['dyna_model_seg4']);                                     // ・ダイナ規格セグメント04←EC注文番号
-            $orderItem->setDynaModelSeg5($ec_order_lineno);                                                 // ・ダイナ規格セグメント05←EC注文明細番号
+            $orderItem->setDynaModelSeg5($itemSave['order_lineno']);                                                 // ・ダイナ規格セグメント05←EC注文明細番号
             $orderItem->setDynaModelSeg6($itemSave['remarks1']);                                     // ・ダイナ規格セグメント04←EC注文番号
             $orderItem->setDynaModelSeg7($itemSave['remarks2']);                                     // ・ダイナ規格セグメント04←EC注文番号
             $orderItem->setDynaModelSeg8($itemSave['remarks3']);
@@ -1444,30 +1444,30 @@ SQL;
 
     public function saveOrderStatus($arEcLData)
     {
-        $total = count($arEcLData);
         foreach ($arEcLData as $itemSave) {
-            $cusOrderLineno = $total;
-            $total--;
-            $ec_order = $itemSave['ec_order_no'];
-            $ec_order_lineno = $cusOrderLineno;
-            $keyFind = ['cus_order_no' => $ec_order, 'cus_order_lineno' => $ec_order_lineno];
-            $objRep = $this->entityManager->getRepository(DtOrderStatus::class)->findOneBy($keyFind);
+            $objRep = $this->entityManager->getRepository(DtOrderStatus::class)->findOneBy(
+                [
+                    'cus_order_no' => $itemSave['order_no'],
+                    'cus_order_lineno' => $itemSave['order_lineno'],
+                    'customer_code' => $itemSave['customer_code'],
+                ]
+            );
             $orderItem = new DtOrderStatus();
 
             if ($objRep !== null) {
-                log_error("Order {$ec_order}-{$ec_order_lineno} is existed");
+                log_error("Order {$itemSave['order_no']}-{$itemSave['order_lineno']} is existed");
                 continue;
             }
 
             $time = new \DateTime();
             $orderItem->setOrderStatus('1');
             $orderItem->setOrderDate($time);
-            $orderItem->setEcOrderLineno($ec_order_lineno);
-            $orderItem->setEcOrderNo($ec_order);
-            $orderItem->setOrderNo($ec_order);
-            $orderItem->setOrderLineNo($ec_order_lineno);
-            $orderItem->setCusOrderNo($ec_order);
-            $orderItem->setCusOrderLineno($cusOrderLineno);
+            $orderItem->setOrderNo($itemSave['order_no']);
+            $orderItem->setOrderLineNo($itemSave['order_lineno']);
+            $orderItem->setEcOrderNo($itemSave['ec_order_no']);
+            $orderItem->setEcOrderLineno($itemSave['order_lineno']);
+            $orderItem->setCusOrderNo($itemSave['order_no']);
+            $orderItem->setCusOrderLineno($itemSave['order_lineno']);
             $orderItem->setCustomerCode($itemSave['customer_code']);
             $orderItem->setShippingCode($itemSave['shipping_code']);
             $orderItem->setOtodokeCode($itemSave['otodoke_code']);
@@ -1554,6 +1554,7 @@ SQL;
 
     /**
      * @return mixed|null
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function getTaxInfo()
@@ -1579,7 +1580,9 @@ SQL;
     /**
      * @param $customerId
      * @param $pre_order_id
+     *
      * @return mixed|null
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function getMstShippingOrder($customerId, $pre_order_id)
@@ -1608,7 +1611,9 @@ SQL;
 
     /**
      * @param
+     *
      * @return array|null
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function getMstProductsOrderCustomer($order_no)
@@ -1726,7 +1731,9 @@ SQL;
 
     /**
      * @param
+     *
      * @return mixed|null
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function getMoreOrderCustomer($pre_order_id)
@@ -2131,6 +2138,11 @@ SQL;
             $orderItem->setRemarks4($value);
         }
 
+        if ($name == 'customer_order_no') {
+            $orderItem->setPreOrderId($pre_order_id);
+            $orderItem->setCustomerOrderNo($value);
+        }
+
         $this->entityManager->persist($orderItem);
         $this->entityManager->flush();
     }
@@ -2401,7 +2413,9 @@ SQL;
 
     /**
      * @param
+     *
      * @return mixed|null
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function getCustomerLocation($customer_code)

@@ -217,7 +217,7 @@ file that was distributed with this source code.
                     width: 140px
                 }
                 .shipping_destination_left >div{
-                    width: 130px;
+                    width: 120px;
                     background-color: #c9b5b5;
                     text-align: center;
 
@@ -378,6 +378,21 @@ file that was distributed with this source code.
                 </div>
             </div>
 
+            {#Customer Order No#}
+            <div class="shipping_destination">
+                <div class="shipping_destination_left">
+                    <div style="background-color: #ffdc00; font-weight: bold">客先発注番号</div>
+                </div>
+                <div class="shipping_destination_right">
+                    <div>
+                        <div>
+                            {{ Order.customer_order_no }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {#Customer Order No#}
+
             {# Remarks#}
             <div class="shipping_destination">
                 <p>
@@ -429,7 +444,7 @@ file that was distributed with this source code.
             </div>
             <div class="shipping_destination">
                 <div class="shipping_destination_left">
-                    <div> {{ 'front.shopping.remarks'|trans }}１</div>
+                    <div> {{ 'front.mypage.remarks'|trans }}１</div>
                 </div>
                 <div class="shipping_destination_right">
                     <div>
@@ -444,7 +459,7 @@ file that was distributed with this source code.
 
             <div class="shipping_destination">
                 <div class="shipping_destination_left">
-                    <div> {{ 'front.shopping.remarks'|trans }}２</div>
+                    <div> {{ 'front.mypage.remarks'|trans }}２</div>
                 </div>
                 <div class="shipping_destination_right">
                     <div>
@@ -526,8 +541,8 @@ file that was distributed with this source code.
                 </div>
                 {% endif %}
                 <div class="ec-totalBox__btn">
-                    <button type="submit"  class="ec-blockBtn--action">{{ 'front.shopping.checkout'|trans }}</button>
-                    <a href="{{ url('shopping') }}" class="ec-blockBtn--cancel">{{ 'front.shopping.back_to_order'|trans }}</a>
+                    <button type="submit" class="ec-blockBtn--action">{{ 'front.shopping.checkout'|trans }}</button>
+                    <a href="{{ url('shopping') }}" data-method="post" class="ec-blockBtn--cancel">{{ 'front.shopping.back_to_order'|trans }}</a>
                 </div>
             </div>
         </div>

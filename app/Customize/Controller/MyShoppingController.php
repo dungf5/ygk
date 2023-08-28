@@ -15,6 +15,7 @@ namespace Customize\Controller;
 
 use Customize\Common\MyCommon;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
+use Customize\Entity\DtOrder;
 use Customize\Entity\MoreOrder;
 use Customize\Service\Common\MyCommonService;
 use Customize\Service\GlobalService;
@@ -32,7 +33,6 @@ use Eccube\Service\CartService;
 use Eccube\Service\OrderHelper;
 use Eccube\Service\Payment\PaymentDispatcher;
 use Eccube\Service\Payment\PaymentMethodInterface;
-use Eccube\Service\PurchaseFlow\PurchaseFlow;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -131,11 +131,20 @@ class MyShoppingController extends AbstractShoppingController
      *
      * purchaseFlowの集計処理実行後, warningがある場合はカートど同期をとるため, カートのPurchaseFlowを実行する.
      *
-     * @Route("/shopping", name="shopping", methods={"GET"})
+     * @Route("/shopping", name="shopping", methods={"GET", "POST"})
      * @Template("Shopping/index.twig")
+     *
+     * @param Request $request
+     *
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+     *
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function index(PurchaseFlow $cartPurchaseFlow)
+    public function index(Request $request)
     {
+        $customer_order_no = $this->globalService->getCustomerOrderNo();
+
         // ログイン状態のチェック.
         $commonService = new MyCommonService($this->entityManager);
 
@@ -369,6 +378,7 @@ class MyShoppingController extends AbstractShoppingController
             'Order' => $Order,
             'hsProductId' => $hsProductId,
             'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
+            'customer_order_no' => $customer_order_no,
         ];
     }
 
@@ -381,9 +391,19 @@ class MyShoppingController extends AbstractShoppingController
      *
      * @Route("/shopping/confirm", name="shopping_confirm", methods={"POST"})
      * @Template("Shopping/confirm.twig")
+     *
+     * @param Request $request
+     *
+     * @return array|\Eccube\Service\PurchaseFlow\PurchaseFlowResult|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     *
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     public function confirm(Request $request)
     {
+        //Request param
+        $customer_order_no = $request->get('customer_order_no', '');
+
         // ログイン状態のチェック.
         if ($this->orderHelper->isLoginRequired()) {
             log_info('[注文確認] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
@@ -517,9 +537,16 @@ class MyShoppingController extends AbstractShoppingController
             $customer_code = $comSer->getMstCustomer($customer_id)['customer_code'] ?? '';
             $hsMstProductCodeCheckShow = $comSer->setCartIndtPrice($hsMstProductCodeCheckShow, $comSer, $customer_code, $login_type, $login_code);
 
+            $Order->customer_order_no = $customer_order_no;
+
+            //Push Session
+            $_SESSION['customer_order_no'] = $customer_order_no;
+
             return [
                 'form' => $form->createView(),
-                'Order' => $Order, 'hsProductId' => $hsProductId, 'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
+                'Order' => $Order,
+                'hsProductId' => $hsProductId,
+                'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
             ];
         }
 
@@ -551,6 +578,7 @@ class MyShoppingController extends AbstractShoppingController
             'Order' => $Order,
             'hsProductId' => $hsProductId,
             'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
+            'customer_order_no' => $customer_order_no,
         ];
     }
 
@@ -652,6 +680,7 @@ class MyShoppingController extends AbstractShoppingController
                 //save more nvtrong
                 $comS = new MyCommonService($this->entityManager);
                 $orderNo = $Order->getOrderNo();
+                $ec_orderNo = $Order->getOrderNo();
                 $subTotal = $Order->getSubtotal();
                 $itemList = $Order->getItems()->toArray();
                 $arEcLData = [];
@@ -690,11 +719,22 @@ class MyShoppingController extends AbstractShoppingController
                 $reCustomer = $comS->getCustomerRelationFromUser($customerCode, $login_type, $login_code);
                 $fusrdec1 = ($comS->getMstCustomerCode($reCustomer['customer_code'] ?? ''))['fusrdec1'] ?? 0;
 
+                $item_index = 0;
+
+                $customer_order_no = $this->globalService->getCustomerOrderNo();
+                if (!empty($customer_order_no)) {
+                    $orderNo = $customer_order_no;
+                }
+
                 foreach ($itemList as $itemOr) {
                     if ($itemOr->isProduct()) {
+                        $item_index++;
+
                         $arEcLData[] = [
-                            'ec_order_no' => $orderNo,
-                            'ec_order_lineno' => $itemOr->getId(),
+                            'ec_order_no' => $ec_orderNo,
+                            'ec_order_lineno' => $item_index,
+                            'order_no' => $orderNo,
+                            'order_lineno' => $item_index,
                             'product_code' => $hsArrEcProductCusProduct[$itemOr->getId()],
                             'customer_code' => $reCustomer['customer_code'] ?? '',
                             'shipping_code' => $ship_code,
@@ -707,9 +747,9 @@ class MyShoppingController extends AbstractShoppingController
                             'deli_plan_date' => $shipping_plan_date,
                             'item_no' => $hsArrJanCode[$itemOr->getId()],
                             'demand_unit' => $hsArrProductQuantity[$itemOr->getId()] > 1 ? 'CS' : 'PC',
-                            'dyna_model_seg2' => $orderNo,
+                            'dyna_model_seg2' => $ec_orderNo,
                             'dyna_model_seg3' => 2,
-                            'dyna_model_seg4' => $orderNo,
+                            'dyna_model_seg4' => $ec_orderNo,
                             'dyna_model_seg5' => count($itemList),
                             'remarks1' => $remarks1,
                             'remarks2' => $remarks2,
@@ -749,7 +789,8 @@ class MyShoppingController extends AbstractShoppingController
             $this->cartService->clear();
 
             // 受注IDをセッションにセット
-            $this->session->set(OrderHelper::SESSION_ORDER_ID, $Order->getId());
+            // Change by task #1933
+            $this->session->set(OrderHelper::SESSION_ORDER_ID, !empty($customer_order_no) ? $customer_order_no : $Order->getId());
             $commonService = new MyCommonService($this->entityManager);
             $rate = $commonService->getTaxInfo()['tax_rate'];
             $tax = (float) $Order->getTotal() / (float) $rate;
@@ -1014,5 +1055,99 @@ class MyShoppingController extends AbstractShoppingController
         } catch (\Exception $e) {
             return $this->json(['status' => 0, 'msg' => $e->getMessage()], 400);
         }
+    }
+
+    /**
+     * Check Merge Order.
+     *
+     * @Route("/shopping/order/check_existed", name="check_order_existed", methods={"POST"})
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function checkMergeOrder(Request $request)
+    {
+        try {
+            if ('POST' === $request->getMethod()) {
+                $customer_order_no = $request->get('customer_order_no', '');
+
+                $commonService = new MyCommonService($this->entityManager);
+                $customer_id = $this->globalService->customerId();
+                $login_type = $this->globalService->getLoginType();
+                $login_code = $this->globalService->getLoginCode();
+                $arCusLogin = $commonService->getMstCustomer($customer_id);
+                $relationCus = $commonService->getCustomerRelationFromUser($arCusLogin['customer_code'], $login_type, $login_code);
+
+                // Get customer_code from dt_customer_relation
+                $customer_code = $relationCus['customer_code'] ?? '';
+
+                if (!empty($customer_code) && !empty($customer_order_no)) {
+                    Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+                    $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findOneBy([
+                        'customer_code' => trim($customer_code),
+                        'order_no' => trim($customer_order_no),
+                    ], [
+                        'order_lineno' => 'DESC',
+                    ]);
+
+                    if (!empty($dtOrder)) {
+                        return $this->json(['status' => 1], 200);
+                    }
+                }
+            }
+
+            return $this->json(['status' => 0], 200);
+        } catch (\Exception $e) {
+            return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * 購入完了画面を表示する.
+     *
+     * @Route("/shopping/complete", name="shopping_complete", methods={"GET"})
+     * @Template("Shopping/complete.twig")
+     */
+    public function complete(Request $request)
+    {
+        log_info('[注文完了] 注文完了画面を表示します.');
+
+        // 受注IDを取得
+        $orderId = $this->session->get(OrderHelper::SESSION_ORDER_ID);
+
+        if (empty($orderId)) {
+            log_info('[注文完了] 受注IDを取得できないため, トップページへ遷移します.');
+
+            return $this->redirectToRoute('homepage');
+        }
+
+        $Order = $this->orderRepository->find($orderId);
+
+        $event = new EventArgs(
+            [
+                'Order' => $Order,
+            ],
+            $request
+        );
+        $this->eventDispatcher->dispatch(EccubeEvents::FRONT_SHOPPING_COMPLETE_INITIALIZE, $event);
+
+        if ($event->getResponse() !== null) {
+            return $event->getResponse();
+        }
+
+        log_info('[注文完了] 購入フローのセッションをクリアします. ');
+        $this->orderHelper->removeSession();
+        unset($_SESSION['customer_order_no']);
+
+        $hasNextCart = !empty($this->cartService->getCarts());
+
+        log_info('[注文完了] 注文完了画面を表示しました. ', [$hasNextCart]);
+
+        return [
+            'Order' => $Order,
+            'order_no' => $orderId,
+            'hasNextCart' => $hasNextCart,
+        ];
     }
 }

@@ -23,7 +23,7 @@ front.shopping.shipping_title_error: 出荷先をご指定ください。
 front.shopping.error_bill_address: 請求先を選んでください。
 
 front.order.order_no_type: 区分
-front.order.order_no: 注文番号
+front.order.order_no: 客先発注番号
 front.order.order_lineno: 明細
 front.order.order_date: 注文日
 front.order.image: 画像
@@ -58,7 +58,7 @@ front.mypage.shipping_plan_date: 出荷指示日
 front.mypage.inquiry_no: 荷送伝票番号
 front.mypage.shipping_company_code: 運送会社
 front.mypage.shipping_no_no: 出荷進展
-front.mypage.remarks: 備考
+front.mypage.remarks: 生産依頼備考
 front.mypage.shipping.customer_name: 顧客名
 front.mypage.shipping.no: 件数
 front.mypage.shipping.delivery_no: 出荷指示№

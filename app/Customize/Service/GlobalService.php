@@ -244,4 +244,9 @@ class GlobalService
 
         return $_SESSION['cart_product_type'] ?? '';
     }
+
+    public function getCustomerOrderNo()
+    {
+        return $_SESSION['customer_order_no'] ?? '';
+    }
 }

@@ -100,14 +100,14 @@ file that was distributed with this source code.
             </div>
             <p class="ec-reportDescription">
                 {{ 'front.shopping.complete_message__body'|trans|nl2br }}
-                {% if Order.id %}
-                    <br /><br /><strong>{{ 'front.shopping.order_no'|trans }} : {{ Order.orderNo }}</strong>
+                {% if order_no %}
+                    <br /><br /><strong>{{ 'front.shopping.order_no'|trans }} : {{ order_no }}</strong>
                 {% endif %}
             </p>
 
-            {% if Order.complete_message is not empty %}
-                {{ Order.complete_message|raw }}
-            {% endif %}
+{#            {% if Order is defined and Order.complete_message is not empty %}#}
+{#                {{ Order.complete_message|raw }}#}
+{#            {% endif %}#}
 
             <div class="ec-off4Grid">
                 {% if hasNextCart %}
