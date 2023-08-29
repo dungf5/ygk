@@ -330,7 +330,7 @@ file that was distributed with this source code.
                 </div>
                 <div class="shipping_destination_right">
                     <div class="shipping_row">
-                        {{ Order.MoreOrder.date_want_delivery }}
+                        {{ Order.delivery_date }}
                     </div>
                 </div>
             </div>
@@ -407,9 +407,8 @@ file that was distributed with this source code.
                 <div class="shipping_destination_right">
                     <div>
                         <div>
-                            {% if Order.MoreOrder is defined %}
-                                {{ Order.MoreOrder.remarks3 }}
-                            {% endif %}
+                            {{ Order.remarks3 }}
+                            <input type="hidden" class="form-control" name="remarks3" id="remarks3" value="{{ Order.remarks3 }}">
                         </div>
                     </div>
                 </div>
@@ -428,9 +427,8 @@ file that was distributed with this source code.
                 <div class="shipping_destination_right">
                     <div>
                         <div>
-                            {% if Order.MoreOrder is defined %}
-                                {{ Order.MoreOrder.remarks4 }}
-                            {% endif %}
+                            {{ Order.remarks4 }}
+                            <input type="hidden" class="form-control" name="remarks4" id="remarks4" value="{{ Order.remarks4 }}">
                         </div>
                     </div>
                 </div>
@@ -449,9 +447,8 @@ file that was distributed with this source code.
                 <div class="shipping_destination_right">
                     <div>
                         <div>
-                            {% if Order.MoreOrder is defined %}
-                                {{ Order.MoreOrder.remarks1 }}
-                            {% endif %}
+                            {{ Order.remarks1 }}
+                            <input type="hidden" class="form-control" name="remarks1" id="remarks1" value="{{ Order.remarks1 }}">
                         </div>
                     </div>
                 </div>
@@ -464,9 +461,8 @@ file that was distributed with this source code.
                 <div class="shipping_destination_right">
                     <div>
                         <div>
-                            {% if Order.MoreOrder is defined %}
-                                {{ Order.MoreOrder.remarks2 }}
-                            {% endif %}
+                            {{ Order.remarks2 }}
+                            <input type="hidden" class="form-control" name="remarks2" id="remarks2" value="{{ Order.remarks2 }}">
                         </div>
                     </div>
                 </div>

@@ -249,4 +249,29 @@ class GlobalService
     {
         return $_SESSION['customer_order_no'] ?? '';
     }
+
+    public function getRemarks1()
+    {
+        return $_SESSION['remarks1'] ?? '';
+    }
+
+    public function getRemarks2()
+    {
+        return $_SESSION['remarks2'] ?? '';
+    }
+
+    public function getRemarks3()
+    {
+        return $_SESSION['remarks3'] ?? '';
+    }
+
+    public function getRemarks4()
+    {
+        return $_SESSION['remarks4'] ?? '';
+    }
+
+    public function getDeliveryDate()
+    {
+        return $_SESSION['delivery_date'] ?? '';
+    }
 }
