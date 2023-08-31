@@ -1139,13 +1139,14 @@ class MailService
         $body = $this->twig->render('Mail/return_product_preview.twig', [
             'url_preview' => $url_preview,
         ]);
+
         $message = (new \Swift_Message())
             ->setSubject('[XBRAID JAPAN] 返品リクエストが届きました')
             ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
             ->setTo([$email])
             ->setBody($body);
-        if (getenv('APP_IS_LOCAL') != 1
-            && getenv('EMAIL_RETURN_CC')) {
+
+        if (getenv('APP_IS_LOCAL') != 1 && getenv('EMAIL_RETURN_CC')) {
             $email = getenv('EMAIL_RETURN_CC');
             if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $message->setCc($email);
@@ -1164,13 +1165,14 @@ class MailService
         $body = $this->twig->render('Mail/return_product_approve.twig', [
             'url_approve' => $url_approve,
         ]);
+
         $message = (new \Swift_Message())
             ->setSubject('[XBRAID JAPAN] 返品リクエスト承認のご案内')
             ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
             ->setTo([$email])
             ->setBody($body);
-        if (getenv('APP_IS_LOCAL') != 1
-            && getenv('EMAIL_RETURN_CC')) {
+
+        if (getenv('APP_IS_LOCAL') != 1 && getenv('EMAIL_RETURN_CC')) {
             $email = getenv('EMAIL_RETURN_CC');
             if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $message->setCc($email);
