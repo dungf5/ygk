@@ -1379,9 +1379,9 @@ class MypageController extends AbstractController
                 $url_preview = $this->generateUrl('mypage_return_preview', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
                 $this->mailService->sendMailReturnProductPreview($email, $url_preview);
 
-                //$email2 = getenv('EMAIL_RETURN_CC') ?? '';
-                //$url_approve = $this->generateUrl('mypage_return_approve', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
-                //$this->mailService->sendMailReturnProductApprove($email2, $url_approve);
+                $email2 = getenv('EMAIL_RETURN_CC') ?? '';
+                $url_approve = $this->generateUrl('mypage_return_approve', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+                $this->mailService->sendMailReturnProductApprove($email2, $url_approve);
 
                 return $this->redirectToRoute('mypage_return_save_complete');
             }
