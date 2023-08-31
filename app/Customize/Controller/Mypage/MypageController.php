@@ -581,8 +581,10 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/favorite", name="mypage_favorite", methods={"GET"})
      * @Template("Mypage/favorite.twig")
+     *
      * @param Request $request
      * @param PaginatorInterface $paginator
+     *
      * @return array
      */
     public function favorite(Request $request, PaginatorInterface $paginator)
@@ -621,7 +623,9 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/shipping/change", name="mypage_shipping", methods={"POST"})
      * @Template("Mypage/login.twig")
+     *
      * @param Request $request
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function changeShippingCode(Request $request)
@@ -659,9 +663,12 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/shipping/history", name="mypage_shipping_history", methods={"GET"})
      * @Template("Mypage/shipping.twig")
+     *
      * @param Request $request
      * @param PaginatorInterface $paginator
+     *
      * @return array
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function shipping(Request $request, PaginatorInterface $paginator)
@@ -878,7 +885,9 @@ class MypageController extends AbstractController
      *
      * @Route("/mypage/represent/change", name="mypage_represent", methods={"POST"})
      * @Template("Mypage/login.twig")
+     *
      * @param Request $request
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function changeRepresentCode(Request $request)
@@ -1197,6 +1206,7 @@ class MypageController extends AbstractController
             $company_name = $this->globalService->companyName();
             $customer_shipping_code = $this->globalService->getShippingCode();
             $customer_otodoke_code = $this->globalService->getOtodokeCode();
+            $customer = $this->globalService->customer();
 
             //Params
             $param = [
@@ -1279,7 +1289,6 @@ class MypageController extends AbstractController
                     'param' => $param,
                     'errors' => $errors,
                 ];
-
             } else {
                 // Insert mst_product_returns_info
                 $returns_no = $commonService->getReturnsNo();
@@ -1364,6 +1373,15 @@ class MypageController extends AbstractController
                             'cus_image_url_path6' => $mst_product_returns_info->getCusImageUrlPath6(),
                         ]);
                 }
+
+                // Send mail
+                $email = $customer['customer_email'] ?? $customer['email'];
+                $url_preview = $this->generateUrl('mypage_return_preview', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+                $this->mailService->sendMailReturnProductPreview($email, $url_preview);
+
+                //$email2 = getenv('EMAIL_RETURN_CC') ?? '';
+                //$url_approve = $this->generateUrl('mypage_return_approve', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+                //$this->mailService->sendMailReturnProductApprove($email2, $url_approve);
 
                 return $this->redirectToRoute('mypage_return_save_complete');
             }
