@@ -1620,7 +1620,7 @@ class MypageController extends AbstractController
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
 
             if (empty($product_returns_info)) {
-                return $this->redirectToRoute('mypage_return');
+                return $this->redirectToRoute('mypage_return_history');
             }
 
             $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
