@@ -1953,7 +1953,11 @@ class MypageController extends AbstractController
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
 
-            if (empty($product_returns_info) || !in_array($product_returns_info->getReturnsStatusFlag(), ['3', '5'])) {
+            if (empty($product_returns_info) || ('GET' === $request->getMethod() && $product_returns_info->getReturnsStatusFlag() != '5')) {
+                return $this->redirectToRoute('mypage_return_history');
+            }
+
+            if (empty($product_returns_info) || ('POST' === $request->getMethod() && $product_returns_info->getReturnsStatusFlag() != '3')) {
                 return $this->redirectToRoute('mypage_return_history');
             }
 
