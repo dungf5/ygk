@@ -1260,13 +1260,13 @@ class MypageController extends AbstractController
 
             if ($param['return_num'] == '') {
                 $errors['return_num'] = '返品数を入力してください。';
-            } elseif ($param['return_num'] <= 0) {
-                $errors['return_num'] = '1以上で入力してください';
-            } else {
-                $cond = $param['shipping_num'] > $param['return_num'] ? $param['shipping_num'] - $param['return_num'] : $param['shipping_num'];
-                if ($param['return_num'] > $cond) {
-                    $errors['return_num'] = '出荷数以上の数量は入力できません。';
-                }
+            } elseif ((int) $param['return_num'] <= 0) {
+                $errors['return_num'] = '1以上で入力してください。';
+            } elseif (
+                ((int) $param['total_returns_num'] > (int) $param['shipping_num']) ||
+                ((int) $param['return_num'] > ((int) $param['shipping_num'] - (int) $param['total_returns_num']))
+            ) {
+                $errors['return_num'] = '出荷数以上の数量は入力できません。';
             }
 
             $images = $request->files->get('images', []);
