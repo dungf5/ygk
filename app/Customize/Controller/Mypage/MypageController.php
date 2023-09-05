@@ -1699,12 +1699,13 @@ class MypageController extends AbstractController
 
                 $product_returns_info = $this->mstProductReturnsInfoRepository->updadteData($returns_no, $data);
 
-                $email = $customer['customer_email'] ?? $customer['email'];
                 if ($submit == 'aprove') {
+                    $email = getenv('EMAIL_RETURN_CC') ?? '';
                     $url_approve_finish = $this->generateUrl('mypage_return_approve_finish', ['returns_no' => $product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
                     $url_receipt = $this->generateUrl('mypage_return_receipt', ['returns_no' => $product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
                     $this->mailService->sendMailReturnProductApproveYes($email, $url_approve_finish, $url_receipt);
                 } else {
+                    $email = $customer['customer_email'] ?? $customer['email'];
                     $this->mailService->sendMailReturnProductApproveNo($email, $aprove_comment_not_yet);
                 }
             }
@@ -1848,12 +1849,14 @@ class MypageController extends AbstractController
                         'stock_image_url_path6' => $product_returns_info->getStockImageUrlPath6(),
                     ]);
                 }
-                $email = $customer['customer_email'] ?? $customer['email'];
+
                 if ($receipt == 'yes') {
-                    $url_return_receipt_finish = $this->generateUrl('mypage_return_receipt_finish', ['returns_no' => $product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $email = $email = getenv('EMAIL_RETURN_CC') ?? '';
+                    $url_return_receipt_finish = $this->generateUrl('mypage_return_complete', ['returns_no' => $product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
                     $cus_reviews_flag = $product_returns_info->getCusReviewsFlag() == 1 ? '良品' : ($product_returns_info->getCusReviewsFlag() == 2 ? '不良品' : '');
                     $this->mailService->sendMailReturnProductReceiptYes($email, $receipt_comment, $url_return_receipt_finish, $cus_reviews_flag);
                 } else {
+                    $email = $customer['customer_email'] ?? $customer['email'];
                     $this->mailService->sendMailReturnProductReceiptNo($email, $receipt_not_yet_comment);
                 }
             }
