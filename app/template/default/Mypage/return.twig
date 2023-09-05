@@ -209,6 +209,7 @@
 										</td>
 										<td title={{ item.total_returns_num }}>
 											<p class="text-nowrap">{{ item.total_returns_num }}</p>
+											<input type="hidden" name="total_returns_num" value="{{ item.total_returns_num }}"/>
 										</td>
 {#										<td title={{ item.returns_status_flag  is empty ? "" : item.returns_status_flag }}>#}
 {#											{% if item.returns_status_flag is defined and item.returns_status_flag != null %}#}
