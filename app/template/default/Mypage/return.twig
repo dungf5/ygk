@@ -255,9 +255,14 @@
 										<input type="hidden" name="shipping_no" value="{{ item.shipping_no }}"/>
 										<input type="hidden" name="shipping_day" value="{{ item.shipping_date }}"/>
 										<input type="hidden" name="jan_code" value="{{ item.jan_code }}"/>
-										<input type="hidden" name="shipping_num" value="{{ item.shipping_num }}"/>
 										<input type="hidden" name="product_code" value="{{ item.product_code }}"/>
 										<input type="hidden" name="product_name" value="{{ item.product_name }}"/>
+										<input type="hidden" name="total_returns_num" value="{{ item.total_returns_num }}"/>
+										{% if item.quantity > 1 %}
+											<input type="hidden" name="shipping_num" value="{{ item.shipping_num * item.quantity }}"/>
+										{% else %}
+											<input type="hidden" name="shipping_num" value="{{ item.shipping_num }}"/>
+										{% endif %}
 									</tr>
 								</form>
 							{% endfor %}
