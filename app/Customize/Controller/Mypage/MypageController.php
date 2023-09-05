@@ -1224,6 +1224,7 @@ class MypageController extends AbstractController
                 'customer_comment' => $request->get('customer_comment', ''),
                 'product_status' => $request->get('product_status', '1'),
                 'product_code' => $request->get('product_code', ''),
+                'total_returns_num' => $request->get('total_returns_num', ''),
             ];
 
             $returns_reson = $commonService->getReturnsReson();
