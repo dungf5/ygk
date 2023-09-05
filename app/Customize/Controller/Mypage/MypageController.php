@@ -1775,6 +1775,11 @@ class MypageController extends AbstractController
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
+
+            if (empty($product_returns_info) || $product_returns_info->getReturnsStatusFlag() != '1') {
+                return $this->redirectToRoute('mypage_return_history');
+            }
+
             $customer = $commonService->getMstCustomerCode($product_returns_info->getCustomerCode());
             $product_name = $commonService->getJanCodeToProductName($product_returns_info->getJanCode());
             $shipping_num = $commonService->getDeliveredNum($product_returns_info->getShippingNo(), $product_returns_info->getProductCode());
