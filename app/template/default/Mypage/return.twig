@@ -205,7 +205,7 @@
 											<button type="submit" class="btn btn-warning" role="button" {% if item.total_returns_num >= item.shipping_num %}disabled{% endif %}>手続き</button>
 										</td>
 										<td title={{ item.returns_num }}>
-											<input type="number" name="return_num" data-value='{{ item.returns_num }}' data-shipping='{{ item.shipping_num }}' data-total_returns='{{ item.total_returns_num }}' class="form-control" value="{{ item.returns_num }}"/>
+											<input type="number" name="return_num" data-value='{{ item.returns_num }}' data-shipping='{{ item.shipping_num }}' data-quantity='{{ item.quantity }}' data-total_returns='{{ item.total_returns_num }}' class="form-control" value="{{ item.returns_num }}"/>
 										</td>
 										<td title={{ item.total_returns_num }}>
 											<p class="text-nowrap">{{ item.total_returns_num }}</p>
@@ -343,9 +343,14 @@
 		let element = $(this);
 		let previous_value = element.data('value');
 		let shipping_num = element.data('shipping');
+		let quantity = element.data('quantity');
 		let total_returns = element.data('total_returns');
 		let current_value = element.val();
 		let mess = '';
+
+		if (parseInt(quantity) > 1) {
+			shipping_num = parseInt(shipping_num) * parseInt(quantity);
+		}
 
 
 		typingRemarksTimer = setTimeout(function () {
