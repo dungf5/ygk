@@ -274,4 +274,26 @@ class GlobalService
     {
         return $_SESSION['delivery_date'] ?? '';
     }
+
+    public function getFusrdec1()
+    {
+        if ($this->customerId() != '') {
+            $fusrdec1 = $this->myCommon->getMstCustomer($this->customerId())['fusrdec1'];
+
+            return (int) $fusrdec1;
+        }
+
+        return 0;
+    }
+
+    public function getFusrstr8()
+    {
+        if ($this->customerId() != '') {
+            $fusrstr8 = $this->myCommon->getMstCustomer($this->customerId())['fusrstr8'];
+
+            return (int) $fusrstr8;
+        }
+
+        return 0;
+    }
 }

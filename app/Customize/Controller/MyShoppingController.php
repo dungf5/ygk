@@ -714,7 +714,8 @@ class MyShoppingController extends AbstractShoppingController
                 $remarks4 = $this->globalService->getRemarks4();
                 $location = $comS->getCustomerLocation($customerCode);
                 $reCustomer = $comS->getCustomerRelationFromUser($customerCode, $login_type, $login_code);
-                $fusrdec1 = ($comS->getMstCustomerCode($reCustomer['customer_code'] ?? ''))['fusrdec1'] ?? 0;
+                $fusrdec1 = $this->globalService->getFusrdec1();
+                $fusrstr8 = $this->globalService->getFusrstr8();
 
                 $item_index = 0;
 
@@ -753,7 +754,7 @@ class MyShoppingController extends AbstractShoppingController
                             'remarks3' => $remarks3,
                             'remarks4' => $remarks4,
                             'location' => !empty($location) ? $location : 'XB0201001',
-                            'fvehicleno' => (int) $subTotal > (int) $fusrdec1 ? '0001' : '1001',
+                            'fvehicleno' => ($fusrstr8 == 1 && $subTotal <= $fusrdec1) ? '1000' : '0000',
                             ];
                     }
                 }
