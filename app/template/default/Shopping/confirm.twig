@@ -26,7 +26,7 @@ file that was distributed with this source code.
             font-size: 100% !important;
         }
         .swal-modal {
-            width: 600px;
+            width: 490px;
         }
      </style>
 <div class="ec-role">
@@ -563,10 +563,10 @@ file that was distributed with this source code.
             }
 
             if (response.status == 0) {
-                let min_price = '￥' + response.message.toLocaleString(window.document.documentElement.lang);
+                let min_price = response.message.toLocaleString(window.document.documentElement.lang) + '円';
                 swal({
-                    title: "小計金額が送料基準額（" + min_price + "）に満たしていないため送料がご負担となります。",
-                    text: "下記ボタンよりお進みください。",
+                    title: "確認",
+                    text: "小計金額が送料基準額（" + min_price + "）に満たしていないため\n送料がご負担となります。\n下記ボタンよりお進みください。",
                     icon: "warning",
                     dangerMode: true,
                     buttons: {
