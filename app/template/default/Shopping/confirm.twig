@@ -12,30 +12,6 @@ file that was distributed with this source code.
 
 {% form_theme form 'Form/form_div_layout.twig' %}
 
-{% block javascript %}
-<script>
-    $(function () {
-        let preOrderId = "{{Order.pre_order_id }}";
-        $.ajax({
-            url: '{{ url('cart_save_temp') }}',
-            type: 'POST',
-            data: {
-            pre_order_id: preOrderId,
-            is_check_exist: 1,
-            '_token':'{{ csrf_token('_token') }}'
-            }
-        })
-        .done(function(htmlRe, statusText, jqXHR) {
-            if (htmlRe == "0") {
-                window.location.href='/';
-            }
-        })
-        .fail(function(jqXHR, statusText, errorThrown) {
-        });
-    });
-</script>
-
-{% endblock javascript %}
 {% block main %}
     <style type="text/css">
         .delivery_address_main {
@@ -537,7 +513,7 @@ file that was distributed with this source code.
                 </div>
                 {% endif %}
                 <div class="ec-totalBox__btn">
-                    <button type="submit" class="ec-blockBtn--action">{{ 'front.shopping.checkout'|trans }}</button>
+                    <button type="button" id="btn-shopping-checkout" class="ec-blockBtn--action">{{ 'front.shopping.checkout'|trans }}</button>
                     <a href="{{ url('shopping') }}" data-method="post" class="ec-blockBtn--cancel">{{ 'front.shopping.back_to_order'|trans }}</a>
                 </div>
             </div>
@@ -545,3 +521,73 @@ file that was distributed with this source code.
     </div>
 </form>
 {% endblock %}
+
+{% block javascript %}
+<script>
+    $(function () {
+        let preOrderId = "{{Order.pre_order_id }}";
+        $.ajax({
+            url: '{{ url('cart_save_temp') }}',
+            type: 'POST',
+            data: {
+                pre_order_id: preOrderId,
+                is_check_exist: 1,
+                '_token':'{{ csrf_token('_token') }}'
+            }
+        })
+        .done(function(htmlRe, statusText, jqXHR) {
+            if (htmlRe == "0") {
+                window.location.href='/';
+            }
+        })
+        .fail(function(jqXHR, statusText, errorThrown) {
+        });
+    });
+
+    $("#btn-shopping-checkout").on('click', function() {
+        loadingOverlay();
+        $.ajax({
+            url: '{{ url('check_fusrstr') }}',
+            type: 'POST',
+            data: {
+                '_token':'{{ csrf_token('_token') }}',
+                total_price: '{{ Order.subtotal }}'
+            }
+        })
+        .done(function(response) {
+            if (response.status == -1) {
+                console.log(response.message);
+            }
+
+            if (response.status == 0) {
+                let min_price = '￥' + response.message.toLocaleString(window.document.documentElement.lang);
+                swal({
+                    title: "小計金額が送料基準額（" + min_price + "）に満たしていないため送料がご負担となります。",
+                    text: "下記ボタンよりお進みください。",
+                    icon: "warning",
+                    dangerMode: true,
+                    buttons: {
+                        cancel: "戻る",
+                        confirm: "注文する"
+                    },
+                })
+                .then(isConfirmed => {
+                    if (isConfirmed) {
+                        $('#shopping-form').submit();
+                    }
+                });
+            }
+
+            if (response.status == 1) {
+                $('#shopping-form').submit();
+            }
+        })
+        .fail(function(jqXHR, statusText, errorThrown) {
+        })
+        .always(function() {
+            loadingOverlay('hide');
+        });
+    })
+</script>
+
+{% endblock javascript %}
