@@ -277,8 +277,11 @@ class GlobalService
 
     public function getFusrdec1()
     {
-        if ($this->customerId() != '') {
-            $fusrdec1 = $this->myCommon->getMstCustomer($this->customerId())['fusrdec1'];
+        $relationCus = $this->myCommon->getCustomerRelationFromUser($this->customerCode(), $this->getLoginType(), $this->getLoginCode());
+
+        if ($relationCus) {
+            $customerCode = $relationCus['customer_code'];
+            $fusrdec1 = $this->myCommon->getMstCustomer2($customerCode)['fusrdec1'];
 
             return (int) $fusrdec1;
         }
@@ -288,8 +291,11 @@ class GlobalService
 
     public function getFusrstr8()
     {
-        if ($this->customerId() != '') {
-            $fusrstr8 = $this->myCommon->getMstCustomer($this->customerId())['fusrstr8'];
+        $relationCus = $this->myCommon->getCustomerRelationFromUser($this->customerCode(), $this->getLoginType(), $this->getLoginCode());
+
+        if ($relationCus) {
+            $customerCode = $relationCus['customer_code'];
+            $fusrstr8 = $this->myCommon->getMstCustomer2($customerCode)['fusrstr8'];
 
             return (int) $fusrstr8;
         }
