@@ -3099,7 +3099,8 @@ SQL;
     public function getShippingWSExportData()
     {
         $sql = '
-                SELECT *
+                SELECT *,
+                    (SELECT DISTINCT IFNULL(mst_product.quantity, 1) FROM mst_product WHERE product_code = dowe.product_code) as quantity
                 FROM
                     mst_shipping_ws_eos mswe
                 JOIN

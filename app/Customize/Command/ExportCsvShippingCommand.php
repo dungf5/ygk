@@ -202,9 +202,9 @@ class ExportCsvShippingCommand extends Command
                     $delivery_no = $mstDelivery['delivery_no'] ?? null;
                     $delivery_line_no = $mstDelivery['delivery_lineno'] ?? null;
                     $delivery_day = $mstDelivery['delivery_date'] ?? null;
-                    $delivery_num = $mstDelivery['quanlity'] ?? 0;
-                    $delivery_price = $mstDelivery['unit_price'] ?? 0;
-                    $delivery_amount = $mstDelivery['amount'] ?? 0;
+                    $delivery_num = ($mstDelivery['quanlity'] ?? 0) * $item['quantity'];
+                    $delivery_price = ($mstDelivery['unit_price'] ?? 0) / $item['quantity'];
+                    $delivery_amount = $delivery_num * $delivery_price;
 
                     $this->entityManager->getConfiguration()->setSQLLogger(null);
                     $this->entityManager->getConnection()->beginTransaction();
