@@ -211,6 +211,8 @@ class MypageController extends AbstractController
         $totalaAmount = 0;
         $inCr = 0;
         $totalTaxRe = 0;
+        $shipFee = 0;
+        $isShipFee = false;
 
         foreach ($arRe as &$item) {
             $inCr++;
@@ -220,6 +222,14 @@ class MypageController extends AbstractController
             $item['is_total'] = 0;
             $item['autoIncr'] = $inCr;
             $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
+
+            if ((int) $item['fusrstr8'] != 1 && empty($item['jan_code'])) {
+                $isShipFee = true;
+            }
+        }
+
+        if ($isShipFee) {
+            $shipFee = max(array_values(array_column($arRe, 'amount')));
         }
 
         $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
@@ -231,6 +241,7 @@ class MypageController extends AbstractController
         $arReturn = [
             'myDatas' => array_chunk($arRe, 15),
             'OrderTotal' => $totalaAmount,
+            'shipFee' => $shipFee,
             'totalTaxRe' => $totalTaxRe,
             'totalaAmountTax' => $totalaAmountTax,
         ];
@@ -1097,6 +1108,8 @@ class MypageController extends AbstractController
                 $totalaAmount = 0;
                 $inCr = 0;
                 $totalTaxRe = 0;
+                $shipFee = 0;
+                $isShipFee = false;
 
                 foreach ($arRe as &$item) {
                     $inCr++;
@@ -1106,6 +1119,14 @@ class MypageController extends AbstractController
                     $item['is_total'] = 0;
                     $item['autoIncr'] = $inCr;
                     $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
+
+                    if ((int) $item['fusrstr8'] != 1 && empty($item['jan_code'])) {
+                        $isShipFee = true;
+                    }
+                }
+
+                if ($isShipFee) {
+                    $shipFee = max(array_values(array_column($arRe, 'amount')));
                 }
 
                 $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
@@ -1115,6 +1136,7 @@ class MypageController extends AbstractController
                 $arReturn = [
                     'myDatas' => array_chunk($arRe, 20),
                     'OrderTotal' => $totalaAmount,
+                    'shipFee' => $shipFee,
                     'totalTaxRe' => $totalTaxRe,
                     'totalaAmountTax' => $totalaAmountTax,
                 ];
@@ -1224,6 +1246,8 @@ class MypageController extends AbstractController
                 $totalaAmount = 0;
                 $inCr = 0;
                 $totalTaxRe = 0;
+                $shipFee = 0;
+                $isShipFee = false;
 
                 foreach ($arRe as &$item) {
                     $inCr++;
@@ -1233,6 +1257,14 @@ class MypageController extends AbstractController
                     $item['is_total'] = 0;
                     $item['autoIncr'] = $inCr;
                     $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
+
+                    if ((int) $item['fusrstr8'] != 1 && empty($item['jan_code'])) {
+                        $isShipFee = true;
+                    }
+                }
+
+                if ($isShipFee) {
+                    $shipFee = max(array_values(array_column($arRe, 'amount')));
                 }
 
                 $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
@@ -1242,6 +1274,7 @@ class MypageController extends AbstractController
                 $arReturn = [
                     'myDatas' => array_chunk($arRe, 15),
                     'OrderTotal' => $totalaAmount,
+                    'shipFee' => $shipFee,
                     'totalTaxRe' => $totalTaxRe,
                     'totalaAmountTax' => $totalaAmountTax,
                 ];
@@ -1338,6 +1371,8 @@ class MypageController extends AbstractController
                 $totalaAmount = 0;
                 $inCr = 0;
                 $totalTaxRe = 0;
+                $shipFee = 0;
+                $isShipFee = false;
 
                 foreach ($arRe as &$item) {
                     $inCr++;
@@ -1347,6 +1382,14 @@ class MypageController extends AbstractController
                     $item['is_total'] = 0;
                     $item['autoIncr'] = $inCr;
                     $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
+
+                    if ((int) $item['fusrstr8'] != 1 && empty($item['jan_code'])) {
+                        $isShipFee = true;
+                    }
+                }
+
+                if ($isShipFee) {
+                    $shipFee = max(array_values(array_column($arRe, 'amount')));
                 }
 
                 $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
@@ -1356,6 +1399,7 @@ class MypageController extends AbstractController
                 $arReturn = [
                     'myDatas' => array_chunk($arRe, 15),
                     'OrderTotal' => $totalaAmount,
+                    'shipFee' => $shipFee,
                     'totalTaxRe' => $totalTaxRe,
                     'totalaAmountTax' => $totalaAmountTax,
                 ];
