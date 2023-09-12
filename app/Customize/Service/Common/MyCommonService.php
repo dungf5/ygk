@@ -131,7 +131,7 @@ class MyCommonService extends AbstractRepository
             $result = $statement->executeQuery($param);
             $rows = $result->fetchAllAssociative();
 
-            return $rows[0] ?? null;
+            return $rows[0];
         } catch (Exception $e) {
             return null;
         }
