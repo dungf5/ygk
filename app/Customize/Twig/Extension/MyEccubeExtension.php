@@ -1,11 +1,20 @@
 <?php
+
+/*
+ * This file is part of EC-CUBE
+ *
+ * Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * http://www.ec-cube.co.jp/
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Customize\Twig\Extension;
+
 use Customize\Common\MyCommon;
-use Customize\Common\MyConstant;
-use Customize\Service\Common\MyCommonService;
 use Doctrine\ORM\EntityManagerInterface;
-use Eccube\Common\EccubeConfig;
-use Eccube\Repository\ProductRepository;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -16,7 +25,6 @@ class MyEccubeExtension extends AbstractExtension
      */
     protected $entityManager;
 
-
     /**
      * EccubeExtension constructor.
      *
@@ -25,8 +33,8 @@ class MyEccubeExtension extends AbstractExtension
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-
     }
+
     public function getFunctions()
     {
         return [
@@ -39,104 +47,121 @@ class MyEccubeExtension extends AbstractExtension
             new TwigFunction('roundPriceZeroTotal', [$this, 'roundPriceZeroTotal']),
             new TwigFunction('roundPriceZeroTotalAll', [$this, 'roundPriceZeroTotalAll']),
             new TwigFunction('roundPriceZeroTax', [$this, 'roundPriceZeroTax']),
+            new TwigFunction('currencyFormat', [$this, 'currencyFormat']),
         ];
     }
 
-    public function getNext3Month(){
+    public function getNext3Month()
+    {
         //quyen tu cho la chon tu ngay mai den 1 thang
         //vi du cho ngay thu2 thi  thu 5 mac dinh (ko bao gom thu 7 cn va le)
-        $newDate = date('Y-m-d', strtotime(date("Y-m-d"). ' + 1 months'));
+        $newDate = date('Y-m-d', strtotime(date('Y-m-d').' + 1 months'));
 
-      return $newDate;
-    }
-    public function getFromUrl($key){
-       $valGet = isset($_REQUEST[$key])?$_REQUEST[$key]:'';
-       return $valGet;
-
-
+        return $newDate;
     }
 
-    public function roundPrice($price) {
-        $numAf      = number_format($price,2);
+    public function getFromUrl($key)
+    {
+        $valGet = isset($_REQUEST[$key]) ? $_REQUEST[$key] : '';
 
-        if (MyCommon::checkExistText($numAf,".00")) {
-            $numAf  = str_replace(".00","",$numAf);
+        return $valGet;
+    }
+
+    public function roundPrice($price)
+    {
+        $numAf = number_format($price, 2);
+
+        if (MyCommon::checkExistText($numAf, '.00')) {
+            $numAf = str_replace('.00', '', $numAf);
         }
 
-        return "￥".$numAf;
+        return '￥'.$numAf;
     }
 
-    public function roundPriceZero($price,$classShow="standar_price"){
-
-        $numAf = number_format($price,2);
-        if(MyCommon::checkExistText($numAf,".00")){
-            $numAf  = str_replace(".00","",$numAf);
+    public function roundPriceZero($price, $classShow = 'standar_price')
+    {
+        $numAf = number_format($price, 2);
+        if (MyCommon::checkExistText($numAf, '.00')) {
+            $numAf = str_replace('.00', '', $numAf);
         }
-        if($classShow=="standar_price"){
-            if($numAf == 0){
+        if ($classShow == 'standar_price') {
+            if ($numAf == 0) {
                 return "<span style='color:#f00'>オープン価格</span>";
             }
         }
-        return "￥".$numAf;
+
+        return '￥'.$numAf;
     }
 
     public function roundPriceZeroTotal($price)
     {
-        $numAf      = number_format((int)$price);
+        $numAf = number_format((int) $price);
 
-        if (MyCommon::checkExistText($numAf,".00")) {
-            $numAf  = str_replace(".00","", $numAf);
+        if (MyCommon::checkExistText($numAf, '.00')) {
+            $numAf = str_replace('.00', '', $numAf);
         }
 
         if ($numAf == 0) {
-            return "";
+            return '';
         }
 
-        return "￥" . $numAf;
+        return '￥'.$numAf;
     }
 
     public function roundPriceZeroTax($price)
     {
-        $numAf      = number_format((int) $price);
+        $numAf = number_format((int) $price);
 
-        if (MyCommon::checkExistText($numAf,".00")) {
-            $numAf  = str_replace(".00","", $numAf);
+        if (MyCommon::checkExistText($numAf, '.00')) {
+            $numAf = str_replace('.00', '', $numAf);
         }
 
         if ($numAf == 0) {
-            return "";
+            return '';
         }
 
-        return "￥" . $numAf;
+        return '￥'.$numAf;
     }
 
     public function roundPriceZeroTotalAll($price)
     {
-        $numAf      = number_format($price,2);
+        $numAf = number_format($price, 2);
 
-        if (MyCommon::checkExistText($numAf,".00")) {
-            $numAf  = str_replace(".00","", $numAf);
+        if (MyCommon::checkExistText($numAf, '.00')) {
+            $numAf = str_replace('.00', '', $numAf);
         }
 
         if ($numAf == 0) {
-            return "";
+            return '';
         }
 
-        $numAf      = str_replace(",","", $numAf);
-        $roundUp    = (int)$numAf;
-        $roundUp    = number_format($roundUp);
+        $numAf = str_replace(',', '', $numAf);
+        $roundUp = (int) $numAf;
+        $roundUp = number_format($roundUp);
 
-        return "￥" . $roundUp;
+        return '￥'.$roundUp;
     }
 
-    public function getMinDate(){
-        $newDate = date('Y-m-d', strtotime(date("Y-m-d")));
+    public function getMinDate()
+    {
+        $newDate = date('Y-m-d', strtotime(date('Y-m-d')));
+
         return $newDate;
     }
 
-    public function getWebRootUrl(){
-
+    public function getWebRootUrl()
+    {
         return env('APP_URL', '^127\\.0\\.0\\.1$,^localhost$');
     }
 
+    public function currencyFormat($price)
+    {
+        $numAf = number_format((int) $price);
+
+        if (MyCommon::checkExistText($numAf, '.00')) {
+            $numAf = str_replace('.00', '', $numAf);
+        }
+
+        return '￥'.$numAf;
+    }
 }

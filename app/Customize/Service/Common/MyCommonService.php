@@ -1216,7 +1216,6 @@ SQL;
                         SELECT
                             {$subUnitPrice},
                             {$subQuantity},
-                            SUBSTRING(mst_delivery.order_no, POSITION(\"-\" IN mst_delivery.order_no)+1) AS orderByAs,
                             mst_delivery.delivery_no,
                             mst_delivery.delivery_date,
                             mst_delivery.deli_post_code,
@@ -1249,7 +1248,8 @@ SQL;
                             mst_delivery.otodoke_code,
                             mst_delivery.otodoke_name,
                             mst_customer.department as deli_department_name,
-                            mst_delivery.shipping_no
+                            mst_delivery.shipping_no,
+                            mst_customer_2.fusrstr8
                         FROM
                             dt_order_status
                         JOIN
@@ -1263,14 +1263,18 @@ SQL;
                         LEFT JOIN
                             mst_customer ON (mst_customer.customer_code = mst_delivery.deli_department)
                         LEFT JOIN
+                            mst_customer as mst_customer_2 ON (mst_customer.customer_code = mst_delivery.customer_code)
+                        LEFT JOIN
                             mst_product ON (mst_product.product_code = mst_delivery.item_no)
                         WHERE
                             {$condition}
                         AND
                             mst_delivery.delivery_no = ?
                             {$addCondition}
+                        GROUP by 
+                            mst_delivery.delivery_no, mst_delivery.delivery_lineno
                         ORDER BY
-                            CONVERT(orderByAs, SIGNED INTEGER) ASC";
+                            mst_delivery.delivery_date, mst_delivery.delivery_no, mst_delivery.delivery_lineno";
 
         $myPara = [$customer_code, $delivery_no];
 
