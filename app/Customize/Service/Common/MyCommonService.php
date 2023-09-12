@@ -1266,7 +1266,7 @@ SQL;
                         LEFT JOIN
                             mst_customer ON (mst_customer.customer_code = mst_delivery.deli_department)
                         LEFT JOIN
-                            mst_customer as mst_customer_2 ON (mst_customer.customer_code = mst_delivery.customer_code)
+                            mst_customer as mst_customer_2 ON (mst_customer_2.customer_code = mst_delivery.customer_code)
                         LEFT JOIN
                             mst_product ON (mst_product.product_code = mst_delivery.item_no)
                         WHERE
