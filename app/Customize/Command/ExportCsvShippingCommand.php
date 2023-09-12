@@ -372,8 +372,8 @@ class ExportCsvShippingCommand extends Command
             foreach ($mstShippingNatEOS as $item) {
                 try {
                     $mstDelivery = $this->commonService->getMstDelivery($item['shipping_no'], $item['reqcd'], $item['order_lineno']);
-                    $delivery_num = $mstDelivery['quanlity'] ?? '';
-                    $delivery_price = $mstDelivery['unit_price'] ?? '';
+                    $delivery_num = ($mstDelivery['quanlity'] ?? 0) * $item['quantity'];
+                    $delivery_price = ($mstDelivery['unit_price'] ?? 0) / $item['quantity'];
 
                     $this->entityManager->getConfiguration()->setSQLLogger(null);
                     $this->entityManager->getConnection()->beginTransaction();
