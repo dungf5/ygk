@@ -1277,7 +1277,7 @@ SQL;
                         GROUP by 
                             mst_delivery.delivery_no, mst_delivery.delivery_lineno, mst_delivery.jan_code
                         ORDER BY
-                            mst_delivery.delivery_date, mst_delivery.delivery_no, mst_delivery.delivery_lineno";
+                            mst_delivery.delivery_date ASC, mst_delivery.delivery_no ASC, mst_delivery.delivery_lineno ASC";
 
         $myPara = [$customer_code, $delivery_no];
 
