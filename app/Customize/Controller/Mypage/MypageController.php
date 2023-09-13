@@ -2107,6 +2107,7 @@ class MypageController extends AbstractController
                 $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
             } else {
                 $arr_delivery_no = array_values(array_diff(explode(',', $delivery_no), ['']));
+                $arr_delivery_no = $comS->orderByDeliveryNoPrintPDF($arr_delivery_no);
             }
 
             if (empty($arr_delivery_no)) {
@@ -2230,6 +2231,7 @@ class MypageController extends AbstractController
                 $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
             } else {
                 $arr_delivery_no = array_values(array_diff(explode(',', $delivery_no), ['']));
+                $arr_delivery_no = $comS->orderByDeliveryNoPrintPDF($arr_delivery_no);
             }
 
             if (empty($arr_delivery_no)) {
@@ -2351,7 +2353,8 @@ class MypageController extends AbstractController
         if (trim($delivery_no) == 'all') {
             $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
         } else {
-            $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
+            $arr_delivery_no = array_values(array_diff(explode(',', $delivery_no), ['']));
+            $arr_delivery_no = $comS->orderByDeliveryNoPrintPDF($arr_delivery_no);
         }
 
         $arr_data = [];
