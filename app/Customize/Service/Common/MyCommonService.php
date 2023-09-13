@@ -1178,6 +1178,50 @@ SQL;
         }
     }
 
+    public function orderByDeliveryNoPrintPDF($arr_delivery_no)
+    {
+        $param = [];
+        $str_delivery_no = '';
+        $index = count($arr_delivery_no);
+
+        for ($i = 0; $i < $index; $i++) {
+            if ($i == $index - 1) {
+                $str_delivery_no .= '?';
+            } else {
+                $str_delivery_no .= '?,';
+            }
+            $param[] = $arr_delivery_no[$i];
+        }
+
+        $sql = "
+                    SELECT
+                        mst_delivery.delivery_no
+                    FROM
+                        mst_delivery
+                    WHERE
+                        mst_delivery.delivery_no IN ({$str_delivery_no})
+                    GROUP BY
+                        mst_delivery.delivery_no
+                    ORDER BY
+                        mst_delivery.delivery_date ASC, mst_delivery.order_no ASC
+                ";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            $arRe = [];
+
+            foreach ($rows as $item) {
+                $arRe[] = $item['delivery_no'];
+            }
+
+            return $arRe;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
     public function getPdfDelivery($delivery_no, $orderNo = '', $customer_code, $login_type)
     {
         switch ($login_type) {
@@ -1274,7 +1318,7 @@ SQL;
                         GROUP by 
                             mst_delivery.delivery_no, mst_delivery.delivery_lineno, mst_delivery.jan_code
                         ORDER BY
-                            mst_delivery.delivery_date ASC, mst_delivery.delivery_no ASC, mst_delivery.delivery_lineno ASC";
+                            mst_delivery.delivery_lineno ASC";
 
         $myPara = [$customer_code, $delivery_no];
 
