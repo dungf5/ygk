@@ -299,10 +299,16 @@
                                 <table class="tblFooterLeft">
                                     <tbody>
                                         <tr>
-                                            <td style="text-align: right">小計：{{ roundPriceZeroTotal(OrderTotal) }}</td>
+                                            <td>
+                                                <span style="margin-left: 75%;">小計：</span>
+                                                <span style="float: right">{{ roundPriceZeroTotal(OrderTotal) }}</span>
+                                            </td>
                                         </tr>
                                         <tr>
-                                            <td style="text-align: right">送料：{{ shipFee }}</td>
+                                            <td>
+                                                <span style="margin-left: 75%;">送料：</span>
+                                                <span style="float: right">{{ shipFee }}</span>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td style="text-align: right">（送料および消費税については請求時に一括計算させていただきます。）</td>
