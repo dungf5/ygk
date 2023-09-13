@@ -1159,7 +1159,7 @@ SQL;
                         GROUP BY
                             mst_delivery.delivery_no
                         ORDER BY
-                            dt_order_status.order_date DESC, mst_delivery.order_no ASC
+                            mst_delivery.delivery_date ASC, mst_delivery.order_no ASC
                 ";
 
         try {
