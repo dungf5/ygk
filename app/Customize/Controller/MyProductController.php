@@ -402,7 +402,7 @@ class MyProductController extends AbstractController
             if ($cart_product_type != $request->get('product_type', 1)) {
                 return $this->json([
                     'status' => 0,
-                    'message' => '通用品と特注品を混在してカートに入れることはできません',
+                    'message' => '通常品と特注品を混在してカートに入れることはできません',
                 ]);
             }
         }
