@@ -1141,6 +1141,7 @@ class MyShoppingController extends AbstractShoppingController
         unset($_SESSION['remarks3']);
         unset($_SESSION['remarks4']);
         unset($_SESSION['delivery_date']);
+        unset($_SESSION['cart_product_type']);
 
         $hasNextCart = !empty($this->cartService->getCarts());
 
