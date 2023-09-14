@@ -319,7 +319,13 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="text-align: right">（送料および消費税については請求時に一括計算させていただきます。）</td>
+                                            <td style="text-align: right">
+                                                {% if shipFee == '￥0' %}
+                                                    （消費税については請求時に一括計算させていただきます。）
+                                                {% else %}
+                                                    （送料および消費税については請求時に一括計算させていただきます。）
+                                                {% endif %}
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>備考: {{ myDatas[0][0].footer_remark1}} </td>
