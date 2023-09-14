@@ -1315,8 +1315,6 @@ SQL;
                         AND
                             mst_delivery.delivery_no = ?
                         AND 
-                            mst_delivery.jan_code IS NOT NULL
-                        AND 
                             mst_delivery.jan_code <> ''
                             {$addCondition}
                         GROUP by 
