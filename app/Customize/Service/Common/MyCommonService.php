@@ -1206,7 +1206,7 @@ SQL;
                     GROUP BY
                         mst_delivery.delivery_no
                     ORDER BY
-                        mst_delivery.delivery_date ASC, mst_delivery.order_no ASC
+                        mst_delivery.delivery_date ASC, mst_delivery.delivery_no ASC
                 ";
 
         try {
