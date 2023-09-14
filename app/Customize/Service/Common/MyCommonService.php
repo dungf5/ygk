@@ -1317,6 +1317,8 @@ SQL;
                             {$condition}
                         AND
                             mst_delivery.delivery_no = ?
+                        AND 
+                            IFNULL(mst_delivery.quanlity, 0) > 0
                             {$addCondition}
                         GROUP by 
                             mst_delivery.delivery_no, mst_delivery.delivery_lineno, mst_delivery.jan_code
