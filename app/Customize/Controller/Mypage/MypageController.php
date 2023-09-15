@@ -2347,7 +2347,7 @@ class MypageController extends AbstractController
 
         $arr_data = [];
         foreach ($arr_delivery_no as $item_delivery_no) {
-            $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
+            $arRe = $comS->getCsvDelivery($item_delivery_no, '', $customer_code, $login_type);
 
             if (!count($arRe)) {
                 continue;
