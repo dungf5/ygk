@@ -237,7 +237,7 @@ class MypageController extends AbstractController
         }
 
         foreach ($arRe as &$item) {
-            if (empty($item['jan_code'])) {
+            if (empty(trim($item['jan_code']))) {
                 $shipFee = '￥'.number_format((int) $item['amount']);
                 continue;
             }
@@ -1994,7 +1994,7 @@ class MypageController extends AbstractController
                 }
 
                 foreach ($arRe as &$item) {
-                    if (empty($item['jan_code'])) {
+                    if (empty(trim($item['jan_code']))) {
                         $shipFee = '￥'.number_format((int) $item['amount']);
                         continue;
                     }
@@ -2134,7 +2134,7 @@ class MypageController extends AbstractController
                 }
 
                 foreach ($arRe as &$item) {
-                    if (empty($item['jan_code'])) {
+                    if (empty(trim($item['jan_code']))) {
                         $shipFee = '￥'.number_format((int) $item['amount']);
                         continue;
                     }
@@ -2261,7 +2261,7 @@ class MypageController extends AbstractController
                 }
 
                 foreach ($arRe as &$item) {
-                    if (empty($item['jan_code'])) {
+                    if (empty(trim($item['jan_code']))) {
                         $shipFee = '￥'.number_format((int) $item['amount']);
                         continue;
                     }
