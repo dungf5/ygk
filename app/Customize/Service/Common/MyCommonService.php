@@ -1336,6 +1336,119 @@ SQL;
         return $rows;
     }
 
+    public function getCsvDelivery($delivery_no, $orderNo = '', $customer_code, $login_type)
+    {
+        switch ($login_type) {
+            case 'shipping_code':
+                $condition = 'dt_order_status.shipping_code = ?';
+                break;
+
+            case 'otodoke_code':
+                $condition = 'dt_order_status.otodoke_code = ?';
+                break;
+
+            default:
+                $condition = 'dt_order_status.customer_code = ?';
+                break;
+        }
+
+        $subQuantity = ' CASE
+                            WHEN mst_product.quantity > 1 THEN mst_product.quantity * mst_delivery.quanlity
+                            ELSE mst_delivery.quanlity
+                            END AS quantity
+                        ';
+
+        $subUnitPrice = '   CASE
+                            WHEN mst_product.quantity > 1 THEN mst_delivery.unit_price / mst_product.quantity
+                            ELSE mst_delivery.unit_price
+                            END AS unit_price
+                       ';
+
+        $addCondition = '';
+
+        if (!empty($orderNo)) {
+            $addCondition = ' and mst_delivery.order_no LIKE ? ';
+        }
+
+        $sql = "
+                        SELECT
+                            {$subUnitPrice},
+                            {$subQuantity},
+                            mst_delivery.delivery_no,
+                            mst_delivery.delivery_date,
+                            mst_delivery.deli_post_code,
+                            mst_delivery.deli_addr01,
+                            mst_delivery.deli_addr02,
+                            mst_delivery.deli_addr03,
+                            mst_delivery.deli_company_name,
+                            mst_delivery.deli_department,
+                            mst_delivery.postal_code,
+                            mst_delivery.addr01 ,
+                            mst_delivery.addr02,
+                            mst_delivery.addr03,
+                            mst_delivery.customer_code,
+                            mst_delivery.company_name,
+                            mst_delivery.department,
+                            mst_delivery.delivery_lineno,
+                            mst_delivery.sale_type,
+                            mst_delivery.item_no,
+                            mst_delivery.jan_code,
+                            mst_delivery.item_name,
+                            'PC' as unit,
+                            mst_delivery.amount,
+                            mst_delivery.tax,
+                            mst_delivery.order_no,
+                            mst_delivery.item_remark,
+                            mst_delivery.total_amount,
+                            mst_delivery.footer_remark1,
+                            mst_delivery.shipping_code,
+                            mst_delivery.shiping_name,
+                            mst_delivery.otodoke_code,
+                            mst_delivery.otodoke_name,
+                            mst_customer.department as deli_department_name,
+                            mst_delivery.shipping_no,
+                            mst_customer_2.fusrstr8
+                        FROM
+                            dt_order_status
+                        JOIN
+                            mst_shipping
+                            ON mst_shipping.cus_order_no = dt_order_status.cus_order_no
+                            AND mst_shipping.cus_order_lineno = dt_order_status.cus_order_lineno
+                        JOIN
+                             mst_delivery
+                             ON mst_delivery.shipping_no = mst_shipping.shipping_no
+                             AND TRIM(mst_delivery.order_no) = CONCAT(TRIM(mst_shipping.cus_order_no),'-',TRIM(mst_shipping.cus_order_lineno))
+                        LEFT JOIN
+                            mst_customer ON (mst_customer.customer_code = mst_delivery.deli_department)
+                        LEFT JOIN
+                            mst_customer as mst_customer_2 ON (mst_customer_2.customer_code = mst_delivery.customer_code)
+                        LEFT JOIN
+                            mst_product ON (mst_product.product_code = mst_delivery.item_no)
+                        WHERE
+                            {$condition}
+                        AND
+                            mst_delivery.delivery_no = ?
+                        AND 
+                            mst_delivery.jan_code <> ''
+                            {$addCondition}
+                        GROUP by 
+                            mst_delivery.delivery_no, mst_delivery.delivery_lineno, mst_delivery.jan_code
+                        ORDER BY
+                            mst_delivery.delivery_lineno ASC";
+
+        $myPara = [$customer_code, $delivery_no];
+
+        if (!empty($orderNo)) {
+            $myPara[] = $orderNo.'-%';
+        }
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery($myPara);
+        $rows = $result->fetchAllAssociative();
+
+        return $rows;
+    }
+
 //    /***
 //     * seikyu_code  noi nhan hoa don
 //     * @param $customer_id
