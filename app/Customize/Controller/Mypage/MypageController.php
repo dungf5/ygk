@@ -211,9 +211,19 @@ class MypageController extends AbstractController
         $totalaAmount = 0;
         $inCr = 0;
         $totalTaxRe = 0;
-        $isShipFee = false;
+
+        if ((int) $arRe[0]['fusrstr8'] != 1) {
+            $shipFee = '*****';
+        } else {
+            $shipFee = '￥0';
+        }
 
         foreach ($arRe as &$item) {
+            if (empty($item['jan_code'])) {
+                $shipFee = '￥'.number_format((int) $item['amount']);
+                continue;
+            }
+
             $inCr++;
             $totalTax = $totalTax + $item['tax'];
             $totalaAmount = $totalaAmount + $item['amount'];
@@ -221,20 +231,6 @@ class MypageController extends AbstractController
             $item['is_total'] = 0;
             $item['autoIncr'] = $inCr;
             $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
-
-            if (empty($item['jan_code'])) {
-                $isShipFee = true;
-            }
-        }
-
-        if ((int) $arRe[0]['fusrstr8'] != 1) {
-            $shipFee = '*****';
-        } else {
-            if ($isShipFee) {
-                $shipFee = '￥'.number_format((int) max(array_values(array_column($arRe, 'amount'))));
-            } else {
-                $shipFee = '￥0';
-            }
         }
 
         $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
@@ -1114,9 +1110,19 @@ class MypageController extends AbstractController
                 $totalaAmount = 0;
                 $inCr = 0;
                 $totalTaxRe = 0;
-                $isShipFee = false;
+
+                if ((int) $arRe[0]['fusrstr8'] != 1) {
+                    $shipFee = '*****';
+                } else {
+                    $shipFee = '￥0';
+                }
 
                 foreach ($arRe as &$item) {
+                    if (empty($item['jan_code'])) {
+                        $shipFee = '￥'.number_format((int) $item['amount']);
+                        continue;
+                    }
+
                     $inCr++;
                     $totalTax = $totalTax + $item['tax'];
                     $totalaAmount = $totalaAmount + $item['amount'];
@@ -1124,20 +1130,6 @@ class MypageController extends AbstractController
                     $item['is_total'] = 0;
                     $item['autoIncr'] = $inCr;
                     $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
-
-                    if (empty($item['jan_code'])) {
-                        $isShipFee = true;
-                    }
-                }
-
-                if ((int) $arRe[0]['fusrstr8'] != 1) {
-                    $shipFee = '*****';
-                } else {
-                    if ($isShipFee) {
-                        $shipFee = '￥'.number_format((int) max(array_values(array_column($arRe, 'amount'))));
-                    } else {
-                        $shipFee = '￥0';
-                    }
                 }
 
                 $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
@@ -1258,9 +1250,19 @@ class MypageController extends AbstractController
                 $totalaAmount = 0;
                 $inCr = 0;
                 $totalTaxRe = 0;
-                $isShipFee = false;
+
+                if ((int) $arRe[0]['fusrstr8'] != 1) {
+                    $shipFee = '*****';
+                } else {
+                    $shipFee = '￥0';
+                }
 
                 foreach ($arRe as &$item) {
+                    if (empty($item['jan_code'])) {
+                        $shipFee = '￥'.number_format((int) $item['amount']);
+                        continue;
+                    }
+
                     $inCr++;
                     $totalTax = $totalTax + $item['tax'];
                     $totalaAmount = $totalaAmount + $item['amount'];
@@ -1268,20 +1270,6 @@ class MypageController extends AbstractController
                     $item['is_total'] = 0;
                     $item['autoIncr'] = $inCr;
                     $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
-
-                    if (empty($item['jan_code'])) {
-                        $isShipFee = true;
-                    }
-                }
-
-                if ((int) $arRe[0]['fusrstr8'] != 1) {
-                    $shipFee = '*****';
-                } else {
-                    if ($isShipFee) {
-                        $shipFee = '￥'.number_format((int) max(array_values(array_column($arRe, 'amount'))));
-                    } else {
-                        $shipFee = '￥0';
-                    }
                 }
 
                 $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
@@ -1389,9 +1377,19 @@ class MypageController extends AbstractController
                 $totalaAmount = 0;
                 $inCr = 0;
                 $totalTaxRe = 0;
-                $isShipFee = false;
+
+                if ((int) $arRe[0]['fusrstr8'] != 1) {
+                    $shipFee = '*****';
+                } else {
+                    $shipFee = '￥0';
+                }
 
                 foreach ($arRe as &$item) {
+                    if (empty($item['jan_code'])) {
+                        $shipFee = '￥'.number_format((int) $item['amount']);
+                        continue;
+                    }
+
                     $inCr++;
                     $totalTax = $totalTax + $item['tax'];
                     $totalaAmount = $totalaAmount + $item['amount'];
@@ -1399,20 +1397,6 @@ class MypageController extends AbstractController
                     $item['is_total'] = 0;
                     $item['autoIncr'] = $inCr;
                     $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
-
-                    if (empty($item['jan_code'])) {
-                        $isShipFee = true;
-                    }
-                }
-
-                if ((int) $arRe[0]['fusrstr8'] != 1) {
-                    $shipFee = '*****';
-                } else {
-                    if ($isShipFee) {
-                        $shipFee = '￥'.number_format((int) max(array_values(array_column($arRe, 'amount'))));
-                    } else {
-                        $shipFee = '￥0';
-                    }
                 }
 
                 $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
