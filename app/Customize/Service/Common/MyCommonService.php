@@ -1314,8 +1314,6 @@ SQL;
                             {$condition}
                         AND
                             mst_delivery.delivery_no = ?
-                        AND 
-                            mst_delivery.jan_code <> ''
                             {$addCondition}
                         GROUP by 
                             mst_delivery.delivery_no, mst_delivery.delivery_lineno, mst_delivery.jan_code
