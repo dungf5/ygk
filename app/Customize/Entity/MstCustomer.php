@@ -112,6 +112,13 @@ if (!class_exists('\Customize\Entity\MstCustomer', false)) {
         private $fusrdec1;
 
         /**
+         * @var int
+         *
+         * @ORM\Column(name="fusrstr8", type="integer", nullable=true)
+         */
+        private $fusrstr8;
+
+        /**
          * @return string
          */
         public function getCustomerCode()
@@ -365,6 +372,22 @@ if (!class_exists('\Customize\Entity\MstCustomer', false)) {
         public function setFusrdec1($fusrdec1)
         {
             $this->fusrdec1 = $fusrdec1;
+        }
+
+        /**
+         * @return int
+         */
+        public function getFusrstr8()
+        {
+            return (int) $this->fusrstr8;
+        }
+
+        /**
+         * @param $fusrstr8
+         */
+        public function setFusrstr8($fusrstr8)
+        {
+            $this->fusrstr8 = $fusrstr8;
         }
     }
 }

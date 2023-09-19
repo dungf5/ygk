@@ -152,9 +152,9 @@ class ValidateCsvDataCommand extends Command
         $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
         /* End - Initial data */
 
-        $this->handleValidateWSEOS();
-        sleep(1);
-        $this->sendMailWSEOSValidateError();
+//        $this->handleValidateWSEOS();
+//        sleep(1);
+//        $this->sendMailWSEOSValidateError();
 
         if ($this->check_validate == false) {
             sleep(1);
@@ -573,12 +573,21 @@ class ValidateCsvDataCommand extends Command
         $information['content2'] = 'お問い合わせは弊社営業担当者までご連絡くださいますようお願いいたします。';
 
         $order_success = [];
-        foreach ($this->success as $key => $success) {
-            $information['success_data'] = $success;
+        $fusrstr8 = (int) $this->customer_7001['fusrstr8'];
 
+        foreach ($this->success as $key => $success) {
             try {
+                // Update dt_order.fvehicleno
+                $orderAmount = $success['summary']['order_amount'] ?? 0;
+
+                if (!isset($order_success[$key])) {
+                    dd($fusrstr8);
+                }
+
+                $information['success_data'] = $success;
                 log_info('[WS-EOS] Send Mail Order Success. '.$key);
                 $this->mailService->sendMailOrderSuccessEOS($information);
+
                 $order_success[] = $key;
             } catch (\Exception $e) {
                 log_error($e->getMessage());
@@ -594,30 +603,32 @@ class ValidateCsvDataCommand extends Command
         ];
 
         $break_key = $this->entityManager->getRepository(DtBreakKey::class)->insertOrUpdate($break_key_data);
-        if ($break_key) {
-            for ($i = 1; $i <= $break_key; $i++) {
-                if ($i > ($break_key - count($this->success)) && isset($order_success[$i - ($break_key - count($this->success)) - 1])) {
-                    $order_no = $order_success[$i - ($break_key - count($this->success)) - 1];
 
-                    $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findBy([
-                        'order_no' => $order_no,
-                    ]);
-
-                    $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
-                    $sum_order_amout = $common->getSumOrderAmout($order_no);
-                    $fvehicleno_start = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
-
-                    foreach ($dtOrder as $order) {
-                        // Change by task #1792
-                        //$fvehicleno_end = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
-                        $fvehicleno_end = '001';
-
-                        $order->setFvehicleno($fvehicleno_start.$fvehicleno_end);
-                        $this->entityManager->getRepository(DtOrder::class)->save($order);
-                    }
-                }
-            }
-        }
+        // Change qui tắc tính fvehicleno theo task #2406. Nên comment lại không dùng nữa.
+//        if ($break_key) {
+//            for ($i = 1; $i <= $break_key; $i++) {
+//                if ($i > ($break_key - count($this->success)) && isset($order_success[$i - ($break_key - count($this->success)) - 1])) {
+//                    $order_no = $order_success[$i - ($break_key - count($this->success)) - 1];
+//
+//                    $dtOrder = $this->entityManager->getRepository(DtOrder::class)->findBy([
+//                        'order_no' => $order_no,
+//                    ]);
+//
+//                    $customer_fusrdec1 = $this->customer_7001['fusrdec1'] ?? 0;
+//                    $sum_order_amout = $common->getSumOrderAmout($order_no);
+//                    $fvehicleno_start = (int) $sum_order_amout > (int) $customer_fusrdec1 ? '0' : '1';
+//
+//                    foreach ($dtOrder as $order) {
+//                        // Change by task #1792
+//                        //$fvehicleno_end = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+//                        $fvehicleno_end = '001';
+//
+//                        $order->setFvehicleno($fvehicleno_start.$fvehicleno_end);
+//                        $this->entityManager->getRepository(DtOrder::class)->save($order);
+//                    }
+//                }
+//            }
+//        }
 
         return;
     }
