@@ -3128,7 +3128,8 @@ SQL;
     public function getShippingNatExportData()
     {
         $sql = '
-                SELECT *
+                SELECT *,
+                	(SELECT DISTINCT IFNULL(mst_product.quantity, 1) FROM mst_product WHERE product_code = done.product_code) as quantity
                 FROM
                     mst_shipping_nat_eos msne
                 JOIN
