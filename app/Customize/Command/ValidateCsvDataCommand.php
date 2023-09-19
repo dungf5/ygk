@@ -580,7 +580,6 @@ class ValidateCsvDataCommand extends Command
             try {
                 // Update dt_order.fvehicleno by task #2406
                 if (!isset($order_success[$key])) {
-                    var_dump('vo');
                     $subTotal = $this->commonService->getSumAmountDtOrder($key);
                     $subTotal = $subTotal['amount'] ?? 0;
                     $fvehicleno = ($fusrstr8 == 1 && $subTotal <= $fusrdec1) ? '1000' : '0000';
