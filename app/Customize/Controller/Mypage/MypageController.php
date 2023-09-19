@@ -230,19 +230,22 @@ class MypageController extends AbstractController
         $inCr = 0;
         $totalTaxRe = 0;
 
-        if ((int) $arRe[0]['fusrstr8'] != 1) {
+        $fusrstr8 = (int) (isset($arRe[0]['fusrstr8']) ? $arRe[0]['fusrstr8'] : 0);
+        $delivery_no = isset($arRe[0]['delivery_no']) ? $arRe[0]['delivery_no'] : '';
+
+        if ($fusrstr8 != 1) {
             $shipFee = '*****';
+
+        } elseif (!empty($delivery_no)) {
+            $obj_delivery = $comS->getDeliveryShipFee($delivery_no);
+            $shipFee = $obj_delivery['amount'] ?? 0;
+            $shipFee = '￥'.number_format((int) $shipFee);
+
         } else {
             $shipFee = '￥0';
         }
 
         foreach ($arRe as $key => &$item) {
-            if (empty(trim($item['jan_code']))) {
-                $shipFee = '￥'.number_format((int) $item['amount']);
-                unset($arRe[$key]);
-                continue;
-            }
-
             $inCr++;
             $totalTax = $totalTax + $item['tax'];
             $totalaAmount = $totalaAmount + $item['amount'];
@@ -1988,19 +1991,22 @@ class MypageController extends AbstractController
                 $inCr = 0;
                 $totalTaxRe = 0;
 
-                if ((int) $arRe[0]['fusrstr8'] != 1) {
+                $fusrstr8 = (int) (isset($arRe[0]['fusrstr8']) ? $arRe[0]['fusrstr8'] : 0);
+                $delivery_no = isset($arRe[0]['delivery_no']) ? $arRe[0]['delivery_no'] : '';
+
+                if ($fusrstr8 != 1) {
                     $shipFee = '*****';
+
+                } elseif (!empty($delivery_no)) {
+                    $obj_delivery = $comS->getDeliveryShipFee($delivery_no);
+                    $shipFee = $obj_delivery['amount'] ?? 0;
+                    $shipFee = '￥'.number_format((int) $shipFee);
+
                 } else {
                     $shipFee = '￥0';
                 }
 
                 foreach ($arRe as $key => &$item) {
-                    if (empty(trim($item['jan_code']))) {
-                        $shipFee = '￥'.number_format((int) $item['amount']);
-                        unset($arRe[$key]);
-                        continue;
-                    }
-
                     $inCr++;
                     $totalTax = $totalTax + $item['tax'];
                     $totalaAmount = $totalaAmount + $item['amount'];
@@ -2129,19 +2135,22 @@ class MypageController extends AbstractController
                 $inCr = 0;
                 $totalTaxRe = 0;
 
-                if ((int) $arRe[0]['fusrstr8'] != 1) {
+                $fusrstr8 = (int) (isset($arRe[0]['fusrstr8']) ? $arRe[0]['fusrstr8'] : 0);
+                $delivery_no = isset($arRe[0]['delivery_no']) ? $arRe[0]['delivery_no'] : '';
+
+                if ($fusrstr8 != 1) {
                     $shipFee = '*****';
+
+                } elseif (!empty($delivery_no)) {
+                    $obj_delivery = $comS->getDeliveryShipFee($delivery_no);
+                    $shipFee = $obj_delivery['amount'] ?? 0;
+                    $shipFee = '￥'.number_format((int) $shipFee);
+
                 } else {
                     $shipFee = '￥0';
                 }
 
                 foreach ($arRe as $key => &$item) {
-                    if (empty(trim($item['jan_code']))) {
-                        $shipFee = '￥'.number_format((int) $item['amount']);
-                        unset($arRe[$key]);
-                        continue;
-                    }
-
                     $inCr++;
                     $totalTax = $totalTax + $item['tax'];
                     $totalaAmount = $totalaAmount + $item['amount'];
@@ -2257,19 +2266,22 @@ class MypageController extends AbstractController
                 $inCr = 0;
                 $totalTaxRe = 0;
 
-                if ((int) $arRe[0]['fusrstr8'] != 1) {
+                $fusrstr8 = (int) (isset($arRe[0]['fusrstr8']) ? $arRe[0]['fusrstr8'] : 0);
+                $delivery_no = isset($arRe[0]['delivery_no']) ? $arRe[0]['delivery_no'] : '';
+
+                if ($fusrstr8 != 1) {
                     $shipFee = '*****';
+
+                } elseif (!empty($delivery_no)) {
+                    $obj_delivery = $comS->getDeliveryShipFee($delivery_no);
+                    $shipFee = $obj_delivery['amount'] ?? 0;
+                    $shipFee = '￥'.number_format((int) $shipFee);
+
                 } else {
                     $shipFee = '￥0';
                 }
 
                 foreach ($arRe as $key => &$item) {
-                    if (empty(trim($item['jan_code']))) {
-                        $shipFee = '￥'.number_format((int) $item['amount']);
-                        unset($arRe[$key]);
-                        continue;
-                    }
-
                     $inCr++;
                     $totalTax = $totalTax + $item['tax'];
                     $totalaAmount = $totalaAmount + $item['amount'];

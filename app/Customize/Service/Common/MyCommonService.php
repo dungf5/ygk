@@ -1314,6 +1314,8 @@ SQL;
                             {$condition}
                         AND
                             mst_delivery.delivery_no = ?
+                        AND 
+                            mst_delivery.jan_code <> ''
                             {$addCondition}
                         GROUP by 
                             mst_delivery.delivery_no, mst_delivery.delivery_lineno, mst_delivery.jan_code
@@ -3353,6 +3355,34 @@ SQL;
             $params = [$data['cus_order_no'], $data['cus_order_lineno'], date('Y-m-d', strtotime($data['shipping_date'] ?? ''))];
             $statement = $this->entityManager->getConnection()->prepare($sql);
             $result = $statement->executeQuery($params);
+            $row = $result->fetchAllAssociative();
+
+            return $row[0] ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getDeliveryShipFee($delivery_no)
+    {
+        $sql = "
+                SELECT 
+                    * 
+                FROM 
+                    mst_delivery 
+                WHERE 
+                    delivery_no = ?
+                AND 
+                    (   jan_code = '' 
+                    OR 
+                        jan_code IS NULL
+                    )
+                LIMIT 1;
+        ";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$delivery_no]);
             $row = $result->fetchAllAssociative();
 
             return $row[0] ?? [];
