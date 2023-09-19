@@ -225,10 +225,63 @@ class GlobalService
         return 0;
     }
 
+    public function getProductType()
+    {
+        // 1. 通常品 (normal product)
+        // 2. 特注品 (special product)
+
+        if ($this->getSpecialOrderFlg() != 1) {
+            $_SESSION['s_product_type'] = 1;
+        }
+
+        return $_SESSION['s_product_type'] ?? 1;
+    }
+
+    public function getCartProductType()
+    {
+        // 1. 通常品 (normal product)
+        // 2. 特注品 (special product)
+
+        return $_SESSION['cart_product_type'] ?? '';
+    }
+
+    public function getCustomerOrderNo()
+    {
+        return $_SESSION['customer_order_no'] ?? '';
+    }
+
+    public function getRemarks1()
+    {
+        return $_SESSION['remarks1'] ?? '';
+    }
+
+    public function getRemarks2()
+    {
+        return $_SESSION['remarks2'] ?? '';
+    }
+
+    public function getRemarks3()
+    {
+        return $_SESSION['remarks3'] ?? '';
+    }
+
+    public function getRemarks4()
+    {
+        return $_SESSION['remarks4'] ?? '';
+    }
+
+    public function getDeliveryDate()
+    {
+        return $_SESSION['delivery_date'] ?? '';
+    }
+
     public function getFusrdec1()
     {
-        if ($this->customerId() != '') {
-            $fusrdec1 = $this->myCommon->getMstCustomer($this->customerId())['fusrdec1'];
+        $relationCus = $this->myCommon->getCustomerRelationFromUser($this->customerCode(), $this->getLoginType(), $this->getLoginCode());
+
+        if ($relationCus) {
+            $customerCode = $relationCus['customer_code'];
+            $fusrdec1 = $this->myCommon->getMstCustomer2($customerCode)['fusrdec1'];
 
             return (int) $fusrdec1;
         }
@@ -238,8 +291,11 @@ class GlobalService
 
     public function getFusrstr8()
     {
-        if ($this->customerId() != '') {
-            $fusrstr8 = $this->myCommon->getMstCustomer($this->customerId())['fusrstr8'];
+        $relationCus = $this->myCommon->getCustomerRelationFromUser($this->customerCode(), $this->getLoginType(), $this->getLoginCode());
+
+        if ($relationCus) {
+            $customerCode = $relationCus['customer_code'];
+            $fusrstr8 = $this->myCommon->getMstCustomer2($customerCode)['fusrstr8'];
 
             return (int) $fusrstr8;
         }
