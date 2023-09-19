@@ -152,9 +152,9 @@ class ValidateCsvDataCommand extends Command
         $this->rate = $this->commonService->getTaxInfo()['tax_rate'] ?? 0;
         /* End - Initial data */
 
-//        $this->handleValidateWSEOS();
-//        sleep(1);
-//        $this->sendMailWSEOSValidateError();
+        $this->handleValidateWSEOS();
+        sleep(1);
+        $this->sendMailWSEOSValidateError();
 
         if ($this->check_validate == false) {
             sleep(1);
@@ -573,15 +573,18 @@ class ValidateCsvDataCommand extends Command
         $information['content2'] = 'お問い合わせは弊社営業担当者までご連絡くださいますようお願いいたします。';
 
         $order_success = [];
-        $fusrstr8 = (int) $this->customer_7001['fusrstr8'];
+        $fusrdec1 = (int) (isset($this->customer_7001['fusrdec1']) ? $this->customer_7001['fusrdec1'] : 0);
+        $fusrstr8 = (int) (isset($this->customer_7001['fusrstr8']) ? $this->customer_7001['fusrstr8'] : 0);
 
         foreach ($this->success as $key => $success) {
             try {
-                // Update dt_order.fvehicleno
-                $orderAmount = $success['summary']['order_amount'] ?? 0;
-
+                // Update dt_order.fvehicleno by task #2406
                 if (!isset($order_success[$key])) {
-                    dd($fusrstr8);
+                    var_dump('vo');
+                    $subTotal = $this->commonService->getSumAmountDtOrder($key);
+                    $subTotal = $subTotal['amount'] ?? 0;
+                    $fvehicleno = ($fusrstr8 == 1 && $subTotal <= $fusrdec1) ? '1000' : '0000';
+                    $this->commonService->updateDtOrder(['order_no' => $key], ['fvehicleno' => $fvehicleno]);
                 }
 
                 $information['success_data'] = $success;

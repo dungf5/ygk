@@ -3200,4 +3200,63 @@ SQL;
             return [];
         }
     }
+
+    public function getSumAmountDtOrder($order_no)
+    {
+        $sql = '
+                SELECT 
+                    SUM(demand_quantity * order_price) AS amount
+                FROM
+                    dt_order
+                WHERE
+                    order_no = ?
+                GROUP BY
+                    order_no;
+        ';
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$order_no]);
+            $row = $result->fetchAllAssociative();
+
+            return $row[0] ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function updateDtOrder($condition = [], $data = [])
+    {
+        $params = [];
+
+        $set = '';
+        foreach ($data as $key => $value) {
+            $set .= " {$key} = ?, ";
+            $params[] = $value;
+        }
+        $set = trim($set, ', ');
+
+        $where = '';
+        foreach ($condition as $key => $value) {
+            $where .= " {$key} = ? AND ";
+            $params[] = $value;
+        }
+        $where = trim($where, 'AND ');
+
+        $sql = "
+                UPDATE
+                    dt_order
+                SET
+                    {$set}
+                Where
+                    {$where}
+        ";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            return $statement->executeQuery($params);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
 }
