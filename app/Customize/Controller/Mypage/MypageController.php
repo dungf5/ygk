@@ -2365,6 +2365,12 @@ class MypageController extends AbstractController
                 continue;
             }
 
+            $deliveryhipfee = $comS->getDeliveryShipFee($item_delivery_no);
+            $deliveryhipfee['quantity'] = $deliveryhipfee['quanlity'] ?? 0;
+            $deliveryhipfee['unit_price'] = $deliveryhipfee['unit_price'] ?? 0;
+            $deliveryhipfee['PC'] = 'unit';
+
+            $arRe[] = $deliveryhipfee;
             $arr_data[] = $arRe;
         }
 
