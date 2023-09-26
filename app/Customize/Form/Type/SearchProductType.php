@@ -90,7 +90,7 @@ class SearchProductType extends AbstractType
         ]);
         $builder->add('pageno', HiddenType::class, []);
         $builder->add('disp_number', ProductListMaxType::class, [
-            'label' => false,
+            'label' => false, 'choice_value' => 'sort_no',
         ]);
         $builder->add('orderby', ProductListOrderByType::class, [
             'label' => false, 'choice_value' => 'sort_no',
