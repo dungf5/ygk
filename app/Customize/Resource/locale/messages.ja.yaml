@@ -124,6 +124,8 @@ front.forgot.reset_not_found: |
   弊社営業担当者にお問い合わせください。
 front.forgot.error_message__title: メールアドレスが登録されていません。
 front.forgot.error_message__body: 弊社営業担当者にお問い合わせください。
+admin.setting.shop.shop.option_open_weekend: 土日設定
+tooltip.setting.shop.shop.option_open_weekend: 土日設定
 
 
 

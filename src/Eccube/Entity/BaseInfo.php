@@ -279,6 +279,13 @@ if (!class_exists('\Eccube\Entity\BaseInfo')) {
         private $Pref;
 
         /**
+         * @var boolean
+         *
+         * @ORM\Column(name="option_open_weekend", type="boolean", options={"default":true})
+         */
+        private $option_open_weekend = true;
+
+        /**
          * Get id.
          *
          * @return int
@@ -1078,6 +1085,30 @@ if (!class_exists('\Eccube\Entity\BaseInfo')) {
             $this->php_path = $php_path;
 
             return $this;
+        }
+
+        /**
+         * Set optionOpenWeekend.
+         *
+         * @param boolean $optionOpenWeekend
+         *
+         * @return BaseInfo
+         */
+        public function setOptionOpenWeekend($optionOpenWeekend)
+        {
+            $this->option_open_weekend = $optionOpenWeekend;
+
+            return $this;
+        }
+
+        /**
+         * Get optionOpenWeekend.
+         *
+         * @return boolean
+         */
+        public function isOptionOpenWeekend()
+        {
+            return $this->option_open_weekend;
         }
     }
 }

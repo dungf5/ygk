@@ -201,6 +201,8 @@ class ShopMasterType extends AbstractType
                     ]),
                 ],
             ])
+            // Option Open Shop Weekend
+            ->add('option_open_weekend', ToggleSwitchType::class)
         ;
 
         $builder->add(

@@ -15,6 +15,8 @@ namespace Customize\Service;
 
 use Customize\Service\Common\MyCommonService;
 use Doctrine\ORM\EntityManagerInterface;
+use Eccube\Entity\BaseInfo;
+use Eccube\Repository\BaseInfoRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -39,6 +41,11 @@ class GlobalService
     protected $myCommon;
 
     /**
+     * @var BaseInfo
+     */
+    protected $BaseInfo;
+
+    /**
      * EccubeExtension constructor.
      *
      * @param EntityManagerInterface $entityManager
@@ -46,11 +53,13 @@ class GlobalService
     public function __construct(
         EntityManagerInterface $entityManager,
         ?ContainerInterface $container,
-        MyCommonService $myCommon
+        MyCommonService $myCommon,
+        BaseInfoRepository $baseInfoRepository
     ) {
         $this->entityManager = $entityManager;
         $this->container = $container;
         $this->myCommon = new $myCommon($entityManager);
+        $this->BaseInfo = $baseInfoRepository->get();
     }
 
     public function customerId()
@@ -301,5 +310,14 @@ class GlobalService
         }
 
         return 0;
+    }
+
+    public function getIsOpenShop()
+    {
+        if (in_array(date('w'), [0, 6, 2]) && $this->BaseInfo->isOptionOpenWeekend() == false) {
+            return false;
+        }
+
+        return true;
     }
 }
