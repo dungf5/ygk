@@ -314,7 +314,9 @@ class GlobalService
 
     public function getIsOpenShop()
     {
-        if (in_array(date('w'), [0, 6, 2]) && $this->BaseInfo->isOptionOpenWeekend() == false) {
+        // 0: sunday
+        // 6: saturday
+        if (in_array(date('w'), [0, 6, 4]) && $this->BaseInfo->isOptionOpenWeekend() == false) {
             return false;
         }
 
