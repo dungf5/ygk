@@ -1715,8 +1715,12 @@ class MypageController extends AbstractController
             $cond = $shipping_num > $returned_num ? $shipping_num - $returned_num : $shipping_num;
             $returns_num = $returns_num > $cond ? $product_returns_info->getReturnsNum() : $returns_num;
 
-            $generator = new \Picqer\Barcode\BarcodeGeneratorJPG();
-            $barcode = base64_encode($generator->getBarcode($returns_no, $generator::TYPE_CODE_39));
+            try {
+                $generator = new \Picqer\Barcode\BarcodeGeneratorJPG();
+                $barcode = base64_encode($generator->getBarcode($returns_no, $generator::TYPE_CODE_39));
+            } catch (\Exception $e) {
+                $barcode = '';
+            }
 
             if ('POST' === $request->getMethod()) {
                 $data = [
