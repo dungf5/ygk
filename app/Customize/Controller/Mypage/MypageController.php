@@ -1227,6 +1227,16 @@ class MypageController extends AbstractController
                 'total_returns_num' => $request->get('total_returns_num', ''),
             ];
 
+            // Set Aprove auto. returns_status_flag = 1
+            if (
+                in_array(trim($param['return_reason']), ['02', '04']) &&
+                date('Ymd') - date('Ymd', strtotime($param['shipping_day'])) < 30
+            ) {
+                $param['returns_status_flag'] = 1;
+            } else {
+                $param['returns_status_flag'] = 0;
+            }
+
             $returns_reson = $commonService->getReturnsReson();
             $shippings = $commonService->getMstShippingCustomer($login_type, $customer_id);
             $otodokes = [];
@@ -1359,7 +1369,7 @@ class MypageController extends AbstractController
                         'cus_image_url_path4' => @$cus_image_url_path[3] ?? '',
                         'cus_image_url_path5' => @$cus_image_url_path[4] ?? '',
                         'cus_image_url_path6' => @$cus_image_url_path[5] ?? '',
-                        'returns_status_flag' => 0,
+                        'returns_status_flag' => $param['returns_status_flag'],
                         'returns_request_date' => date('Y-m-d H:i:s'),
                     ]);
 
@@ -1381,14 +1391,23 @@ class MypageController extends AbstractController
                 $url_preview = $this->generateUrl('mypage_return_preview', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
                 $this->mailService->sendMailReturnProductPreview($email, $url_preview);
 
-                $email2 = getenv('EMAIL_RETURN_CC') ?? '';
-                $url_approve = $this->generateUrl('mypage_return_approve', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
-                $this->mailService->sendMailReturnProductApprove($email2, $url_approve);
+                if (!$param['returns_status_flag']) {
+                    // Send mail Aprove step 1
+                    $email2 = getenv('EMAIL_RETURN_CC') ?? '';
+                    $url_approve = $this->generateUrl('mypage_return_approve', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $this->mailService->sendMailReturnProductApprove($email2, $url_approve);
+                } else {
+                    // Auto Aprove Step 1, send mail aprove step 2
+                    $email2 = getenv('EMAIL_RETURN_CC') ?? '';
+                    $url_approve_finish = $this->generateUrl('mypage_return_approve_finish', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $url_receipt = $this->generateUrl('mypage_return_receipt', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $this->mailService->sendMailReturnProductApproveYes($email2, $url_approve_finish, $url_receipt);
+                }
 
                 return $this->redirectToRoute('mypage_return_save_complete');
             }
         } catch (\Exception $e) {
-            log_error('MypageController.php returnCreate(): '.$e->getMessage());
+            log_error('MypageController.php returnSave(): '.$e->getMessage());
 
             return $this->redirectToRoute('mypage_return');
         }

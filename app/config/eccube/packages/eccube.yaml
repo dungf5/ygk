@@ -138,3 +138,4 @@ parameters:
     eccube_2fa_enabled: '%env(ECCUBE_2FA_ENABLED)%'
     eccube_2fa_cookie_name: '%env(ECCUBE_2FA_COOKIE_NAME)%'
     eccube_2fa_expire: '%env(ECCUBE_2FA_EXPIRE)%'
+    eccube_return_image_dir: '%kernel.project_dir%/html/upload/return_image'
