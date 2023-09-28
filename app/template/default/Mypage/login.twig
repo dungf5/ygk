@@ -193,10 +193,14 @@ file that was distributed with this source code.
         $(".ec-layoutRole .ec-layoutRole__header .headerMenu .search").hide();
         $(".ec-layoutRole .ec-layoutRole__header .headerMenu .menu").hide();
         $(".ec-layoutRole .ec-layoutRole__contents .ec-layoutRole__left").hide();
-        swal("お知らせ", "メンテナンス中のため、ログインができません。", "");
-        setTimeout(function() {
+
+        swal({ title: "お知らせ",
+            text: "メンテナンス中のため、ログインができません。",
+            type: ""
+        })
+            .then(() => {
             window.location.href    = "{{ url('logout') }}";
-        }, 2000);
+        });
     }
 </script>
 
