@@ -190,11 +190,10 @@ file that was distributed with this source code.
 
     let shop_close = "{{ shopClose ?? false }}";
     if (shop_close) {
-        loadingOverlay();
         $(".ec-layoutRole .ec-layoutRole__header .headerMenu .search").hide();
         $(".ec-layoutRole .ec-layoutRole__header .headerMenu .menu").hide();
         $(".ec-layoutRole .ec-layoutRole__contents .ec-layoutRole__left").hide();
-        swal("エラー", "メンテナンスのため、ログインできない。", "error");
+        swal("お知らせ", "メンテナンス中のため、ログインができません。", "");
         setTimeout(function() {
             window.location.href    = "{{ url('logout') }}";
         }, 2000);
