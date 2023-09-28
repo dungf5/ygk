@@ -1134,7 +1134,9 @@ if (!class_exists('\Eccube\Entity\BaseInfo')) {
         {
             $arr_option_oprn_shop = $this->getOptionOpenShop();
             $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
-            $this->setOptionOpenMonday((bool) $arr_option_oprn_shop['monday'] ?? $this->option_open_monday);
+            if (isset($arr_option_oprn_shop['monday'])) {
+                $this->setOptionOpenMonday((bool) $arr_option_oprn_shop['monday']);
+            }
 
             return $this->option_open_monday;
         }
@@ -1162,7 +1164,9 @@ if (!class_exists('\Eccube\Entity\BaseInfo')) {
         {
             $arr_option_oprn_shop = $this->getOptionOpenShop();
             $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
-            $this->setOptionOpenTuesday((bool) $arr_option_oprn_shop['tuesday'] ?? $this->option_open_tuesday);
+            if (isset($arr_option_oprn_shop['tuesday'])) {
+                $this->setOptionOpenMonday((bool) $arr_option_oprn_shop['tuesday']);
+            }
 
             return $this->option_open_tuesday;
         }
@@ -1190,7 +1194,9 @@ if (!class_exists('\Eccube\Entity\BaseInfo')) {
         {
             $arr_option_oprn_shop = $this->getOptionOpenShop();
             $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
-            $this->setOptionOpenWednesday((bool) $arr_option_oprn_shop['wednesday'] ?? $this->option_open_wednesday);
+            if (isset($arr_option_oprn_shop['wednesday'])) {
+                $this->setOptionOpenMonday((bool) $arr_option_oprn_shop['wednesday']);
+            }
 
             return $this->option_open_wednesday;
         }
@@ -1218,7 +1224,9 @@ if (!class_exists('\Eccube\Entity\BaseInfo')) {
         {
             $arr_option_oprn_shop = $this->getOptionOpenShop();
             $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
-            $this->setOptionOpenThursday((bool) $arr_option_oprn_shop['thursday'] ?? $this->option_open_thursday);
+            if (isset($arr_option_oprn_shop['thursday'])) {
+                $this->setOptionOpenMonday((bool) $arr_option_oprn_shop['thursday']);
+            }
 
             return $this->option_open_thursday;
         }
@@ -1246,7 +1254,9 @@ if (!class_exists('\Eccube\Entity\BaseInfo')) {
         {
             $arr_option_oprn_shop = $this->getOptionOpenShop();
             $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
-            $this->setOptionOpenFriday((bool) $arr_option_oprn_shop['friday'] ?? $this->option_open_friday);
+            if (isset($arr_option_oprn_shop['friday'])) {
+                $this->setOptionOpenMonday((bool) $arr_option_oprn_shop['friday']);
+            }
 
             return $this->option_open_friday;
         }
@@ -1274,7 +1284,9 @@ if (!class_exists('\Eccube\Entity\BaseInfo')) {
         {
             $arr_option_oprn_shop = $this->getOptionOpenShop();
             $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
-            $this->setOptionOpenSaturday((bool) $arr_option_oprn_shop['saturday'] ?? $this->option_open_saturday);
+            if (isset($arr_option_oprn_shop['saturday'])) {
+                $this->setOptionOpenMonday((bool) $arr_option_oprn_shop['saturday']);
+            }
 
             return $this->option_open_saturday;
         }
@@ -1302,7 +1314,9 @@ if (!class_exists('\Eccube\Entity\BaseInfo')) {
         {
             $arr_option_oprn_shop = $this->getOptionOpenShop();
             $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
-            $this->setOptionOpenSunday((bool) $arr_option_oprn_shop['sunday'] ?? $this->option_open_sunday);
+            if (isset($arr_option_oprn_shop['sunday'])) {
+                $this->setOptionOpenMonday((bool) $arr_option_oprn_shop['sunday']);
+            }
 
             return $this->option_open_sunday;
         }
