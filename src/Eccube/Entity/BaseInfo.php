@@ -279,11 +279,19 @@ if (!class_exists('\Eccube\Entity\BaseInfo')) {
         private $Pref;
 
         /**
-         * @var boolean
+         * @var string
          *
-         * @ORM\Column(name="option_open_weekend", type="boolean", options={"default":true})
+         * @ORM\Column(name="option_open_shop", type="string", length=255, nullable=true)
          */
-        private $option_open_weekend = true;
+        private $option_open_shop;
+
+        private $option_open_monday = true;
+        private $option_open_tuesday = true;
+        private $option_open_wednesday = true;
+        private $option_open_thursday = true;
+        private $option_open_friday = true;
+        private $option_open_saturday = true;
+        private $option_open_sunday = true;
 
         /**
          * Get id.
@@ -1088,27 +1096,215 @@ if (!class_exists('\Eccube\Entity\BaseInfo')) {
         }
 
         /**
-         * Set optionOpenWeekend.
+         * @return string|null
+         */
+        public function getOptionOpenShop()
+        {
+            return $this->option_open_shop;
+        }
+
+        /**
+         * @param $option_open_shop
+         */
+        public function setOptionOpenShop($option_open_shop)
+        {
+            $this->option_open_shop = $option_open_shop;
+        }
+
+        /**
+         * Set option_open_monday.
          *
-         * @param boolean $optionOpenWeekend
+         * @param boolean $option_open_monday
          *
          * @return BaseInfo
          */
-        public function setOptionOpenWeekend($optionOpenWeekend)
+        public function setOptionOpenMonday($option_open_monday)
         {
-            $this->option_open_weekend = $optionOpenWeekend;
+            $this->option_open_monday = $option_open_monday;
 
             return $this;
         }
 
         /**
-         * Get optionOpenWeekend.
+         * Get option_open_monday.
          *
          * @return boolean
          */
-        public function isOptionOpenWeekend()
+        public function getOptionOpenMonday()
         {
-            return $this->option_open_weekend;
+            $arr_option_oprn_shop = $this->getOptionOpenShop();
+            $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
+            $this->setOptionOpenMonday((bool) $arr_option_oprn_shop['monday']);
+
+            return $this->option_open_monday;
+        }
+
+        /**
+         * Set option_open_tuesday.
+         *
+         * @param boolean $option_open_tuesday
+         *
+         * @return BaseInfo
+         */
+        public function setOptionOpenTuesday($option_open_tuesday)
+        {
+            $this->option_open_tuesday = $option_open_tuesday;
+
+            return $this;
+        }
+
+        /**
+         * Get option_open_tuesday.
+         *
+         * @return boolean
+         */
+        public function getOptionOpenTuesday()
+        {
+            $arr_option_oprn_shop = $this->getOptionOpenShop();
+            $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
+            $this->setOptionOpenTuesday((bool) $arr_option_oprn_shop['tuesday']);
+
+            return $this->option_open_tuesday;
+        }
+
+        /**
+         * Set option_open_wednesday.
+         *
+         * @param boolean $option_open_wednesday
+         *
+         * @return BaseInfo
+         */
+        public function setOptionOpenWednesday($option_open_wednesday)
+        {
+            $this->option_open_wednesday = $option_open_wednesday;
+
+            return $this;
+        }
+
+        /**
+         * Get option_open_wednesday.
+         *
+         * @return boolean
+         */
+        public function getOptionOpenWednesday()
+        {
+            $arr_option_oprn_shop = $this->getOptionOpenShop();
+            $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
+            $this->setOptionOpenWednesday((bool) $arr_option_oprn_shop['wednesday']);
+
+            return $this->option_open_wednesday;
+        }
+
+        /**
+         * Set option_open_thursday.
+         *
+         * @param boolean $option_open_thursday
+         *
+         * @return BaseInfo
+         */
+        public function setOptionOpenThursday($option_open_thursday)
+        {
+            $this->option_open_thursday = $option_open_thursday;
+
+            return $this;
+        }
+
+        /**
+         * Get option_open_thursday.
+         *
+         * @return boolean
+         */
+        public function getOptionOpenThursday()
+        {
+            $arr_option_oprn_shop = $this->getOptionOpenShop();
+            $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
+            $this->setOptionOpenThursday((bool) $arr_option_oprn_shop['thursday']);
+
+            return $this->option_open_thursday;
+        }
+
+        /**
+         * Set option_open_friday.
+         *
+         * @param boolean $option_open_friday
+         *
+         * @return BaseInfo
+         */
+        public function setOptionOpenFriday($option_open_friday)
+        {
+            $this->option_open_friday = $option_open_friday;
+
+            return $this;
+        }
+
+        /**
+         * Get option_open_friday.
+         *
+         * @return boolean
+         */
+        public function getOptionOpenFriday()
+        {
+            $arr_option_oprn_shop = $this->getOptionOpenShop();
+            $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
+            $this->setOptionOpenFriday((bool) $arr_option_oprn_shop['friday']);
+
+            return $this->option_open_friday;
+        }
+
+        /**
+         * Set option_open_saturday.
+         *
+         * @param boolean $option_open_saturday
+         *
+         * @return BaseInfo
+         */
+        public function setOptionOpenSaturday($option_open_saturday)
+        {
+            $this->option_open_saturday = $option_open_saturday;
+
+            return $this;
+        }
+
+        /**
+         * Get option_open_saturday.
+         *
+         * @return boolean
+         */
+        public function getOptionOpenSaturday()
+        {
+            $arr_option_oprn_shop = $this->getOptionOpenShop();
+            $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
+            $this->setOptionOpenSaturday((bool) $arr_option_oprn_shop['saturday']);
+
+            return $this->option_open_saturday;
+        }
+
+        /**
+         * Set option_open_sunday.
+         *
+         * @param boolean $option_open_sunday
+         *
+         * @return BaseInfo
+         */
+        public function setOptionOpenSunday($option_open_sunday)
+        {
+            $this->option_open_sunday = $option_open_sunday;
+
+            return $this;
+        }
+
+        /**
+         * Get option_open_sunday.
+         *
+         * @return boolean
+         */
+        public function getOptionOpenSunday()
+        {
+            $arr_option_oprn_shop = $this->getOptionOpenShop();
+            $arr_option_oprn_shop = json_decode($arr_option_oprn_shop, true);
+            $this->setOptionOpenSunday((bool) $arr_option_oprn_shop['sunday']);
+
+            return $this->option_open_sunday;
         }
     }
 }
