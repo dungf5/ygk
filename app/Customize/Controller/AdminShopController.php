@@ -80,7 +80,6 @@ class AdminShopController extends AbstractController
         $form = $builder->getForm();
         $form->handleRequest($request);
 
-
         if ($form->isSubmitted() && $form->isValid()) {
             //Option Open Shop
             $option_open_shop = [
@@ -135,6 +134,15 @@ class AdminShopController extends AbstractController
             $cacheUtil->clearDoctrineCache();
 
             $this->addSuccess('admin.common.save_complete', 'admin');
+
+            $sessionPath = env('SESSION_PATH', '');
+            if (!empty($sessionPath)) {
+                try {
+                    array_map('unlink', array_filter((array) glob($sessionPath.'/*')));
+                } catch (\Exception $e) {
+                    log_error($e->getMessage());
+                }
+            }
 
             return $this->redirectToRoute('admin_setting_shop');
         }
