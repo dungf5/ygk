@@ -135,10 +135,13 @@ class AdminShopController extends AbstractController
 
             $this->addSuccess('admin.common.save_complete', 'admin');
 
-            $sessionPath = env('SESSION_PATH', '');
-            if (!empty($sessionPath)) {
+            $kernel = $this->get('kernel');
+            $container = $kernel->getContainer();
+            $sessionSavePath = $container->getParameter('session.save_path');
+
+            if (!empty($sessionSavePath)) {
                 try {
-                    array_map('unlink', array_filter((array) glob($sessionPath.'/*')));
+                    array_map('unlink', array_filter((array) glob($sessionSavePath.'/*')));
                 } catch (\Exception $e) {
                     log_error($e->getMessage());
                 }
