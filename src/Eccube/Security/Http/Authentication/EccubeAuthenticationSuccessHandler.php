@@ -13,15 +13,29 @@
 
 namespace Eccube\Security\Http\Authentication;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Eccube\Entity\BaseInfo;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
+use Symfony\Component\Security\Http\HttpUtils;
 
 class EccubeAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler
 {
+    /**
+     * @var EntityManagerInterface
+     */
+    protected $entityManager;
+
+    public function __construct(HttpUtils $httpUtils, EntityManagerInterface $entityManager)
+    {
+        parent::__construct($httpUtils);
+        $this->entityManager = $entityManager;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -42,11 +56,21 @@ class EccubeAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHan
             try {
                 $loginType = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
 
-                // Check option open weekend
-                if (!empty($loginType) && $loginType != 'supper_user' && !$this->globalService->getIsOpenShop()) {
-                    $_SESSION['shop_close'] = true;
+                // Check option open shop
+                if (!empty($loginType) && $loginType != 'supper_user') {
+                    $base_info = $this->entityManager->getRepository(BaseInfo::class)->find(1);
 
-                    return new RedirectResponse('/mypage/login');
+                    if (isset($base_info)) {
+                        $arr_open_shop = $base_info->getOptionOpenShop();
+                        $arr_open_shop = json_decode($arr_open_shop, true);
+                        $current_day = date('l');
+
+                        if (isset($arr_open_shop[strtolower($current_day)]) && (int) $arr_open_shop[strtolower($current_day)] == 0) {
+                            $_SESSION['shop_close'] = true;
+
+                            return new RedirectResponse('/mypage/login');
+                        }
+                    }
                 }
 
                 if (!empty($loginType) && $loginType == 'supper_user') {
