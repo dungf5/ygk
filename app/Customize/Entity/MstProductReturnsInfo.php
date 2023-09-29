@@ -968,5 +968,51 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         {
             $this->xbj_reviews_flag = $xbj_reviews_flag;
         }
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="cus_order_no", type="string")
+         */
+        private $cus_order_no;
+
+        /**
+         * @return string
+         */
+        public function getCusOrderNo(): ?string
+        {
+            return $this->cus_order_no;
+        }
+
+        /**
+         * @param string $cus_order_no
+         */
+        public function setCusOrderNo(string $cus_order_no): void
+        {
+            $this->cus_order_no = $cus_order_no;
+        }
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="cus_order_lineno", type="string")
+         */
+        private $cus_order_lineno;
+
+        /**
+         * @return string
+         */
+        public function getCusOrderLineno(): ?string
+        {
+            return $this->cus_order_lineno;
+        }
+
+        /**
+         * @param string $cus_order_lineno
+         */
+        public function setCusOrderLineno(string $cus_order_lineno): void
+        {
+            $this->cus_order_lineno = $cus_order_lineno;
+        }
     }
 }

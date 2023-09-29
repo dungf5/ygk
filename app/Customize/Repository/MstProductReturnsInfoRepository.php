@@ -392,7 +392,9 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'product.product_name',
             'product.quantity',
             "'' as returns_reson",
-            'shipping.shipping_num'
+            'shipping.shipping_num',
+            'order_status.cus_order_no',
+            'order_status.cus_order_lineno',
         );
 
         $qb->addSelect('(SELECT mst_cus.company_name FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = shipping.shipping_code) shipping_name')
@@ -484,6 +486,8 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'product.product_name',
             'product.quantity',
             'returns_reson.returns_reson',
+            'product_returns_info.cus_order_no',
+            'product_returns_info.cus_order_lineno',
         );
 
         if (!empty($paramSearch['search_jan_code'])) {

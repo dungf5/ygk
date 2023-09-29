@@ -125,6 +125,8 @@ front.forgot.reset_not_found: |
   弊社営業担当者にお問い合わせください。
 front.forgot.error_message__title: メールアドレスが登録されていません。
 front.forgot.error_message__body: 弊社営業担当者にお問い合わせください。
+front.order.cus_order_no: 注文番号
+front.order.cus_order_lineno: 明細番号
 
 
 
