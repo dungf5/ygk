@@ -474,6 +474,12 @@ class MypageController extends AbstractController
      */
     public function login(Request $request, AuthenticationUtils $utils)
     {
+        // Check Close Shop
+        if (!empty($_SESSION['shop_close'])) {
+            return [
+                'shopClose' => true,
+            ];
+        }
         // Check case must to choose represent
         if (!empty($_SESSION['choose_represent'])) {
             $my_common = new MyCommonService($this->entityManager);
@@ -573,6 +579,7 @@ class MypageController extends AbstractController
         return [
             'shipping' => false,
             'represent' => false,
+            'loginForm' => true,
             'error' => $utils->getLastAuthenticationError(),
             'form' => $form->createView(),
         ];
