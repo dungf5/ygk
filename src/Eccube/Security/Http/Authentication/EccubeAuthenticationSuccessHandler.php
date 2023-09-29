@@ -13,29 +13,15 @@
 
 namespace Eccube\Security\Http\Authentication;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Eccube\Entity\BaseInfo;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
-use Symfony\Component\Security\Http\HttpUtils;
 
 class EccubeAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
-
-    public function __construct(HttpUtils $httpUtils, EntityManagerInterface $entityManager)
-    {
-        parent::__construct($httpUtils);
-        $this->entityManager = $entityManager;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -51,42 +37,24 @@ class EccubeAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHan
             $response->setTargetUrl($request->getUriForPath('/'));
         }
 
-        $customerId = $_SESSION['customer_id'] ?? '';
+        $customerId     = $_SESSION["customer_id"] ?? '';
         if (!empty($customerId)) {
             try {
-                $loginType = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
+                $loginType  = $_SESSION["usc_{$customerId}"]['login_type'] ?? '';
 
-                // Check option open shop
-                if (!empty($loginType) && $loginType != 'supper_user') {
-                    $base_info = $this->entityManager->getRepository(BaseInfo::class)->find(1);
-
-                    if (isset($base_info)) {
-                        $arr_open_shop = $base_info->getOptionOpenShop();
-                        $arr_open_shop = json_decode($arr_open_shop, true);
-                        $current_day = date('l');
-
-                        if (isset($arr_open_shop[strtolower($current_day)]) && (int) $arr_open_shop[strtolower($current_day)] == 0) {
-                            $_SESSION['shop_close'] = true;
-
-                            return new RedirectResponse('/mypage/login');
-                        }
-                    }
-                }
-
-                if (!empty($loginType) && $loginType == 'supper_user') {
-                    $_SESSION['choose_represent'] = true;
-
+                if (!empty($loginType) && $loginType == "supper_user") {
+                    $_SESSION["choose_represent"]    = true;
                     return new RedirectResponse('/mypage/login');
                 }
 
-                if (!empty($loginType) && $loginType == 'represent_code') {
-                    $_SESSION['choose_shipping'] = true;
-
+                if (!empty($loginType) && $loginType == "represent_code") {
+                    $_SESSION["choose_shipping"]    = true;
                     return new RedirectResponse('/mypage/login');
                 }
-            } catch (\Exception $e) {
-            }
+
+            } catch (\Exception $e) {}
         }
+
 
         return $response;
     }

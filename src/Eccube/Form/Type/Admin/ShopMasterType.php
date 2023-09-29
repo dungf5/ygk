@@ -23,7 +23,6 @@ use Eccube\Form\Type\ToggleSwitchType;
 use Eccube\Form\Validator\Email;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -202,15 +201,6 @@ class ShopMasterType extends AbstractType
                     ]),
                 ],
             ])
-            // Option Open Shop
-            ->add('option_open_shop', HiddenType::class)
-            ->add('option_open_monday', ToggleSwitchType::class)
-            ->add('option_open_tuesday', ToggleSwitchType::class)
-            ->add('option_open_wednesday', ToggleSwitchType::class)
-            ->add('option_open_thursday', ToggleSwitchType::class)
-            ->add('option_open_friday', ToggleSwitchType::class)
-            ->add('option_open_saturday', ToggleSwitchType::class)
-            ->add('option_open_sunday', ToggleSwitchType::class)
         ;
 
         $builder->add(
