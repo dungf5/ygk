@@ -1083,59 +1083,48 @@ SQL;
             case 'shipping_code':
                 $condition = 'dt_order_status.shipping_code = ?';
                 break;
-
             case 'otodoke_code':
                 $condition = 'dt_order_status.otodoke_code = ?';
                 break;
-
             default:
                 $condition = 'dt_order_status.customer_code = ?';
                 break;
         }
-
         $myPara = [$customer_code];
-
         $date_from_condition = '';
         if (!empty($params_search['search_shipping_date_from'])) {
             $date_from_condition = "AND DATE_FORMAT(mst_delivery.delivery_date,'%Y-%m-%d') >= ?";
             $myPara[] = $params_search['search_shipping_date_from'];
         }
-
         $date_to_condition = '';
         if (!empty($params_search['search_shipping_date_to'])) {
             $date_to_condition = "AND DATE_FORMAT(mst_delivery.delivery_date,'%Y-%m-%d') <= ?";
             $myPara[] = $params_search['search_shipping_date_to'];
         }
-
         $shipping_date_condition = '';
         if (!empty($params_search['search_shipping_date'])) {
             $shipping_date_condition = 'AND mst_delivery.delivery_date like ?';
             $myPara[] = $params_search['search_shipping_date'].'-%';
         }
-
         $order_shipping_condition = '';
         if (!empty($params_search['search_order_shipping'])) {
             $order_shipping_condition = 'AND TRIM(mst_delivery.shiping_name) = (select company_name from mst_customer where customer_code = ?)';
             $myPara[] = $params_search['search_order_shipping'];
         }
-
         $order_otodoke_condition = '';
         if (!empty($params_search['search_order_otodoke'])) {
             $order_otodoke_condition = 'AND TRIM(mst_delivery.otodoke_name) = (select company_name from mst_customer where customer_code = ?)';
             $myPara[] = $params_search['search_order_otodoke'];
         }
-
         $sale_type_condition = '';
         if ($params_search['search_sale_type'] != '0') {
             if ($params_search['search_sale_type'] == '1') {
                 $sale_type_condition = "AND TRIM(mst_delivery.sale_type) = '通常' ";
             }
-
             if ($params_search['search_sale_type'] == '2') {
                 $sale_type_condition = "AND TRIM(mst_delivery.sale_type) = '返品' ";
             }
         }
-
         $sql = "
                         SELECT
                             mst_delivery.delivery_no
@@ -1160,19 +1149,55 @@ SQL;
                         GROUP BY
                             mst_delivery.delivery_no
                         ORDER BY
-                            dt_order_status.order_date DESC, mst_delivery.order_no ASC
+                            mst_delivery.delivery_date ASC, mst_delivery.order_no ASC
                 ";
-
         try {
             $statement = $this->entityManager->getConnection()->prepare($sql);
             $result = $statement->executeQuery($myPara);
             $rows = $result->fetchAllAssociative();
             $arRe = [];
-
             foreach ($rows as $item) {
                 $arRe[] = $item['delivery_no'];
             }
+            return $arRe;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
 
+    public function orderByDeliveryNoPrintPDF($arr_delivery_no)
+    {
+        $param = [];
+        $str_delivery_no = '';
+        $index = count($arr_delivery_no);
+        for ($i = 0; $i < $index; $i++) {
+            if ($i == $index - 1) {
+                $str_delivery_no .= '?';
+            } else {
+                $str_delivery_no .= '?,';
+            }
+            $param[] = $arr_delivery_no[$i];
+        }
+        $sql = "
+                    SELECT
+                        mst_delivery.delivery_no
+                    FROM
+                        mst_delivery
+                    WHERE
+                        mst_delivery.delivery_no IN ({$str_delivery_no})
+                    GROUP BY
+                        mst_delivery.delivery_no
+                    ORDER BY
+                        mst_delivery.delivery_date ASC, mst_delivery.delivery_no ASC
+                ";
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            $arRe = [];
+            foreach ($rows as $item) {
+                $arRe[] = $item['delivery_no'];
+            }
             return $arRe;
         } catch (\Exception $e) {
             return [];
@@ -1185,39 +1210,31 @@ SQL;
             case 'shipping_code':
                 $condition = 'dt_order_status.shipping_code = ?';
                 break;
-
             case 'otodoke_code':
                 $condition = 'dt_order_status.otodoke_code = ?';
                 break;
-
             default:
                 $condition = 'dt_order_status.customer_code = ?';
                 break;
         }
-
         $subQuantity = ' CASE
                             WHEN mst_product.quantity > 1 THEN mst_product.quantity * mst_delivery.quanlity
                             ELSE mst_delivery.quanlity
                             END AS quantity
                         ';
-
         $subUnitPrice = '   CASE
                             WHEN mst_product.quantity > 1 THEN mst_delivery.unit_price / mst_product.quantity
                             ELSE mst_delivery.unit_price
                             END AS unit_price
                        ';
-
         $addCondition = '';
-
         if (!empty($orderNo)) {
             $addCondition = ' and mst_delivery.order_no LIKE ? ';
         }
-
         $sql = "
                         SELECT
                             {$subUnitPrice},
                             {$subQuantity},
-                            SUBSTRING(mst_delivery.order_no, POSITION(\"-\" IN mst_delivery.order_no)+1) AS orderByAs,
                             mst_delivery.delivery_no,
                             mst_delivery.delivery_date,
                             mst_delivery.deli_post_code,
@@ -1250,7 +1267,8 @@ SQL;
                             mst_delivery.otodoke_code,
                             mst_delivery.otodoke_name,
                             mst_customer.department as deli_department_name,
-                            mst_delivery.shipping_no
+                            mst_delivery.shipping_no,
+                            mst_customer_2.fusrstr8
                         FROM
                             dt_order_status
                         JOIN
@@ -1264,25 +1282,113 @@ SQL;
                         LEFT JOIN
                             mst_customer ON (mst_customer.customer_code = mst_delivery.deli_department)
                         LEFT JOIN
+                            mst_customer as mst_customer_2 ON (mst_customer_2.customer_code = mst_delivery.customer_code)
+                        LEFT JOIN
                             mst_product ON (mst_product.product_code = mst_delivery.item_no)
                         WHERE
                             {$condition}
                         AND
                             mst_delivery.delivery_no = ?
+                        AND 
+                            mst_delivery.jan_code <> ''
                             {$addCondition}
+                        GROUP by 
+                            mst_delivery.delivery_no, mst_delivery.delivery_lineno, mst_delivery.jan_code
                         ORDER BY
-                            CONVERT(orderByAs, SIGNED INTEGER) ASC";
-
+                            mst_delivery.delivery_lineno ASC";
         $myPara = [$customer_code, $delivery_no];
-
         if (!empty($orderNo)) {
             $myPara[] = $orderNo.'-%';
         }
-
         $statement = $this->entityManager->getConnection()->prepare($sql);
         $result = $statement->executeQuery($myPara);
         $rows = $result->fetchAllAssociative();
+        return $rows;
+    }
 
+    public function getCsvDelivery($delivery_no, $orderNo = '', $customer_code, $login_type)
+    {
+        switch ($login_type) {
+            case 'shipping_code':
+                $condition = 'dt_order_status.shipping_code = ?';
+                break;
+            case 'otodoke_code':
+                $condition = 'dt_order_status.otodoke_code = ?';
+                break;
+            default:
+                $condition = 'dt_order_status.customer_code = ?';
+                break;
+        }
+        $subQuantity = ' CASE
+                            WHEN mst_product.quantity > 1 THEN mst_product.quantity * mst_delivery.quanlity
+                            ELSE mst_delivery.quanlity
+                            END AS quantity
+                        ';
+        $subUnitPrice = '   CASE
+                            WHEN mst_product.quantity > 1 THEN mst_delivery.unit_price / mst_product.quantity
+                            ELSE mst_delivery.unit_price
+                            END AS unit_price
+                       ';
+        $addCondition = '';
+        if (!empty($orderNo)) {
+            $addCondition = ' and mst_delivery.order_no LIKE ? ';
+        }
+        $sql = "
+                        SELECT
+                            {$subUnitPrice},
+                            {$subQuantity},
+                            mst_delivery.delivery_no,
+                            mst_delivery.delivery_lineno,
+                            mst_delivery.delivery_date,
+                            mst_delivery.customer_code,
+                            mst_delivery.deli_company_name,
+                            mst_delivery.shipping_code,
+                            mst_delivery.shiping_name,
+                            mst_delivery.otodoke_code,
+                            mst_delivery.otodoke_name,
+                            mst_delivery.sale_type,
+                            mst_delivery.item_no,
+                            mst_delivery.jan_code,
+                            mst_delivery.item_name,
+                            'PC' as unit,
+                            mst_delivery.amount,
+                            mst_delivery.shipping_no,
+                            mst_delivery.order_no,
+                            mst_delivery.footer_remark1
+                        FROM
+                            dt_order_status
+                        JOIN
+                            mst_shipping
+                            ON mst_shipping.cus_order_no = dt_order_status.cus_order_no
+                            AND mst_shipping.cus_order_lineno = dt_order_status.cus_order_lineno
+                        JOIN
+                             mst_delivery
+                             ON mst_delivery.shipping_no = mst_shipping.shipping_no
+                             AND TRIM(mst_delivery.order_no) = CONCAT(TRIM(mst_shipping.cus_order_no),'-',TRIM(mst_shipping.cus_order_lineno))
+                        LEFT JOIN
+                            mst_customer ON (mst_customer.customer_code = mst_delivery.deli_department)
+                        LEFT JOIN
+                            mst_customer as mst_customer_2 ON (mst_customer_2.customer_code = mst_delivery.customer_code)
+                        LEFT JOIN
+                            mst_product ON (mst_product.product_code = mst_delivery.item_no)
+                        WHERE
+                            {$condition}
+                        AND
+                            mst_delivery.delivery_no = ?
+                        AND 
+                            mst_delivery.jan_code <> ''
+                            {$addCondition}
+                        GROUP by 
+                            mst_delivery.delivery_no, mst_delivery.delivery_lineno, mst_delivery.jan_code
+                        ORDER BY
+                            mst_delivery.delivery_lineno ASC";
+        $myPara = [$customer_code, $delivery_no];
+        if (!empty($orderNo)) {
+            $myPara[] = $orderNo.'-%';
+        }
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery($myPara);
+        $rows = $result->fetchAllAssociative();
         return $rows;
     }
 
@@ -3197,6 +3303,32 @@ SQL;
             $result = $statement->executeQuery($params);
             $row = $result->fetchAllAssociative();
 
+            return $row[0] ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getDeliveryShipFee($delivery_no)
+    {
+        $sql = "
+                SELECT 
+                    * 
+                FROM 
+                    mst_delivery 
+                WHERE 
+                    delivery_no = ?
+                AND 
+                    (   jan_code = '' 
+                    OR 
+                        jan_code IS NULL
+                    )
+                LIMIT 1;
+        ";
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$delivery_no]);
+            $row = $result->fetchAllAssociative();
             return $row[0] ?? [];
         } catch (Exception $e) {
             return [];

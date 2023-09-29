@@ -210,27 +210,32 @@ class MypageController extends AbstractController
         $htmlFileName = 'Mypage/exportOrderPdf.twig';
         $delivery_no = MyCommon::getPara('delivery_no');
         $order_no_line_no = MyCommon::getPara('order_no_line_no');
-
         $comS = new MyCommonService($this->entityManager);
         $orderNo = explode('-', $order_no_line_no)[0];
-
         $customer_id = $this->globalService->customerId();
         $login_type = $this->globalService->getLoginType();
         $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
-
         $arRe = $comS->getPdfDelivery($delivery_no, $orderNo, $customer_code, $login_type);
-
         if (!count($arRe)) {
             return $this->redirectToRoute('mypage_delivery_history');
         }
-
         //add special line
         $totalTax = 0;
         $totalaAmount = 0;
         $inCr = 0;
         $totalTaxRe = 0;
-
-        foreach ($arRe as &$item) {
+        $fusrstr8 = (int) (isset($arRe[0]['fusrstr8']) ? $arRe[0]['fusrstr8'] : 0);
+        $delivery_no = isset($arRe[0]['delivery_no']) ? $arRe[0]['delivery_no'] : '';
+        if ($fusrstr8 != 1) {
+            $shipFee = '*****';
+        } elseif (!empty($delivery_no)) {
+            $obj_delivery = $comS->getDeliveryShipFee($delivery_no);
+            $shipFee = $obj_delivery['amount'] ?? 0;
+            $shipFee = '￥'.number_format((int) $shipFee);
+        } else {
+            $shipFee = '￥0';
+        }
+        foreach ($arRe as $key => &$item) {
             $inCr++;
             $totalTax = $totalTax + $item['tax'];
             $totalaAmount = $totalaAmount + $item['amount'];
@@ -239,20 +244,18 @@ class MypageController extends AbstractController
             $item['autoIncr'] = $inCr;
             $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
         }
-
         $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
         $arSpecial = ['is_total' => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
         $arRe[] = $arSpecial;
-
         $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
         FileUtil::makeDirectory($dirPdf);
         $arReturn = [
             'myDatas' => array_chunk($arRe, 15),
             'OrderTotal' => $totalaAmount,
+            'shipFee' => $shipFee,
             'totalTaxRe' => $totalTaxRe,
             'totalaAmountTax' => $totalaAmountTax,
         ];
-
         $namePdf = 'ship_'.$delivery_no.'.pdf';
         $file = $dirPdf.'/'.$namePdf;
         $html = $this->twig->render($htmlFileName, $arReturn);
@@ -263,7 +266,6 @@ class MypageController extends AbstractController
         $dompdf->stream($file);
         $output = $dompdf->output();
         file_put_contents($file, $output);
-
         return $this->file($file);
     }
 
@@ -1943,7 +1945,6 @@ class MypageController extends AbstractController
             ini_set('memory_limit', '9072M');
             ini_set('max_execution_time', '0');
             ini_set('max_input_time', '-1');
-
             $htmlFileName = 'Mypage/exportPdfMultiple.twig';
             $preview = MyCommon::getPara('preview');
             $delivery_no = MyCommon::getPara('delivery_no');
@@ -1955,33 +1956,39 @@ class MypageController extends AbstractController
                 'search_shipping_date_from' => MyCommon::getPara('search_shipping_date_from'),
                 'search_shipping_date_to' => MyCommon::getPara('search_shipping_date_to'),
             ];
-
             $comS = new MyCommonService($this->entityManager);
             $customer_id = $this->globalService->customerId();
             $login_type = $this->globalService->getLoginType();
             $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
-
             if (trim($delivery_no) == 'all') {
                 $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
             } else {
                 $arr_delivery_no = array_values(array_diff(explode(',', $delivery_no), ['']));
+                $arr_delivery_no = $comS->orderByDeliveryNoPrintPDF($arr_delivery_no);
             }
-
             $arr_data = [];
             foreach ($arr_delivery_no as $item_delivery_no) {
                 $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
-
                 if (!count($arRe)) {
                     continue;
                 }
-
                 //add special line
                 $totalTax = 0;
                 $totalaAmount = 0;
                 $inCr = 0;
                 $totalTaxRe = 0;
-
-                foreach ($arRe as &$item) {
+                $fusrstr8 = (int) (isset($arRe[0]['fusrstr8']) ? $arRe[0]['fusrstr8'] : 0);
+                $delivery_no = isset($arRe[0]['delivery_no']) ? $arRe[0]['delivery_no'] : '';
+                if ($fusrstr8 != 1) {
+                    $shipFee = '*****';
+                } elseif (!empty($delivery_no)) {
+                    $obj_delivery = $comS->getDeliveryShipFee($delivery_no);
+                    $shipFee = $obj_delivery['amount'] ?? 0;
+                    $shipFee = '￥'.number_format((int) $shipFee);
+                } else {
+                    $shipFee = '￥0';
+                }
+                foreach ($arRe as $key => &$item) {
                     $inCr++;
                     $totalTax = $totalTax + $item['tax'];
                     $totalaAmount = $totalaAmount + $item['amount'];
@@ -1990,39 +1997,32 @@ class MypageController extends AbstractController
                     $item['autoIncr'] = $inCr;
                     $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
                 }
-
                 $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
                 $arSpecial = ['is_total' => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
                 $arRe[] = $arSpecial;
-
                 $arReturn = [
                     'myDatas' => array_chunk($arRe, 20),
                     'OrderTotal' => $totalaAmount,
+                    'shipFee' => $shipFee,
                     'totalTaxRe' => $totalTaxRe,
                     'totalaAmountTax' => $totalaAmountTax,
                 ];
-
                 $arr_data['data'][] = $arReturn;
             }
-
             if (!$preview) {
                 $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
                 FileUtil::makeDirectory($dirPdf);
                 $namePdf = count($arr_delivery_no) == 1 ? 'ship_'.$arr_delivery_no[0].'.pdf' : 'ship_'.date('YmdHis').'.pdf';
                 $file = $dirPdf.'/'.$namePdf;
-
                 $html = $this->twig->render($htmlFileName, $arr_data);
-
                 if (env('APP_IS_LOCAL', 1) != 1) {
                     MyCommon::converHtmlToPdf($dirPdf, $namePdf, $html);
                     header('Content-Description: File Transfer');
                     header('Content-Type: application/octet-stream');
                     header('Content-Disposition: attachment; filename="'.basename($file).'"');
-
                     readfile($file);
                     unlink($file);
                     unlink(str_replace('.pdf', '.html', $file));
-
                     return;
                 } else {
                     //$dompdf = new Dompdf();
@@ -2034,7 +2034,6 @@ class MypageController extends AbstractController
                     //$dompdf->stream($file);
                 }
             }
-
             if (!empty($arr_data)) {
                 return $arr_data;
             } else {
@@ -2042,7 +2041,6 @@ class MypageController extends AbstractController
             }
         } catch (\Exception $e) {
             log_error($e->getMessage());
-
             return $this->redirectToRoute('mypage_delivery_print');
         }
     }
@@ -2060,7 +2058,6 @@ class MypageController extends AbstractController
             ini_set('memory_limit', '9072M');
             ini_set('max_execution_time', '0');
             ini_set('max_input_time', '-1');
-
             $htmlFileName = 'Mypage/exportOrderPdf.twig';
             $delivery_no = MyCommon::getPara('delivery_no');
             $params = [
@@ -2071,44 +2068,47 @@ class MypageController extends AbstractController
                 'search_shipping_date_from' => MyCommon::getPara('search_shipping_date_from'),
                 'search_shipping_date_to' => MyCommon::getPara('search_shipping_date_to'),
             ];
-
             $comS = new MyCommonService($this->entityManager);
             $customer_id = $this->globalService->customerId();
             $login_type = $this->globalService->getLoginType();
             $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
-
             if (trim($delivery_no) == 'all') {
                 $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
             } else {
                 $arr_delivery_no = array_values(array_diff(explode(',', $delivery_no), ['']));
+                $arr_delivery_no = $comS->orderByDeliveryNoPrintPDF($arr_delivery_no);
             }
-
             if (empty($arr_delivery_no)) {
                 return $this->redirectToRoute('mypage_delivery_print');
             }
-
             $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
             FileUtil::makeDirectory($dirPdf);
-
             $zipName = 'ship_'.date('YmdHis').'.zip';
             $zipName = $dirPdf.'/'.$zipName;
-
             $zip = new ZipArchive();
             $zip->open($zipName, \ZIPARCHIVE::CREATE);
-
             foreach ($arr_delivery_no as $item_delivery_no) {
                 $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
                 if (!count($arRe)) {
                     continue;
                 }
-
                 //add special line
                 $totalTax = 0;
                 $totalaAmount = 0;
                 $inCr = 0;
                 $totalTaxRe = 0;
-
-                foreach ($arRe as &$item) {
+                $fusrstr8 = (int) (isset($arRe[0]['fusrstr8']) ? $arRe[0]['fusrstr8'] : 0);
+                $delivery_no = isset($arRe[0]['delivery_no']) ? $arRe[0]['delivery_no'] : '';
+                if ($fusrstr8 != 1) {
+                    $shipFee = '*****';
+                } elseif (!empty($delivery_no)) {
+                    $obj_delivery = $comS->getDeliveryShipFee($delivery_no);
+                    $shipFee = $obj_delivery['amount'] ?? 0;
+                    $shipFee = '￥'.number_format((int) $shipFee);
+                } else {
+                    $shipFee = '￥0';
+                }
+                foreach ($arRe as $key => &$item) {
                     $inCr++;
                     $totalTax = $totalTax + $item['tax'];
                     $totalaAmount = $totalaAmount + $item['amount'];
@@ -2117,21 +2117,18 @@ class MypageController extends AbstractController
                     $item['autoIncr'] = $inCr;
                     $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
                 }
-
                 $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
                 $arSpecial = ['is_total' => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
                 $arRe[] = $arSpecial;
-
                 $arReturn = [
                     'myDatas' => array_chunk($arRe, 15),
                     'OrderTotal' => $totalaAmount,
+                    'shipFee' => $shipFee,
                     'totalTaxRe' => $totalTaxRe,
                     'totalaAmountTax' => $totalaAmountTax,
                 ];
-
                 $namePdf = $item_delivery_no.'.pdf';
                 $file = $dirPdf.'/'.$namePdf;
-
                 $html = $this->twig->render($htmlFileName, $arReturn);
                 $dompdf = new Dompdf();
                 $dompdf->loadHtml($html);
@@ -2139,16 +2136,12 @@ class MypageController extends AbstractController
                 $dompdf->render();
                 $output = $dompdf->output();
                 file_put_contents($file, $output);
-
                 $zip->addFile($file, $namePdf);
             }
-
             $zip->close();
-
             return $this->file($zipName);
         } catch (\Exception $e) {
             log_error($e->getMessage());
-
             return $this->redirectToRoute('mypage_delivery_print');
         }
     }
@@ -2165,7 +2158,6 @@ class MypageController extends AbstractController
             ini_set('memory_limit', '9072M');
             ini_set('max_execution_time', '0');
             ini_set('max_input_time', '-1');
-
             $htmlFileName = 'Mypage/exportOrderPdf.twig';
             $step = MyCommon::getPara('step', 0);
             $zip_name = MyCommon::getPara('zip_name');
@@ -2178,51 +2170,52 @@ class MypageController extends AbstractController
                 'search_shipping_date_from' => MyCommon::getPara('search_shipping_date_from'),
                 'search_shipping_date_to' => MyCommon::getPara('search_shipping_date_to'),
             ];
-
             $comS = new MyCommonService($this->entityManager);
             $customer_id = $this->globalService->customerId();
             $login_type = $this->globalService->getLoginType();
             $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
-
             if (trim($delivery_no) == 'all') {
                 $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
             } else {
                 $arr_delivery_no = array_values(array_diff(explode(',', $delivery_no), ['']));
+                $arr_delivery_no = $comS->orderByDeliveryNoPrintPDF($arr_delivery_no);
             }
-
             if (empty($arr_delivery_no)) {
                 return $this->json(['status' => 0, 'message' => 'Data empty'], 400);
             }
-
             $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
             FileUtil::makeDirectory($dirPdf);
-
             if (empty($zip_name)) {
                 $zipName = 'ship_'.date('YmdHis').'.zip';
                 $arr_delivery_no = array_chunk($arr_delivery_no, 30);
                 return $this->json(['status' => 2, 'message' => $zipName, 'arr_delivery_no' => $arr_delivery_no], 200);
             }
-
             $zipName = trim($zip_name);
             $zipPath = $dirPdf.'/'.$zipName;
-
-
             $zip = new ZipArchive();
             $zip->open($zipPath, \ZipArchive::CREATE);
-
             foreach ($arr_delivery_no as $item_delivery_no) {
                 $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
                 if (!count($arRe)) {
                     continue;
                 }
-
                 //add special line
                 $totalTax = 0;
                 $totalaAmount = 0;
                 $inCr = 0;
                 $totalTaxRe = 0;
-
-                foreach ($arRe as &$item) {
+                $fusrstr8 = (int) (isset($arRe[0]['fusrstr8']) ? $arRe[0]['fusrstr8'] : 0);
+                $delivery_no = isset($arRe[0]['delivery_no']) ? $arRe[0]['delivery_no'] : '';
+                if ($fusrstr8 != 1) {
+                    $shipFee = '*****';
+                } elseif (!empty($delivery_no)) {
+                    $obj_delivery = $comS->getDeliveryShipFee($delivery_no);
+                    $shipFee = $obj_delivery['amount'] ?? 0;
+                    $shipFee = '￥'.number_format((int) $shipFee);
+                } else {
+                    $shipFee = '￥0';
+                }
+                foreach ($arRe as $key => &$item) {
                     $inCr++;
                     $totalTax = $totalTax + $item['tax'];
                     $totalaAmount = $totalaAmount + $item['amount'];
@@ -2231,21 +2224,18 @@ class MypageController extends AbstractController
                     $item['autoIncr'] = $inCr;
                     $item['delivery_date'] = explode(' ', $item['delivery_date'])[0];
                 }
-
                 $totalaAmountTax = $totalaAmount + $totalTaxRe; //$item["tax"];
                 $arSpecial = ['is_total' => 1, 'totalaAmount' => $totalaAmount, 'totalTax' => $totalTax];
                 $arRe[] = $arSpecial;
-
                 $arReturn = [
                     'myDatas' => array_chunk($arRe, 15),
                     'OrderTotal' => $totalaAmount,
+                    'shipFee' => $shipFee,
                     'totalTaxRe' => $totalTaxRe,
                     'totalaAmountTax' => $totalaAmountTax,
                 ];
-
                 $namePdf = $item_delivery_no.'.pdf';
                 $file = $dirPdf.'/'.$namePdf;
-
                 $html = $this->twig->render($htmlFileName, $arReturn);
                 $dompdf = new Dompdf();
                 $dompdf->loadHtml($html);
@@ -2253,20 +2243,16 @@ class MypageController extends AbstractController
                 $dompdf->render();
                 $output = $dompdf->output();
                 file_put_contents($file, $output);
-
                 $zip->addFile($file, $namePdf);
             }
-
             $zip->close();
-
             return $this->json(['status' => 1, 'step' => $step,  'message' => '/html/user_data/pdf/'.$zipName], 200);
-
         } catch (\Exception $e) {
             log_error($e->getMessage());
-
             return $this->json(['status' => -1, 'message' => $e->getMessage()], 400);
         }
     }
+
 
     /**
      * マイページ.
