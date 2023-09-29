@@ -47,6 +47,8 @@
 			</div>
 			<div class="col-xs-12">
 				<form class="form-horizontal" action="{{ url('mypage_return_save') }}" method="POST" enctype="multipart/form-data" id="form_return_create">
+					<input type="hidden" class="form-control" name="cus_order_no" value="{{ param.cus_order_no }}"/>
+					<input type="hidden" class="form-control" name="cus_order_lineno" value="{{ param.cus_order_lineno }}"/>
 					<table class="table table-bordered">
 						<tr>
 							<td class="col-xs-3 text-right left_background">
