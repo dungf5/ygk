@@ -1020,6 +1020,8 @@ class MypageController extends AbstractController
                 'product_status' => $request->get('product_status', '1'),
                 'product_code' => $request->get('product_code', ''),
                 'total_returns_num' => $request->get('total_returns_num', ''),
+                'cus_order_no' => $request->get('cus_order_no', ''),
+                'cus_order_lineno' => $request->get('cus_order_lineno', ''),
             ];
 
             $returns_reson = $commonService->getReturnsReson();
@@ -1225,6 +1227,8 @@ class MypageController extends AbstractController
                 'product_status' => $request->get('product_status', '1'),
                 'product_code' => $request->get('product_code', ''),
                 'total_returns_num' => $request->get('total_returns_num', ''),
+                'cus_order_no' => $request->get('cus_order_no', ''),
+                'cus_order_lineno' => $request->get('cus_order_lineno', ''),
             ];
 
             // Set Aprove auto. returns_status_flag = 1
@@ -1371,6 +1375,8 @@ class MypageController extends AbstractController
                         'cus_image_url_path6' => @$cus_image_url_path[5] ?? '',
                         'returns_status_flag' => $param['returns_status_flag'],
                         'returns_request_date' => date('Y-m-d H:i:s'),
+                        'cus_order_no' => $param['cus_order_no'],
+                        'cus_order_lineno' => $param['cus_order_lineno'],
                     ]);
 
                 if (!empty($cus_image_url_path)) {
