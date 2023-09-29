@@ -136,6 +136,12 @@
 									{{ "front.mypage.return.shipping_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
 								</a>
 							</th>
+							<th title={{ "front.order.cus_order_no" | trans | raw }}>
+								<p class="text-nowrap">{{ "front.order.cus_order_no" | trans | raw }}</p>
+							</th>
+							<th title={{ "front.order.cus_order_lineno" | trans | raw }}>
+								<p class="text-nowrap">{{ "front.order.cus_order_lineno" | trans | raw }}</p>
+							</th>
 							<th title='{{ "front.mypage.return.shiping_code" | trans | raw}}  {{ "front.mypage.return.otodoke_code" | trans | raw }}'>
 								<select class="hidden" id="search_shipping" name="search_shipping">
 									<option value="0" {% if param.search_shipping == 0 %} selected {% endif %}>全て</option>
@@ -235,15 +241,21 @@
 										<td title={{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}>
 											<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
 										</td>
-										<td title='{{ item.shipping_name }} - {{ item.otodoke_name }}'>
+										<td title="{{ item.cus_order_no }}">
+											<p class="text-nowrap">{{ item.cus_order_no }}</p>
+										</td>
+										<td title="{{ item.cus_order_lineno }}">
+											<p class="text-nowrap">{{ item.cus_order_lineno }}</p>
+										</td>
+										<td title='{{ item.shipping_name }} | {{ item.otodoke_name }}'>
 											<p class="text-nowrap">{{ item.shipping_name }}</p>
 											<p class="text-nowrap">{{ item.otodoke_name }}</p>
 										</td>
-										<td title='{{ item.jan_code }} {{ item.product_name }}'>
+										<td title='{{ item.jan_code }} | {{ item.product_name }}'>
 											<p class="text-nowrap">{{ item.jan_code }}</p>
 											<p class="text-nowrap">{{ item.product_name }}</p>
 										</td>
-										<td title={{ item.shipping_num }}>
+										<td>
 											<p class="text-nowrap">
 												{% if item.quantity > 1 %}
 													{{ item.shipping_num * item.quantity }}
@@ -270,7 +282,7 @@
 					{% else %}
 						<tbody>
 							<tr>
-								<td colspan="9">
+								<td colspan="10">
 									<p>返品対象の商品はありません。</p>
 								</td>
 							</tr>
