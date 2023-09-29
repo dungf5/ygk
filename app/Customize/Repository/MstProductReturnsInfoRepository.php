@@ -65,6 +65,8 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             $object->setCusImageUrlPath6($data['cus_image_url_path6']);
             $object->setReturnsStatusFlag($data['returns_status_flag']);
             $object->setReturnsRequestDate($data['returns_request_date']);
+            $object->setCusOrderNo($data['cus_order_no']);
+            $object->setCusOrderLineno($data['cus_order_lineno']);
 
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();
