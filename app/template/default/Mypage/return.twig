@@ -207,11 +207,16 @@
 {#									<tr ondblclick="$('#return_create_{{index}}').submit()" >#}
 {#								{% endif %}#}
 									<tr>
+										{% if item.quantity > 1 %}
+											{% set item_shipping_num = item.shipping_num * item.quantity %}
+										{% else %}
+											{% set item_shipping_num = item.shipping_num %}
+										{% endif %}
 										<td title="手続き">
-											<button type="submit" class="btn btn-warning" role="button" {% if item.total_returns_num >= item.shipping_num %}disabled{% endif %}>手続き</button>
+											<button type="submit" class="btn btn-warning" role="button" {% if item.total_returns_num >= item_shipping_num %}disabled{% endif %}>手続き</button>
 										</td>
 										<td title={{ item.returns_num }}>
-											<input type="number" name="return_num" data-value='{{ item.returns_num }}' data-shipping='{{ item.shipping_num }}' data-quantity='{{ item.quantity }}' data-total_returns='{{ item.total_returns_num }}' class="form-control" value="{{ item.returns_num }}"/>
+											<input type="number" name="return_num" data-value='{{ item.returns_num }}' data-shipping='{{ item_shipping_num }}' data-total_returns='{{ item.total_returns_num }}' class="form-control" value="{{ item.returns_num }}"/>
 										</td>
 										<td title={{ item.total_returns_num }}>
 											<p class="text-nowrap">{{ item.total_returns_num }}</p>
@@ -257,11 +262,7 @@
 										</td>
 										<td>
 											<p class="text-nowrap">
-												{% if item.quantity > 1 %}
-													{{ item.shipping_num * item.quantity }}
-												{% else %}
-													{{ item.shipping_num }}
-												{% endif %}
+												{{ item_shipping_num }}
 											</p>
 										</td>
 										<input type="hidden" name="shipping_no" value="{{ item.shipping_no }}"/>
@@ -270,11 +271,7 @@
 										<input type="hidden" name="product_code" value="{{ item.product_code }}"/>
 										<input type="hidden" name="product_name" value="{{ item.product_name }}"/>
 										<input type="hidden" name="total_returns_num" value="{{ item.total_returns_num }}"/>
-										{% if item.quantity > 1 %}
-											<input type="hidden" name="shipping_num" value="{{ item.shipping_num * item.quantity }}"/>
-										{% else %}
-											<input type="hidden" name="shipping_num" value="{{ item.shipping_num }}"/>
-										{% endif %}
+										<input type="hidden" name="shipping_num" value="{{ item_shipping_num }}"/>
 										<input type="hidden" name="cus_order_no" value="{{ item.cus_order_no }}"/>
 										<input type="hidden" name="cus_order_lineno" value="{{ item.cus_order_lineno }}"/>
 									</tr>
@@ -357,15 +354,9 @@
 		let element = $(this);
 		let previous_value = element.data('value');
 		let shipping_num = element.data('shipping');
-		let quantity = element.data('quantity');
 		let total_returns = element.data('total_returns');
 		let current_value = element.val();
 		let mess = '';
-
-		if (parseInt(quantity) > 1) {
-			shipping_num = parseInt(shipping_num) * parseInt(quantity);
-		}
-
 
 		typingRemarksTimer = setTimeout(function () {
 			if (current_value == '') {
