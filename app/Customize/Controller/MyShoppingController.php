@@ -1153,4 +1153,35 @@ class MyShoppingController extends AbstractShoppingController
             'hasNextCart' => $hasNextCart,
         ];
     }
+
+
+    /**
+     * Check Fusrstr.
+     *
+     * @Route("/shopping/order/check_fusrstr", name="check_fusrstr", methods={"POST"})
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function checkFusrstr(Request $request)
+    {
+        try {
+            $int_total_price = (int) $request->get('total_price', 0);
+            if ('POST' === $request->getMethod()) {
+                $int_fusrdec1 = $this->globalService->getFusrdec1();
+                $int_fusrstr8 = $this->globalService->getFusrstr8();
+
+                if ($int_fusrstr8 == 1 && $int_total_price < $int_fusrdec1) {
+                    return $this->json(['status' => 0, 'message' => $int_fusrdec1], 200);
+                }
+
+                return $this->json(['status' => 1], 200);
+            }
+
+            return $this->json(['status' => -1, 'message' => 'Method not Allowed'], 400);
+        } catch (\Exception $e) {
+            return $this->json(['status' => -1, 'message' => $e->getMessage()], 400);
+        }
+    }
 }
