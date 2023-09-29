@@ -15,6 +15,8 @@ namespace Customize\Service;
 
 use Customize\Service\Common\MyCommonService;
 use Doctrine\ORM\EntityManagerInterface;
+use Eccube\Entity\BaseInfo;
+use Eccube\Repository\BaseInfoRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -39,6 +41,11 @@ class GlobalService
     protected $myCommon;
 
     /**
+     * @var BaseInfo
+     */
+    protected $BaseInfo;
+
+    /**
      * EccubeExtension constructor.
      *
      * @param EntityManagerInterface $entityManager
@@ -46,11 +53,13 @@ class GlobalService
     public function __construct(
         EntityManagerInterface $entityManager,
         ?ContainerInterface $container,
-        MyCommonService $myCommon
+        MyCommonService $myCommon,
+        BaseInfoRepository $baseInfoRepository
     ) {
         $this->entityManager = $entityManager;
         $this->container = $container;
         $this->myCommon = new $myCommon($entityManager);
+        $this->BaseInfo = $baseInfoRepository->get();
     }
 
     public function customerId()
@@ -273,5 +282,46 @@ class GlobalService
     public function getDeliveryDate()
     {
         return $_SESSION['delivery_date'] ?? '';
+    }
+
+    public function getFusrdec1()
+    {
+        $relationCus = $this->myCommon->getCustomerRelationFromUser($this->customerCode(), $this->getLoginType(), $this->getLoginCode());
+
+        if ($relationCus) {
+            $customerCode = $relationCus['customer_code'];
+            $fusrdec1 = $this->myCommon->getMstCustomer2($customerCode)['fusrdec1'];
+
+            return (int) $fusrdec1;
+        }
+
+        return 0;
+    }
+
+    public function getFusrstr8()
+    {
+        $relationCus = $this->myCommon->getCustomerRelationFromUser($this->customerCode(), $this->getLoginType(), $this->getLoginCode());
+
+        if ($relationCus) {
+            $customerCode = $relationCus['customer_code'];
+            $fusrstr8 = $this->myCommon->getMstCustomer2($customerCode)['fusrstr8'];
+
+            return (int) $fusrstr8;
+        }
+
+        return 0;
+    }
+
+    public function getIsOpenShop()
+    {
+        $arr_open_shop = $this->BaseInfo->getOptionOpenShop();
+        $arr_open_shop = json_decode($arr_open_shop, true);
+        $current_day = date('l');
+
+        if (isset($arr_open_shop[strtolower($current_day)]) && (int) $arr_open_shop[strtolower($current_day)] == 0) {
+            return false;
+        }
+
+        return true;
     }
 }
