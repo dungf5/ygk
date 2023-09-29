@@ -2270,43 +2270,40 @@ class MypageController extends AbstractController
             'search_shipping_date_from' => MyCommon::getPara('search_shipping_date_from'),
             'search_shipping_date_to' => MyCommon::getPara('search_shipping_date_to'),
         ];
-
         $comS = new MyCommonService($this->entityManager);
         $customer_id = $this->globalService->customerId();
         $login_type = $this->globalService->getLoginType();
         $customer_code = $comS->getMstCustomer($customer_id)['customer_code'] ?? '';
-
         if (trim($delivery_no) == 'all') {
             $arr_delivery_no = $comS->getDeliveryNoPrintPDF($customer_code, $login_type, $params);
         } else {
-            $arr_delivery_no = array_diff(explode(',', $delivery_no), ['']);
+            $arr_delivery_no = array_values(array_diff(explode(',', $delivery_no), ['']));
+            $arr_delivery_no = $comS->orderByDeliveryNoPrintPDF($arr_delivery_no);
         }
-
         $arr_data = [];
         foreach ($arr_delivery_no as $item_delivery_no) {
-            $arRe = $comS->getPdfDelivery($item_delivery_no, '', $customer_code, $login_type);
-
+            $arRe = $comS->getCsvDelivery($item_delivery_no, '', $customer_code, $login_type);
             if (!count($arRe)) {
                 continue;
             }
-
+            $deliveryhipfee = $comS->getDeliveryShipFee($item_delivery_no);
+            $deliveryhipfee['quantity'] = $deliveryhipfee['quanlity'] ?? 0;
+            $deliveryhipfee['unit_price'] = $deliveryhipfee['unit_price'] ?? 0;
+            $deliveryhipfee['PC'] = 'unit';
+            $arRe[] = $deliveryhipfee;
             $arr_data[] = $arRe;
         }
-
         $dir = MyCommon::getHtmluserDataDir().'/csv';
         FileUtil::makeDirectory($dir);
         $name = 'ship_'.date('YmdHis').'.csv';
         $file = $dir.'/'.$name;
-
         $fp = fopen(trim($file), 'w');
-
         if ($fp) {
             $headerFields = [];
             foreach ($this->getDeliveryPrintExportHeader() as $header) {
                 $headerFields[] = mb_convert_encoding($header, 'Shift-JIS', 'UTF-8');
             }
             fputcsv($fp, $headerFields);
-
             foreach ($arr_data as $data) {
                 foreach ($data as $item) {
                     try {
@@ -2332,17 +2329,14 @@ class MypageController extends AbstractController
                             mb_convert_encoding(trim($item['order_no']), 'Shift-JIS', 'UTF-8'),
                             mb_convert_encoding(trim($item['footer_remark1']), 'Shift-JIS', 'UTF-8'),
                         ];
-
                         fputcsv($fp, $fields);
                     } catch (\Exception $e) {
                         log_error($e->getMessage());
                     }
                 }
             }
-
             fclose($fp);
         }
-
         // Check file after put data
         if (($fp = fopen(trim($file), 'r')) !== false) {
             $getFileCSV = file_get_contents($file, (bool) FILE_USE_INCLUDE_PATH);
@@ -2350,7 +2344,6 @@ class MypageController extends AbstractController
             file_put_contents($file, $getFileCSV);
             fclose($fp);
         }
-
         return $this->file($file);
     }
 }
