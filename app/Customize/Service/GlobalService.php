@@ -290,9 +290,12 @@ class GlobalService
 
         if ($relationCus) {
             $customerCode = $relationCus['customer_code'];
-            $fusrdec1 = $this->myCommon->getMstCustomer2($customerCode)['fusrdec1'];
 
-            return (int) $fusrdec1;
+            if (!empty($obj = $this->myCommon->getMstCustomer2($customerCode))) {
+                $fusrdec1 = $obj['fusrdec1'];
+
+                return (int) $fusrdec1;
+            }
         }
 
         return 0;
@@ -304,9 +307,12 @@ class GlobalService
 
         if ($relationCus) {
             $customerCode = $relationCus['customer_code'];
-            $fusrstr8 = $this->myCommon->getMstCustomer2($customerCode)['fusrstr8'];
 
-            return (int) $fusrstr8;
+            if (!empty($obj = $this->myCommon->getMstCustomer2($customerCode))) {
+                $fusrstr8 = $obj['fusrstr8'];
+
+                return (int) $fusrstr8;
+            }
         }
 
         return 0;
