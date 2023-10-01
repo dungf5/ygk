@@ -1497,11 +1497,13 @@ class MypageController extends AbstractController
             }
 
             $deliveryhipfee = $comS->getDeliveryShipFee($item_delivery_no);
-            $deliveryhipfee['quantity'] = $deliveryhipfee['quanlity'] ?? 0;
-            $deliveryhipfee['unit_price'] = $deliveryhipfee['unit_price'] ?? 0;
-            $deliveryhipfee['PC'] = 'unit';
+            if (!empty($deliveryhipfee) && $deliveryhipfee['amount'] > 0) {
+                $deliveryhipfee['quantity'] = '';
+                $deliveryhipfee['unit'] = '';
+                $deliveryhipfee['unit_price'] = '';
+                $arRe[] = $deliveryhipfee;
+            }
 
-            $arRe[] = $deliveryhipfee;
             $arr_data[] = $arRe;
         }
 
