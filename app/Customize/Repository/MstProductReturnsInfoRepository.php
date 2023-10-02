@@ -422,7 +422,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
 //                ->setParameter(':returns_status_flag', $paramSearch['returns_status_flag']);
 //        }
 
-        if (!empty($paramSearch['search_jan_code'])) {
+        if (isset($paramSearch['search_jan_code']) && trim($paramSearch['search_jan_code']) != '') {
             $qb->andWhere('product.jan_code LIKE :search_jan_code')
                 ->setParameter(':search_jan_code', "%{$paramSearch['search_jan_code']}%");
         }
