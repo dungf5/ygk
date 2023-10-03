@@ -74,6 +74,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             return $object;
         } catch (\Exception $e) {
             log_error($e->getMessage());
+
             return null;
         }
 

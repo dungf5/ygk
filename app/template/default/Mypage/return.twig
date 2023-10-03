@@ -355,13 +355,13 @@
 		let previous_value = element.data('value');
 		let shipping_num = element.data('shipping');
 		let total_returns = element.data('total_returns');
-		let current_value = element.val();
+		let current_value = element.val().trim();
 		let mess = '';
 
 		typingRemarksTimer = setTimeout(function () {
-			if (current_value == '') {
-				mess += "\n返品数を入力してください。";
-			}
+			// if (current_value == '') {
+			// 	mess += "\n返品数を入力してください。";
+			// }
 
 			if (current_value != '' && current_value <= 0) {
 				mess += "\n1以上で入力してください。";
