@@ -932,24 +932,21 @@ class MypageController extends AbstractController
     {
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
-
         //Params
         $param = [
             'returns_status_flag' => '',
             'pageno' => $request->get('pageno', 1),
-            'search_jan_code' => $request->get('search_jan_code', null),
+            'search_jan_code' => $request->get('search_jan_code', ''),
             'search_shipping_date' => $request->get('search_shipping_date', 0),
             'search_shipping' => $request->get('search_shipping', 0),
             'search_otodoke' => $request->get('search_otodoke', 0),
         ];
-
         // paginator
         $my_common = new MyCommonService($this->entityManager);
         $user_login = $this->twig->getGlobals()['app']->getUser();
         $customer_id = $this->globalService->customerId();
         $login_type = $this->globalService->getLoginType();
         $customer_code = $this->globalService->customerCode();
-
         if (!empty($_SESSION['usc_'.$customer_id]) && !empty($_SESSION['usc_'.$customer_id]['login_code'])) {
             $represent_code = $_SESSION['usc_'.$customer_id]['login_code'];
             $temp_customer_code = $my_common->getCustomerRelation($represent_code);
@@ -957,31 +954,21 @@ class MypageController extends AbstractController
                 $customer_code = $temp_customer_code['customer_code'];
             }
         }
-
-        if (isset($param['search_jan_code']) && trim($param['search_jan_code']) != '') {
-            $qb = $this->mstProductReturnsInfoRepository->getShippingForReturn($param, $customer_code, $login_type);
-
-            $pagination = $paginator->paginate(
-                $qb,
-                $request->get('pageno', 1),
-                $this->eccubeConfig['eccube_search_pmax'],
-                ['distinct' => false]
-            );
-        } else {
-            $pagination = [];
-        }
-
+        $qb = $this->mstProductReturnsInfoRepository->getShippingForReturn($param, $customer_code, $login_type);
+        $pagination = $paginator->paginate(
+            $qb,
+            $request->get('pageno', 1),
+            $this->eccubeConfig['eccube_search_pmax'],
+            ['distinct' => false]
+        );
         /*create list order date*/
         $shipping_date_list = [];
         for ($i = 0; $i < 24; $i++) {
             $shipping_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
         }
-
         $shippingList = $this->globalService->shippingOption();
-
         $search_shipping = (isset($param['search_shipping']) && $param['search_shipping'] != '0') ? $param['search_shipping'] : ($this->globalService->getShippingCode());
         $otodokes = $this->globalService->otodokeOption($customer_id, $search_shipping);
-
         return [
             'pagination' => $pagination,
             'customer_id' => $customer_id,
