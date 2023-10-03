@@ -35,124 +35,124 @@
 				</div>
 				<table class="table table-bordered">
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">返品番号</label>
 						</td>
-						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ product_returns_info.returns_no }}</p>
+						<td class="col-xs-9 text-left">
+							<p>{{ product_returns_info.returns_no }}</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">お客様</label>
 						</td>
-						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ customer.company_name }}</p>
+						<td class="col-xs-9 text-left">
+							<p>{{ customer.company_name }}</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">出荷先</label>
 						</td>
-						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ product_returns_info.shipping_name }}</p>
+						<td class="col-xs-9 text-left">
+							<p>{{ product_returns_info.shipping_name }}</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">届け先</label>
 						</td>
-						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ product_returns_info.otodoke_name }}</p>
+						<td class="col-xs-9 text-left">
+							<p>{{ product_returns_info.otodoke_name }}</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">出荷指示№</label>
 						</td>
-						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ product_returns_info.shipping_no }}</p>
+						<td class="col-xs-9 text-left">
+							<p>{{ product_returns_info.shipping_no }}</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">出荷日</label>
 						</td>
-						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ product_returns_info.shipping_date|date('Y/m/d') }}</p>
+						<td class="col-xs-9 text-left">
+							<p>{{ product_returns_info.shipping_date|date('Y-m-d') }}</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">JANコード</label>
 						</td>
-						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ product_returns_info.jan_code }}</p>
+						<td class="col-xs-9 text-left">
+							<p>{{ product_returns_info.jan_code }}</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">商品名</label>
 						</td>
-						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ product_name }}</p>
+						<td class="col-xs-9 text-left">
+							<p>{{ product_name }}</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">出荷数</label>
 						</td>
-						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ shipping_num }}</p>
+						<td class="col-xs-9 text-left">
+							<p>{{ shipping_num }}</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">返品理由</label>
 						</td>
-						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ returns_reson_text }}</p>
+						<td class="col-xs-9 text-left">
+							<p>{{ returns_reson_text }}</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">顧客コメント</label>
 						</td>
-						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ product_returns_info.customer_comment }}</p>
+						<td class="col-xs-9 text-left">
+							<p>{{ product_returns_info.customer_comment }}</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">返品数</label>
 						</td>
-						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ product_returns_info.returns_num }}</p>
+						<td class="col-xs-9 text-left">
+							<p>{{ product_returns_info.returns_num }}</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">返品依頼日</label>
 						</td>
-						<td class="col-xs-10 text-left">
-							<p class="text-nowrap">{{ product_returns_info.returns_request_date|date('Y/d/m') }}</p>
+						<td class="col-xs-9 text-left">
+							<p>{{ product_returns_info.returns_request_date|date('Y-m-d') }}</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="customer_code">返品承認日</label>
 						</td>
-						<td class="col-xs-10 text-left">
+						<td class="col-xs-9 text-left">
 							{% if product_returns_info.aprove_date is not empty %}
-								<p class="text-nowrap">{{ product_returns_info.aprove_date|date('Y/d/m') }}</p>
+								<p>{{ product_returns_info.aprove_date|date('Y-m-d') }}</p>
 							{% endif %}
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-2 text-right left_background">
+						<td class="col-xs-3 text-right left_background">
 							<label for="shipping_fee1">送料</label>
 						</td>
-						<td class="col-xs-10 text-left">
+						<td class="col-xs-9 text-left">
 							<label class="radio-inline">
 								<input type="radio" name="shipping_fee" id="shipping_fee1" value="1" disabled 
 									{% if product_returns_info.shipping_fee == 1 %} checked {% endif %}> 元払い

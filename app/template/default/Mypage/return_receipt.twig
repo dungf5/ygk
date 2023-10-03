@@ -48,7 +48,7 @@
 								<label for="customer_code">返品番号</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ product_returns_info.returns_no }}</p>
+								<p>{{ product_returns_info.returns_no }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -56,7 +56,7 @@
 								<label for="customer_code">お客様</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ customer.company_name }}</p>
+								<p>{{ customer.company_name }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -64,7 +64,7 @@
 								<label for="customer_code">出荷先</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ product_returns_info.shipping_name }}</p>
+								<p>{{ product_returns_info.shipping_name }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -72,7 +72,7 @@
 								<label for="customer_code">届け先</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ product_returns_info.otodoke_name }}</p>
+								<p>{{ product_returns_info.otodoke_name }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -80,7 +80,7 @@
 								<label for="customer_code">出荷指示№</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ product_returns_info.shipping_no }}</p>
+								<p>{{ product_returns_info.shipping_no }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -88,7 +88,7 @@
 								<label for="customer_code">出荷日</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ product_returns_info.shipping_date|date('Y/m/d') }}</p>
+								<p>{{ product_returns_info.shipping_date|date('Y-m-d') }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -96,7 +96,7 @@
 								<label for="customer_code">JANコード</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ product_returns_info.jan_code }}</p>
+								<p>{{ product_returns_info.jan_code }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -104,7 +104,7 @@
 								<label for="customer_code">商品名</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ product_name }}</p>
+								<p>{{ product_name }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -112,7 +112,7 @@
 								<label for="customer_code">出荷数</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ product_returns_info.shipping_num }}</p>
+								<p>{{ product_returns_info.shipping_num }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -120,7 +120,7 @@
 								<label for="customer_code">返品理由</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ returns_reson_text }}</p>
+								<p>{{ returns_reson_text }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -128,7 +128,7 @@
 								<label for="customer_code">顧客コメント</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ product_returns_info.customer_comment }}</p>
+								<p>{{ product_returns_info.customer_comment }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -136,8 +136,8 @@
 								<label for="customer_code">顧客からみた<br>良品・不良品</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								{% if product_returns_info.cus_reviews_flag == 1 %} <p class="text-nowrap">良品</p> {% endif %}
-								{% if product_returns_info.cus_reviews_flag == 2 %} <p class="text-nowrap">不良品</p> {% endif %}
+								{% if product_returns_info.cus_reviews_flag == 1 %} <p>良品</p> {% endif %}
+								{% if product_returns_info.cus_reviews_flag == 2 %} <p>不良品</p> {% endif %}
 							</td>
 						</tr>
 						<tr>
@@ -145,7 +145,7 @@
 								<label for="customer_code">返品数</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ returns_num }}</p>
+								<p>{{ returns_num }}</p>
 								<input type="hidden" name="returns_num" value="{{ returns_num }}" />
 							</td>
 						</tr>
@@ -154,7 +154,7 @@
 								<label for="customer_code">返品依頼日</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								<p class="text-nowrap">{{ product_returns_info.returns_request_date|date('Y/m/d') }}</p>
+								<p>{{ product_returns_info.returns_request_date|date('Y-m-d') }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -163,7 +163,7 @@
 							</td>
 							<td class="col-xs-9 text-left">
 								{% if product_returns_info.aprove_date is not empty %}
-									<p class="text-nowrap">{{ product_returns_info.aprove_date|date('Y/m/d') }}</p>
+									<p>{{ product_returns_info.aprove_date|date('Y-m-d') }}</p>
 								{% endif %}
 							</td>
 						</tr>
@@ -173,17 +173,17 @@
 							</td>
 							<td class="col-xs-9 text-left">
 								{% if product_returns_info.returns_status_flag == 1 %}
-									<p class="text-nowrap">承認</p>
+									<p>承認</p>
 								{% elseif product_returns_info.returns_status_flag == 2 %}
-									<p class="text-nowrap">未承認</p>
+									<p>未承認</p>
 								{% elseif product_returns_info.returns_status_flag == 3 %}
-									<p class="text-nowrap">受取受理</p>
+									<p>受取受理</p>
 								{% elseif product_returns_info.returns_status_flag == 4 %}
-									<p class="text-nowrap">受取未受理</p>
+									<p>受取未受理</p>
 								{% elseif product_returns_info.returns_status_flag == 5 %}
-									<p class="text-nowrap">返品完了</p>
+									<p>返品完了</p>
 								{% else %}
-									<p class="text-nowrap">申請中</p>
+									<p>申請中</p>
 								{% endif %}
 							</td>
 						</tr>
@@ -192,8 +192,8 @@
 								<label for="customer_code">送料</label>
 							</td>
 							<td class="col-xs-9 text-left">
-								{% if product_returns_info.shipping_fee == 1 %} <p class="text-nowrap">元払い</p> {% endif %}
-								{% if product_returns_info.shipping_fee == 2 %} <p class="text-nowrap">着払い</p> {% endif %}
+								{% if product_returns_info.shipping_fee == 1 %} <p>元払い</p> {% endif %}
+								{% if product_returns_info.shipping_fee == 2 %} <p>着払い</p> {% endif %}
 							</td>
 						</tr>
 						<tr>
