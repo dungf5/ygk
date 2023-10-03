@@ -10,6 +10,44 @@
 	.search:focus {
 		color: #fff;
 	}
+	.p-0 {
+		padding: 0;
+	}
+	.p-l-15 {
+		padding-left: 15px;
+	}
+	.p-r-15 {
+		padding-right: 15px;
+	}
+	.table {
+		font-size: 87.5%;
+		margin: 0 0 50px;
+	}
+	.table thead tr th {
+		background: #666;
+		font-size: 93.75%;
+		color: #fff;
+		text-align: center !important;
+		vertical-align: middle;
+		border-top: 2px solid #ccc !important;
+		border-bottom: 2px solid #ccc !important;
+		border-left: 1px dotted #ccc;
+		padding: 0.5em;
+	}
+	.table tbody tr:nth-child(even) td {
+		background: #fdfdf4;
+	}
+	.table tbody tr td:first-child {
+		border-left: none;
+	}
+	.table tbody tr td {
+		text-align: center!important;
+		vertical-align: middle;
+		border-top: none!important;
+		border-bottom: 2px solid #ccc!important;
+		border-left: 1px dotted #ccc;
+		padding: 0.5em;
+	}
 </style>
 {% endblock stylesheet %}
 
@@ -27,8 +65,15 @@
 					{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}
 				</p>
 			{% endif %}
+
+			{% if pagination and pagination.totalItemCount > 0 %}
+				<div class="ec-pagerRole">
+					{% include "pager.twig" with {'pages': pagination.paginationData} %}
+				</div>
+			{% endif %}
+
 			<div class="table-responsive">
-				<table class="table myTable">
+				<table class="table">
 					<thead>
 						<tr>
 							<th title={{ "front.mypage.history.return_no" | trans | raw }}>

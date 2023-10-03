@@ -67,6 +67,44 @@
 	input[type=number] {
   		-moz-appearance: textfield;
 	}
+	.p-0 {
+		padding: 0;
+	}
+	.p-l-15 {
+		padding-left: 15px;
+	}
+	.p-r-15 {
+		padding-right: 15px;
+	}
+	.table {
+		font-size: 87.5%;
+		margin: 0 0 50px;
+	}
+	.table thead tr th {
+		background: #666;
+		font-size: 93.75%;
+		color: #fff;
+		text-align: center !important;
+		vertical-align: middle;
+		border-top: 2px solid #ccc !important;
+		border-bottom: 2px solid #ccc !important;
+		border-left: 1px dotted #ccc;
+		padding: 0.5em;
+	}
+	.table tbody tr:nth-child(even) td {
+		background: #fdfdf4;
+	}
+	.table tbody tr td:first-child {
+		border-left: none;
+	}
+	.table tbody tr td {
+		text-align: center!important;
+		vertical-align: middle;
+		border-top: none!important;
+		border-bottom: 2px solid #ccc!important;
+		border-left: 1px dotted #ccc;
+		padding: 0.5em;
+	}
 </style>
 {% endblock stylesheet %}
 
@@ -80,7 +118,7 @@
 		</div>
 		<div class="ec-mypageRole">
 			<div class="row">
-				<div class="col-md-6">
+				<div class="col-md-6 col-xs-12 p-0 p-l-15">
 					<div class="alert alert-search" role="alert">
 						<form class="form-inline" method="GET">
 							<div class="form-group">
@@ -93,7 +131,7 @@
 						</form>
 					</div>
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-6 col-xs-12 p-0 p-r-15">
 					<div class="alert alert-return" role="alert">
 						<a class="btn btn-return" href={{ url('mypage_return_create') }}>
 							<i class="fas fa-arrow-right"></i> 一覧にない場合はこちら
@@ -106,8 +144,15 @@
 					{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}
 				</p>
 			{% endif %}
+
+			{% if pagination and pagination.totalItemCount > 0 %}
+				<div class="ec-pagerRole">
+					{% include "pager.twig" with {'pages': pagination.paginationData} %}
+				</div>
+			{% endif %}
+
 			<div class="table-responsive">
-				<table class="table myTable">
+				<table class="table">
 					<thead>
 						<tr>
 							<th title="{{ "front.mypage.return.return_type" | trans | raw }}">
@@ -119,9 +164,7 @@
 							<th title="{{ "front.mypage.return.return_number_request" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.return_number_request" | trans | raw }}</p>
 							</th>
-{#							<th title="{{ "front.mypage.return.return_status" | trans | raw }}">#}
-{#								<p class="text-nowrap">{{ "front.mypage.return.return_status" | trans | raw }}</p>#}
-{#							</th>#}
+
 							<th title="{{ "front.mypage.return.shipping_no" | trans | raw }}">
 								<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
 							</th>
@@ -186,32 +229,15 @@
 						{% set index = 0 %}
 						<tbody>
 							{% for item in pagination %}
-							{% set index = index + 1 %}
-{#								{% if item.returns_status_flag is defined and item.returns_status_flag != null %}#}
-{#									{% if item.returns_status_flag == 1 %}#}
-{#										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_receipt', { 'returns_no':item.returns_no } ) }}" method="GET">#}
-{#									{% elseif item.returns_status_flag == 2 or item.returns_status_flag == 3 or item.returns_status_flag == 4 %}#}
-{#										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_complete', { 'returns_no':item.returns_no } ) }}" method="GET">#}
-{#									{% else %}#}
-{#										<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_approve', { 'returns_no':item.returns_no } ) }}" method="GET">#}
-{#									{% endif %}#}
-{#								{% else %}#}
-{#									<form id="return_create_{{index}}" action="{{ url('mypage_return_create') }}" method="POST">#}
-{#								{% endif %}#}
+								{% set index = index + 1 %}
+								{% if item.quantity > 1 %}
+									{% set item_shipping_num = item.shipping_num * item.quantity %}
+								{% else %}
+									{% set item_shipping_num = item.shipping_num %}
+								{% endif %}
 
-								<form id="return_create_{{index}}" action="{{ url('mypage_return_create') }}" method="POST">
-
-{#								{% if item.returns_status_flag is defined and item.returns_status_flag != null %}#}
-{#									<tr ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >#}
-{#								{% else %}#}
-{#									<tr ondblclick="$('#return_create_{{index}}').submit()" >#}
-{#								{% endif %}#}
+								<form action="{{ url('mypage_return_create') }}" method="POST">
 									<tr>
-										{% if item.quantity > 1 %}
-											{% set item_shipping_num = item.shipping_num * item.quantity %}
-										{% else %}
-											{% set item_shipping_num = item.shipping_num %}
-										{% endif %}
 										<td title="手続き">
 											<button type="submit" class="btn btn-warning" role="button" {% if item.total_returns_num >= item_shipping_num %}disabled{% endif %}>手続き</button>
 										</td>
@@ -221,25 +247,6 @@
 										<td title={{ item.total_returns_num }}>
 											<p class="text-nowrap">{{ item.total_returns_num }}</p>
 										</td>
-{#										<td title={{ item.returns_status_flag  is empty ? "" : item.returns_status_flag }}>#}
-{#											{% if item.returns_status_flag is defined and item.returns_status_flag != null %}#}
-{#												{% if item.returns_status_flag == 0 %}#}
-{#													<p class="text-nowrap">申請中</p>#}
-{#												{% elseif item.returns_status_flag == 1 %}#}
-{#													<p class="text-nowrap">承認</p>#}
-{#												{% elseif item.returns_status_flag == 2 %}#}
-{#													<p class="text-nowrap">未承認</p>#}
-{#												{% elseif item.returns_status_flag == 3 %}#}
-{#													<p class="text-nowrap">受取受理</p>#}
-{#												{% elseif item.returns_status_flag == 4 %}#}
-{#													<p class="text-nowrap">受取未受理</p>#}
-{#												{% elseif item.returns_status_flag == 5 %}#}
-{#													<p class="text-nowrap">返品完了</p>#}
-{#												{% endif %}#}
-{#											{% else %}#}
-{#												<p class="text-nowrap"></p>#}
-{#											{% endif %}#}
-{#										</td>#}
 										<td title={{ item.shipping_no }}>
 											<p class="text-nowrap">{{ item.shipping_no }}</p>
 										</td>
@@ -265,6 +272,8 @@
 												{{ item_shipping_num }}
 											</p>
 										</td>
+
+										{#Hidden data#}
 										<input type="hidden" name="shipping_no" value="{{ item.shipping_no }}"/>
 										<input type="hidden" name="shipping_day" value="{{ item.shipping_date }}"/>
 										<input type="hidden" name="jan_code" value="{{ item.jan_code }}"/>
@@ -289,6 +298,7 @@
 					{% endif %}
 				</table>
 			</div>
+
 			{% if pagination and pagination.totalItemCount > 0 %}
 				<div class="ec-pagerRole">
 					{% include "pager.twig" with {'pages': pagination.paginationData} %}
