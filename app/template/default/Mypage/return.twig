@@ -145,12 +145,6 @@
 				</p>
 			{% endif %}
 
-			{% if pagination and pagination.totalItemCount > 0 %}
-				<div class="ec-pagerRole">
-					{% include "pager.twig" with {'pages': pagination.paginationData} %}
-				</div>
-			{% endif %}
-
 			<div class="table-responsive">
 				<table class="table">
 					<thead>
