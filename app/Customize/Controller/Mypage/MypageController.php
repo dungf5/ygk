@@ -1234,13 +1234,14 @@ class MypageController extends AbstractController
             // Set Aprove auto. returns_status_flag = 1
             if (
                 in_array(trim($param['return_reason']), ['02', '04']) &&
-                date('Ymd') - date('Ymd', strtotime($param['shipping_day'])) < 30
+                date('Ymd', strtotime(' - 30 days')) <= date('Ymd', strtotime($param['shipping_day'])) &&
+                date('Ymd', strtotime($param['shipping_day'])) <= date('Ymd')
             ) {
                 $param['returns_status_flag'] = 1;
             } else {
                 $param['returns_status_flag'] = 0;
             }
-
+           
             $returns_reson = $commonService->getReturnsReson();
             $shippings = $commonService->getMstShippingCustomer($login_type, $customer_id);
             $otodokes = [];
