@@ -1156,7 +1156,7 @@ class MailService
         ]);
 
         $message = (new \Swift_Message())
-            ->setSubject('[XBRAID JAPAN] 返品リクエスト承認のご案内')
+            ->setSubject('[XBRAID JAPAN]  返品リクエストが届きました')
             ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
             ->setTo([$email])
             ->setBody($body);

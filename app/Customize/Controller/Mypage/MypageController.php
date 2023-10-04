@@ -1393,10 +1393,10 @@ class MypageController extends AbstractController
                         ]);
                 }
 
-                // Send mail
-                $email = $customer['customer_email'] ?? $customer['email'];
-                $url_preview = $this->generateUrl('mypage_return_preview', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
-                $this->mailService->sendMailReturnProductPreview($email, $url_preview);
+                // Send mail User
+//                $email = $customer['customer_email'] ?? $customer['email'];
+//                $url_preview = $this->generateUrl('mypage_return_preview', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+//                $this->mailService->sendMailReturnProductPreview($email, $url_preview);
 
                 if (!$param['returns_status_flag']) {
                     // Send mail Aprove step 1
