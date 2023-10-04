@@ -1241,7 +1241,7 @@ class MypageController extends AbstractController
             } else {
                 $param['returns_status_flag'] = 0;
             }
-           
+
             $returns_reson = $commonService->getReturnsReson();
             $shippings = $commonService->getMstShippingCustomer($login_type, $customer_id);
             $otodokes = [];
