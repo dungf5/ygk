@@ -300,6 +300,10 @@ $(function() {
         </div>
         <div class="ec-shelfRole">
             {% if pagination.totalItemCount > 0 %}
+                <div class="ec-pagerRole">
+                    {% include "pager.twig" with {'pages': pagination.paginationData} %}
+                </div>
+
                 <div class="w-100" >
                     {% if app.user==null %}
                         <div style="text-align: center;color:#00B050">未ログインのため、標準単価を表示しています</div>
@@ -330,21 +334,23 @@ $(function() {
                                         </div>
 
                                         <div class="itemName">
+                                            <input type="hidden" name="product_code" readonly value="{{ Product.product_code }}"/>
+                                            <input type="hidden" name="product_name_kana" readonly value="{{ Product.product_name_kana }}"/>
                                             <p class="sku">{{ Product.jan_code }}</p>
                                             <p class="name">{{ Product.product_name }}</p>
                                             <div class="numPrice">
-                                                {% if Product.mst_quantity > 1 %}
+                                                {% if Product.quantity > 1 %}
                                                     <dl>
                                                         <dt>販売単位</dt>
-                                                        <dd> : {{ Product.mst_quantity }}個/箱～</dd>
+                                                        <dd> : {{ Product.quantity }}個/箱～</dd>
                                                     </dl>
                                                 {% else %}
                                                     <dl>
                                                         <dt>販売単位</dt>
                                                         <dd>
-                                                            : {{ Product.mst_quantity }}個～
+                                                            : {{ Product.quantity }}個～
 
-                                                            {% if Product.mst_quantity == 1 and Product.quantity_box > 0 %}
+                                                            {% if Product.quantity == 1 and Product.quantity_box > 0 %}
                                                                 （ボックス単位数：{{ Product.quantity_box }}個）
                                                             {% endif %}
                                                         </dd>
@@ -452,12 +458,12 @@ $(function() {
                                             {% endif %}
 
                                             <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}:</span>
-                                                    {{ form_widget(form.quantity, {'attr': {'myId':Product.id,'title':'','mymst_quantity':Product.mst_quantity,'class': 'quantity','value': Product.mst_quantity|number_format
-                                                    ,'min':Product.mst_quantity
-                                                    ,'step':Product.mst_quantity}}) }}
+                                                    {{ form_widget(form.quantity, {'attr': {'myId':Product.id,'title':'','mymst_quantity':Product.quantity,'class': 'quantity','value': Product.quantity|number_format
+                                                    ,'min':Product.quantity
+                                                    ,'step':Product.quantity}}) }}
                                                 {{ form_errors(form.quantity) }}
                                             </div>
-                                            <input type="hidden" id="checkQuantity{{ Product.id }}" class="checkQuantity"  value="{{ Product.mst_quantity }}">
+                                            <input type="hidden" id="checkQuantity{{ Product.id }}" class="checkQuantity"  value="{{ Product.quantity }}">
 
                                             {#product type#}
                                             <input type="hidden" name="product_type" value="{{ Product.product_type }}">

@@ -25,6 +25,7 @@ use Eccube\Entity\Cart;
 use Eccube\Entity\CartItem;
 use Eccube\Entity\Customer;
 use Eccube\Repository\AbstractRepository;
+use Eccube\Util\StringUtil;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -3375,6 +3376,111 @@ SQL;
 
             return $row[0] ?? [];
         } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getTankaList($searchData, $shipping_code = '', $customer_code = '')
+    {
+        if (empty($shipping_code) || empty($customer_code)) {
+            return [];
+        }
+
+        $param = [$shipping_code, $customer_code];
+        $additionalCondition = '';
+
+        // Search left menu
+        if (isset($searchData['mode']) && $searchData['mode'] == 'searchLeft') {
+            $commonService = new MyCommonService($this->entityManager);
+
+            if (StringUtil::isNotBlank($searchData['s_product_name'])) {
+                $arCode = $commonService->getSearchProductName($searchData['s_product_name']);
+                $tempCondition = '';
+
+                foreach ($arCode as $item) {
+                    $item = trim($item);
+                    if ($item == '') {
+                        continue;
+                    }
+
+                    $tempCondition .= ' mp.jan_code = ? or ';
+                    array_push($param, $item);
+                }
+
+                $additionalCondition .= ' AND ( '.trim($tempCondition, 'or ').' ) ';
+            }
+
+            if (StringUtil::isNotBlank($searchData['s_jan'])) {
+                $arrJan = explode(' ', $searchData['s_jan']);
+                $tempCondition = '';
+
+                foreach ($arrJan as $item) {
+                    $item = trim($item);
+                    if ($item == '') {
+                        continue;
+                    }
+
+                    $tempCondition .= ' mp.jan_code like ? or ';
+                    array_push($param, '%'.$item.'%');
+                }
+
+                $additionalCondition .= ' AND ( '.trim($tempCondition, 'or ').' ) ';
+            }
+
+            if (StringUtil::isNotBlank($searchData['s_catalog_code'])) {
+                $arCode = $commonService->getSearchCatalogCode($searchData['s_catalog_code']);
+                $tempCondition = '';
+
+                foreach ($arCode as $item) {
+                    $item = trim($item);
+                    if ($item == '') {
+                        continue;
+                    }
+
+                    $tempCondition .= ' mp.jan_code = ? or ';
+                    array_push($param, $item);
+                }
+
+                $additionalCondition .= ' AND ( '.trim($tempCondition, 'or ').' ) ';
+            }
+        }
+
+        $sql = " select
+                    MAX(pri.tanka_number) AS max_tanka_number
+                from
+                    dt_customer_relation as cur
+                join
+                    dt_price as pri
+                on
+                    cur.customer_code = pri.customer_code
+                and
+                    cur.shipping_code = pri.shipping_no
+                join
+                    mst_product mp
+                on
+                    mp.product_code = pri.product_code
+                WHERE
+                    pri.shipping_no = ?
+                AND pri.customer_code = ?
+                AND DATE_FORMAT(NOW(), '%Y-%m-%d') >= pri.valid_date
+                AND DATE_FORMAT(NOW(), '%Y-%m-%d') < pri.expire_date
+                {$additionalCondition}
+                GROUP BY
+                    pri.product_code
+                 ORDER BY
+                    pri.tanka_number desc; 
+                ";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            $arrTanaka = array_column($rows, 'max_tanka_number');
+
+            return $arrTanaka;
+        } catch (\Exception $e) {
+            log_info($e->getMessage());
+
             return [];
         }
     }
