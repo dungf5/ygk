@@ -1,16 +1,16 @@
-deploy_production:
+deploy_develop:
   tags:
-    - production
+    - develop
   before_script:
-    - whoami > /var/tmp/ygk-production.txt
+    - whoami > /var/tmp/ygk-dev1.txt
     - eval $(ssh-agent -s)
     - ssh-add /home/ec2-user/.ssh/id_rsa
-    - cd /var/www/html/production
+    - cd /var/www/html/develop
   environment:
-    name: production
+    name: develop
   when: manual
   script:
     - git checkout .
     - git pull origin
   only:
-    - production
+    - develop
