@@ -3,63 +3,71 @@
 {% set body_class = 'mypage' %}
 
 {% block stylesheet %}
-    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap-multiselect.min.css') }}">
-	<style>
-		.alert-search {
-			border: solid 1px #333;
-			background-color: #ccc;
-			border-radius: 8px;
-		}
-		.btn-search,
-		.btn-search:hover,
-		.btn-search:focus {
-			background-color: #000;
-			color: #fff;
-			border-radius: 8px;
-		}
-		.alert-return {
-			float: right;
-		}
-		.btn-return,
-		.btn-return:hover,
-		.btn-return:focus {
-			border: none;
-			border-radius: 0;
-			background-color: #f00;
-			color: #fff;
-			font-weight: bold;
-			font-size: 16px;
-			padding: 12px 36px;
-			position: relative;
-		}
-		.btn-return:after {
-			content: "";
-			position: absolute;
-			left: -25px;
-			bottom: 0;
-			width: 0;
-			height: 0;
-			border-left: 25px solid transparent;
-			border-top: 23px solid #f00;
-			border-bottom: 23px solid #f00;
-		}
-		.btn-return:before {
-			content: "";
-			position: absolute;
-			right: -25px;
-			bottom: 0;
-			width: 0;
-			height: 0;
-			border-left: 25px solid red;
-			border-top: 23px solid transparent;
-			border-bottom: 23px solid transparent;
-		}
-		.search_shipping_date,
-		.search_shipping_date:hover,
-		.search_shipping_date:focus {
-			color: #fff;
-		}
-	</style>
+<link rel="stylesheet" href="{{ asset('assets/css/select2/select2.min.css', 'user_data') }}">
+<style>
+	.alert-search {
+		border: solid 1px #333;
+		background-color: #ccc;
+		border-radius: 8px;
+	}
+	.btn-search,
+	.btn-search:hover,
+	.btn-search:focus {
+		background-color: #000;
+		color: #fff;
+		border-radius: 8px;
+	}
+	.alert-return {
+		float: right;
+	}
+	.btn-return,
+	.btn-return:hover,
+	.btn-return:focus {
+		border: none;
+		border-radius: 0;
+		background-color: #f00;
+		color: #fff;
+		font-weight: bold;
+		font-size: 16px;
+		padding: 12px 36px;
+		position: relative;
+	}
+	.btn-return:after {
+		content: "";
+		position: absolute;
+		left: -24px;
+		bottom: 0;
+		width: 0;
+		height: 0;
+		border-left: 25px solid transparent;
+		border-top: 24px solid #f00;
+		border-bottom: 23px solid #f00;
+	}
+	.btn-return:before {
+		content: "";
+		position: absolute;
+		right: -24px;
+		bottom: 0;
+		width: 0;
+		height: 0;
+		border-left: 25px solid red;
+		border-top: 24px solid transparent;
+		border-bottom: 23px solid transparent;
+	}
+	.search,
+	.search:hover,
+	.search:focus {
+		color: #fff;
+	}
+	input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+  		-webkit-appearance: none;
+  		margin: 0;
+	}
+	input[type=number] {
+  		-moz-appearance: textfield;
+	}
+</style>
 {% endblock stylesheet %}
 
 {% block main %}
@@ -77,7 +85,7 @@
 						<form class="form-inline" method="GET">
 							<div class="form-group">
 								<label for="jan_code">JANコード</label>
-								<input type="text" class="form-control" id="jan_code" name="jan_code" value="{{ param.search_jan_code }}"/>
+								<input type="text" class="form-control" id="search_jan_code" name="search_jan_code" value="{{ param.search_jan_code }}"/>
 							</div>
 							<button type="submit" class="btn btn-search">
 								<i class="fas fa-angle-double-right" style="color: #f00"></i > 絞り込み
@@ -87,101 +95,149 @@
 				</div>
 				<div class="col-md-6">
 					<div class="alert alert-return" role="alert">
-						<a class="btn btn-return">
+						<a class="btn btn-return" href={{ url('mypage_return_create') }}>
 							<i class="fas fa-arrow-right"></i> 一覧にない場合はこちら
 						</a>
 					</div>
 				</div>
 			</div>
-
 			{% if pagination and pagination.totalItemCount > 0 %}
 				<p class="ec-para-normal">
 					{{ 'front.mypage.history_count'|trans({'%count%':pagination.totalItemCount}) }}
 				</p>
 			{% endif %}
-
-			<table class="table myTable">
-				<thead>
-					<tr>
-						<th title="return_type">
-							<p class="text-nowrap">{{ "front.mypage.return.return_type" | trans | raw }}</p>
-						</th>
-						<th title="return_number">
-							<p class="text-nowrap">{{ "front.mypage.return.return_number" | trans | raw }}</p>
-						</th>
-						<th title="return_status">
-							<p class="text-nowrap">{{ "front.mypage.return.return_status" | trans | raw }}</p>
-						</th>
-						<th title="shipping_no">
-							<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
-						</th>
-						<th title="shipping_date">
-							<a href="javascript:void(0)" class="text-nowrap search_shipping_date">
-                                {{ "front.mypage.return.shipping_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
-                            </a>
-						</th>
-						<th title="shiping_code otodoke_code">
-							<a href="javascript:void(0)" class="text-nowrap search_shipping_date">
-                                {{ "front.mypage.return.shiping_code" | trans | raw}} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
-                            </a>
-							<br/>
-							<a href="javascript:void(0)" class="text-nowrap search_shipping_date">
-                                {{ "front.mypage.return.otodoke_code" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
-                            </a>
-						</th>
-						<th title="jan_code product_name">
-							<p class="text-nowrap">{{ "front.mypage.return.jan_code" | trans | raw }}</p>
-							<p class="text-nowrap">{{ "front.mypage.return.product_name" | trans | raw }}</p>
-						</th>
-						<th title="shipping_num">
-							<p class="text-nowrap">{{ "front.mypage.return.shipping_num" | trans | raw }}</p>
-						</th>
-					</tr>
-				</thead>
-				{% if pagination and pagination.totalItemCount > 0 %}
-					<tbody>
-						{% for item in pagination %}
+			<div class="table-responsive">
+				<table class="table myTable">
+					<thead>
+						<tr>
+							<th title="return_type">
+								<p class="text-nowrap">{{ "front.mypage.return.return_type" | trans | raw }}</p>
+							</th>
+							<th title="return_number">
+								<p class="text-nowrap">{{ "front.mypage.return.return_number" | trans | raw }}</p>
+							</th>
+							<th title="return_status">
+								<p class="text-nowrap">{{ "front.mypage.return.return_status" | trans | raw }}</p>
+							</th>
+							<th title="shipping_no">
+								<p class="text-nowrap">{{ "front.mypage.return.shipping_no" | trans | raw }}</p>
+							</th>
+							<th title="shipping_date">
+								<select class="hidden" id="search_shipping_date" name="search_shipping_date">
+									<option value="0" {% if param.search_shipping_date == 0 %} selected {% endif %}>全て</option>
+									{% for shipping_date in shipping_date_list %}
+										<option value="{{ shipping_date }}" {% if param.search_shipping_date == shipping_date %} selected {% endif %}>{{ shipping_date }}</option>
+									{% endfor %}
+								</select>
+								<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_shipping_date').select2('open')">
+									{{ "front.mypage.return.shipping_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+								</a>
+							</th>
+							<th title="shiping_code otodoke_code">
+								<select class="hidden" id="search_shipping" name="search_shipping">
+									<option value="0" {% if param.search_shipping == 0 %} selected {% endif %}>全て</option>
+									{% for shipping in shippings %}
+										<option
+											value="{{ shipping.shipping_no }}"
+											{% if param.search_shipping == shipping.shipping_no %} selected {% endif %}
+										>
+											{{ shipping.name01 }} 〒 {{ shipping.postal_code }} {{ shipping.addr01 }} {{ shipping.addr02 }} {{ shipping.addr03 }}
+										</option>
+									{% endfor %}
+								</select>
+								<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_shipping').select2('open')">
+									{{ "front.mypage.return.shiping_code" | trans | raw}} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+								</a>
+								<br/>
+								<select class="hidden" id="search_otodoke" name="search_otodoke">
+									<option value="0" {% if param.search_otodoke == 0 %} selected {% endif %}>全て</option>
+									{% for otodoke in otodokes %}
+										<option
+											value="{{ otodoke.otodoke_code }}"
+											{% if param.search_otodoke == otodoke.otodoke_code %} selected {% endif %}
+										>
+											{{ otodoke.name01 }} 〒 {{ otodoke.postal_code }} {{ otodoke.addr01 }} {{ otodoke.addr02 }} {{otodoke.addr03 }}
+										</option>
+									{% endfor %}
+								</select>
+								<a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_otodoke').select2('open')">
+									{{ "front.mypage.return.otodoke_code" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+								</a>
+							</th>
+							<th title="jan_code product_name">
+								<p class="text-nowrap">{{ "front.mypage.return.jan_code" | trans | raw }}</p>
+								<p class="text-nowrap">{{ "front.mypage.return.product_name" | trans | raw }}</p>
+							</th>
+							<th title="shipping_num">
+								<p class="text-nowrap">{{ "front.mypage.return.shipping_num" | trans | raw }}</p>
+							</th>
+						</tr>
+					</thead>
+					{% if pagination and pagination.totalItemCount > 0 %}
+						<tbody>
+							{% for item in pagination %}
+								{% if item.returns_status_flag == 1 %}
+									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_receipt', { 'returns_no':item.returns_no } ) }}" method="GET">
+								{% elseif item.returns_status_flag == 2 or item.returns_status_flag == 3 or item.returns_status_flag == 4 %}
+									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_complete', { 'returns_no':item.returns_no } ) }}" method="GET">
+								{% else %}
+									<form id="return_edit_{{item.returns_no}}" action="{{ url( 'mypage_return_approve', { 'returns_no':item.returns_no } ) }}" method="GET">
+								{% endif %}
+									<tr 
+										ondblclick="$('#return_edit_{{item.returns_no}}').submit()" >
+										<td title="return_type">
+											<button type="submit" class="btn btn-warning" role="button">手続き</button> 
+										</td>
+										<td title="return_number">
+											<input type="number" id="returns_num" name="returns_num" class="form-control" value="{{ item.returns_num }}"/>
+										</td>
+										<td title="return_status">
+											{% if item.returns_status_flag == 1 %}
+												<p class="text-nowrap">承認</p>
+											{% elseif item.returns_status_flag == 2 %}
+												<p class="text-nowrap">未承認</p>
+											{% elseif item.returns_status_flag == 3 %}
+												<p class="text-nowrap">受取受理</p>
+											{% elseif item.returns_status_flag == 4 %}
+												<p class="text-nowrap">受取未受理</p>
+											{% elseif item.returns_status_flag == 5 %}
+												<p class="text-nowrap">返品完了</p>
+											{% else %}
+												<p class="text-nowrap">申請中</p>
+											{% endif %}
+										</td>
+										<td title="shipping_no">
+											<p class="text-nowrap">{{ item.shipping_no }}</p>
+										</td>
+										<td title="shipping_date">
+											<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y/m/d') }}</p>
+										</td>
+										<td title="shiping_code otodoke_code">
+											<p class="text-nowrap">{{ item.shipping_name }}</p>
+											<p class="text-nowrap">{{ item.otodoke_name }}</p>
+										</td>
+										<td title="jan_code product_name">
+											<p class="text-nowrap">{{ item.jan_code }}</p>
+											<p class="text-nowrap">{{ item.product_name }}</p>
+										</td>
+										<td title="shipping_num">
+											<p class="text-nowrap">{{ item.shipping_num }}</p>
+										</td>
+									</tr>
+								</form>
+							{% endfor %}
+						</tbody>
+					{% else %}
+						<tbody>
 							<tr>
-								<td title="return_type">
-									<a href="#" class="btn btn-warning" role="button">手続き</a>
-								</td>
-								<td title="return_number">
-									<input type="number" class="form-control" />
-								</td>
-								<td title="return_status">
-									1
-								</td>
-								<td title="shipping_no">
-									<p class="text-nowrap">{{ item.shipping_no }}</p>
-								</td>
-								<td title="shipping_date">
-									<p class="text-nowrap">{{ item.shipping_date }}</p>
-								</td>
-								<td title="shiping_code otodoke_code">
-									<p class="text-nowrap">{{ item.shipping_name }}</p>
-									<p class="text-nowrap">{{ item.otodoke_name }}</p>
-								</td>
-								<td title="jan_code product_name">
-									<p class="text-nowrap">{{ item.jan_code }}</p>
-									<p class="text-nowrap">{{ item.product_name }}</p>
-								</td>
-								<td title="shipping_num">
-									<p class="text-nowrap">{{ item.shipping_num }}</p>
+								<td colspan="8">
+									<p>返品手続きの履歴がありません。</p>
 								</td>
 							</tr>
-						{% endfor %}
-					</tbody>
-				{% else %}
-					<tbody>
-						<tr>
-							<td colspan="8">
-								<p>返品手続きの履歴がありません。</p>
-							</td>
-						</tr>
-					</tbody>
-				{% endif %}
-			</table>
-
+						</tbody>
+					{% endif %}
+				</table>
+			</div>
 			{% if pagination and pagination.totalItemCount > 0 %}
 				<div class="ec-pagerRole">
 					{% include "pager.twig" with {'pages': pagination.paginationData} %}
@@ -192,8 +248,51 @@
 {% endblock main%}
 
 {% block javascript %}
-<script src="{{ asset('assets/js/bootstrap-multiselect.min.js') }}"></script>
+<script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
 <script>
-	
+	var search_jan_code      = "{{ param.search_jan_code }}"
+	var search_shipping_date = "{{ param.search_shipping_date }}"
+	var search_shipping      = "{{ param.search_shipping }}"
+	var search_otodoke       = "{{ param.search_otodoke }}"
+
+	function reload() {
+		loadingOverlay("show")
+		let _parser = new URL( window.location.href )
+		_parser.searchParams.set( 'search_jan_code', search_jan_code )
+		_parser.searchParams.set( 'search_shipping_date', search_shipping_date )
+		_parser.searchParams.set( 'search_shipping', search_shipping )
+		_parser.searchParams.set( 'search_otodoke', search_otodoke )
+		window.location = _parser.href
+	}
+
+	$( function() {
+		$("#search_shipping_date").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_shipping_date = e.params.data.id
+			reload()
+		});
+
+		$("#search_shipping").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_shipping = e.params.data.id
+			if( search_shipping == 0 ) search_otodoke = 0
+			reload()
+		});
+
+		$("#search_otodoke").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_otodoke = e.params.data.id
+			reload()
+		});
+	} );
 </script>
 {% endblock %}

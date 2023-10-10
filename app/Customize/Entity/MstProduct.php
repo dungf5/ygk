@@ -783,5 +783,29 @@ if (!class_exists('\Customize\Entity\MstProduct', false)) {
         {
             $this->discontinued_date = $discontinued_date;
         }
+
+        /**
+         * @var string
+         *
+         * @ORM\Column(name="product_name_kana", type="string", nullable=true)
+         */
+        private $product_name_kana;
+
+        /**
+         * @return string
+         */
+        public function getProductNameKana(): string
+        {
+            return $this->product_name_kana;
+        }
+
+        /**
+         * @param string $product_name_kana
+         */
+        public function setProductNameKana(string $product_name_kana): void
+        {
+            $this->product_name_kana = $product_name_kana;
+        }
+
     }
 }

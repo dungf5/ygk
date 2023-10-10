@@ -25,6 +25,7 @@ use Eccube\Entity\Cart;
 use Eccube\Entity\CartItem;
 use Eccube\Entity\Customer;
 use Eccube\Repository\AbstractRepository;
+use Eccube\Util\StringUtil;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -93,8 +94,8 @@ class MyCommonService extends AbstractRepository
                     a.price_view_flg,
                     a.fusrdec1,
                     a.pdf_export_flg,
-                    a.fusrstr8
-         ';
+                    a.fusrstr8         
+                ';
 
         $sql = " SELECT $column   FROM mst_customer a join `dtb_customer` `dtcus` on((`dtcus`.`id` = `a`.`ec_customer_id`))  WHERE ec_customer_id=?";
         $param = [];
@@ -131,7 +132,7 @@ class MyCommonService extends AbstractRepository
             $result = $statement->executeQuery($param);
             $rows = $result->fetchAllAssociative();
 
-            return $rows[0];
+            return $rows[0] ?? null;
         } catch (Exception $e) {
             return null;
         }
@@ -309,8 +310,6 @@ SQL;
                     d.company_name as user_created_company_name,
                     b.jan_code,
                     f.order_no as deli_order_no,
-                    c.ec_order_no,
-                    c.ec_order_lineno,
                     b.product_name,
                     b.quantity,
                     f.delivery_no,
@@ -1085,59 +1084,48 @@ SQL;
             case 'shipping_code':
                 $condition = 'dt_order_status.shipping_code = ?';
                 break;
-
             case 'otodoke_code':
                 $condition = 'dt_order_status.otodoke_code = ?';
                 break;
-
             default:
                 $condition = 'dt_order_status.customer_code = ?';
                 break;
         }
-
         $myPara = [$customer_code];
-
         $date_from_condition = '';
         if (!empty($params_search['search_shipping_date_from'])) {
             $date_from_condition = "AND DATE_FORMAT(mst_delivery.delivery_date,'%Y-%m-%d') >= ?";
             $myPara[] = $params_search['search_shipping_date_from'];
         }
-
         $date_to_condition = '';
         if (!empty($params_search['search_shipping_date_to'])) {
             $date_to_condition = "AND DATE_FORMAT(mst_delivery.delivery_date,'%Y-%m-%d') <= ?";
             $myPara[] = $params_search['search_shipping_date_to'];
         }
-
         $shipping_date_condition = '';
         if (!empty($params_search['search_shipping_date'])) {
             $shipping_date_condition = 'AND mst_delivery.delivery_date like ?';
             $myPara[] = $params_search['search_shipping_date'].'-%';
         }
-
         $order_shipping_condition = '';
         if (!empty($params_search['search_order_shipping'])) {
             $order_shipping_condition = 'AND TRIM(mst_delivery.shiping_name) = (select company_name from mst_customer where customer_code = ?)';
             $myPara[] = $params_search['search_order_shipping'];
         }
-
         $order_otodoke_condition = '';
         if (!empty($params_search['search_order_otodoke'])) {
             $order_otodoke_condition = 'AND TRIM(mst_delivery.otodoke_name) = (select company_name from mst_customer where customer_code = ?)';
             $myPara[] = $params_search['search_order_otodoke'];
         }
-
         $sale_type_condition = '';
         if ($params_search['search_sale_type'] != '0') {
             if ($params_search['search_sale_type'] == '1') {
                 $sale_type_condition = "AND TRIM(mst_delivery.sale_type) = '通常' ";
             }
-
             if ($params_search['search_sale_type'] == '2') {
                 $sale_type_condition = "AND TRIM(mst_delivery.sale_type) = '返品' ";
             }
         }
-
         $sql = "
                         SELECT
                             mst_delivery.delivery_no
@@ -1162,15 +1150,13 @@ SQL;
                         GROUP BY
                             mst_delivery.delivery_no
                         ORDER BY
-                            mst_delivery.delivery_date ASC, mst_delivery.order_no ASC
+                            mst_delivery.delivery_date ASC, mst_delivery.delivery_no ASC
                 ";
-
         try {
             $statement = $this->entityManager->getConnection()->prepare($sql);
             $result = $statement->executeQuery($myPara);
             $rows = $result->fetchAllAssociative();
             $arRe = [];
-
             foreach ($rows as $item) {
                 $arRe[] = $item['delivery_no'];
             }
@@ -1186,7 +1172,6 @@ SQL;
         $param = [];
         $str_delivery_no = '';
         $index = count($arr_delivery_no);
-
         for ($i = 0; $i < $index; $i++) {
             if ($i == $index - 1) {
                 $str_delivery_no .= '?';
@@ -1195,7 +1180,6 @@ SQL;
             }
             $param[] = $arr_delivery_no[$i];
         }
-
         $sql = "
                     SELECT
                         mst_delivery.delivery_no
@@ -1208,13 +1192,11 @@ SQL;
                     ORDER BY
                         mst_delivery.delivery_date ASC, mst_delivery.delivery_no ASC
                 ";
-
         try {
             $statement = $this->entityManager->getConnection()->prepare($sql);
             $result = $statement->executeQuery($param);
             $rows = $result->fetchAllAssociative();
             $arRe = [];
-
             foreach ($rows as $item) {
                 $arRe[] = $item['delivery_no'];
             }
@@ -1231,34 +1213,27 @@ SQL;
             case 'shipping_code':
                 $condition = 'dt_order_status.shipping_code = ?';
                 break;
-
             case 'otodoke_code':
                 $condition = 'dt_order_status.otodoke_code = ?';
                 break;
-
             default:
                 $condition = 'dt_order_status.customer_code = ?';
                 break;
         }
-
         $subQuantity = ' CASE
                             WHEN mst_product.quantity > 1 THEN mst_product.quantity * mst_delivery.quanlity
                             ELSE mst_delivery.quanlity
                             END AS quantity
                         ';
-
         $subUnitPrice = '   CASE
                             WHEN mst_product.quantity > 1 THEN mst_delivery.unit_price / mst_product.quantity
                             ELSE mst_delivery.unit_price
                             END AS unit_price
                        ';
-
         $addCondition = '';
-
         if (!empty($orderNo)) {
             $addCondition = ' and mst_delivery.order_no LIKE ? ';
         }
-
         $sql = "
                         SELECT
                             {$subUnitPrice},
@@ -1324,13 +1299,10 @@ SQL;
                             mst_delivery.delivery_no, mst_delivery.delivery_lineno, mst_delivery.jan_code
                         ORDER BY
                             mst_delivery.delivery_lineno ASC";
-
         $myPara = [$customer_code, $delivery_no];
-
         if (!empty($orderNo)) {
             $myPara[] = $orderNo.'-%';
         }
-
         $statement = $this->entityManager->getConnection()->prepare($sql);
         $result = $statement->executeQuery($myPara);
         $rows = $result->fetchAllAssociative();
@@ -1344,34 +1316,27 @@ SQL;
             case 'shipping_code':
                 $condition = 'dt_order_status.shipping_code = ?';
                 break;
-
             case 'otodoke_code':
                 $condition = 'dt_order_status.otodoke_code = ?';
                 break;
-
             default:
                 $condition = 'dt_order_status.customer_code = ?';
                 break;
         }
-
         $subQuantity = ' CASE
                             WHEN mst_product.quantity > 1 THEN mst_product.quantity * mst_delivery.quanlity
                             ELSE mst_delivery.quanlity
                             END AS quantity
                         ';
-
         $subUnitPrice = '   CASE
                             WHEN mst_product.quantity > 1 THEN mst_delivery.unit_price / mst_product.quantity
                             ELSE mst_delivery.unit_price
                             END AS unit_price
                        ';
-
         $addCondition = '';
-
         if (!empty($orderNo)) {
             $addCondition = ' and mst_delivery.order_no LIKE ? ';
         }
-
         $sql = "
                         SELECT
                             {$subUnitPrice},
@@ -1421,13 +1386,10 @@ SQL;
                             mst_delivery.delivery_no, mst_delivery.delivery_lineno, mst_delivery.jan_code
                         ORDER BY
                             mst_delivery.delivery_lineno ASC";
-
         $myPara = [$customer_code, $delivery_no];
-
         if (!empty($orderNo)) {
             $myPara[] = $orderNo.'-%';
         }
-
         $statement = $this->entityManager->getConnection()->prepare($sql);
         $result = $statement->executeQuery($myPara);
         $rows = $result->fetchAllAssociative();
@@ -3249,7 +3211,8 @@ SQL;
     public function getShippingWSExportData()
     {
         $sql = '
-                SELECT *
+                SELECT *,
+                    (SELECT DISTINCT IFNULL(mst_product.quantity, 1) FROM mst_product WHERE product_code = dowe.product_code) as quantity
                 FROM
                     mst_shipping_ws_eos mswe
                 JOIN
@@ -3260,9 +3223,8 @@ SQL;
                     dowe.order_line_no = mswe.order_line_no
                 WHERE
                     mswe.shipping_send_flg = 1
--- Tạm thời comment. Do chưa release                     
---                 AND
---                     IFNULL(dowe.shipping_num, 0) > 0;
+                AND
+                    IFNULL(dowe.shipping_num, 0) > 0;
         ';
 
         try {
@@ -3278,7 +3240,8 @@ SQL;
     public function getShippingNatExportData()
     {
         $sql = '
-                SELECT *
+                SELECT *,
+                	(SELECT DISTINCT IFNULL(mst_product.quantity, 1) FROM mst_product WHERE product_code = done.product_code) as quantity
                 FROM
                     mst_shipping_nat_eos msne
                 JOIN
@@ -3367,7 +3330,6 @@ SQL;
                     )
                 LIMIT 1;
         ";
-
         try {
             $statement = $this->entityManager->getConnection()->prepare($sql);
             $result = $statement->executeQuery([$delivery_no]);
@@ -3375,6 +3337,166 @@ SQL;
 
             return $row[0] ?? [];
         } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getSumAmountDtOrder($order_no)
+    {
+        $sql = '
+                SELECT 
+                    SUM(demand_quantity * order_price) AS amount
+                FROM
+                    dt_order
+                WHERE
+                    order_no = ?
+                GROUP BY
+                    order_no;
+        ';
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery([$order_no]);
+            $row = $result->fetchAllAssociative();
+
+            return $row[0] ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function updateDtOrder($condition = [], $data = [])
+    {
+        $params = [];
+        $set = '';
+        foreach ($data as $key => $value) {
+            $set .= " {$key} = ?, ";
+            $params[] = $value;
+        }
+        $set = trim($set, ', ');
+        $where = '';
+        foreach ($condition as $key => $value) {
+            $where .= " {$key} = ? AND ";
+            $params[] = $value;
+        }
+        $where = trim($where, 'AND ');
+        $sql = "
+                UPDATE
+                    dt_order
+                SET
+                    {$set}
+                Where
+                    {$where}
+        ";
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+
+            return $statement->executeQuery($params);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    public function getTankaList($searchData, $shipping_code = '', $customer_code = '')
+    {
+        if (empty($shipping_code) || empty($customer_code)) {
+            return [];
+        }
+
+        $param = [$shipping_code, $customer_code];
+        $additionalCondition = '';
+
+        // Search left menu
+        if (isset($searchData['mode']) && $searchData['mode'] == 'searchLeft') {
+            $commonService = new MyCommonService($this->entityManager);
+
+            if (StringUtil::isNotBlank($searchData['s_product_name'])) {
+                $arCode = $commonService->getSearchProductName($searchData['s_product_name']);
+                $tempCondition = '';
+
+                foreach ($arCode as $item) {
+                    $item = trim($item);
+                    if ($item == '') {
+                        continue;
+                    }
+
+                    $tempCondition .= ' mp.jan_code = ? or ';
+                    array_push($param, $item);
+                }
+
+                $additionalCondition .= ' AND ( '.trim($tempCondition, 'or ').' ) ';
+            }
+
+            if (StringUtil::isNotBlank($searchData['s_jan'])) {
+                $arrJan = explode(' ', $searchData['s_jan']);
+                $tempCondition = '';
+
+                foreach ($arrJan as $item) {
+                    $item = trim($item);
+                    if ($item == '') {
+                        continue;
+                    }
+
+                    $tempCondition .= ' mp.jan_code like ? or ';
+                    array_push($param, '%'.$item.'%');
+                }
+
+                $additionalCondition .= ' AND ( '.trim($tempCondition, 'or ').' ) ';
+            }
+
+            if (StringUtil::isNotBlank($searchData['s_catalog_code'])) {
+                $arCode = $commonService->getSearchCatalogCode($searchData['s_catalog_code']);
+                $tempCondition = '';
+
+                foreach ($arCode as $item) {
+                    $item = trim($item);
+                    if ($item == '') {
+                        continue;
+                    }
+
+                    $tempCondition .= ' mp.jan_code = ? or ';
+                    array_push($param, $item);
+                }
+
+                $additionalCondition .= ' AND ( '.trim($tempCondition, 'or ').' ) ';
+            }
+        }
+
+        $sql = " select
+                    MAX(pri.tanka_number) AS max_tanka_number
+                from
+                    dt_customer_relation as cur
+                join
+                    dt_price as pri
+                on
+                    cur.customer_code = pri.customer_code
+                and
+                    cur.shipping_code = pri.shipping_no
+                join
+                    mst_product mp
+                on
+                    mp.product_code = pri.product_code
+                WHERE
+                    pri.shipping_no = ?
+                AND pri.customer_code = ?
+                AND DATE_FORMAT(NOW(), '%Y-%m-%d') >= pri.valid_date
+                AND DATE_FORMAT(NOW(), '%Y-%m-%d') < pri.expire_date
+                {$additionalCondition}
+                GROUP BY
+                    pri.product_code
+                 ORDER BY
+                    pri.tanka_number desc; 
+                ";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+            $arrTanaka = array_column($rows, 'max_tanka_number');
+
+            return $arrTanaka;
+        } catch (\Exception $e) {
+            log_info($e->getMessage());
+
             return [];
         }
     }

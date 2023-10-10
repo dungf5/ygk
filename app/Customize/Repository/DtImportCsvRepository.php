@@ -47,8 +47,6 @@ class DtImportCsvRepository extends AbstractRepository
             $object->setIsSync($data['is_sync']);
             $object->setIsError($data['is_error']);
             $object->setIsSendMail($data['is_send_mail']);
-            $object->setInDate($data['in_date']);
-            $object->setUpDate($data['up_date']);
 
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();
@@ -67,7 +65,7 @@ class DtImportCsvRepository extends AbstractRepository
             }
 
             Type::overrideType('datetimetz', UTCDateTimeTzType::class);
-            $object = $this->findOneBy(['file_name' => $data['file_name']]);
+            $object = $this->find($data['id']);
 
             if (!empty($object)) {
                 foreach ($data as $key => $value) {
@@ -90,10 +88,10 @@ class DtImportCsvRepository extends AbstractRepository
                         $object->setIsSendMail($value);
                     }
                     if ($key == 'in_date') {
-                        $object->setInDate($value);
+                        $object->setCreateDate($value);
                     }
                     if ($key == 'up_date') {
-                        $object->setUpDate($value);
+                        $object->setUpdateDate($value);
                     }
                 }
 

@@ -63,21 +63,34 @@ if (!class_exists('\Customize\Entity\DtImportCSV', false)) {
          * @ORM\Column(name="is_send_mail", type="integer", length=10, nullable=false, options={"comment":""})
          */
         private $is_send_mail;
-
         /**
          * @var \DateTime
          *
-         * @ORM\Column(name="in_date", type="datetimetz", nullable=false, options={"comment":""})
+         * @ORM\Column(name="create_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT ''")
          */
-        private $in_date;
-
+        private $create_date;
         /**
          * @var \DateTime
          *
-         * @ORM\Column(name="up_date", type="datetimetz", nullable=false, options={"comment":""})
+         * @ORM\Column(name="update_date", type="datetimetz", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP(3) COMMENT ''")
          */
-        private $up_date;
+        private $update_date;
 
+        /**
+         * @return int
+         */
+        public function getId()
+        {
+            return $this->id;
+        }
+
+        /**
+         * @param $id
+         */
+        public function setId($id)
+        {
+            $this->id = $id;
+        }
 
         /**
          * @return string|null
@@ -181,35 +194,35 @@ if (!class_exists('\Customize\Entity\DtImportCSV', false)) {
         }
 
         /**
-         * @return \DateTime|null
+         * @return \DateTime
          */
-        public function getInDate()
+        public function getCreateDate()
         {
-            return $this->in_date;
+            return $this->create_date;
         }
 
         /**
-         * @param \DateTime|null $in_date
+         * @param $create_date
          */
-        public function setInDate($in_date = null)
+        public function setCreateDate($create_date)
         {
-            $this->in_date = $in_date;
+            $this->create_date = $create_date;
         }
 
         /**
-         * @return \DateTime|null
+         * @return \DateTime
          */
-        public function getUpDate()
+        public function getUpdateDate()
         {
-            return $this->up_date;
+            return $this->update_date;
         }
 
         /**
-         * @param \DateTime|null $up_date
+         * @param $update_date
          */
-        public function setUpDate($up_date = null)
+        public function setUpdateDate($update_date)
         {
-            $this->up_date = $up_date;
+            $this->update_date = $update_date;
         }
     }
 }

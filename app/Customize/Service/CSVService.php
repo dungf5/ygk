@@ -13,8 +13,20 @@
 
 namespace Customize\Service;
 
+use Doctrine\ORM\EntityManagerInterface;
+
 class CSVService
 {
+    use CurlPost;
+
+    /** @var EntityManagerInterface */
+    private $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     /***
      * @param string $path
      * @return array
@@ -48,6 +60,132 @@ class CSVService
             return [
                 'status' => 0,
                 'message' => "File {$path} ".$e->getMessage(),
+            ];
+        }
+    }
+
+    public function transferFile($path_from, $path_to, $file_from, $file_to, $error_file)
+    {
+        try {
+            if (empty($file_from)) {
+                $message = "copy file FROM {$path_from} TO {$path_to}";
+                $message .= "\nFile is empty";
+                $this->pushGoogleChat($message);
+
+                return [
+                    'status' => 0,
+                    'message' => 'File is empty',
+                ];
+            }
+
+            $temp_path_local = '';
+
+            if (getenv('APP_IS_LOCAL') == 1) {
+                $temp_path_local = '.';
+                $path_from = '.'.$path_from;
+                $path_to = '.'.$path_to;
+            }
+
+            if (!empty($error_file) && file_exists($path_from.$error_file) == true) {
+                if (($fp = fopen($path_from.$error_file, 'r')) !== false) {
+                    $error_str = fread($fp, 2096);
+                    fclose($fp);
+
+                    if (str_contains($error_str, "File don't make DATA 0!->logout")) {
+                        $message = 'Get file FTP';
+                        $message .= "0532 File don't make DATA 0!->logout.";
+                        $this->pushGoogleChat($message);
+
+                        return [
+                            'status' => -1,
+                            'message' => "0532 File don't make DATA 0!->logout.",
+                        ];
+                    }
+
+                    if (str_contains($error_str, 'This file is unacquirable')) {
+                        $message = 'Get file FTP';
+                        $message .= '0526 This file is unacquirable.';
+                        $this->pushGoogleChat($message);
+
+                        return [
+                            'status' => -1,
+                            'message' => '0526 This file is unacquirable.',
+                        ];
+                    }
+
+                    if (str_contains($error_str, 'Login failed') || str_contains($error_str, 'Login incorrect')) {
+                        $message = 'Get file FTP';
+                        $message .= '530 0508 Login incorrect.';
+                        $this->pushGoogleChat($message);
+
+                        return [
+                            'status' => -1,
+                            'message' => '530 0508 Login incorrect.',
+                        ];
+                    }
+                }
+            }
+
+            if (file_exists($path_from.$file_from) == false) {
+                $this->pushGoogleChat('path: '.$path_from.$file_from.' is invalid');
+
+                return [
+                    'status' => -1,
+                    'message' => 'File '.$file_from.' is not existed',
+                ];
+            }
+
+            // Create directory local if have'n
+            $arr_path_local = explode('/', $path_to);
+
+            foreach ($arr_path_local as $subDir) {
+                if (empty($subDir)) {
+                    continue;
+                }
+                $temp_path_local .= '/'.$subDir;
+
+                if (file_exists($temp_path_local) == false) {
+                    mkdir($temp_path_local);
+                }
+            }
+            $temp_path_local = null;
+            // End - Create directory local if have'n
+
+            $yearDir = $path_to.date('Y');
+            if (file_exists($yearDir) == false) {
+                mkdir($yearDir);
+            }
+
+            $monthDir = $path_to.date('Y/m');
+            if (file_exists($monthDir) == false) {
+                mkdir($monthDir);
+            }
+
+            $local_file = $monthDir.'/'.$file_to;
+
+            // try to copy file from path_from to path_to
+            if (copy($path_from.$file_from, $local_file)) {
+                $status = 1;
+                $message = "successfully written {$file_from} to {$local_file}";
+                $this->pushGoogleChat("successfully written {$file_from} to {$local_file}");
+                unlink($path_from.$file_from);
+            } else {
+                $status = 0;
+                $message = "There was a problem while downloading {$file_from} to {$local_file}";
+
+                $this->pushGoogleChat("There was a problem while downloading {$file_from} to {$local_file}");
+            }
+
+            return [
+                'status' => $status,
+                'message' => $message,
+            ];
+        } catch (\Exception $e) {
+            $this->pushGoogleChat($e->getMessage());
+
+            return [
+                'status' => -1,
+                'message' => $e->getMessage(),
             ];
         }
     }

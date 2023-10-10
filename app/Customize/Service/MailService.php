@@ -755,9 +755,8 @@ class MailService
     }
 
     /**
-     * Send order ws eos mail.
+     * Send mail import order ws-eos.
      *
-     * @param string $template
      * @param array $information
      *
      * @return \Swift_Message
@@ -766,7 +765,7 @@ class MailService
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function sendMailWSEOS($information = [])
+    public function sendMailGetCsvWSEOS($information = [])
     {
         if (empty($information)) {
             return;
@@ -780,20 +779,20 @@ class MailService
 
         // Information successfully
         if ($information['status'] == 1) {
-            $information['subject_mail'] = 'EOS注文データ受信が完了しました';
+            $information['subject_mail'] = 'ワールドスポーツの発注データ受信が完了しました';
             $information['title_mail'] = '※本メールは自動配信メールです。';
             $information['title_time'] = '受信完了日時';
             $information['content1'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
-            $information['content2'] = 'ご連絡くださいますようお願いいたします。';
+            $information['content2'] = '　ご連絡くださいますようお願いいたします。';
         }
 
         // Information error
         if ($information['status'] == 0) {
-            $information['subject_mail'] = 'EOS注文データ受信にエラーが発生しました';
+            $information['subject_mail'] = 'ワールドスポーツの発注文データ受信にエラーが発生しました';
             $information['title_mail'] = '※本メールは自動配信メールです。';
             $information['content1'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
             $information['content2'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
-            $information['content3'] = 'ご連絡くださいますようお願いいたします。';
+            $information['content3'] = '　ご連絡くださいますようお願いいたします。';
             $information['error_title'] = 'エラー内容';
         }
 
@@ -838,6 +837,88 @@ class MailService
     }
 
     /**
+     * Send mail import order ws-eos.
+     *
+     * @param array $information
+     *
+     * @return \Swift_Message
+     *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function sendMailGetCSVNatEOS($information = [])
+    {
+        if (empty($information)) {
+            return;
+        }
+
+        if (empty($information['email'])) {
+            return;
+        }
+
+        log_info('[NAT-EOS] Start Send Mail FTP');
+
+        // Information successfully
+        if ($information['status'] == 1) {
+            $information['subject_mail'] = 'ナチュラムの発注明細データ受信が完了しました';
+            $information['title_mail'] = '※本メールは自動配信メールです。';
+            $information['title_time'] = '受信完了日時';
+            $information['content1'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+            $information['content2'] = '　ご連絡くださいますようお願いいたします。';
+        }
+
+        // Information error
+        if ($information['status'] == 0) {
+            $information['subject_mail'] = 'ナチュラムの発注データ受信にエラーが発生しました';
+            $information['title_mail'] = '※本メールは自動配信メールです。';
+            $information['content1'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
+            $information['content2'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+            $information['content3'] = '　ご連絡くださいますようお願いいたします。';
+            $information['error_title'] = 'エラー内容';
+        }
+
+        $body = $this->twig->render($information['file_name'], [
+            'information' => $information,
+        ]);
+
+        $message = (new \Swift_Message())
+            ->setSubject('['.$this->BaseInfo->getShopName().'] '.$information['subject_mail'])
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$information['email']])
+            ->setReplyTo($this->BaseInfo->getEmail03())
+            ->setReturnPath($this->BaseInfo->getEmail04());
+
+        if (!empty($information['email_cc'])) {
+            $message->setCc($information['email_cc']);
+        }
+
+        if (!empty($information['email_bcc'])) {
+            $message->setBcc($information['email_bcc']);
+        }
+
+        // HTMLテンプレートが存在する場合
+        $htmlFileName = $this->getHtmlTemplate($information['file_name']);
+        if (!is_null($htmlFileName)) {
+            $htmlBody = $this->twig->render($htmlFileName, [
+                'information' => $information,
+            ]);
+
+            $message
+                ->setContentType('text/plain; charset=UTF-8')
+                ->setBody($body, 'text/plain')
+                ->addPart($htmlBody, 'text/html');
+        } else {
+            $message->setBody($body);
+        }
+
+        $count = $this->mailer->send($message);
+        log_info('[NAT-EOS] End Send Mail FTP', ['count' => $count]);
+
+        return $message;
+    }
+
+    /**
      * Send error ws eos mail.
      *
      * @param string $template
@@ -862,12 +943,11 @@ class MailService
         log_info('[WS-EOS] Start Send Mail Validate Error.');
 
         // Information
-        $information['subject_mail'] = 'EOS注文データにエラーがありました';
+        $information['subject_mail'] = 'ワールドスポーツの発注データにエラーがありました';
         $information['title_mail'] = '※本メールは自動配信メールです。';
         $information['error_title'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
-        $information['error_title'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
         $information['content'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
-        $information['content2'] = 'ご連絡くださいますようお願いいたします。';
+        $information['content2'] = '　ご連絡くださいますようお願いいたします。';
 
         $body = $this->twig->render($information['file_name'], [
             'information' => $information,
@@ -910,7 +990,7 @@ class MailService
     }
 
     /**
-     * Send order success ws eos mail.
+     * Send error nat eos mail.
      *
      * @param string $template
      * @param array $information
@@ -921,7 +1001,7 @@ class MailService
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function sendMailOrderSuccessWSEOS($information = [])
+    public function sendMailErrorNatEOS($information = [])
     {
         if (empty($information)) {
             return;
@@ -931,13 +1011,9 @@ class MailService
             return;
         }
 
-        log_info('[WS-EOS] Start Send Mail Order Success.');
+        log_info('[NAT-EOS] Start Send Mail Validate Error.');
 
-        // Information
-        $information['subject_mail'] = 'ご注文ありがとうございます';
-        $information['title_mail'] = 'この度はご注文いただき誠にありがとうございます。';
-        $information['content'] = '下記ご注文内容にお間違えがないかご確認下さい。';
-        $information['content2'] = 'お問い合わせは弊社営業担当者までご連絡くださいますようお願いいたします。';
+
 
         $body = $this->twig->render($information['file_name'], [
             'information' => $information,
@@ -974,7 +1050,492 @@ class MailService
         }
 
         $count = $this->mailer->send($message);
-        log_info('[WS-EOS] End Send Mail Order Success.', ['count' => $count]);
+        log_info('[NAT-EOS] End Send Mail Validate Error.', ['count' => $count]);
+
+        return $message;
+    }
+
+    /**
+     * Send order success ws eos mail.
+     *
+     * @param string $template
+     * @param array $information
+     *
+     * @return \Swift_Message
+     *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function sendMailOrderSuccessEOS($information = [])
+    {
+        if (empty($information)) {
+            return;
+        }
+
+        if (empty($information['email'])) {
+            return;
+        }
+
+        log_info('[EOS] Start Send Mail Order Success.');
+
+        $body = $this->twig->render($information['file_name'], [
+            'information' => $information,
+        ]);
+
+        $message = (new \Swift_Message())
+            ->setSubject('['.$this->BaseInfo->getShopName().'] '.$information['subject_mail'])
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$information['email']])
+            ->setReplyTo($this->BaseInfo->getEmail03())
+            ->setReturnPath($this->BaseInfo->getEmail04());
+
+        if (!empty($information['email_cc'])) {
+            $message->setCc($information['email_cc']);
+        }
+
+        if (!empty($information['email_bcc'])) {
+            $message->setBcc($information['email_bcc']);
+        }
+
+        // HTMLテンプレートが存在する場合
+        $htmlFileName = $this->getHtmlTemplate($information['file_name']);
+        if (!is_null($htmlFileName)) {
+            $htmlBody = $this->twig->render($htmlFileName, [
+                'information' => $information,
+            ]);
+
+            $message
+                ->setContentType('text/plain; charset=UTF-8')
+                ->setBody($body, 'text/plain')
+                ->addPart($htmlBody, 'text/html');
+        } else {
+            $message->setBody($body);
+        }
+
+        $count = $this->mailer->send($message);
+        log_info('[EOS] End Send Mail Order Success.', ['count' => $count]);
+
+        return $message;
+    }
+
+    public function sendMailReturnProductPreview($email, $url_preview)
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        $body = $this->twig->render('Mail/return_product_preview.twig', [
+            'url_preview' => $url_preview,
+        ]);
+        $message = (new \Swift_Message())
+            ->setSubject('[XBRAID JAPAN] 返品リクエストが届きました')
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$email])
+            ->setBody($body);
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
+            $email = getenv('EMAIL_RETURN_CC');
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $message->setCc($email);
+            }
+        }
+
+        return $this->mailer->send($message);
+    }
+
+    public function sendMailReturnProductApprove($email, $url_approve)
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        $body = $this->twig->render('Mail/return_product_approve.twig', [
+            'url_approve' => $url_approve,
+        ]);
+        $message = (new \Swift_Message())
+            ->setSubject('[XBRAID JAPAN] 返品リクエスト承認のご案内')
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$email])
+            ->setBody($body);
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
+            $email = getenv('EMAIL_RETURN_CC');
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $message->setCc($email);
+            }
+        }
+
+        return $this->mailer->send($message);
+    }
+
+    public function sendMailReturnProductApproveYes($email, $url_approve_finish, $url_receipt)
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        $body = $this->twig->render('Mail/return_product_approve_yes.twig', [
+            'url_approve_finish' => $url_approve_finish,
+            'url_receipt' => $url_receipt,
+        ]);
+        $message = (new \Swift_Message())
+            ->setSubject('[XBRAID JAPAN] 返品リクエスト承認のご案内')
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$email])
+            ->setBody($body);
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
+            $email = getenv('EMAIL_RETURN_CC');
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $message->setCc($email);
+            }
+        }
+
+        return $this->mailer->send($message);
+    }
+
+    public function sendMailReturnProductApproveNo($email, $aprove_comment_not_yet)
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        $body = $this->twig->render('Mail/return_product_approve_no.twig', [
+            'aprove_comment_not_yet' => $aprove_comment_not_yet,
+        ]);
+        $message = (new \Swift_Message())
+            ->setSubject('[XBRAID JAPAN] 返品リクエスト未承認のお知らせ')
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$email])
+            ->setBody($body);
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
+            $email = getenv('EMAIL_RETURN_CC');
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $message->setCc($email);
+            }
+        }
+
+        return $this->mailer->send($message);
+    }
+
+    public function sendMailReturnProductReceiptYes($email, $receipt_comment, $url_return_receipt_finish)
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        $body = $this->twig->render('Mail/return_product_receipt_yes.twig', [
+            'receipt_comment' => $receipt_comment,
+            'url_return_receipt_finish' => $url_return_receipt_finish,
+        ]);
+        $message = (new \Swift_Message())
+            ->setSubject('[XBRAID JAPAN] 返品商品受取受理のご案内')
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$email])
+            ->setBody($body);
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
+            $email = getenv('EMAIL_RETURN_CC');
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $message->setCc($email);
+            }
+        }
+
+        return $this->mailer->send($message);
+    }
+
+    public function sendMailReturnProductReceiptNo($email, $receipt_not_yet_comment)
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        $body = $this->twig->render('Mail/return_product_receipt_no.twig', [
+            'receipt_not_yet_comment' => $receipt_not_yet_comment,
+        ]);
+        $message = (new \Swift_Message())
+            ->setSubject('[XBRAID JAPAN] 返品商品受取未受理のお知らせ')
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$email])
+            ->setBody($body);
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
+            $email = getenv('EMAIL_RETURN_CC');
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $message->setCc($email);
+            }
+        }
+
+        return $this->mailer->send($message);
+    }
+
+    public function sendMailReturnProductComplete($email)
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        $body = $this->twig->render('Mail/return_product_complete.twig');
+        $message = (new \Swift_Message())
+            ->setSubject('[XBRAID JAPAN] 返品完了のお知らせ')
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$email])
+            ->setBody($body);
+        if (getenv('APP_IS_LOCAL') != 1
+            && getenv('EMAIL_RETURN_CC')) {
+            $email = getenv('EMAIL_RETURN_CC');
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $message->setCc($email);
+            }
+        }
+
+        return $this->mailer->send($message);
+    }
+
+    /**
+     * Send mail export order ws-eos.
+     *
+     * @param array $information
+     *
+     * @return \Swift_Message
+     *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function sendMailExportWSEOS($information = [])
+    {
+        if (empty($information)) {
+            return;
+        }
+
+        if (empty($information['email'])) {
+            return;
+        }
+
+        log_info('[WS-EOS] Start Send Mail FTP');
+
+        // Information successfully
+        if ($information['status'] == 1) {
+            $information['subject_mail'] = 'ワールドスポーツへ出荷データ送信が完了しました';
+            $information['title_mail'] = '※本メールは自動配信メールです。';
+            $information['title_time'] = '送信完了日時';
+            $information['content1'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+            $information['content2'] = '　ご連絡くださいますようお願いいたします。';
+        }
+
+        // Information error
+        if ($information['status'] == 0) {
+            $information['subject_mail'] = 'ワールドスポーツへ出荷データ送信にエラーが発生しました';
+            $information['title_mail'] = '※本メールは自動配信メールです。';
+            $information['content1'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
+            $information['content2'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+            $information['content3'] = '　ご連絡くださいますようお願いいたします。';
+            $information['error_title'] = 'エラー内容';
+        }
+
+        $body = $this->twig->render($information['file_name'], [
+            'information' => $information,
+        ]);
+
+        $message = (new \Swift_Message())
+            ->setSubject('['.$this->BaseInfo->getShopName().'] '.$information['subject_mail'])
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$information['email']])
+            ->setReplyTo($this->BaseInfo->getEmail03())
+            ->setReturnPath($this->BaseInfo->getEmail04());
+
+        if (!empty($information['email_cc'])) {
+            $message->setCc($information['email_cc']);
+        }
+
+        if (!empty($information['email_bcc'])) {
+            $message->setBcc($information['email_bcc']);
+        }
+
+        // HTMLテンプレートが存在する場合
+        $htmlFileName = $this->getHtmlTemplate($information['file_name']);
+        if (!is_null($htmlFileName)) {
+            $htmlBody = $this->twig->render($htmlFileName, [
+                'information' => $information,
+            ]);
+
+            $message
+                ->setContentType('text/plain; charset=UTF-8')
+                ->setBody($body, 'text/plain')
+                ->addPart($htmlBody, 'text/html');
+        } else {
+            $message->setBody($body);
+        }
+
+        $count = $this->mailer->send($message);
+        log_info('[WS-EOS] End Send Mail FTP', ['count' => $count]);
+
+        return $message;
+    }
+
+    /**
+     * Send mail export nat stock list.
+     *
+     * @param array $information
+     *
+     * @return \Swift_Message
+     *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function sendMailExportNatStock($information = [])
+    {
+        if (empty($information)) {
+            return;
+        }
+
+        if (empty($information['email'])) {
+            return;
+        }
+
+        log_info('[WS-EOS] Start Send Mail FTP');
+
+        // Information successfully
+        if ($information['status'] == 1) {
+            $information['subject_mail'] = 'ナチュラムへ在庫データ送信が完了しました';
+            $information['title_mail'] = '※本メールは自動配信メールです。';
+            $information['title_time'] = '送信完了日時';
+            $information['content1'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+            $information['content2'] = '　ご連絡くださいますようお願いいたします。';
+        }
+
+        // Information error
+        if ($information['status'] == 0) {
+            $information['subject_mail'] = 'ナチュラムへ在庫データ送信にエラーが発生しました';
+            $information['title_mail'] = '※本メールは自動配信メールです。';
+            $information['content1'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
+            $information['content2'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+            $information['content3'] = '　ご連絡くださいますようお願いいたします。';
+            $information['error_title'] = 'エラー内容';
+        }
+
+        $body = $this->twig->render($information['file_name'], [
+            'information' => $information,
+        ]);
+
+        $message = (new \Swift_Message())
+            ->setSubject('['.$this->BaseInfo->getShopName().'] '.$information['subject_mail'])
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$information['email']])
+            ->setReplyTo($this->BaseInfo->getEmail03())
+            ->setReturnPath($this->BaseInfo->getEmail04());
+
+        if (!empty($information['email_cc'])) {
+            $message->setCc($information['email_cc']);
+        }
+
+        if (!empty($information['email_bcc'])) {
+            $message->setBcc($information['email_bcc']);
+        }
+
+        // HTMLテンプレートが存在する場合
+        $htmlFileName = $this->getHtmlTemplate($information['file_name']);
+        if (!is_null($htmlFileName)) {
+            $htmlBody = $this->twig->render($htmlFileName, [
+                'information' => $information,
+            ]);
+
+            $message
+                ->setContentType('text/plain; charset=UTF-8')
+                ->setBody($body, 'text/plain')
+                ->addPart($htmlBody, 'text/html');
+        } else {
+            $message->setBody($body);
+        }
+
+        $count = $this->mailer->send($message);
+        log_info('[WS-EOS] End Send Mail FTP', ['count' => $count]);
+
+        return $message;
+    }
+
+    /**
+     * Send mail export nat eos data.
+     *
+     * @param array $information
+     *
+     * @return \Swift_Message
+     *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function sendMailExportNatEOS($information = [])
+    {
+        if (empty($information)) {
+            return;
+        }
+
+        if (empty($information['email'])) {
+            return;
+        }
+
+        log_info('[NAT-EOS] Start Send Mail FTP');
+
+        // Information successfully
+        if ($information['status'] == 1) {
+            $information['subject_mail'] = 'ナチュラムへ納品データ送信が完了しました';
+            $information['title_mail'] = '※本メールは自動配信メールです。';
+            $information['title_time'] = '送信完了日時';
+            $information['content1'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+            $information['content2'] = '　ご連絡くださいますようお願いいたします。';
+        }
+
+        // Information error
+        if ($information['status'] == 0) {
+            $information['subject_mail'] = 'ナチュラムへ納品データ送信にエラーが発生しました';
+            $information['title_mail'] = '※本メールは自動配信メールです。';
+            $information['content1'] = 'エラー内容は以下となります。ご確認をお願いいたします。';
+            $information['content2'] = '※大変お手数ではございますがお問い合わせは弊社営業担当者まで';
+            $information['content3'] = '　ご連絡くださいますようお願いいたします。';
+            $information['error_title'] = 'エラー内容';
+        }
+
+        $body = $this->twig->render($information['file_name'], [
+            'information' => $information,
+        ]);
+
+        $message = (new \Swift_Message())
+            ->setSubject('['.$this->BaseInfo->getShopName().'] '.$information['subject_mail'])
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$information['email']])
+            ->setReplyTo($this->BaseInfo->getEmail03())
+            ->setReturnPath($this->BaseInfo->getEmail04());
+
+        if (!empty($information['email_cc'])) {
+            $message->setCc($information['email_cc']);
+        }
+
+        if (!empty($information['email_bcc'])) {
+            $message->setBcc($information['email_bcc']);
+        }
+
+        // HTMLテンプレートが存在する場合
+        $htmlFileName = $this->getHtmlTemplate($information['file_name']);
+        if (!is_null($htmlFileName)) {
+            $htmlBody = $this->twig->render($htmlFileName, [
+                'information' => $information,
+            ]);
+
+            $message
+                ->setContentType('text/plain; charset=UTF-8')
+                ->setBody($body, 'text/plain')
+                ->addPart($htmlBody, 'text/html');
+        } else {
+            $message->setBody($body);
+        }
+
+        $count = $this->mailer->send($message);
+        log_info('[NAT-EOS] End Send Mail FTP', ['count' => $count]);
 
         return $message;
     }

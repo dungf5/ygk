@@ -85,10 +85,7 @@ class DtOrderWSEOSRepository extends AbstractRepository
             $object->setOrderImportDay(date('Ymd'));
             $object->setOrderRegistedFlg(0);
             $object->setErrorType(0);
-            $object->setCustomerCode($data['customer_code']);
-            $object->setShippingCode($data['shipping_code']);
-            $object->setOtodokeCode($data['otodoke_code']);
-            $object->setProductCode($data['product_code']);
+            $object->setShippingSentFlg(0);
 
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();
@@ -168,6 +165,7 @@ class DtOrderWSEOSRepository extends AbstractRepository
                 $object->setErrorContent8(null);
                 $object->setErrorContent9(null);
                 $object->setErrorContent10(null);
+                $object->setErrorType(0);
 
                 $this->getEntityManager()->persist($object);
                 $this->getEntityManager()->flush();
@@ -196,6 +194,8 @@ class DtOrderWSEOSRepository extends AbstractRepository
             ]);
 
             if (!empty($object)) {
+                $this->resetError($object);
+
                 foreach ($data as $key => $value) {
                     if ($key == 'error_content1') {
                         $object->setErrorContent1($value);
@@ -238,5 +238,19 @@ class DtOrderWSEOSRepository extends AbstractRepository
         } catch (\Exception $e) {
             return;
         }
+    }
+
+    private function resetError($object)
+    {
+        $object->setErrorContent1(null);
+        $object->setErrorContent2(null);
+        $object->setErrorContent3(null);
+        $object->setErrorContent4(null);
+        $object->setErrorContent5(null);
+        $object->setErrorContent6(null);
+        $object->setErrorContent7(null);
+        $object->setErrorContent8(null);
+        $object->setErrorContent9(null);
+        $object->setErrorContent10(null);
     }
 }

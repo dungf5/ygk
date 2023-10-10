@@ -253,13 +253,7 @@ class MyProductController extends AbstractController
             $customer_code = $this->globalService->customerCode();
             $is_favorite = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
             $dtPrice = $cmS->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $mstProduct->getProductCode(), $login_type, $login_code);
-            $relationCus = $cmS->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
-
-            if ($relationCus) {
-                $customerCodeForLocation = $relationCus['customer_code'];
-            }
-
-            $location = $cmS->getCustomerLocation($customerCodeForLocation ?? '');
+            $location = $cmS->getCustomerLocation($customer_code);
             $stock = $this->stockListRepository->getData($mstProduct->getProductCode(), $location);
 
             if ($stock) {
@@ -531,6 +525,14 @@ class MyProductController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
+        //Not login. Redirect home page
+        if (!$this->isGranted('ROLE_USER')) {
+            return $this->redirectToRoute('homepage');
+        }
+
+        log_info('Start MyProductController/Index');
+        $time_start = time();
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // Doctrine SQLFilter
@@ -538,17 +540,12 @@ class MyProductController extends AbstractController
             $this->entityManager->getFilters()->enable('option_nostock_hidden');
         }
 
-        // handleRequestは空のqueryの場合は無視するため
-        if ($request->getMethod() === 'GET') {
-            $request->query->set('pageno', $request->query->get('pageno', ''));
-        }
-
         // searchForm
-        /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
         $builder = $this->formFactory->createNamedBuilder('', \Customize\Form\Type\SearchProductType::class);
 
         if ($request->getMethod() === 'GET') {
             $builder->setMethod('GET');
+            $request->query->set('pageno', $request->query->get('pageno', ''));
         }
 
         $event = new EventArgs(
@@ -557,32 +554,24 @@ class MyProductController extends AbstractController
             ],
             $request
         );
+
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_INITIALIZE, $event);
 
-        /* @var $searchForm \Symfony\Component\Form\FormInterface */
         $searchForm = $builder->getForm();
-
         $searchForm->handleRequest($request);
+        $searchData = $searchForm->getData();
         $commonService = new MyCommonService($this->entityManager);
-        $user = false;
         $customer_code = '';
-        $login_type = '';
-        $login_code = '';
 
         if ($this->isGranted('ROLE_USER')) {
-            $user = true;
-            $myC = new MyCommonService($this->entityManager);
-            $login_type = $this->globalService->getLoginType();
-            $login_code = $this->globalService->getLoginCode();
-            $Customer_id = $this->globalService->customerId();
-            $customer_code = $myC->getMstCustomer($Customer_id)['customer_code'] ?? '';
+            $customer_code = $this->globalService->customerCode();
         }
 
-        // paginator
-        $searchData = $searchForm->getData();
+        $login_type = $this->globalService->getLoginType();
+        $login_code = $this->globalService->getLoginCode();
         $customerCode = '';
         $shippingCode = '';
-        $arProductCodeInDtPrice = [];
+        $location = '';
         $arTanakaNumber = [];
         $relationCus = $commonService->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
 
@@ -594,12 +583,11 @@ class MyProductController extends AbstractController
                 $shippingCode = $this->globalService->getShippingCode();
             }
 
-            $arPriceAndTanaka = $commonService->getPriceFromDtPriceOfCusV2($customerCode, $shippingCode);
-            $arProductCodeInDtPrice = $arPriceAndTanaka[0];
-            $arTanakaNumber = $arPriceAndTanaka[1];
+            $location = $commonService->getCustomerLocation($customerCode);
+            $arTanakaNumber = $commonService->getTankaList($searchData, $shippingCode, $customerCode);
         }
 
-        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchDataNewCustom($searchData, $user, $customerCode, $shippingCode, $arProductCodeInDtPrice, $arTanakaNumber);
+        $qb = $this->productCustomizeRepository->getQueryBuilderBySearchData($searchData, $customerCode, $shippingCode, $arTanakaNumber, $location);
 
         $event = new EventArgs(
             [
@@ -621,19 +609,8 @@ class MyProductController extends AbstractController
         );
 
         $ids = [];
-
         foreach ($pagination as $key => $Product) {
             $ids[] = $Product['id'];
-
-            //Get dt_price.price_s01
-//            $temp                       = $pagination[$key];
-//            $temp['price_s01']          = '';
-//            $priceTxt                   = $commonService->getPriceFromDtPriceOfCusProductcodeV2($customer_code, $Product['product_code'], $login_type, $login_code);
-//            if ($priceTxt) {
-//                $temp['price_s01']      = $priceTxt['price_s01'];
-//            }
-//
-//            $pagination[$key]           = $temp;
         }
 
         $ProductsAndClassCategories = $this->productRepository->findProductsWithSortedClassCategories($ids, 'p.id');
@@ -700,8 +677,9 @@ class MyProductController extends AbstractController
             ProductListOrderByType::class,
             null,
             [
-                'required' => false, 'choice_value' => 'sort_no',
+                'required' => false,
                 'allow_extra_fields' => true,
+                'choice_value' => 'sort_no',
             ]
         );
 
@@ -721,6 +699,11 @@ class MyProductController extends AbstractController
         $orderByForm = $builder->getForm();
         $orderByForm->handleRequest($request);
         $Category = $searchForm->get('category_id')->getData();
+
+        $time_end = time();
+        $execution_time = ($time_end - $time_start);
+        log_info("Time Total for MyProductController/Index Is: $execution_time s");
+        log_info('End MyProductController/Index');
 
         return [
             'subtitle' => $this->getPageTitle($searchData),

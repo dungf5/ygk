@@ -254,6 +254,11 @@ class GlobalService
         return $_SESSION['cart_product_type'] ?? '';
     }
 
+    public function getCustomerOrderNo()
+    {
+        return $_SESSION['customer_order_no'] ?? '';
+    }
+
     public function getRemarks1()
     {
         return $_SESSION['remarks1'] ?? '';
@@ -279,20 +284,18 @@ class GlobalService
         return $_SESSION['delivery_date'] ?? '';
     }
 
-    public function getCustomerOrderNo()
-    {
-        return $_SESSION['customer_order_no'] ?? '';
-    }
-
     public function getFusrdec1()
     {
         $relationCus = $this->myCommon->getCustomerRelationFromUser($this->customerCode(), $this->getLoginType(), $this->getLoginCode());
 
         if ($relationCus) {
             $customerCode = $relationCus['customer_code'];
-            $fusrdec1 = $this->myCommon->getMstCustomer2($customerCode)['fusrdec1'];
 
-            return (int) $fusrdec1;
+            if (!empty($obj = $this->myCommon->getMstCustomer2($customerCode))) {
+                $fusrdec1 = $obj['fusrdec1'];
+
+                return (int) $fusrdec1;
+            }
         }
 
         return 0;
@@ -304,9 +307,12 @@ class GlobalService
 
         if ($relationCus) {
             $customerCode = $relationCus['customer_code'];
-            $fusrstr8 = $this->myCommon->getMstCustomer2($customerCode)['fusrstr8'];
 
-            return (int) $fusrstr8;
+            if (!empty($obj = $this->myCommon->getMstCustomer2($customerCode))) {
+                $fusrstr8 = $obj['fusrstr8'];
+
+                return (int) $fusrstr8;
+            }
         }
 
         return 0;

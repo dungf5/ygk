@@ -87,7 +87,8 @@ class MyCartController extends AbstractController
         PurchaseFlow $cartPurchaseFlow,
         BaseInfoRepository $baseInfoRepository,
         PriceRepository $priceRepository,
-        MstProductRepository $mstProductRepository, EntityManagerInterface $entityManager,
+        MstProductRepository $mstProductRepository,
+        EntityManagerInterface $entityManager,
         GlobalService $globalService
     ) {
         $this->productClassRepository = $productClassRepository;
@@ -181,6 +182,7 @@ class MyCartController extends AbstractController
             $remarks2 = $request->get('remarks2');
             $remarks3 = $request->get('remarks3');
             $remarks4 = $request->get('remarks4');
+            $customer_order_no = $request->get('customer_order_no');
 
             $result = [
                 'is_ok' => '1',

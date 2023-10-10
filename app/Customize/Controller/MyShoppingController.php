@@ -143,12 +143,12 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function index(Request $request)
     {
+        $customer_order_no = $this->globalService->getCustomerOrderNo();
         $remarks1 = $this->globalService->getRemarks1();
         $remarks2 = $this->globalService->getRemarks2();
         $remarks3 = $this->globalService->getRemarks3();
         $remarks4 = $this->globalService->getRemarks4();
         $delivery_date = $this->globalService->getDeliveryDate();
-        $customer_order_no = $this->globalService->getCustomerOrderNo();
 
         // ログイン状態のチェック.
         $commonService = new MyCommonService($this->entityManager);
@@ -388,12 +388,12 @@ class MyShoppingController extends AbstractShoppingController
     public function confirm(Request $request)
     {
         //Request param
+        $customer_order_no = $request->get('customer_order_no', '');
         $remarks1 = $request->get('remarks1', '');
         $remarks2 = $request->get('remarks2', '');
         $remarks3 = $request->get('remarks3', '');
         $remarks4 = $request->get('remarks4', '');
         $delivery_date = $request->get('date_picker_delivery', '');
-        $customer_order_no = $request->get('customer_order_no', '');
 
         // ログイン状態のチェック.
         if ($this->orderHelper->isLoginRequired()) {
@@ -524,20 +524,20 @@ class MyShoppingController extends AbstractShoppingController
                 $delivery_date = MyCommon::get3DayAfterDayOff($arrDayOff);
             }
 
+            $Order->customer_order_no = $customer_order_no;
             $Order->delivery_date = $delivery_date;
             $Order->remarks1 = $remarks1;
             $Order->remarks2 = $remarks2;
             $Order->remarks3 = $remarks3;
             $Order->remarks4 = $remarks4;
-            $Order->customer_order_no = $customer_order_no;
 
             //Push Session
+            $_SESSION['customer_order_no'] = $customer_order_no;
             $_SESSION['remarks1'] = $remarks1;
             $_SESSION['remarks2'] = $remarks2;
             $_SESSION['remarks3'] = $remarks3;
             $_SESSION['remarks4'] = $remarks4;
             $_SESSION['delivery_date'] = $delivery_date;
-            $_SESSION['customer_order_no'] = $customer_order_no;
 
             return [
                 'form' => $form->createView(),
@@ -716,7 +716,6 @@ class MyShoppingController extends AbstractShoppingController
                 $reCustomer = $comS->getCustomerRelationFromUser($customerCode, $login_type, $login_code);
                 $fusrdec1 = $this->globalService->getFusrdec1();
                 $fusrstr8 = $this->globalService->getFusrstr8();
-
                 $item_index = 0;
 
                 $customer_order_no = $this->globalService->getCustomerOrderNo();
@@ -755,7 +754,7 @@ class MyShoppingController extends AbstractShoppingController
                             'remarks4' => $remarks4,
                             'location' => !empty($location) ? $location : 'XB0201001',
                             'fvehicleno' => ($fusrstr8 == 1 && $subTotal <= $fusrdec1) ? '1000' : '0000',
-                            ];
+                        ];
                     }
                 }
 
@@ -1136,12 +1135,12 @@ class MyShoppingController extends AbstractShoppingController
 
         log_info('[注文完了] 購入フローのセッションをクリアします. ');
         $this->orderHelper->removeSession();
+        unset($_SESSION['customer_order_no']);
         unset($_SESSION['remarks1']);
         unset($_SESSION['remarks2']);
         unset($_SESSION['remarks3']);
         unset($_SESSION['remarks4']);
         unset($_SESSION['delivery_date']);
-        unset($_SESSION['customer_order_no']);
         unset($_SESSION['cart_product_type']);
 
         $hasNextCart = !empty($this->cartService->getCarts());
@@ -1154,6 +1153,7 @@ class MyShoppingController extends AbstractShoppingController
             'hasNextCart' => $hasNextCart,
         ];
     }
+
 
     /**
      * Check Fusrstr.

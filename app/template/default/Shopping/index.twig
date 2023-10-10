@@ -341,12 +341,12 @@ $(function () {
             $('.error_delivery_address').hide();
         }
 
-        if ($("#customer_order_no").val().trim() != '' && $("#error_customer_order_no").text().trim() != '') {
-            isSubmit = 0;
+        if ("{{ global_service.getCartProductType }}" == 2 && $("#remarks1").val().trim() == '' && $("#remarks2").val().trim() == '') {
+             $('.error_remarks').show();
+             isSubmit = 0;
         }
 
-        if ("{{ global_service.getCartProductType }}" == 2 && $("#remarks1").val().trim() == '' && $("#remarks2").val().trim() == '') {
-            $('.error_remarks').show();
+        if ($("#customer_order_no").val().trim() != '' && $("#error_customer_order_no").text().trim() != '') {
             isSubmit = 0;
         }
 
