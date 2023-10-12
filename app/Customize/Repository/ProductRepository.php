@@ -410,14 +410,9 @@ class ProductRepository extends AbstractRepository
             mst_product.quantity_box,
             stock_list.stock_num,
             dt_price.price_s01,
-            (CASE
-                WHEN dt_price.price_s01 is null THEN mst_product.unit_price
-                ELSE dt_price.price_s01
-                END
-            ) AS hidden price,
+            dt_price.price_s01 as price,
             mst_delivery_plan.delivery_date AS dp_delivery_date,
             mst_delivery_plan.quanlity AS dp_quanlity
-            
         ';
 
         $qb = $this->getEntityManager()->createQueryBuilder();
@@ -442,6 +437,7 @@ class ProductRepository extends AbstractRepository
             dt_price.product_code = mst_product.product_code 
             AND dt_price.shipping_no = :shipping_code 
             AND dt_price.customer_code = :customer_code 
+            AND dt_price.price_s01 > 0 
             AND dt_price.valid_date <= '$curentDate' 
             AND dt_price.expire_date > '$curentDate' 
             AND dt_price.tanka_number in (:tanka_number)

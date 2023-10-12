@@ -145,7 +145,7 @@ file that was distributed with this source code.
                 '_token':'{{ csrf_token('_token') }}',
                 'product_id':productIdEc,
                 'productClassId':productClassId,
-                'oneCartId':'{{ oneCartId }}',
+                {#'oneCartId':'{{ oneCartId }}',#}
                 'is_update':1
             }
         })
@@ -356,7 +356,7 @@ file that was distributed with this source code.
                             {% for CartItem in Cart.CartItems %}
                                 {% set ProductClass = CartItem.ProductClass %}
                                 {% set Product = ProductClass.Product %}
-                                {% set MstProduct = hsProductId[Product.id] %}
+                                {#{% set MstProduct = hsProductId[Product.id] %}#}
 
                                 <ul class="ec-cartRow">
                                     <li class="ec-cartRow__delColumn">
@@ -372,17 +372,17 @@ file that was distributed with this source code.
                                         </div>
                                         <div class="ec-cartRow__summary">
                                             <div class="ec-cartRow__name">
-                                                <a  href="{{ url('product_detail', {id : Product.id} ) }}">{{ MstProduct.product_name }}</a>
+                                                <a  href="{{ url('product_detail', {id : Product.id} ) }}">{{ Product.name }}</a>
                                                 <br>
-                                                {{ MstProduct.jan_code}}
+                                                {{ Product.jan}}
                                             </div>
                                             <div class="ec-cartRow__unitPrice">
-                                                {% if MstProduct.quantity>1 %}
-                                                    販売単位：{{ MstProduct.quantity }}個/箱～
+                                                {% if Product.quantity>1 %}
+                                                    販売単位：{{ Product.quantity }}個/箱～
                                                 {% else %}
-                                                    販売単位：{{ MstProduct.quantity }}個～
+                                                    販売単位：{{ Product.quantity }}個～
                                                 {% endif %}
-                                                {% set classShow=hsMstProductCodeCheckShow[MstProduct.product_code] -%}
+                                                {% set classShow = Product.price == Product.unit_price ? 'standar_price' : 'good_price' -%}
 
                                                 {# Check mst_customer.price_view_flg #}
                                                 {% if global_service.getPriceViewFlg %}
@@ -404,7 +404,7 @@ file that was distributed with this source code.
                                     </li>
                                     <li class="ec-cartRow__amountColumn">
                                         <div class="ec-cartRow__amountSP">{{ 'common.quantity__with_separator'|trans }}{{ CartItem.quantity|number_format }}</div>
-                                        <input type="number" maxlength="5" class="inputCart" id="quantity{{ MstProduct.ec_product_id }}" productclassid="{{ ProductClass.id }}" name="quantity{{ MstProduct.ec_product_id }}" required="required" min="{{ MstProduct.quantity }}" maxlength="9" myid="{{ MstProduct.ec_product_id }}" title="" mymst_quantity="{{ MstProduct.quantity }}" class="quantity form-control" oldvalue="{{ (CartItem.quantity * MstProduct.quantity) }}" value="{{ (CartItem.quantity * MstProduct.quantity) }}" step="{{ MstProduct.quantity }}">
+                                        <input type="number" maxlength="5" class="inputCart quantity form-control" id="{{ Product.id }}" productclassid="{{ ProductClass.id }}" name="{{ Product.id }}" required="required" min="{{ Product.quantity }}" title="" current_value="{{ (CartItem.quantity * Product.quantity) }}" value="{{ (CartItem.quantity * Product.quantity) }}" step="{{ Product.quantity }}">
                                     </li>
                                     <li class="ec-cartRow__subtotalColumn">
                                         {# Check mst_customer.price_view_flg #}

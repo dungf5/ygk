@@ -29,7 +29,9 @@ use Eccube\Repository\BaseInfoRepository;
 use Eccube\Repository\ProductClassRepository;
 use Eccube\Service\CartService;
 use Eccube\Service\OrderHelper;
+use Eccube\Service\PurchaseFlow\PurchaseContext;
 use Eccube\Service\PurchaseFlow\PurchaseFlow;
+use Eccube\Service\PurchaseFlow\PurchaseFlowResult;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -102,57 +104,58 @@ class MyCartController extends AbstractController
     }
 
     /**
-     * MyCartController
+     * カート画面.
      *
-     * @param Request   $request
-     * @Route("/cart_save_temp", name="cart_save_temp", methods={"POST"})
-     * @Template("Ajax/add_list.twig")
-     *
-     * @return array
+     * @Route("/cart", name="cart")
+     * @Template("Cart/index.twig")
      */
     public function index(Request $request)
     {
-        if ('POST' === $request->getMethod()) {
-            $commonService = new MyCommonService($this->entityManager);
-            $shipping_code = $request->get('shipping_code');
-            $pre_order_id = $request->get('pre_order_id');
-            $customer_id = $request->get('customer_id');
-            $date_want_delivery = $request->get('date_want_delivery');
-            $is_check_exist = $request->get('is_check_exist');
+        // カートを取得して明細の正規化を実行
+        $Carts = $this->cartService->getCarts();
+        $this->execPurchaseFlow($Carts);
 
-            if ($is_check_exist == 1) {
-                echo $commonService->checkExistPreOrder($pre_order_id);
-                exit();
+        // TODO itemHolderから取得できるように
+        $totalPrice = 0;
+        $totalQuantity = 0;
+        $onecart_id = '';
+        $onecart_key = '';
+
+        foreach ($Carts as $Cart) {
+            $totalPrice += $Cart->getTotalPrice();
+            $totalQuantity += $Cart->getQuantity();
+
+            $cartItems = $Cart->getCartItems();
+
+            foreach ($cartItems as &$cartItem) {
+                $productClass = $cartItem->getProductClass();
+                $product = $productClass->getProduct();
+
+                // Get mst_product
+                $mstProduct = $this->mstProductRepository->getData($product->getId());
+
+                $product->setName($mstProduct['product_name'] ?? '');
+                $product->setJan($mstProduct['jan_code'] ?? '');
+                $product->setQuantity((int) $mstProduct['quantity'] ?? 1);
+                $product->setUnitPrice((int) $mstProduct['unit_price'] ?? 0);
+                $product->setPrice((int) $cartItem->getPrice() ?? 0);
             }
 
-            $commonService->saveTempCart($shipping_code, $pre_order_id);
-            $arrOtoProductOrder = $commonService->getCustomerOtodoke($this->globalService->getLoginType(), $this->globalService->customerId(), $shipping_code, null);
-            $moreOrder = $commonService->getMoreOrder($pre_order_id);
-            $data = (object) [];
-            $otodoke_code_checked = '';
-
-            if (!MyCommon::isEmptyOrNull($moreOrder)) {
-                $data->moreOrder = $moreOrder;
-                $data->hasMoreOrder = 1;
-
-                foreach ($arrOtoProductOrder as $mS) {
-                    if ($mS['otodoke_code'] == $moreOrder['otodoke_code']) {
-                        $otodoke_code_checked = $mS['otodoke_code'];
-                    }
-                }
-            } else {
-                $data->hasMoreOrder = 0;
-            }
-
-            $data->otodoke_code_checked = $otodoke_code_checked;
-            $data->shipping = $arrOtoProductOrder;
-
-            $result = ['is_ok' => '1', 'msg' => 'OK', 'data' => $data];
-
-            return $result;
+            $onecart_id = $Cart->getId();
+            $onecart_key = $Cart->getCartKey();
         }
 
-        return [];
+        // カートが分割された時のセッション情報を削除
+        $request->getSession()->remove(OrderHelper::SESSION_CART_DIVIDE_FLAG);
+
+        return [
+            'totalPrice' => $totalPrice,
+            'totalQuantity' => $totalQuantity,
+            // 空のカートを削除し取得し直す
+            'Carts' => $this->cartService->getCarts(true),
+            'onecart_id' => $onecart_id,
+            'onecart_key' => $onecart_key,
+        ];
     }
 
     /**
@@ -322,117 +325,6 @@ class MyCartController extends AbstractController
     }
 
     /**
-     * カート画面.
-     *
-     * @Route("/cart", name="cart", methods={"GET"})
-     * @Template("Cart/index.twig")
-     */
-    public function showCart(Request $request)
-    {
-        // カートを取得して明細の正規化を実行
-        $Carts = $this->cartService->getCarts();
-
-        //$this->execPurchaseFlow($Carts);
-        // TODO itemHolderから取得できるように
-        $least = [];
-        $quantity = [];
-        $isDeliveryFree = [];
-        $totalPrice = 0;
-        $totalQuantity = 0;
-        $carSession = MyCommon::getCarSession();
-
-        foreach ($Carts as $Cart) {
-            if ($Cart['key_eccube'] !== $carSession) {
-                continue;
-            }
-
-            $quantity[$Cart->getCartKey()] = 0;
-            $isDeliveryFree[$Cart->getCartKey()] = false;
-
-            if ($this->baseInfo->getDeliveryFreeQuantity()) {
-                if ($this->baseInfo->getDeliveryFreeQuantity() > $Cart->getQuantity()) {
-                    $quantity[$Cart->getCartKey()] = $this->baseInfo->getDeliveryFreeQuantity() - $Cart->getQuantity();
-                } else {
-                    $isDeliveryFree[$Cart->getCartKey()] = true;
-                }
-            }
-
-            if ($this->baseInfo->getDeliveryFreeAmount()) {
-                if (!$isDeliveryFree[$Cart->getCartKey()] && $this->baseInfo->getDeliveryFreeAmount() <= $Cart->getTotalPrice()) {
-                    $isDeliveryFree[$Cart->getCartKey()] = true;
-                } else {
-                    $least[$Cart->getCartKey()] = $this->baseInfo->getDeliveryFreeAmount() - $Cart->getTotalPrice();
-                }
-            }
-
-            $totalPrice += $Cart->getTotalPrice();
-            $totalQuantity += $Cart->getQuantity();
-        }
-
-        // カートが分割された時のセッション情報を削除
-        $request->getSession()->remove(OrderHelper::SESSION_CART_DIVIDE_FLAG);
-        $myCart = $this->cartService->getCarts(true);
-
-        //Mapping cart product with mst product
-        $comSer = new MyCommonService($this->entityManager);
-        $cartList = [];
-        $oneCartId = 0;
-        $onecart_key = '';
-
-        foreach ($myCart as $cartT) {
-            $cartList[] = $cartT['id'];
-            $oneCartId = $cartT['id'];
-            $onecart_key = $cartT['cart_key'];
-        }
-
-        $mstProduct = $comSer->getMstProductsFromCart($cartList);
-        $hsMstProductPrice = [];
-        $hsProductId = [];
-        $arProductCode = [];
-        $hsMstProductCodeCheckShow = [];
-
-        foreach ($mstProduct as $itemP) {
-            //car_quantity,a.product_id as my_product_id
-            $hsProductId[$itemP['ec_product_id']] = $itemP;
-            $arProductCode[] = $itemP['product_code'];
-            $hsMstProductCodeCheckShow[$itemP['product_code']] = 'standar_price';
-        }
-        //end mapping
-
-        $isHideNext = false;
-        if ($this->getUser()) {
-            $commonS = new MyCommonService($this->entityManager);
-            $login_type = $this->globalService->getLoginType();
-            $login_code = $this->globalService->getLoginCode();
-            $customer_id = $this->globalService->customerId();
-            $customer_code = $commonS->getMstCustomer($customer_id)['customer_code'] ?? '';
-
-            if ($customer_code == '6000') {
-                $isHideNext = true;
-            }
-
-            if (count($arProductCode) > 0) {
-                $hsMstProductCodeCheckShow = $commonS->setCartIndtPrice($hsMstProductCodeCheckShow, $commonS, $customer_code, $login_type, $login_code);
-            }
-        }
-
-        return [
-            'totalPrice' => $totalPrice,
-            'isHideNext' => $isHideNext,
-            'totalQuantity' => $totalQuantity,
-            // 空のカートを削除し取得し直す
-            'Carts' => $myCart,
-            'least' => $least,
-            'onecart_key' => $onecart_key,
-            'oneCartId' => $oneCartId,
-            'quantity' => $quantity,
-            'hsProductId' => $hsProductId,
-            'hsMstProductCodeCheckShow' => $hsMstProductCodeCheckShow,
-            'is_delivery_free' => $isDeliveryFree,
-        ];
-    }
-
-    /**
      * カートに追加.
      *
      * @Route("/cart/update_cart", name="update_cart",methods={"POST"})
@@ -581,6 +473,51 @@ class MyCartController extends AbstractController
                 'totalPrice' => $totalPrice,
                 'Carts' => $Carts,
             ]);
+        }
+    }
+
+    /**
+     * @param $Carts
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    protected function execPurchaseFlow($Carts)
+    {
+        /** @var PurchaseFlowResult[] $flowResults */
+        $flowResults = array_map(function ($Cart) {
+            $purchaseContext = new PurchaseContext($Cart, $this->getUser());
+
+            return $this->purchaseFlow->validate($Cart, $purchaseContext);
+        }, $Carts);
+
+        // 復旧不可のエラーが発生した場合はカートをクリアして再描画
+        $hasError = false;
+        foreach ($flowResults as $result) {
+            if ($result->hasError()) {
+                $hasError = true;
+                foreach ($result->getErrors() as $error) {
+                    $this->addRequestError($error->getMessage());
+                }
+            }
+        }
+        if ($hasError) {
+            $this->cartService->clear();
+
+            return $this->redirectToRoute('cart');
+        }
+
+        $this->cartService->save();
+
+        foreach ($flowResults as $index => $result) {
+            foreach ($result->getWarning() as $warning) {
+                if ($Carts[$index]->getItems()->count() > 0) {
+                    $cart_key = $Carts[$index]->getCartKey();
+                    $this->addRequestError($warning->getMessage(), "front.cart.${cart_key}");
+                } else {
+                    // キーが存在しない場合はグローバルにエラーを表示する
+                    $this->addRequestError($warning->getMessage());
+                }
+            }
         }
     }
 }
