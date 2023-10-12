@@ -391,7 +391,6 @@ class ProductRepository extends AbstractRepository
     public function getQueryBuilderBySearchData($searchData, $customer_code = '', $shipping_code = '', $tanka_number = [], $location)
     {
         $commonService = new MyCommonService($this->getEntityManager());
-
         $col = '
             dtb_product.id,
             dtb_product.description_list,
@@ -409,23 +408,15 @@ class ProductRepository extends AbstractRepository
             mst_product.quantity_box,
             stock_list.stock_num,
             dt_price.price_s01,
-            (CASE
-                WHEN dt_price.price_s01 is null THEN mst_product.unit_price
-                ELSE dt_price.price_s01
-                END
-            ) AS hidden price,
+            dt_price.price_s01 as price,
             mst_delivery_plan.delivery_date AS dp_delivery_date,
             mst_delivery_plan.quanlity AS dp_quanlity
-            
         ';
-
         $qb = $this->getEntityManager()->createQueryBuilder();
         $curentDate = date('Y-m-d');
         $curentDateTime = date('Y-m-d H:i:s');
         $additionalJoin = '';
-
         $qb->select($col)->from('Customize\Entity\Product', 'dtb_product')->where('dtb_product.Status = 1');
-
         // Relation
         $qb->innerJoin('Customize\Entity\MstProduct',
             'mst_product',
@@ -433,7 +424,6 @@ class ProductRepository extends AbstractRepository
             AND mst_product.jan_code <> '' 
             AND DATE_FORMAT(IFNULL(mst_product.discontinued_date, '9999-12-31 00:00:00'), '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT('{$curentDateTime}', '%Y-%m-%d %H:%i:%s')"
         );
-
         $qb->innerJoin('Customize\Entity\Price',
             'dt_price',
             Join::WITH,
@@ -441,6 +431,7 @@ class ProductRepository extends AbstractRepository
             dt_price.product_code = mst_product.product_code 
             AND dt_price.shipping_no = :shipping_code 
             AND dt_price.customer_code = :customer_code 
+            AND dt_price.price_s01 > 0 
             AND dt_price.valid_date <= '$curentDate' 
             AND dt_price.expire_date > '$curentDate' 
             AND dt_price.tanka_number in (:tanka_number)
@@ -448,7 +439,6 @@ class ProductRepository extends AbstractRepository
             ->setParameter(':shipping_code', $shipping_code)
             ->setParameter(':customer_code', $customer_code)
             ->setParameter(':tanka_number', $tanka_number);
-
         if (!empty($location)) {
             $qb->leftJoin('Customize\Entity\StockList',
                 'stock_list',
@@ -456,7 +446,6 @@ class ProductRepository extends AbstractRepository
                 'stock_list.product_code = mst_product.product_code
                 AND stock_list.stock_location = :stockLocation')
                 ->setParameter(':stockLocation', $location);
-
             $qb->leftJoin('Customize\Entity\MstDeliveryPlan',
                 'mst_delivery_plan',
                 Join::WITH,
@@ -466,11 +455,9 @@ class ProductRepository extends AbstractRepository
                 ->setParameter(':stockLocation', $location);
         }
         // End - Relation
-
         // Filter
         if (!empty($searchData['category_id']) && $searchData['category_id']) {
             $Categories = $searchData['category_id'];
-
             if ($Categories) {
                 $qb->innerJoin('dtb_product.ProductCategories', 'pct')
                     ->innerJoin('pct.Category', 'c')
@@ -478,13 +465,11 @@ class ProductRepository extends AbstractRepository
                     ->setParameter('Categories', $Categories);
             }
         }
-
         if (isset($searchData['mode']) && $searchData['mode'] == 'searchLeft') {
             if (StringUtil::isNotBlank($searchData['s_product_name_kana'])) {
                 $s_product_name_kana = $searchData['s_product_name_kana'];
                 $s_product_name_kana = explode(' ', $s_product_name_kana);
                 $orStatements = $qb->expr()->orX();
-
                 foreach ($s_product_name_kana as $key => $value) {
                     $orStatements->add(
                         $qb->expr()->like('mst_product.product_name_kana', $qb->expr()->literal('%'.$value.'%'))
@@ -492,12 +477,10 @@ class ProductRepository extends AbstractRepository
                 }
                 $qb->andWhere($orStatements);
             }
-
             if (StringUtil::isNotBlank($searchData['s_product_name'])) {
                 $s_product_name = $searchData['s_product_name'];
                 $s_product_name = explode(' ', $s_product_name);
                 $orStatements = $qb->expr()->orX();
-
                 foreach ($s_product_name as $key => $value) {
                     $orStatements->add(
                         $qb->expr()->like('mst_product.product_name', $qb->expr()->literal('%'.$value.'%'))
@@ -505,12 +488,10 @@ class ProductRepository extends AbstractRepository
                 }
                 $qb->andWhere($orStatements);
             }
-
             if (StringUtil::isNotBlank($searchData['s_jan'])) {
                 $s_jan = $searchData['s_jan'];
                 $s_jan = explode(' ', $s_jan);
                 $orStatements = $qb->expr()->orX();
-
                 foreach ($s_jan as $key => $value) {
                     $orStatements->add(
                         $qb->expr()->like('mst_product.jan_code', $qb->expr()->literal('%'.$value.'%'))
@@ -518,7 +499,6 @@ class ProductRepository extends AbstractRepository
                 }
                 $qb->andWhere($orStatements);
             }
-
             if (StringUtil::isNotBlank($searchData['s_catalog_code'])) {
                 $key = $searchData['s_catalog_code'];
                 $arCode = $commonService->getSearchCatalogCode($key);
@@ -527,7 +507,6 @@ class ProductRepository extends AbstractRepository
                 $qb->andWhere($whereMore2);
             }
         }
-
         if (isset($searchData['name']) && StringUtil::isNotBlank($searchData['name'])) {
             $key = $searchData['name'];
             $orStatements = $qb->expr()->orX();
@@ -541,26 +520,21 @@ class ProductRepository extends AbstractRepository
             $qb->andWhere($orStatements);
         }
         // End - Filter
-
         // Order By
         if (!empty($searchData['orderby'])) {
             $config = $this->eccubeConfig;
-
             // JANコード順
             if ($searchData['orderby']->getId() == $config['eccube_product_jancd_lower']) {
                 $qb->addOrderBy('mst_product.jan_code', 'asc');
             }
-
             //価格が低い順
             elseif ($searchData['orderby']->getId() == $config['eccube_product_order_price_lower']) {
                 $qb->addOrderBy('price', 'asc');
             }
-
             // 価格が高い順
             elseif ($searchData['orderby']->getId() == $config['eccube_product_order_price_higher']) {
                 $qb->addOrderBy('price', 'desc');
             }
-
             // 新着順
             elseif ($searchData['orderby']->getId() == $config['eccube_product_order_newer']) {
                 $qb->orderBy('dtb_product.create_date', 'DESC');
@@ -571,7 +545,6 @@ class ProductRepository extends AbstractRepository
             }
         }
         // End - Order By
-
         // Check Product Type
         if ($this->globalService->getProductType() == 2) {
             if ($this->globalService->getSpecialOrderFlg() == 1) {
@@ -585,14 +558,11 @@ class ProductRepository extends AbstractRepository
             $qb->andWhere("(mst_product.special_order_flg <> 'Y' OR mst_product.special_order_flg is null)");
             $qb->addSelect("'1' AS product_type");
         }
-
         $qb->groupBy('mst_product.product_code');
-
         //var_dump($qb->getQuery()->getSQL());
         //var_dump($qb->getParameters());
         //var_dump($searchData);
         //die();
-
         return $this->queries->customize(QueryKey::PRODUCT_SEARCH, $qb, $searchData);
     }
 }

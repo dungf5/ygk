@@ -3462,6 +3462,7 @@ SQL;
                 WHERE
                     pri.shipping_no = ?
                 AND pri.customer_code = ?
+                AND pri.price_s01 > 0
                 AND DATE_FORMAT(NOW(), '%Y-%m-%d') >= pri.valid_date
                 AND DATE_FORMAT(NOW(), '%Y-%m-%d') < pri.expire_date
                 {$additionalCondition}
@@ -3482,6 +3483,59 @@ SQL;
             log_info($e->getMessage());
 
             return [];
+        }
+    }
+
+
+    public function getPriceFromDtPrice($customer_code = '', $shipping_no = '', $productCode)
+    {
+        if ($customer_code == '' || $shipping_no == '') {
+            return '';
+        }
+
+        $sql = " SELECT  dt_price.price_s01
+                    FROM
+                        dt_price
+                    JOIN
+                        (   select pri.product_code, MAX(pri.tanka_number) AS max_tanka_number
+                            from dt_price pri
+                            WHERE pri.customer_code = ?
+                            AND pri.shipping_no = ?
+                            AND pri.price_s01 > 0
+                            AND DATE_FORMAT(NOW(),'%Y-%m-%d') >= pri.valid_date
+                            AND DATE_FORMAT(NOW(),'%Y-%m-%d') < pri.expire_date
+                            AND pri.product_code = ?
+                        ) AS dt_price_2
+                    ON
+                        dt_price_2.max_tanka_number = dt_price.tanka_number
+                    AND
+                        dt_price_2.product_code = dt_price.product_code
+                    WHERE
+                        dt_price.shipping_no = ?
+                    AND 
+                        dt_price.price_s01 > 0
+                    AND 
+                        dt_price.customer_code = ?
+                    GROUP BY dt_price.product_code; 
+                ";
+
+        $param = [$customer_code, $shipping_no, $productCode, $shipping_no, $customer_code];
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $price = '';
+
+        try {
+            $result = $statement->executeQuery($param);
+            $rows = $result->fetchAllAssociative();
+
+            if (count($rows) > 0) {
+                $price = $rows[0] ?? '';
+            }
+
+            return $price;
+        } catch (\Exception $e) {
+            log_info($e->getMessage());
+
+            return '';
         }
     }
 }

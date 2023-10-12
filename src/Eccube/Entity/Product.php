@@ -41,6 +41,10 @@ if (!class_exists('\Eccube\Entity\Product')) {
         private $classCategories2 = [];
         private $className1;
         private $className2;
+        private $jan = '';
+        private $quantity = 1;
+        private $unit_price = 0;
+        private $price = 0;
 
         /**
          * @return string
@@ -1072,6 +1076,90 @@ if (!class_exists('\Eccube\Entity\Product')) {
         public function getStatus()
         {
             return $this->Status;
+        }
+
+        /**
+         * Set jan.
+         *
+         * @param string $jan
+         *
+         */
+        public function setJan($jan)
+        {
+            $this->jan = $jan;
+        }
+
+        /**
+         * Get name.
+         *
+         * @return string
+         */
+        public function getJan()
+        {
+            return $this->jan;
+        }
+
+        /**
+         * Set quantity.
+         *
+         * @param integer $quantity
+         *
+         */
+        public function setQuantity($quantity)
+        {
+            $this->quantity = $quantity;
+        }
+
+        /**
+         * Get name.
+         *
+         * @return integer
+         */
+        public function getQuantity()
+        {
+            return $this->quantity;
+        }
+
+        /**
+         * Set unit_price.
+         *
+         * @param float $unit_price
+         *
+         */
+        public function setUnitPrice($unit_price)
+        {
+            $this->unit_price = $unit_price;
+        }
+
+        /**
+         * Get name.
+         *
+         * @return float
+         */
+        public function getUnitPrice()
+        {
+            return $this->unit_price;
+        }
+
+        /**
+         * Set price.
+         *
+         * @param float $price
+         *
+         */
+        public function setPrice($price)
+        {
+            $this->price = $price;
+        }
+
+        /**
+         * Get name.
+         *
+         * @return float
+         */
+        public function getPrice()
+        {
+            return $this->price;
         }
     }
 }
