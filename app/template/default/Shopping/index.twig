@@ -12,726 +12,308 @@ file that was distributed with this source code.
 {% form_theme form 'Form/form_div_layout.twig' %}
 
 {% block javascript %}
-<script src="{{ asset('assets/selectbox/jquery-ui_1_13_2.js') }}"></script>
-<script>
-$( function() {
-    $.widget( "custom.combobox", {
-        _create: function() {
-            this.wrapper    = $( "<span>" )
-            .addClass( "custom-combobox" )
-            .insertAfter( this.element );
+    <script src="{{ asset('assets/selectbox/jquery-ui_1_13_2.js') }}"></script>
+    <script src="{{ asset('assets/js/vendor/moment.min.js', 'admin') }}"></script>
+    <script src="{{ asset('assets/js/vendor/moment-with-locales.min.js', 'admin') }}"></script>
+    <script src="{{ asset('assets/js/vendor/tempusdominus-bootstrap-4.min.js', 'admin') }}"></script>
+    <script src="{{ asset('assets/jquery-validation/jquery.validate.min.js', 'user_data') }}"></script>
 
-            this.element.hide();
-            this._createAutocomplete();
-            this._createShowAllButton();
-        },
+    <script>
+        $(document).ready(function() {
+            $(".ec-totalBox__btn").css('display', 'initial');
 
-        _createAutocomplete: function() {
-            var selected    = this.element.children( ":selected" ),
-            value           = selected.val() ? selected.text() : "";
 
-            this.input      = $( "<input>" )
-            .appendTo( this.wrapper )
-            .val( value )
-            .attr( "title", "" )
-            .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left select" )
-            .autocomplete({
-                delay: 0,
-                minLength: 0,
-                source: this._source.bind( this )
-            })
-            .tooltip({
-                classes: {
-                    "ui-tooltip": "ui-state-highlight"
+            var maxDate         = "{{ getNext3Month() }}";
+            var minDate         = "{{ getMinDate() }}";
+            let defaultDate     = '{{ delivery_date }}';
+
+            $('#date_picker_delivery').datetimepicker({
+                locale: 'ja',
+                format: 'YYYY-MM-DD',
+                useCurrent: false,
+                maxDate: maxDate,
+                minDate: minDate,
+                defaultDate:defaultDate,
+                useStrict: true,
+                keepInvalid: true,
+                buttons: {
+                    showToday: true,
+                    showClose: true
                 }
             });
 
-            this._on( this.input, {
-                autocompleteselect: function( event, ui ) {
-                    ui.item.option.selected                 = true;
-
-                    //shipping_destination_right shipping_radio_is_shipping_code
-                    let shipping_radio_is_shipping_code     =  $(this.input).parent().parent().attr("class");
-
-                    if (shipping_radio_is_shipping_code == "shipping_destination_right") {
-                        updateShipingAddress(ui.item.option.value);
-
-                        // Khi shipping_code change thì update otodoke_code laị về rỗng. Vì otodoke_code phụ thuộc vào shipping_code
-                        updateDeliverydAdress('');
-
-                        //Update Cart
-                        handleChangeShippingCode(ui.item.option.value);
-                    }
-                    else {
-                        updateDeliverydAdress(ui.item.option.value);
-                    }
-
-                    this._trigger( "select", event, {
-                        item: ui.item.option
-                    });
-                },
-
-                autocompletechange: "_removeIfInvalid"
-            });
-        },
-
-        _createShowAllButton: function() {
-            var input       = this.input,
-            wasOpen         = false;
-
-            input.on( "focusout", function(objI) {
-                if (this.value == "") {
-                    //$('.delivery_address_main').html('');
-                    let clasCheck   = $(this).parent().parent().attr("class");
-
-                    if (clasCheck == 'shipping_destination_right combo_add_list') {
-                        //  $('.combo_add_list').html('');
-                        $("select[name='delivery_address']").val('');
-                    }
-                    else {
-                        $('.error_delivery_address').hide();
-                        let Temp    = '<span class="custom-combobox"><input title="" class="custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left ui-autocomplete-input select" autocomplete="off" data-dashlane-rid="c17f3366f0c61f3d" data-form-type="other"><a tabindex="-1" title="すべて表示" class="ui-button ui-widget ui-button-icon-only custom-combobox-toggle ui-corner-right" role="button" data-dashlane-label="true" data-dashlane-rid="a9ea447d28e61422" data-form-type="other"><span class="ui-button-icon ui-icon ui-icon-triangle-1-s"></span><span class="ui-button-icon-space"> </span></a></span>';
-
-                        $('.combo_add_list').html(Temp);
-                        $("select[name='shipping_radio']").val('');
-                    }
-                }
+            $("#date_picker_delivery").on("keyup.datetimepicker", function (e) {
+                checkDate()
             });
 
-            $( "<a>" )
-            .attr( "tabIndex", -1 )
-            .attr( "title", "すべて表示" )
-            .tooltip()
-            .appendTo( this.wrapper )
-            .button({
-                icons: {
-                    primary: "ui-icon-triangle-1-s"
-                },
-                text: false
-            })
-            .removeClass( "ui-corner-all" )
-            .addClass( "custom-combobox-toggle ui-corner-right" )
-            .on( "mousedown", function() {
-                wasOpen = input.autocomplete( "widget" ).is( ":visible" );
-            })
-            .on( "click", function() {
-                input.trigger( "focus" );
-
-                // Close if already visible
-                if ( wasOpen ) {
-                    return;
-                }
-
-                // Pass empty string as value to search for, displaying all results
-                input.autocomplete( "search", "" );
+            $("#date_picker_delivery").on("hide.datetimepicker", function (e) {
+                checkDate()
             });
-        },
 
-        _source: function( request, response ) {
-            var matcher         = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+            function dateIsValid(dateStr) {
+                const regex         = /^\d{4}-\d{2}-\d{2}$/;
 
-            response( this.element.children( "option" ).map(function() {
-                var value2      = $( this ).val()
-                var text        = $( this ).text();
-
-                if (this.value && ( !request.term || matcher.test(text) || matcher.test(value2)))
-                return {
-                    label: text,
-                    value: text,
-                    option: this
-                };
-            }));
-        },
-
-        _removeIfInvalid: function( event, ui ) {
-            // Selected an item, nothing to do
-            if ( ui.item ) {
-                return;
-            }
-
-            // Search for a match (case-insensitive)
-            var value           = this.input.val(),
-            valueLowerCase      = value.toLowerCase(),
-            valid               = false;
-
-            this.element.children( "option" ).each(function() {
-                if ($( this ).text().toLowerCase() === valueLowerCase) {
-                    this.selected = valid = true;
+                if (dateStr.match(regex) === null) {
                     return false;
                 }
-            });
 
-            // Found a match, nothing to do
-            if (valid) {
-                return;
+                const date          = new Date(dateStr);
+                const timestamp     = date.getTime();
+
+                if (typeof timestamp !== 'number' || Number.isNaN(timestamp)) {
+                    return false;
+                }
+
+                return date.toISOString().startsWith(dateStr);
             }
 
-            // Remove invalid value
-            this.input
-            .val( "" )
-            .attr( "title", value + " お届け先が不在でございます。" )
-            .tooltip( "open" );
+            $("#date_picker_delivery").on("change.datetimepicker", function (e) {
+                if (e.date != undefined) {
+                    let dateChoose  = e.date.format('YYYY-MM-DD');
 
-            this.element.val( "" );
-            this._delay(function() {
-                this.input.tooltip( "close" ).attr( "title", "" );
-            }, 500 );
-
-            this.input.autocomplete( "instance" ).term = "";
-        },
-
-        _destroy: function() {
-            this.wrapper.remove();
-            this.element.show();
-        }
-    });
-
-    $( "#shipping_radio" ).combobox({});
-});
-</script>
-
-<script>
-$(function () {
-    var $redirectCallback = function () {
-        loadingOverlay();
-        $('#shopping_order_redirect_to').val($(this).attr('data-path'));
-        $('#shopping-form').attr('action', '{{ url("shopping_redirect_to") }}').submit();
-
-        setTimeout(function () {
-            loadingOverlay("hide");
-        }, 2000);
-    };
-
-    $('[data-trigger]').each(function() {
-        $(this).on($(this).attr('data-trigger'), $redirectCallback);
-    });
-
-    {% if is_granted('ROLE_USER') == false %}
-        var edit            = $('.customer-edit');
-        var hidden          = $('.customer-in');
-        var form            = $('.customer-form');
-
-        $('#customer').click(function() {
-            $(edit).each(function(index) {
-                var name    = $(this).text();
-                var input   = $('<input id="edit' + index + '" type="text" />').val(name);
-                $(form[index]).empty().append(input);
+                    if (checkDate()) {
+                        updateDateDeli(dateChoose);
+                    }
+                }
             });
 
-            $('.non-customer-display').hide();
-            $('.non-customer-edit').show();
-            $('.mod-button').show();
+            if ($("#customer_order_no").val() != '') {
+                handleCheckOrderNotExisted($("#customer_order_no").val());
+            }
         });
 
-        $('#customer-ok').click(function() {
-            $(form).each(function(index) {
-                $(hidden[index]).val($(form[index]).children('input').val());
-            });
+        var typingTimer;
+    
+        $(function () {
+            $("#select_shipping_code").change(function() {
+                $("#shipping_code").val(this.value);
 
-            var postData        = {};
-            $(hidden).each(function() {
-                postData[$(this).attr('name')] = $(this).val();
-            });
+                handleChangeShippingCode(this.value);
+            })
 
-            loadingOverlay();
+            $("#select_otodoke_code").change(function() {
+                $("#otodoke_code").val(this.value);
+            })
+
+            // $("#shopping-form").validate({
+            //         ignore: null,
+            //         rules: {
+            //             shipping_code: {
+            //                 required: true,
+            //             },
+            //             otodoke_code: {
+            //                 required: true,
+            //             },
+            //         },
+            //         messages: {
+            //             shipping_code: "出荷先を選択してください。",
+            //             otodoke_code: "届け先を選択してください。",
+            //         },
+            //         invalidHandler: function(event, validator) {
+            //             loadingOverlay("hide")
+            //         },
+            //         submitHandler: function(form) {
+            //             form.submit();
+            //         }
+            //     });
+        });
+
+        Date.isLeapYear = function (year) {
+            return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0));
+        };
+
+        Date.getDaysInMonth = function (year, month) {
+            return [31, (Date.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+        };
+
+        Date.prototype.isLeapYear = function () {
+            return Date.isLeapYear(this.getFullYear());
+        };
+
+        Date.prototype.getDaysInMonth = function () {
+            return Date.getDaysInMonth(this.getFullYear(), this.getMonth());
+        };
+
+        Date.prototype.addMonths = function (value) {
+            var n   = this.getDate();
+            this.setDate(1);
+            this.setMonth(this.getMonth() + value);
+            this.setDate(Math.min(n, this.getDaysInMonth()));
+            return this;
+        };
+
+        function checkDate() {
+            $('.error_date').html('');
+
+            let msErSame        = "{{ 'front.shopping.shipping_date_err_same'|trans }}";//same error_date
+            let msErSmal        =  "{{ 'front.shopping.shipping_date_err_small'|trans }}";//smaller
+            let msErMonth       =  "{{ 'front.shopping.shipping_date_err_month'|trans }}";//>1month
+            let date1Str        = $('#date_picker_delivery').val();
+
+            if (date1Str.trim() == '') {
+                return  true;
+            }
+
+            let inputDateStr    = date1Str;
+            let curDate         = new Date();
+            curDate.setHours(0, 0, 0, 0);
+            let inputDate       = new Date(inputDateStr);
+            inputDate.setHours(0, 0, 0, 0);
+
+            // Bỏ check cùng ngày
+            // if (curDate.toString() == inputDate.toString()) {
+            //     $('#date_picker_delivery').focus();
+            //     $('.error_date').html(msErSame);
+            //
+            //     return false;
+            // }
+
+            if (inputDate < curDate) {
+                $('.error_date').html(msErSmal);
+
+                return false;
+            }
+
+            curDate.addMonths(1);
+
+            if (inputDate > curDate) {
+                $('.error_date').html(msErMonth);
+
+                return false;
+            }
+
+            return true;
+        }
+
+        var CUR_INPUT_DATE      = null;
+
+
+
+        function updateDateDeli(dateChoose) {
+            let htmlRe1 = '';
+            $('.error_date').html('');
 
             $.ajax({
-                url: "{{ url('shopping_customer') }}",
+                url: '{{ url('check_delivery_date') }}',
                 type: 'POST',
-                data: postData,
-                dataType: 'json'
-            })
-            .done(function(data) {
-                if (data.status == 'OK') {
-                        $(form).each(function(index) {
-                        $(edit[index]).empty().text($(form[index]).children('input').val());
-                        $(form[index]).empty();
-                    });
-
-                    // kana field
-                    $(edit[2]).empty().text(data.kana01);
-                    $(edit[3]).empty().text(data.kana02);
-                    $('#customer-kana01').val(data.kana01);
-                    $('#customer-kana02').val(data.kana02);
+                async:false,
+                data: {
+                    'date_want_delivery': dateChoose,
                 }
             })
-            .fail(function() {
-                alert('更新に失敗しました。入力内容を確認してください。');
+            .done(function(htmlRe, statusText, jqXHR) {
+                htmlRe1 = htmlRe;
             })
-            .always(function(data) {
-                // overlayを無効
-                loadingOverlay('hide');
+            .fail(function(jqXHR, statusText, errorThrown) {
+
             });
 
-            $('.non-customer-display').show();
-            $('.non-customer-edit').hide();
-            $('.mod-button').hide();
-        });
+            $("#date_picker_delivery").val(htmlRe1.date_want_delivery);
 
-        $('#customer-cancel').click(function() {
-            $('.non-customer-display').show();
-            $('.non-customer-edit').hide();
-            $('.mod-button').hide();
-        });
-    {% endif %}
-
-    //nvtrong ajax
-    $('.mySubmitConfirm').click(function() {
-        let isSubmit                = 1;
-        let valbill_address         = $("select[name='bill_address']").val();
-        let valbill_addressInput    = $("input[name='bill_address']").val();//leng =1
-        let ishow2_addressInputOk   = 0;
-
-        if (valbill_addressInput!=null || valbill_addressInput!='' ) {
-            ishow2_addressInputOk=1;
-        }
-
-        if (ishow2_addressInputOk == 0) {
-            if ( (valbill_address==null || valbill_address=='' )) {
-                $('.error_bill_address').show();
-                isSubmit            = 0;
-            }
-            else {
-                $('.error_bill_address').hide();
+            if (htmlRe1.is_ok == 0) {
+                $('.error_date').html(htmlRe1.msg);
             }
         }
 
-        let shipRadioVal            = $("input[name='shipping_radio']").val();//leng =1
-        let isShipNoOk              = 0;
-
-        if (shipRadioVal != null) {
-            isShipNoOk=1;
-        }
-
-        if (isShipNoOk == 0) {
-            let valShip             = $("select[name='shipping_radio']").val();
-
-            if ( valShip == null || valShip== "") {
-                isSubmit            = 0;
-                $('.errorshipping_radio').show();
-            }
-            else {
-                $('.errorshipping_radio').hide();
-            }
-        }
-        else {
-            $('.errorshipping_radio').hide();
-        }
-
-
-        let deliveryRadioVal        = $("input[name='delivery_address']").val();//leng =1
-        let isDeliveryOk            = 0;
-
-        if (deliveryRadioVal != null) {
-            isDeliveryOk=1;
-        }
-
-        if (isDeliveryOk == 0) {
-            let valdelivery_address = $("select[name='delivery_address']").val();
-
-            if (valdelivery_address == null || valdelivery_address == '') {
-                $('.error_delivery_address').show();
-                isSubmit            = 0;
-            }
-            else {
-                $('.error_delivery_address').hide();
-            }
-        }
-        else {
-            $('.error_delivery_address').hide();
-        }
-
-        if ($("#customer_order_no").val().trim() != '' && $("#error_customer_order_no").text().trim() != '') {
-            isSubmit = 0;
-        }
-
-        if ("{{ global_service.getCartProductType }}" == 2 && $("#remarks1").val().trim() == '' && $("#remarks2").val().trim() == '') {
-            $('.error_remarks').show();
-            isSubmit = 0;
-        }
-
-        if (checkDate() && isSubmit === 1) {
-            $('#shopping-form').submit();
-        }
-    });
-    //end validate sumit
-
-    //delivery_address is otoke_code delivery_address_main
-    $('.combo_add_list').delegate("select[name='delivery_address']", 'change', function() {
-        let delivery_code       = $(this).val();
-
-        //delivery_address is otoke_code
-        updateDeliverydAdress(delivery_code);
-    });
-
-    $('.bill_address').delegate("select[name='bill_address']", 'change', function() {
-        let bill_code           =  $(this).val();
-
-        updateBillAddress(bill_code);
-        $('.error_bill_address').hide();
-    });
-
-    $("select[name='shipping_radio']").change(function() {
-        let shipping_code       =  $(this).val();
-        updateShipingAddress(shipping_code);
-    });
-
-    {% if Order.dtBillSeikyuCode|length == 1 %}
-        updateBillAddress('{{ Order.dtBillSeikyuCode[0]["seikyu_code"] }}');
-    {% endif %}
-
-    {% if Order.mstShips|length == 1 %}
-        updateShipingAddress('{{ Order.mstShips[0]["shipping_code"] }}');
-    {% endif %}
-});
-
-function updateShipingAddress(shipping_code) {
-    $('.error_delivery_address').hide();
-    $('.errorshipping_radio').hide();
-
-    $.ajax({
-        url: '{{ url('cart_save_temp') }}',
-        type: 'POST',
-        data: {
-            shipping_code:shipping_code ,
-            '_token':'{{ csrf_token('_token') }}',
-            'pre_order_id':'{{ Order.pre_order_id }}',
-            'customer_id':'{{ Order.Customer.id }}'
-        }
-    })
-    .done(function(htmlRe, statusText, jqXHR) {
-        // delivery_address_main
-        $('.combo_add_list').html(htmlRe);
-    })
-    .fail(function(jqXHR, statusText, errorThrown) {
-    });
-}
-
-function updateBillAddress(bill_code) {
-    $.ajax({
-        url: '{{ url('cart_save_temp_order') }}',
-        type: 'POST',
-        data: {
-            'bill_code': bill_code,
-            '_token':'{{ csrf_token('_token') }}',
-            'pre_order_id':'{{ Order.pre_order_id }}',
-            'customer_id':'{{ Order.Customer.id }}'
-        }
-    })
-    .done(function(htmlRe, statusText, jqXHR) {
-    })
-    .fail(function(jqXHR, statusText, errorThrown) {
-    });
-}
-
-function updateDeliverydAdress(delivery_code) {
-    $.ajax({
-        url: '{{ url('cart_save_temp_order') }}',
-        type: 'POST',
-        data: {
-            'delivery_code': delivery_code,
-            '_token':'{{ csrf_token('_token') }}',
-            'pre_order_id':'{{ Order.pre_order_id }}',
-            'customer_id':'{{ Order.Customer.id }}'
-        }
-    }).done(function(htmlRe, statusText, jqXHR) {
-
-    }).fail(function(jqXHR, statusText, errorThrown) {
-
-    });
-}
-
-{% if Order.shipping_no_checked !=""  %}
-    updateShipingAddress("{{Order.shipping_no_checked}}");
-{% endif %}
-
-//update one item xxxxx
-{% if Order.mstShips|length == 1 %}
-    updateShipingAddress("{{ Order.mstShips[0]["shipping_no"] }}");
-{% endif %}
-</script>
-
-<script src="{{ asset('assets/js/vendor/moment.min.js', 'admin') }}"></script>
-<script src="{{ asset('assets/js/vendor/moment-with-locales.min.js', 'admin') }}"></script>
-<script src="{{ asset('assets/js/vendor/tempusdominus-bootstrap-4.min.js', 'admin') }}"></script>
-
-<script>
-    Date.isLeapYear = function (year) {
-        return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0));
-    };
-
-    Date.getDaysInMonth = function (year, month) {
-        return [31, (Date.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
-    };
-
-    Date.prototype.isLeapYear = function () {
-        return Date.isLeapYear(this.getFullYear());
-    };
-
-    Date.prototype.getDaysInMonth = function () {
-        return Date.getDaysInMonth(this.getFullYear(), this.getMonth());
-    };
-
-    Date.prototype.addMonths = function (value) {
-        var n   = this.getDate();
-        this.setDate(1);
-        this.setMonth(this.getMonth() + value);
-        this.setDate(Math.min(n, this.getDaysInMonth()));
-        return this;
-    };
-
-    function checkDate() {
-        $('.error_date').html('');
-
-        let msErSame        = "{{ 'front.shopping.shipping_date_err_same'|trans }}";//same error_date
-        let msErSmal        =  "{{ 'front.shopping.shipping_date_err_small'|trans }}";//smaller
-        let msErMonth       =  "{{ 'front.shopping.shipping_date_err_month'|trans }}";//>1month
-        let date1Str        = $('#date_picker_delivery').val();
-
-        if (date1Str.trim() == '') {
-            return  true;
-        }
-
-        let inputDateStr    = date1Str;
-        let curDate         = new Date();
-        curDate.setHours(0, 0, 0, 0);
-        let inputDate       = new Date(inputDateStr);
-        inputDate.setHours(0, 0, 0, 0);
-
-        // if (curDate.toString() == inputDate.toString()) {
-        //     $('#date_picker_delivery').focus();
-        //     $('.error_date').html(msErSame);
-        //
-        //     return false;
-        // }
-
-        if (inputDate < curDate) {
-            $('.error_date').html(msErSmal);
-
-            return false;
-        }
-
-        curDate.addMonths(1);
-
-        if (inputDate > curDate) {
-            $('.error_date').html(msErMonth);
-
-            return false;
-        }
-
-        return true;
-    }
-
-    var CUR_INPUT_DATE      = null;
-    $( document ).ready(function() {
-        var maxDate         = "{{ getNext3Month() }}";
-        var minDate         = "{{ getMinDate() }}";
-        let defaultDate     = "{{ delivery_date }}";
-
-        $('#date_picker_delivery').datetimepicker({
-            locale: 'ja',
-            format: 'YYYY-MM-DD',
-            useCurrent: false,
-            maxDate: maxDate,
-            minDate: minDate,
-            defaultDate:defaultDate,
-            useStrict: true,
-            keepInvalid: true,
-            buttons: {
-            showToday: true,
-            showClose: true
-            }
-        });
-
-        $("#date_picker_delivery").on("keyup.datetimepicker", function (e) {
-            checkDate()
-        });
-
-        $("#date_picker_delivery").on("hide.datetimepicker", function (e) {
-            checkDate()
-        });
-
-        function dateIsValid(dateStr) {
-            const regex         = /^\d{4}-\d{2}-\d{2}$/;
-
-            if (dateStr.match(regex) === null) {
-                return false;
-            }
-
-            const date          = new Date(dateStr);
-            const timestamp     = date.getTime();
-
-            if (typeof timestamp !== 'number' || Number.isNaN(timestamp)) {
-                return false;
-            }
-
-            return date.toISOString().startsWith(dateStr);
-        }
-
-        $("#date_picker_delivery").on("change.datetimepicker", function (e) {
-            if (e.date != undefined) {
-                let dateChoose  = e.date.format('YYYY-MM-DD');
-
-                if (checkDate()) {
-                    updateDateDeli(dateChoose);
+        function handleChangeShippingCode (shipping_code) {
+        $.ajax({
+            url: '{{ url('shipping_code_change') }}',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'shipping_code': shipping_code,
+                    '_csrf_token': '{{ csrf_token('authenticate') }}'
+                },
+                beforeSend: function( xhr ) {
+                    loadingOverlay();
                 }
+            })
+            .done(function(data) {
+
+            })
+            .fail(function(data) {
+
+            }).always(function() {
+                loadingOverlay("hide");
+
+                window.location.reload();
+            });
+    }
+
+        function checkOrderNotExisted(target) {
+            let name                = target['name'];
+            let value               = target['value'];
+
+            clearTimeout(typingTimer);
+
+            typingTimer      = setTimeout(function () {
+                handleCheckOrderNotExisted(value);
+            }, 1000);
+        }
+
+        function handleCheckOrderNotExisted(value) {
+            $.ajax({
+                url: '{{ url('check_order_existed') }}',
+                type: 'POST',
+                data: {
+                    customer_order_no:value,
+                    '_token':'{{ csrf_token('_token') }}',
+                },
+                beforeSend: function(xhr, settings) {
+                    loadingOverlay();
+                }
+            })
+            .done(function(data) {
+                if (data.status == 1) {
+                    $("#customer_order_no-error").text('客先注文番号がすでに登録されています');
+                    $("#customer_order_no-error").css('display', 'initial');
+                } else {
+                    $("#customer_order_no-error").text('');
+                    $("#customer_order_no-error").css('display', 'none');
+                }
+            }).always(function() {
+                loadingOverlay('hide');
+            });
+        }
+
+        $('.mySubmitConfirm').click(function() {
+            let isSubmit                = 1;
+
+            if ($("#shipping_code").val().trim() == '') {
+                $('.shipping_code-error').show();
+                isSubmit = 0;
+            } else {
+                 $('.shipping_code-error').hide();
+            }
+
+            if ($("#otodoke_code").val().trim() == '') {
+                $('.otodoke_code-error').show();
+                isSubmit = 0;
+            } else {
+                 $('.otodoke_code-error').hide();
+            }
+
+            if ($("#customer_order_no").val().trim() != '' && $("#customer_order_no-error").text().trim() != '') {
+                isSubmit = 0;
+            }
+
+            if ("{{ global_service.getCartProductType }}" == 2 && $("#remarks1").val().trim() == '' && $("#remarks2").val().trim() == '') {
+                $('.remarks-error').show();
+                isSubmit = 0;
+            } else {
+                $('.remarks-error').hide();
+            }
+
+            if (checkDate() && isSubmit === 1) {
+                $('#shopping-form').submit();
             }
         });
-
-
-        if ($("#customer_order_no").val() != '') {
-            handleCheckOrderNoExisted($("#customer_order_no").val());
-        }
-    });
-
-    function updateDateDeli(dateChoose) {
-        let htmlRe1 = '';
-        $('.error_date').html('');
-
-        $.ajax({
-            url: '{{ url('cart_save_temp_order') }}',
-            type: 'POST',
-            async:false,
-            data: {
-                'date_want_delivery': dateChoose,
-                'pre_order_id':'{{ Order.pre_order_id }}',
-                'customer_id':'{{ Order.Customer.id }}'
-            }
-        })
-        .done(function(htmlRe, statusText, jqXHR) {
-            htmlRe1 = htmlRe;
-        })
-        .fail(function(jqXHR, statusText, errorThrown) {
-
-        });
-
-        $("#date_picker_delivery").val(htmlRe1.date_want_delivery);
-
-        if (htmlRe1.is_ok == 0) {
-            $('.error_date').html(htmlRe1.msg);
-        }
-    }
-</script>
-
-<script>
-    $(function () {
-        let preOrderId = "{{Order.pre_order_id }}";
-
-        $.ajax({
-            url: '{{ url('cart_save_temp') }}',
-            type: 'POST',
-            data: {
-                pre_order_id: preOrderId,
-                is_check_exist: 1,
-                '_token':'{{ csrf_token('_token') }}'
-            }
-        })
-        .done(function(htmlRe, statusText, jqXHR) {
-           if (htmlRe == "0") {
-               window.location.href='/';
-           }
-        })
-        .fail(function(jqXHR, statusText, errorThrown) {
-
-         });
-    });
-
-    var typingRemarksTimer;
-    var doneTypingInterval      = 2000;
-    function updateTempOrder(target) {
-        $("button.mySubmitConfirm").prop("disabled", true);
-        let name                = target['name'];
-        let value               = target['value'];
-
-        clearTimeout(typingRemarksTimer);
-        loadingOverlay('hide');
-
-        typingRemarksTimer      = setTimeout(function () {
-            handelUpdateTempOrder(name, value);
-        }, doneTypingInterval);
-    }
-
-    function checkOrderNoExisted(target) {
-        let name                = target['name'];
-        let value               = target['value'];
-
-        clearTimeout(typingRemarksTimer);
-
-        typingRemarksTimer      = setTimeout(function () {
-            handleCheckOrderNoExisted(value);
-        }, 1000);
-    }
-
-    function handelUpdateTempOrder(name, value) {
-        loadingOverlay();
-        let remarks1    = $("input[name=remarks1]").val();
-        let remarks2    = $("input[name=remarks2]").val();
-        let remarks3    = $("input[name=remarks3]").val();
-        let remarks4    = $("input[name=remarks4]").val();
-        let customer_order_no    = $("input[name=customer_order_no]").val();
-
-        if (name == 'remarks1') remarks1    = value;
-        if (name == 'remarks2') remarks2    = value;
-        if (name == 'remarks3') remarks3    = value;
-        if (name == 'remarks4') remarks4    = value;
-        if (name == 'customer_order_no') customer_order_no    = value;
-
-        $.ajax({
-            url: '{{ url('cart_save_temp_order') }}',
-            type: 'POST',
-            async:false,
-            data: {
-                'remarks1': remarks1,
-                'remarks2': remarks2,
-                'remarks3': remarks3,
-                'remarks4': remarks4,
-                'customer_order_no': customer_order_no,
-                'pre_order_id':'{{ Order.pre_order_id }}',
-                'customer_id':'{{ Order.Customer.id }}'
-            }
-        })
-        .done(function(htmlRe, statusText, jqXHR) {
-
-        })
-        .fail(function(jqXHR, statusText, errorThrown) {
-
-        })
-        .always(function() {
-            loadingOverlay('hide');
-            $("button.mySubmitConfirm").prop("disabled", false);
-        });
-    }
-
-    function handleCheckOrderNoExisted(value) {
-    $.ajax({
-        url: '{{ url('check_order_existed') }}',
-        type: 'POST',
-        data: {
-            customer_order_no:value,
-            '_token':'{{ csrf_token('_token') }}',
-        },
-        beforeSend: function(xhr, settings) {
-            loadingOverlay();
-        }
-    })
-    .done(function(data) {
-        if (data.status == 1) {
-            $("#error_customer_order_no").text('客先注文番号がすでに登録されています');
-            $("#error_customer_order_no").css('display', 'initial');
-        } else {
-            $("#error_customer_order_no").text('');
-            $("#error_customer_order_no").css('display', 'none');
-        }
-    }).always(function() {
-        loadingOverlay('hide');
-    });
-}
-</script>
+    </script>
 {% endblock javascript %}
 
 {% block main %}
     <link rel="stylesheet" href="{{ asset('assets/selectbox/jquery_ui_1_13_2.css') }}">
-    <style>
+    <style type="text/css">
         .standar_price {
             color: #00B050;
             font-size: 100% !important;
@@ -764,9 +346,60 @@ function updateDeliverydAdress(delivery_code) {
         .ui-draggable, .ui-droppable {
             background-position: top;
         }
-    </style>
 
-    <style type="text/css">
+        .shipping_destination {
+            display: flex;
+        }
+
+        .shipping_destination_left {
+            width: 140px
+        }
+
+        .shipping_destination_left > div {
+            width: 120px;
+            background-color: #c9b5b5;
+            text-align: center;
+            margin-right: 20px;
+        }
+
+        .shipping_destination_right {
+
+        }
+
+        .shipping_row {
+            display: block;
+        }
+
+        .date_picker_row {
+            display: flex;
+            margin-top: 10px;
+        }
+        .date-picker-delivery-notify {
+            padding: 5px 0;
+        }
+        .ui-autocomplete-input.select {
+            position: relative;
+            align-items: center;
+            max-width: 26vw;
+            height: 30px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+            margin: 0;
+            padding: 0;
+        }
+        .shipping_radio_is_shipping_code {
+            position: relative;
+            align-items: center;
+            max-width: 26vw;
+            height: 30px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+            margin: 0;
+            padding: 0;
+        }
+
         .datepicker-days th.dow:first-child,
         .datepicker-days td:first-child {
             color: #f00;
@@ -796,6 +429,10 @@ function updateDeliverydAdress(delivery_code) {
 
         option {
             color: #000;
+        }
+
+        .error {
+            color: red;
         }
     </style>
 
@@ -848,7 +485,7 @@ function updateDeliverydAdress(delivery_code) {
         {{ include('Shopping/alert.twig') }}
     </div>
 
-    <form id="shopping-form" method="post" action="{{ url('shopping_confirm') }}">
+    <form id="shopping-form" method="post" action="{{ url('shopping_confirm') }}" autocomplete="off">
         {{ form_widget(form._token) }}
         {{ form_widget(form.redirect_to) }}
         <div class="ec-orderRole">
@@ -979,30 +616,9 @@ function updateDeliverydAdress(delivery_code) {
                             <span id="customer-ok"><button type="button" class="ec-inlineBtn">{{ 'common.ok'|trans }}</button></span>
                             <span id="customer-cancel"><button type="button" class="ec-inlineBtn">{{ 'common.cancel'|trans }}</button></span>
                         </div>
-                        <input type="hidden" id="customer-name01" class="customer-in" name="customer_name01"
-                               value="{{ Order.name01 }}">
-                        <input type="hidden" id="customer-name02" class="customer-in" name="customer_name02"
-                               value="{{ Order.name02 }}">
-                        <input type="hidden" id="customer-kana01" class="customer-in" name="customer_kana01"
-                               value="{{ Order.kana01 }}">
-                        <input type="hidden" id="customer-kana02" class="customer-in" name="customer_kana02"
-                               value="{{ Order.kana02 }}">
-                        <input type="hidden" id="customer-company-name" class="customer-in" name="customer_company_name"
-                               value="{{ Order.companyName }}">
-                        <input type="hidden" id="customer-postal_code" class="customer-in" name="customer_postal_code"
-                               value="{{ Order.postal_code }}">
-                        <input type="hidden" id="customer-pref" class="customer-in" name="customer_pref"
-                               value="{{ Order.pref }}">
-                        <input type="hidden" id="customer-addr01" class="customer-in" name="customer_addr01"
-                               value="{{ Order.addr01 }}">
-                        <input type="hidden" id="customer-addr02" class="customer-in" name="customer_addr02"
-                               value="{{ Order.addr02 }}">
-                        <input type="hidden" id="customer-phone_number" class="customer-in" name="customer_phone_number"
-                               value="{{ Order.phone_number }}">
-                        <input type="hidden" id="customer-email" class="customer-in" name="customer_email"
-                               value="{{ Order.email }}">
                     {% endif %}
                 </div>
+                
                 <div class="ec-orderDelivery ">
                     <div class="ec-rectHeading  nvtrong hidden">
                         <h2>{{ 'front.shopping.delivery_info'|trans }}</h2>
@@ -1014,8 +630,6 @@ function updateDeliverydAdress(delivery_code) {
                         <div class="ec-orderDelivery__item">
                             <ul class="ec-borderedList">
                                 {% for orderItem in shipping.productOrderItems %}
-                                    {% set MstProduct = hsProductId[orderItem.Product.id] %}
-                                    {% set classShow=hsMstProductCodeCheckShow[MstProduct.product_code] -%}
                                     <li>
                                         {% if global_service.getCartProductType == 2%}
                                             <p><strong>{{ 'front.cart.special_product'|trans }}</strong></p>
@@ -1023,10 +637,10 @@ function updateDeliverydAdress(delivery_code) {
                                         <div class="ec-imageGrid">
                                             <div class="ec-imageGrid__img"><img
                                                     src="{{ asset((orderItem.product is null ? null : orderItem.product.MainListImage)|no_image_product, 'save_image') }}"
-                                                    alt="{{ MstProduct.product_name }}"></div>
+                                                    alt="{{ orderItem.MstProduct.product_name }}"></div>
                                             <div class="ec-imageGrid__content">
-                                                {{ MstProduct.jan_code}}
-                                                <p>{{ MstProduct.product_name }}</p>
+                                                {{ orderItem.MstProduct.jan_code}}
+                                                <p>{{ orderItem.MstProduct.product_name }}</p>
 
                                                 {% if orderItem.productClass is not null and orderItem.productClass.classCategory1 %}
                                                     {{ orderItem.productClass.classCategory1.className.name }}：{{ orderItem.productClass.classCategory1 }}
@@ -1034,6 +648,8 @@ function updateDeliverydAdress(delivery_code) {
                                                 {% if orderItem.productClass is not null and orderItem.productClass.classCategory2 %}
                                                     {{ orderItem.productClass.classCategory2.className.name }}：{{ orderItem.productClass.classCategory2 }}
                                                 {% endif %}
+
+                                                {% set classShow = orderItem.price == orderItem.MstProduct.unit_price ? 'standar_price' : 'good_price' -%}
 
                                                 {# Check mst_customer.price_view_flg #}
                                                 {% if global_service.getPriceViewFlg %}
@@ -1044,8 +660,8 @@ function updateDeliverydAdress(delivery_code) {
                                                 {% endif %}
 
                                                 {{ orderItem.quantity|number_format }}
-                                                {% if MstProduct.quantity > 1 %}
-                                                    箱({{ orderItem.quantity*MstProduct.quantity }}個)
+                                                {% if orderItem.MstProduct.quantity > 1 %}
+                                                    箱({{ orderItem.quantity * orderItem.MstProduct.quantity }}個)
                                                 {% else %}
                                                     個
                                                 {% endif %}
@@ -1173,15 +789,15 @@ function updateDeliverydAdress(delivery_code) {
                     <div class="shipping_destination_right">
                         <div class="shipping_row">
                             <div class="shipping_col1 Order.name01 Order.name02">
-                                {{ Order.arCusLogin.company_name }}
+                                {{ Order.Customer.company_name }}
                             </div>
                             <div class="shipping_row">
 
-                                〒 {{ Order.arCusLogin.postal_code }}
+                                〒 {{ Order.Customer.postal_code }}
 
-                                {{ Order.arCusLogin.addr01 }}
-                                {{ Order.arCusLogin.addr02 }}
-                                {{ Order.arCusLogin.addr03 }}
+                                {{ Order.Customer.addr01 }}
+                                {{ Order.Customer.addr02 }}
+                                {{ Order.Customer.addr03 }}
                             </div>
 
                         </div>
@@ -1190,6 +806,7 @@ function updateDeliverydAdress(delivery_code) {
                 <p class="error_bill_address" style="color: red;font-size: larger;font-weight: bold;display: none">
                     {{ 'front.shopping.error_bill_address'|trans }}
                 </p>
+
                 <div style="margin-bottom: 30px;"></div>
 
                 <div class="shipping_destination">
@@ -1197,69 +814,49 @@ function updateDeliverydAdress(delivery_code) {
                         <div>出荷先</div>
                     </div>
                     <div class="shipping_destination_right">
-
-                        {% if Order.mstShips|length == 1 %}
-                            <div class="shipping_row">
-                                <div class="shipping_col1">
-                                    <span>
-                                        {% if Order.mstShips|length == 1 %}
-                                            <input type="radio" class="hidden" checked name="shipping_radio"
-                                                   value="{{ Order.mstShips[0]["shipping_no"] }}"
-                                                   id="{{ Order.mstShips[0]["shipping_no"] }}">
-
-                                        {% endif %}
-                                    </span>
-                                    {{ Order.mstShips[0]["name01"] }}
-                                </div>
-                                <div class="shipping_col2">
-                                    〒 {{ Order.mstShips[0]["postal_code"] }} {{ Order.mstShips[0]["addr01"] }} {{ Order.mstShips[0]["addr02"] }} {{ Order.mstShips[0]["addr03"] }}
-                                </div>
-                            </div>
-                        {% else %}
-                            <select id="shipping_radio" style="width: 555px" name="shipping_radio">
-                                <option disabled selected value=""> {{ 'front.shopping.select_one_shipping_radio'|trans }}</option>
-                                {% for arShipping in Order.mstShips %}
-                                    {% if Order.shipping_no_checked ==  arShipping["shipping_no"] %}
-                                        <option selected value="{{ arShipping["shipping_no"] }}">{{ arShipping["name01"] }} 〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}</option>
-                                    {% else %}
-                                        <option value="{{ arShipping["shipping_no"] }}">{{ arShipping["name01"] }}〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                        {% endif %}
+                        <select id="select_shipping_code" class="form-control" name="select_shipping_code">
+                            <option disabled selected value=""> {{ 'front.shopping.select_one_shipping_radio'|trans }}</option>
+                            {% for arrShipping in Order.shipping_option %}
+                                <option value="{{ arrShipping["shipping_no"] }}" {% if shipping_code == arrShipping["shipping_no"] %}selected{% endif %}>{{ arrShipping["name01"] }}〒 {{ arrShipping["postal_code"] }} {{ arrShipping["addr01"] }} {{ arrShipping["addr02"] }} {{ arrShipping["addr03"] }}</option>
+                            {% endfor %}
+                        </select>
+                        <input id="shipping_code" name="shipping_code" type="hidden" value="{{ shipping_code }}">
                     </div>
                 </div>
-                <p class="errorshipping_radio" style="color: red;font-size: larger;font-weight: bold;display: none">
-                    {{ 'front.shopping.shipping_title_error'|trans }}
+                <p class="shipping_code-error" style="color: red;font-size: larger;font-weight: bold;display: none">
+                    出荷先を選択してください。
                 </p>
 
-                <div class="delivery_address_main">
-                    <div class="delivery_address shipping_destination">
-                        <div class="shipping_destination_left">
-                            <div>届け先 </div>
-                        </div>
-                        <div class="shipping_destination_right combo_add_list">
-                            <span class="custom-combobox"><input title="" class="custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left ui-autocomplete-input select" autocomplete="off" data-dashlane-rid="c17f3366f0c61f3d" data-form-type="other"><a tabindex="-1" title="すべて表示" class="ui-button ui-widget ui-button-icon-only custom-combobox-toggle ui-corner-right" role="button" data-dashlane-label="true" data-dashlane-rid="a9ea447d28e61422" data-form-type="other"><span class="ui-button-icon ui-icon ui-icon-triangle-1-s"></span><span class="ui-button-icon-space"> </span></a></span>
-                        </div>
+                <div style="margin-bottom: 10px;"></div>
+
+                <div class="shipping_destination">
+                    <div class="shipping_destination_left">
+                        <div>届け先 </div>
                     </div>
-                    <p class="error_delivery_address" style="color: red;font-size: larger;font-weight: bold;display: none">
-                        {{ 'front.shopping.error_delivery_address'|trans }}
-                    </p>
+                    <div class="shipping_destination_right">
+                        <select id="select_otodoke_code" class="form-control" name="select_otodoke_code">
+                            <option disabled selected value=""> {{ 'front.shopping.select_one_delivery_address'|trans }}</option>
+                            {% for arrOtodoke in Order.otodoke_option %}
+                                <option value="{{ arrOtodoke["otodoke_code"] }}" {% if otodoke_code == arrOtodoke["otodoke_code"] %}selected{% endif %}>{{ arrOtodoke["name01"] }}〒 {{ arrOtodoke["postal_code"] }} {{ arrOtodoke["addr01"] }} {{ arrOtodoke["addr02"] }} {{ arrOtodoke["addr03"] }}</option>
+                            {% endfor %}
+                        </select>
+                        <input id="otodoke_code" name="otodoke_code" type="hidden" value="{{ otodoke_code }}">
+                    </div>
                 </div>
+                <p class="otodoke_code-error" style="color: red;font-size: larger;font-weight: bold;display: none">
+                    届け先を選択してください。
+                </p>
 
                 <div class="ec-orderAccount  ">
-                    <div class=" date_picker_row ">
+                    <div class="date_picker_row">
                         <div class="shipping_destination_left date_picker_delivery">
                             <div> {{ 'front.shopping.date_picker_delivery'|trans }}</div>
                         </div>
                         <div class="shipping_destination_right">
                             <div class="shipping_row">
                                 <div class="date_picker_delivery">
-                                    <div class="controls" id="date_picker_delivery_p" style="position: relative">
-                                        <input type="text" readonly='true'
-                                               id="date_picker_delivery" name="date_picker_delivery"
-                                               class="datetimepicker-input form-control" data-target="#date_picker_delivery"
-                                               data-toggle="datetimepicker"/>
+                                    <div class="controls" id="date_picker_delivery_p" style="position: relative; cursor:default">
+                                        <input type="text" id="date_picker_delivery" name="date_picker_delivery" class="datetimepicker-input form-control" data-toggle="datetimepicker"/>
                                     </div>
                                 </div>
                             </div>
@@ -1267,7 +864,7 @@ function updateDeliverydAdress(delivery_code) {
                     </div>
                     <div class="date_picker_row">
                         <div class="shipping_destination_left"></div>
-                        <div>
+                        <div class="shipping_destination_right">
                             <p class="date-picker-delivery-notify">倉庫状況によりご希望日に添えない場合がございます<br/>詳しくは各担当者までお問い合わせください<br/>配送確定はマイページの出荷履歴をご確認ください</p>
                             <p class="error_date" style="color: red;font-size: larger;font-weight: bold;"></p>
                         </div>
@@ -1321,12 +918,14 @@ function updateDeliverydAdress(delivery_code) {
                         <div class="shipping_destination_left">
                             <div style="background-color: #ffdc00; font-weight: bold">客先発注番号</div>
                         </div>
-                        <div class="col-md-12" style="padding: 0">
-                            <input type="text" class="form-control" name="customer_order_no" id="customer_order_no" value="{% if customer_order_no is defined %}{{ customer_order_no }}{% endif %}" onkeyup="checkOrderNoExisted(this)" maxlength="20">
+                        <div class="shipping_destination_right">
+                            <input type="text" class="form-control" name="customer_order_no" id="customer_order_no" value="{% if customer_order_no is defined %}{{ customer_order_no }}{% endif %}" onkeyup="checkOrderNotExisted(this)" maxlength="20">
                         </div>
                     </div>
-                    <p id="error_customer_order_no" style="color: red; font-size: larger; font-weight: bold; display: none"></p>
                 </div>
+                <p id="customer_order_no-error" style="color: red;font-size: larger;font-weight: bold;display: none">
+                    客先注文番号がすでに登録されています。
+                </p>
                 {#Customer Order No#}
 
                 {# Remarks #}
@@ -1336,6 +935,7 @@ function updateDeliverydAdress(delivery_code) {
                         出荷案内書と納品書の備考に表示される項目（店名、オーダー番号、その他）
                     </p>
                 </div>
+
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
                     <div class="shipping_destination_left">
                         <div>発注書備考</div>
@@ -1351,6 +951,7 @@ function updateDeliverydAdress(delivery_code) {
                         発注に対するコメント
                     </p>
                 </div>
+
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
                     <div class="shipping_destination_left">
                         <div>発注書コメント</div>
@@ -1366,6 +967,7 @@ function updateDeliverydAdress(delivery_code) {
                         生産依頼項目（特注の仕様など）
                     </p>
                 </div>
+
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
                     <div class="shipping_destination_left">
                         <div> {{ 'front.mypage.remarks'|trans }}１</div>
@@ -1374,6 +976,7 @@ function updateDeliverydAdress(delivery_code) {
                         <input type="text" class="form-control" name="remarks1" id="remarks1" value="{{ remarks1 }}">
                     </div>
                 </div>
+
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-top: 10px">
                     <div class="shipping_destination_left">
                         <div> {{ 'front.mypage.remarks'|trans }}２</div>
@@ -1382,7 +985,8 @@ function updateDeliverydAdress(delivery_code) {
                         <input type="text" class="form-control" name="remarks2" id="remarks2" value="{{ remarks2 }}">
                     </div>
                 </div>
-                <p class="error_remarks" style="color: red;font-size: larger;font-weight: bold;display: none">
+
+                <p class="remarks-error" style="color: red;font-size: larger;font-weight: bold;display: none">
                     生産依頼備考１または生産依頼備考２を入力してください
                 </p>
                 {# End - Remarks#}
@@ -1419,7 +1023,6 @@ function updateDeliverydAdress(delivery_code) {
                         {% endif %}
                     </div>
                     <dl class="ec-totalBox__taxRate hidden">
-                        <dt>{{ 'common.tax_rate_target' | trans({ '%rate%': Order.rate }) }}</dt>
                         {# Check mst_customer.price_view_flg #}
                         {% if global_service.getPriceViewFlg %}
                             <dd>{{ roundPriceZeroTotalAll(Order.total) | raw }}</dd>
@@ -1451,7 +1054,7 @@ function updateDeliverydAdress(delivery_code) {
                             </dl>
                         </div>
                     {% endif %}
-                    <div class="ec-totalBox__btn">
+                    <div class="ec-totalBox__btn" style="display: none;">
                         <button type="button" class="ec-blockBtn--action mySubmitConfirm">{{ 'front.shopping.go_to_confirm'|trans }}</button>
                         <a href="{{ url("cart") }}" class="ec-blockBtn--cancel">{{ 'front.shopping.back_to_cart'|trans }}</a>
                     </div>

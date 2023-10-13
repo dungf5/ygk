@@ -28,52 +28,84 @@ file that was distributed with this source code.
         .swal-modal {
             width: 490px;
         }
-     </style>
-<div class="ec-role">
-    <div class="ec-pageHeader">
-        <h1>{{ 'front.shopping.confirm_title'|trans }}</h1>
-    </div>
-</div>
+        .shipping_destination{
+            display: flex;
+            margin-top: 10px;
+        }
+        .shipping_destination_left{
+            width: 140px
+        }
+        .shipping_destination_left >div{
+            width: 120px;
+            background-color: #c9b5b5;
+            text-align: center;
 
-<div class="ec-cartRole">
-    <div class="ec-cartRole__progress">
-        <ul class="ec-progress">
-            {% set step = 1 %}
-            <li class="ec-progress__item">
-                <div class="ec-progress__number">{{ step }}{% set step = step + 1 %}
-                </div>
-                <div class="ec-progress__label">{{ 'front.cart.nav__cart_items'|trans }}
-                </div>
-            </li>
-            {% if is_granted('ROLE_USER') == false %}
+        }
+        .shipping_destination_right{
+
+        }
+        .shipping_row{
+            display: block;
+        }
+
+        .shipping_col1{
+            /*width: 150px;*/
+        }
+
+        .shipping_col2{
+
+        }
+        .date_picker_row{
+            display: flex;
+            margin-top: 10px;
+        }
+    </style>
+
+    <div class="ec-role">
+        <div class="ec-pageHeader">
+            <h1>{{ 'front.shopping.confirm_title'|trans }}</h1>
+        </div>
+    </div>
+
+    <div class="ec-cartRole">
+        <div class="ec-cartRole__progress">
+            <ul class="ec-progress">
+                {% set step = 1 %}
                 <li class="ec-progress__item">
                     <div class="ec-progress__number">{{ step }}{% set step = step + 1 %}
                     </div>
-                    <div class="ec-progress__label">{{ 'front.cart.nav__customer_info'|trans }}
+                    <div class="ec-progress__label">{{ 'front.cart.nav__cart_items'|trans }}
                     </div>
                 </li>
-            {% endif %}
-            <li class="ec-progress__item">
-                <div class="ec-progress__number">{{ step }}{% set step = step + 1 %}
-                </div>
-                <div class="ec-progress__label">{{ 'front.cart.nav__order'|trans }}
-                </div>
-            </li>
-            <li class="ec-progress__item is-complete">
-                <div class="ec-progress__number">{{ step }}{% set step = step + 1 %}
-                </div>
-                <div class="ec-progress__label">{{ 'front.cart.nav__confirm'|trans }}
-                </div>
-            </li>
-            <li class="ec-progress__item">
-                <div class="ec-progress__number">{{ step }}{% set step = step + 1 %}
-                </div>
-                <div class="ec-progress__label">{{ 'front.cart.nav__complete'|trans }}
-                </div>
-            </li>
-        </ul>
+                {% if is_granted('ROLE_USER') == false %}
+                    <li class="ec-progress__item">
+                        <div class="ec-progress__number">{{ step }}{% set step = step + 1 %}
+                        </div>
+                        <div class="ec-progress__label">{{ 'front.cart.nav__customer_info'|trans }}
+                        </div>
+                    </li>
+                {% endif %}
+                <li class="ec-progress__item">
+                    <div class="ec-progress__number">{{ step }}{% set step = step + 1 %}
+                    </div>
+                    <div class="ec-progress__label">{{ 'front.cart.nav__order'|trans }}
+                    </div>
+                </li>
+                <li class="ec-progress__item is-complete">
+                    <div class="ec-progress__number">{{ step }}{% set step = step + 1 %}
+                    </div>
+                    <div class="ec-progress__label">{{ 'front.cart.nav__confirm'|trans }}
+                    </div>
+                </li>
+                <li class="ec-progress__item">
+                    <div class="ec-progress__number">{{ step }}{% set step = step + 1 %}
+                    </div>
+                    <div class="ec-progress__label">{{ 'front.cart.nav__complete'|trans }}
+                    </div>
+                </li>
+            </ul>
+        </div>
     </div>
-</div>
 
     <form id="shopping-form" method="post" action="{{ url('shopping_checkout') }}">
     {{ form_widget(form._token) }}
@@ -85,18 +117,18 @@ file that was distributed with this source code.
                     <h2>{{ 'front.shopping.customer_info'|trans }}</h2>
                 </div>
                 <div class="ec-orderAccount__account">
-                    <p class="ec-input">{{ Order.arCusLogin.company_name }}</p>
+                    <p class="ec-input">{{ Order.company_name }}</p>
                     <p class="ec-halfInput">
-                        {% if Order.arCusLogin.name01 %}
-                            {{ 'common.name.prefix'|trans }}{{ Order.arCusLogin.name01 }} {{ 'common.name.suffix'|trans }}
+                        {% if Order.name01 %}
+                            {{ 'common.name.prefix'|trans }}{{ Order.name01 }} {{ 'common.name.suffix'|trans }}
                         {% else %}
                             ご担当者様
                         {% endif %}
                     </p>
-                    <p class="ec-zipInput">{{ 'common.postal_symbol'|trans }}{{ Order.arCusLogin.postal_code }}</p>
-                    <p class="ec-input"> {{ Order.arCusLogin.addr01 }} {{ Order.arCusLogin.addr02 }} {{ Order.arCusLogin.addr03 }}</p>
-                    <p class="ec-telInput">{{ Order.arCusLogin.phone_number }}</p>
-                    <p class="ec-input">{{ Order.arCusLogin.customer_email }}</p>
+                    <p class="ec-zipInput">{{ 'common.postal_symbol'|trans }}{{ Order.postal_code }}</p>
+                    <p class="ec-input"> {{ Order.addr01 }} {{ Order.addr02 }} {{ Order.addr03 }}</p>
+                    <p class="ec-telInput">{{ Order.phone_number }}</p>
+                    <p class="ec-input">{{ Order.email }}</p>
                 </div>
             </div>
             <div class="ec-orderDelivery">
@@ -109,17 +141,16 @@ file that was distributed with this source code.
                     <div class="ec-orderDelivery__item">
                         <ul class="ec-borderedList">
                             {% for orderItem in shipping.productOrderItems %}
-                                {% set MstProduct = hsProductId[orderItem.Product.id] %}
-                                {% set classShow=hsMstProductCodeCheckShow[MstProduct.product_code] %}
+                                {% set classShow = orderItem.price == orderItem.MstProduct.unit_price ? 'standar_price' : 'good_price' -%}
                             <li>
                                 {% if global_service.getCartProductType == 2%}
                                     <p><strong>{{ 'front.cart.special_product'|trans }}</strong></p>
                                 {% endif %}
                                 <div class="ec-imageGrid">
-                                    <div class="ec-imageGrid__img"><img src="{{ asset((orderItem.product is null ? null : orderItem.product.MainListImage)|no_image_product, 'save_image') }}" alt="{{ MstProduct.product_name }}"></div>
+                                    <div class="ec-imageGrid__img"><img src="{{ asset((orderItem.product is null ? null : orderItem.product.MainListImage)|no_image_product, 'save_image') }}" alt="{{ orderItem.MstProduct.product_name }}"></div>
                                     <div class="ec-imageGrid__content">
-                                        {{ MstProduct.jan_code }}
-                                        <p>{{ MstProduct.product_name }}
+                                        {{ orderItem.MstProduct.jan_code }}
+                                        <p>{{ orderItem.MstProduct.product_name }}
 {#                                            {% if is_reduced_tax_rate(orderItem) %}{{ 'common.reduced_tax_rate_symbol'|trans }}{% set isShowReducedTaxMess = true %}{% endif %}#}
                                         </p>
                                         {% if orderItem.productClass is not null and orderItem.productClass.classCategory1 %}
@@ -138,8 +169,8 @@ file that was distributed with this source code.
                                             {% endif %}
 
                                             {{ orderItem.quantity|number_format }}
-                                            {% if MstProduct.quantity>1 %}
-                                                箱({{ orderItem.quantity*MstProduct.quantity }}個)
+                                            {% if orderItem.MstProduct.quantity>1 %}
+                                                箱({{ orderItem.quantity*orderItem.MstProduct.quantity }}個)
                                             {% else %}
                                                 個
                                             {% endif %}
@@ -186,121 +217,53 @@ file that was distributed with this source code.
                     </div>
                 {% endfor %}
             </div>
-{################            nvtrong start#}
-            <style>
-                .shipping_destination{
-                    display: flex;
-                    margin-top: 10px;
-                }
-                .shipping_destination_left{
-                    width: 140px
-                }
-                .shipping_destination_left >div{
-                    width: 120px;
-                    background-color: #c9b5b5;
-                    text-align: center;
 
-                }
-                .shipping_destination_right{
-
-                }
-                .shipping_row{
-                    display: block;
-                }
-
-                .shipping_col1{
-                    /*width: 150px;*/
-                }
-
-                .shipping_col2{
-
-                }
-                .date_picker_row{
-                    display: flex;
-                    margin-top: 10px;
-                }
-            </style>
-            <div class="bill_address shipping_destination" style="margin-bottom: 30px;">
+            <div class="shipping_destination">
                 <div class="shipping_destination_left">
-                    <div>請求先 </div>
+                    <div>請求先</div>
                 </div>
                 <div class="shipping_destination_right">
-
-                    {% for arShipping in Order.dtBillSeikyuCode %}
-
-                        <div class="shipping_row">
-
-                            <div class="shipping_col1">
-                                    <span>
-                                        {% if Order.dtBillSeikyuCode|length == 1 %}
-                                            <input class="hidden seikyu_code_"   checked name="bill_address" value="{{ arShipping["seikyu_code"] }}" id="bill_{{ arShipping["seikyu_code"] }}" >
-
-                                        {% else %}
-                                            <input type="radio" class="seikyu_code_" name="bill_address" value="{{ arShipping["seikyu_code"] }}" id="bill_{{ arShipping["seikyu_code"] }}" >
-                                        {% endif %}
-
-                                    </span>
-                                {{ arShipping["name01"] }}
-                            </div>
-                            <div class="shipping_col2">
-                                〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}
-
-                            </div>
-
+                    <div class="shipping_row">
+                        <div class="shipping_col1">
+                            <label for="{{ Order.seikyu_code }}" >{{ Order.seikyu_name }} </label>
                         </div>
-
-                    {% endfor %}
-
-
-
-
-
+                        <div class="shipping_col2">
+                            {{ Order.seikyu_address }}
+                        </div>
+                    </div>
                 </div>
-
             </div>
-            <p class="error_delivery_address" style="color: red;font-size: larger;font-weight: bold;display: none">
-                {{ 'front.shopping.shipping_title_error'|trans }}
-            </p>
+
             <div class="shipping_destination">
                 <div class="shipping_destination_left">
                     <div>出荷先</div>
                 </div>
                 <div class="shipping_destination_right">
-
-                    {% for arShipping in Order.mstShips %}
-
-                        <div class="shipping_row">
-
-                            <div class="shipping_col1">
-                                    <span>
-
-                                         {% if Order.mstShips|length == 1 %}
-                                             <input type="radio" class="hidden shipping_no"  checked name="shipping_radio" value="{{ arShipping["shipping_no"] }}" id="{{ arShipping["shipping_no"] }}" >
-
-                                        {% else %}
-                                             <input type="radio"  class=" shipping_no"  name="shipping_radio" value="{{ arShipping["shipping_no"] }}" id="{{ arShipping["shipping_no"] }}" >
-
-                                         {% endif %}
-
-                                    </span>
-                                {{ arShipping["name01"] }}
-                            </div>
-                            <div class="shipping_col2">
-                                〒 {{ arShipping["postal_code"] }} {{ arShipping["addr01"] }} {{ arShipping["addr02"] }} {{ arShipping["addr03"] }}
-
-                            </div>
-
+                    <div class="shipping_row">
+                        <div class="shipping_col1">
+                            <label for="{{ Order.shipping_no }}" >{{ Order.shipping_name }} </label>
                         </div>
-
-                    {% endfor %}
+                        <div class="shipping_col2">
+                            {{ Order.shipping_address }}
+                        </div>
+                    </div>
                 </div>
             </div>
-            <p class="errorshipping_radio" style="color: red;font-size: larger;font-weight: bold;display: none">
-                {{ 'front.shopping.shipping_title_error'|trans }}
-            </p>
-            {#                dtCusAddress#}
-            <div class="delivery_address_main">
-                {% include "Ajax/oto_list.twig" with {'data':Order.dtCustomerOtodoke } %}
+
+            <div class="shipping_destination">
+                <div class="shipping_destination_left">
+                    <div>届け先</div>
+                </div>
+                <div class="shipping_destination_right">
+                    <div class="shipping_row">
+                        <div class="shipping_col1">
+                            <label for="{{ Order.otodoke_no }}" >{{ Order.otodoke_name }} </label>
+                        </div>
+                        <div class="shipping_col2">
+                            {{ Order.otodoke_address }}
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="date_picker_row ">
@@ -319,8 +282,6 @@ file that was distributed with this source code.
                     <p class="date-picker-delivery-notify">倉庫状況によりご希望日に添えない場合がございます<br/>詳しくは各担当者までお問い合わせください<br/>配送確定はマイページの出荷履歴をご確認ください</p>
                 </div>
             </div>
-
-{################            nvtrong end#}
 
             <div class="ec-orderPayment nvtrong hidden">
                 <div class="ec-rectHeading">
@@ -484,7 +445,6 @@ file that was distributed with this source code.
                     {% endif %}
                 </div>
                 <dl class="ec-totalBox__taxRate hidden">
-                    <dt>{{ 'common.tax_rate_target'|trans({ '%rate%': Order.rate }) }}</dt>
                     {# Check mst_customer.price_view_flg #}
                     {% if global_service.getPriceViewFlg %}
                         <dd>{{ roundPriceZeroTotalAll(Order.total) | raw }}</dd>
@@ -526,71 +486,50 @@ file that was distributed with this source code.
 {% endblock %}
 
 {% block javascript %}
-<script>
-    $(function () {
-        let preOrderId = "{{Order.pre_order_id }}";
-        $.ajax({
-            url: '{{ url('cart_save_temp') }}',
-            type: 'POST',
-            data: {
-                pre_order_id: preOrderId,
-                is_check_exist: 1,
-                '_token':'{{ csrf_token('_token') }}'
-            }
-        })
-        .done(function(htmlRe, statusText, jqXHR) {
-            if (htmlRe == "0") {
-                window.location.href='/';
-            }
-        })
-        .fail(function(jqXHR, statusText, errorThrown) {
-        });
-    });
+    <script>
+        $("#btn-shopping-checkout").on('click', function() {
+            loadingOverlay();
+            $.ajax({
+                url: '{{ url('check_fusrstr') }}',
+                type: 'POST',
+                data: {
+                    '_token':'{{ csrf_token('_token') }}',
+                    total_price: '{{ Order.subtotal }}'
+                }
+            })
+            .done(function(response) {
+                if (response.status == -1) {
+                    console.log(response.message);
+                }
 
-    $("#btn-shopping-checkout").on('click', function() {
-        loadingOverlay();
-        $.ajax({
-            url: '{{ url('check_fusrstr') }}',
-            type: 'POST',
-            data: {
-                '_token':'{{ csrf_token('_token') }}',
-                total_price: '{{ Order.subtotal }}'
-            }
-        })
-        .done(function(response) {
-            if (response.status == -1) {
-                console.log(response.message);
-            }
+                if (response.status == 0) {
+                    let min_price = response.message.toLocaleString(window.document.documentElement.lang) + '円';
+                    swal({
+                        title: "確認",
+                        text: "小計金額が送料基準額（" + min_price + "）に満たしていないため\n送料がご負担となります。\n下記ボタンよりお進みください。",
+                        icon: "warning",
+                        dangerMode: true,
+                        buttons: {
+                            cancel: "戻る",
+                            confirm: "注文する"
+                        },
+                    })
+                    .then(isConfirmed => {
+                        if (isConfirmed) {
+                            $('#shopping-form').submit();
+                        }
+                    });
+                }
 
-            if (response.status == 0) {
-                let min_price = response.message.toLocaleString(window.document.documentElement.lang) + '円';
-                swal({
-                    title: "確認",
-                    text: "小計金額が送料基準額（" + min_price + "）に満たしていないため\n送料がご負担となります。\n下記ボタンよりお進みください。",
-                    icon: "warning",
-                    dangerMode: true,
-                    buttons: {
-                        cancel: "戻る",
-                        confirm: "注文する"
-                    },
-                })
-                .then(isConfirmed => {
-                    if (isConfirmed) {
-                        $('#shopping-form').submit();
-                    }
-                });
-            }
-
-            if (response.status == 1) {
-                $('#shopping-form').submit();
-            }
+                if (response.status == 1) {
+                    $('#shopping-form').submit();
+                }
+            })
+            .fail(function(jqXHR, statusText, errorThrown) {
+            })
+            .always(function() {
+                loadingOverlay('hide');
+            });
         })
-        .fail(function(jqXHR, statusText, errorThrown) {
-        })
-        .always(function() {
-            loadingOverlay('hide');
-        });
-    })
-</script>
-
+    </script>
 {% endblock javascript %}
