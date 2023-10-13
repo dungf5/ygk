@@ -113,7 +113,7 @@ class GlobalService
     {
         try {
             if ($this->customerId() != '') {
-                $arrShipping = $this->myCommon->getMstShippingCustomer($this->getLoginType(), $this->customerId(), null);
+                $arrShipping = $this->myCommon->getMstShippingCustomer($this->getLoginType(), $this->customerId());
                 $arrShipping = $arrShipping ?? [];
 
                 if (count($arrShipping) == 1 && isset($arrShipping[0]['shipping_no'])) {
