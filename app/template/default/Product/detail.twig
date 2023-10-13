@@ -199,37 +199,45 @@ file that was distributed with this source code.
                         $('.add-cart').prop('disabled', true);
                     }
                 }).done(function(data) {
-                    if (data.cart_quantity_total) {
+                    if (!data.status) {
+                        // difference product type
+                        swal("エラー", data.message, "error");
+
+                        return;
+                    }
+                    else if (data.cart_quantity_total) {
                         if (data.cart_quantity_total > 1 && data.cart_quantity_total <= 99) {
                             $('a.cart_quantity_total>.fnDIN').text(data.cart_quantity_total);
                         }
-                        else if (data.cart_quantity_total > 99) {
-                            swal("エラー", "一度に100件を超える注文はできません", "error");
-                            return;
-                        }
                         else {
-                            const node = document.createElement("span");
-                            node.classList.add('fnDIN');
-                            const textnode = document.createTextNode(data.cart_quantity_total);
-                            node.appendChild(textnode);
-                            document.getElementsByClassName('cart_quantity_total')[0].appendChild(node);
+                            if (data.cart_quantity_total > 99) {
+                                swal("エラー", "一度に100件を超える注文はできません", "error");
+
+                                return;
+                            }
+                            else {
+                                const node = document.createElement("span");
+                                node.classList.add('fnDIN');
+                                const textnode = document.createTextNode(data.cart_quantity_total);
+                                node.appendChild(textnode);
+                                document.getElementsByClassName('cart_quantity_total')[0].appendChild(node);
+                            }
+
+                            // レスポンス内のメッセージをalertで表示
+                            $.each(data.messages, function() {
+                                $('#ec-modal-header').html(this);
+                            });
+
+                            $('.ec-modal').show()
+
+                            //nvtrongxxx
+                            let myValue = $.cookie($('#product_id').val());
+
+                            if (myValue != undefined) {
+                                $('#quantity').val(myValue);
+                            }
                         }
                     }
-
-                    // レスポンス内のメッセージをalertで表示
-                    $.each(data.messages, function() {
-                        $('#ec-modal-header').html(this);
-                    });
-
-                    $('.ec-modal').show()
-
-                    //nvtrongxxx
-                    let myValue = $.cookie($('#product_id').val());
-
-                    if (myValue != undefined) {
-                        $('#quantity').val(myValue);
-                    }
-
                 }).fail(function(data) {
                     alert('{{ 'front.product.add_cart_error'|trans }}');
                 }).always(function(data) {

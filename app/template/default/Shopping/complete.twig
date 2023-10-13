@@ -19,29 +19,29 @@ file that was distributed with this source code.
         window.location.href='/';
     }
 
-    $(document).ready(function () {
-        setTimeout(function () {
-            $.ajax({
-                url: "{{ url('shopping_send_mail') }}",
-                type: 'POST',
-                data: {},
-                dataType: 'json'
-            })
-            .done(function(data) {});
+    {#$(document).ready(function () {#}
+    {#    setTimeout(function () {#}
+    {#        $.ajax({#}
+    {#            url: "{{ url('shopping_send_mail') }}",#}
+    {#            type: 'POST',#}
+    {#            data: {},#}
+    {#            dataType: 'json'#}
+    {#        })#}
+    {#        .done(function(data) {});#}
 
-        }, 1000)
+    {#    }, 1000)#}
 
-        setInterval(function () {
-            $.ajax({
-                url: "{{ url('shopping_send_mail') }}",
-                type: 'POST',
-                data: {},
-                dataType: 'json'
-            })
-            .done(function(data) {});
+    {#    setInterval(function () {#}
+    {#        $.ajax({#}
+    {#            url: "{{ url('shopping_send_mail') }}",#}
+    {#            type: 'POST',#}
+    {#            data: {},#}
+    {#            dataType: 'json'#}
+    {#        })#}
+    {#        .done(function(data) {});#}
 
-        }, 20000)
-    })
+    {#    }, 20000)#}
+    {#})#}
 </script>
 {% endblock javascript %}
 

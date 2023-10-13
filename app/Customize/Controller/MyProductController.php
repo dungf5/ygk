@@ -556,6 +556,19 @@ class MyProductController extends AbstractController
         $form = $builder->getForm();
         $form->handleRequest($request);
 
+        // Push session cart product type
+        $cart_product_type = $this->globalService->getCartProductType();
+        if (empty($cart_product_type)) {
+            $_SESSION['cart_product_type'] = $request->get('product_type', 1);
+        } else {
+            if ($cart_product_type != $request->get('product_type', 1)) {
+                return $this->json([
+                    'status' => 0,
+                    'message' => '通常品と特注品を混在してカートに入れることはできません',
+                ]);
+            }
+        }
+
         $carSession = MyCommon::getCarSession();
 
         // Get mst_product
@@ -677,7 +690,7 @@ class MyProductController extends AbstractController
                 $messages = $errorMessages;
             }
 
-            return $this->json(['done' => $done, 'messages' => $messages, 'cart_quantity_total' => $commonService->getTotalItemCart($cartId) ?? 1]);
+            return $this->json(['status' => 1, 'done' => $done, 'messages' => $messages, 'cart_quantity_total' => $commonService->getTotalItemCart($cartId) ?? 1]);
         } else {
             // ajax以外でのリクエストの場合はカート画面へリダイレクト
             foreach ($errorMessages as $errorMessage) {

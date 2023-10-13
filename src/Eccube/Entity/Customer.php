@@ -104,6 +104,13 @@ if (!class_exists('\Eccube\Entity\Customer')) {
         private $addr02;
 
         /**
+         * @var string|null
+         *
+         * @ORM\Column(name="addr03", type="string", length=255, nullable=true)
+         */
+        private $addr03;
+
+        /**
          * @var string
          *
          * @ORM\Column(name="email", type="string", length=255)
@@ -1215,6 +1222,16 @@ if (!class_exists('\Eccube\Entity\Customer')) {
         public function setCustomerCode(string $customer_code): void
         {
             $this->customer_code = $customer_code;
+        }
+
+        public function setAddr03($addr03 = null)
+        {
+            $this->addr03 = $addr03;
+        }
+
+        public function getAddr03()
+        {
+            return $this->addr03;
         }
     }
 }

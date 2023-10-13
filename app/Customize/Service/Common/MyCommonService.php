@@ -979,9 +979,8 @@ SQL;
         }
 
         $column = '
-                    a.customer_code as seikyu_code,
+                    a.customer_code,
                     ec_customer_id,
-                    company_name as name01,
                     company_name,
                     company_name_abb,
                     department,
@@ -1009,7 +1008,7 @@ SQL;
             $result = $statement->executeQuery($myPara);
             $rows = $result->fetchAllAssociative();
 
-            return $rows ?? [];
+            return $rows[0] ?? [];
         } catch (\Exception $e) {
             return [];
         }
@@ -1494,101 +1493,109 @@ SQL;
         }
     }
 
-    public function savedtOrder($arEcLData)
+    public function savedtOrder(\Eccube\Entity\Order $Order)
     {
-        foreach ($arEcLData as $itemSave) {
-            $objRep = $this->entityManager->getRepository(DtOrder::class)->findOneBy(
+        $orderItems = $Order->getProductOrderItems();
+        $index = 0;
+        log_info('Insert dt_order');
+
+        foreach ($orderItems as $item) {
+            $index++;
+            log_info($index);
+            log_info(json_encode($item));
+
+            $obj = $this->entityManager->getRepository(DtOrder::class)->findOneBy(
                 [
-                    'order_no' => $itemSave['order_no'],
-                    'order_lineno' => $itemSave['order_lineno'],
-                    'customer_code' => $itemSave['customer_code'],
+                    'order_no' => $Order->getOrderNo(),
+                    'order_lineno' => $index,
+                    'customer_code' => $Order->customer_code,
                 ]
             );
-            $orderItem = new DtOrder();
 
-            if ($objRep !== null) {
-                log_error("Order {$itemSave['order_no']}-{$itemSave['order_lineno']} is existed");
+            if ($obj !== null) {
+                log_error("Order {$Order->getOrderNo()}-{$index} is existed");
                 continue;
             }
 
-            $orderItem->setOrderLineno($itemSave['order_lineno']);
-            $orderItem->setOrderNo($itemSave['order_no']);
-            $orderItem->setShippingCode($itemSave['shipping_code']);
-            $orderItem->setSeikyuCode($itemSave['seikyu_code'] ?? '');
-            $orderItem->setShipingPlanDate($itemSave['shipping_plan_date'] ?? '');
+            $orderItem = new DtOrder();
+            $orderItem->setOrderLineno($index);
+            $orderItem->setOrderNo($Order->getOrderNo());
+            $orderItem->setShippingCode($Order->shipping_no);
+            $orderItem->setSeikyuCode($Order->seikyu_code);
+            $orderItem->setShipingPlanDate($Order->delivery_date);
             $orderItem->setRequestFlg('Y');
-            $orderItem->setCustomerCode($itemSave['customer_code']);
-            $orderItem->setProductCode($itemSave['product_code']);
-            $orderItem->setOtodokeCode($itemSave['otodoke_code']);
-            $orderItem->setOrderPrice($itemSave['order_price']);
-            $orderItem->setDemandQuantity($itemSave['demand_quantity']);
+            $orderItem->setCustomerCode($Order->customer_code);
+            $orderItem->setProductCode($item->getMstProduct()['product_code']);
+            $orderItem->setOtodokeCode($Order->otodoke_no);
+            $orderItem->setOrderPrice($item->getPrice());
+            $orderItem->setDemandQuantity($item->getQuantity());
+            $orderItem->setOrderDate(new \DateTime('now', new \DateTimeZone('UTC')));
+            $orderItem->setDeliPlanDate($Order->delivery_date);
 
-            // No41 注文情報送信I/F start
-            $time = new \DateTime();
-            $orderItem->setOrderDate($time);
-            // ・受注日←受注日(購入日)
-            if (!is_null($itemSave['deli_plan_date'])) {
-                $orderItem->setDeliPlanDate($itemSave['deli_plan_date']);                                       // ・希望納期（納入予定日）←配送日指定
-            }
-
-            $orderItem->setItemNo($itemSave['item_no'] ?? '');                                                    // ・客先品目No←JANコード
-            $orderItem->setDemandUnit($itemSave['demand_unit']);                                            // ・需要単位←商品情報の入り数が‘1’の場合、‘PC’、入り数が‘1’以外の場合、‘CS’
-            $orderItem->setDynaModelSeg2($itemSave['dyna_model_seg2']);                                     // ・ダイナ規格セグメント02←EC注文番号
-            $orderItem->setDynaModelSeg3($itemSave['dyna_model_seg3']);
-            $orderItem->setDynaModelSeg4($itemSave['dyna_model_seg4']);                                     // ・ダイナ規格セグメント04←EC注文番号
-            $orderItem->setDynaModelSeg5($itemSave['order_lineno']);                                                 // ・ダイナ規格セグメント05←EC注文明細番号
-            $orderItem->setDynaModelSeg6($itemSave['remarks1']);                                     // ・ダイナ規格セグメント04←EC注文番号
-            $orderItem->setDynaModelSeg7($itemSave['remarks2']);                                     // ・ダイナ規格セグメント04←EC注文番号
-            $orderItem->setDynaModelSeg8($itemSave['remarks3']);
-            $orderItem->setDynaModelSeg9($itemSave['remarks4']);
+            $orderItem->setItemNo($item->getMstProduct()['jan_code']);
+            $orderItem->setDemandUnit($item->getMstProduct()['quantity'] > 1 ? 'CS' : 'PC');
+            $orderItem->setDynaModelSeg2($Order->getId());
+            $orderItem->setDynaModelSeg3('2');
+            $orderItem->setDynaModelSeg4($Order->getId());
+            $orderItem->setDynaModelSeg5($index);
+            $orderItem->setDynaModelSeg6($Order->remarks1);
+            $orderItem->setDynaModelSeg7($Order->remarks2);
+            $orderItem->setDynaModelSeg8($Order->remarks3);
+            $orderItem->setDynaModelSeg9($Order->remarks4);
             $orderItem->setUnitPriceStatus('FOR');
             $orderItem->setDeploy('XB');
             $orderItem->setCompanyId('XB');
-            $orderItem->setShipingDepositCode($itemSave['location']);
-            $orderItem->setFvehicleno($itemSave['fvehicleno']);
+            $orderItem->setShipingDepositCode($Order->location);
+            $orderItem->setFvehicleno($Order->fvehicleno);
             $orderItem->setFtrnsportcd('87001');
 
-            // No41 注文情報送信I/F end
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
         }
     }
 
-    public function saveOrderStatus($arEcLData)
+    public function saveOrderStatus(\Eccube\Entity\Order $Order)
     {
-        foreach ($arEcLData as $itemSave) {
-            $objRep = $this->entityManager->getRepository(DtOrderStatus::class)->findOneBy(
+        $orderItems = $Order->getProductOrderItems();
+        $index = 0;
+        log_info('Insert dt_order_status');
+
+        foreach ($orderItems as $item) {
+            $index++;
+            log_info($index);
+            log_info(json_encode($item));
+
+            $obj = $this->entityManager->getRepository(DtOrderStatus::class)->findOneBy(
                 [
-                    'cus_order_no' => $itemSave['order_no'],
-                    'cus_order_lineno' => $itemSave['order_lineno'],
-                    'customer_code' => $itemSave['customer_code'],
+                    'cus_order_no' => $Order->getOrderNo(),
+                    'cus_order_lineno' => $index,
+                    'customer_code' => $Order->customer_code,
                 ]
             );
-            $orderItem = new DtOrderStatus();
 
-            if ($objRep !== null) {
-                log_error("Order {$itemSave['order_no']}-{$itemSave['order_lineno']} is existed");
+            if ($obj !== null) {
+                log_error("Order {$Order->getOrderNo()}-{$index} is existed");
                 continue;
             }
 
-            $time = new \DateTime();
+            $orderItem = new DtOrderStatus();
             $orderItem->setOrderStatus('1');
-            $orderItem->setOrderDate($time);
-            $orderItem->setOrderNo($itemSave['order_no']);
-            $orderItem->setOrderLineNo($itemSave['order_lineno']);
-            $orderItem->setEcOrderNo($itemSave['ec_order_no']);
-            $orderItem->setEcOrderLineno($itemSave['order_lineno']);
-            $orderItem->setCusOrderNo($itemSave['order_no']);
-            $orderItem->setCusOrderLineno($itemSave['order_lineno']);
-            $orderItem->setCustomerCode($itemSave['customer_code']);
-            $orderItem->setShippingCode($itemSave['shipping_code']);
-            $orderItem->setOtodokeCode($itemSave['otodoke_code']);
-            $orderItem->setOrderRemainNum($itemSave['order_remain_num']);
-            $orderItem->setProductCode($itemSave['product_code']);
-            $orderItem->setRemarks1($itemSave['remarks1']);
-            $orderItem->setRemarks2($itemSave['remarks2']);
-            $orderItem->setRemarks3($itemSave['remarks3']);
-            $orderItem->setRemarks4($itemSave['remarks4']);
+            $orderItem->setOrderDate(new \DateTime('now', new \DateTimeZone('UTC')));
+            $orderItem->setOrderNo($Order->getOrderNo());
+            $orderItem->setOrderLineNo($index);
+            $orderItem->setEcOrderNo($Order->getId());
+            $orderItem->setEcOrderLineno($index);
+            $orderItem->setCusOrderNo($Order->getOrderNo());
+            $orderItem->setCusOrderLineno($index);
+            $orderItem->setCustomerCode($Order->customer_code);
+            $orderItem->setShippingCode($Order->shipping_no);
+            $orderItem->setOtodokeCode($Order->otodoke_no);
+            $orderItem->setOrderRemainNum($item->getQuantity());
+            $orderItem->setProductCode($item->getMstProduct()['product_code']);
+            $orderItem->setRemarks1($Order->remarks1);
+            $orderItem->setRemarks2($Order->remarks2);
+            $orderItem->setRemarks3($Order->remarks3);
+            $orderItem->setRemarks4($Order->remarks4);
             $orderItem->setEcType('1');
 
             $this->entityManager->persist($orderItem);

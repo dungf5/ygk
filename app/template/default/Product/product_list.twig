@@ -60,32 +60,38 @@ file that was distributed with this source code.
             }
         })
         .done(function(data) {
-            if (data.cart_quantity_total) {
-                if (data.cart_quantity_total > 1) {
-                    $('a.cart_quantity_total>.fnDIN').text(data.cart_quantity_total);
+             if (!data.status) {
+                // difference product type
+                swal("エラー", data.message, "error");
+                return;
 
-                }
-                else {
-                    const node = document.createElement("span");
-                    node.classList.add('fnDIN');
-                    const textnode = document.createTextNode(data.cart_quantity_total);
-                    node.appendChild(textnode);
-                    document.getElementsByClassName('cart_quantity_total')[0].appendChild(node);
-                }
             }
+             else {
+                if (data.cart_quantity_total) {
+                    if (data.cart_quantity_total > 1) {
+                        $('a.cart_quantity_total>.fnDIN').text(data.cart_quantity_total);
+                    }
+                    else {
+                        const node = document.createElement("span");
+                        node.classList.add('fnDIN');
+                        const textnode = document.createTextNode(data.cart_quantity_total);
+                        node.appendChild(textnode);
+                        document.getElementsByClassName('cart_quantity_total')[0].appendChild(node);
+                    }
 
-            // レスポンス内のメッセージをalertで表示
-            $.each(data.messages, function() {
-                $('#ec-modal-header').html(this);
-            });
+                    // レスポンス内のメッセージをalertで表示
+                    $.each(data.messages, function() {
+                        $('#ec-modal-header').html(this);
+                    });
 
-            $('.ec-modal').show();
+                    $('.ec-modal').show();
 
-            let cookie_product_quantity = $.cookie(idProduct);
-            if (cookie_product_quantity != undefined) {
-                $('#quantity'+idProduct).val(cookie_product_quantity);
-            }
-
+                    let cookie_product_quantity = $.cookie(idProduct);
+                    if (cookie_product_quantity != undefined) {
+                        $('#quantity'+idProduct).val(cookie_product_quantity);
+                    }
+                }
+             }
         })
         .fail(function(data) {
             alert('{{ 'front.product.add_cart_error'|trans }}');
