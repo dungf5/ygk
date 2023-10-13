@@ -13,203 +13,253 @@ file that was distributed with this source code.
 {% set body_class = 'cart_page' %}
 {% block javascript %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script >
-    function  previewUrl() {
+    <script >
+        function  previewUrl() {
         let urlBack = document.referrer;
+
         if (urlBack == '') {
             window.location.href = '/';
-        } else {
+        }
+
+        else {
             if (urlBack.indexOf('products/list') > -1) {
                 window.location.href = urlBack;
-            } else {
+            }
+
+            else {
                 window.location.href = '/products/list';
             }
         }
     }
 
-    function checkInput(idQuantity) {
-        var valInput = $('#'+idQuantity).val().trim();
-        let mymst_quantity = $('#'+idQuantity).attr('mymst_quantity');
-        let input1 =document.getElementById(idQuantity);
-        input1.setCustomValidity('');
-        if (valInput == "") {
+        var typingTimer;
+        var doneTypingInterval = 500;
+        var flg_key_up = false;
 
-
-            input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
-                        input1.reportValidity();
-                        return false;
-                  }
-
-                 if ( (valInput == 0) && (1 == mymst_quantity) ){
-
-                        input1.setCustomValidity(mymst_quantity+'{{ 'front.product.invalid_quantity'|trans }}');
-                        input1.reportValidity();
-                        return false;
-                  }
-
-                if ( (valInput == 0) && (1 != mymst_quantity) ){
-                       //%number%
-                       let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
-                       msgShow = msgShow.replace('%number%',mymst_quantity);
-                        input1.setCustomValidity(msgShow);
-                        input1.reportValidity();
-                        return false;
-                  }
-                 if(valInput % mymst_quantity  !== 0) {
-                       let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
-                       msgShow = msgShow.replace('%number%',mymst_quantity);
-                        $('#'+idQuantity)[0].setCustomValidity(msgShow);
-                        $('#'+idQuantity)[0].reportValidity();
-                         return false;
-                 }
-                    $.cookie( idQuantity,valInput, { path: '/' });
-                 return true;
-            }
-
-    $('.inputCart').keyup(function(e) {
-        loadingOverlay();
-        $(".ec-blockBtn--action").attr('disabled', true);
-        $(".ec-blockBtn--action").css('pointer-events', 'none');
-        $(".ec-blockBtn--cancel").attr('disabled', true);
-        $(".ec-blockBtn--cancel").css('pointer-events', 'none');
-
-        if (e.key != "Enter") {
-            if (this.value.length > this.maxLength) {
-                this.value = this.value.slice(0, this.maxLength);
-            }
-
-            clearTimeout($.data(this, 'timer'));
-            var wait = setTimeout(checkInputFirst, 500,this);
-            $(this).data('timer', wait);
-        }
-    });
-
-    $('.inputCart').click(function(e) {
-        loadingOverlay();
-        $(".ec-blockBtn--action").attr('disabled', true);
-        $(".ec-blockBtn--action").css('pointer-events', 'none');
-        $(".ec-blockBtn--cancel").attr('disabled', true);
-        $(".ec-blockBtn--cancel").css('pointer-events', 'none');
-
-        let oldvalue = $(this).attr('oldvalue');
-        if ($(this).val()!=oldvalue) {
-            clearTimeout($.data(this, 'timer'));
-            var wait = setTimeout(checkInputFirst, 500,this);
-            $(this).data('timer', wait);
-        }
-    });
-
-    function checkInputFirst(objT) {
-        var isFail = false;
-        let quantityId = "quantity"+$(objT).attr('myid');
-        let input1 =document.getElementById(objT.id);
-        input1.setCustomValidity('');
-        let mymst_quantity = $(objT).attr('mymst_quantity');
-        let resultCheck = checkInput(quantityId);
-
-        if (resultCheck == true) {
-            updateOne(objT);
-        }
-
-        setTimeout(function () {
+        $('.inputCart').keyup(function(event) {
+            flg_key_up = true;
+            clearTimeout(typingTimer);
             loadingOverlay('hide');
-            $(".ec-blockBtn--action").attr('disabled', false);
-            $(".ec-blockBtn--action").css('pointer-events', 'auto');
-            $(".ec-blockBtn--cancel").attr('disabled', false);
-            $(".ec-blockBtn--cancel").css('pointer-events', 'auto');
-        }, 1000);
-    }
+            $(".ec-blockBtn--action").attr('disabled', true);
+            $(".ec-blockBtn--action").css('pointer-events', 'none');
+            $(".ec-blockBtn--cancel").attr('disabled', true);
+            $(".ec-blockBtn--cancel").css('pointer-events', 'none');
 
-    function updateOne(objThis) {
-        let quantityId = "quantity"+$(objThis).attr('myid');
-        let productIdEc = $(objThis).attr('myid');
-        let valInput = $('#'+quantityId).val().trim();
-        let productClassId = $(objThis).attr('productclassid');
-        let resultCheck = checkInput(quantityId);
+            if ( event.key == "Enter") {
+                typingTimer = setTimeout(function () {
+                    loadingOverlay();
+                    handelChangeQuantity(event.target);
+                }, doneTypingInterval);
 
-        if (resultCheck == true) {
+            } else {
+                typingTimer = setTimeout(function () {
+                    loadingOverlay();
+                    handelChangeQuantity(event.target);
+                }, 1000);
+            }
+        });
 
-        } else {
-            let newUrl = "javascript:;";
-            $('#objNext').attr('href',newUrl);
+        $('.inputCart').change(function(event) {
+            if (flg_key_up) {
+                return;
+            }
+            clearTimeout(typingTimer);
+            loadingOverlay('hide');
+            $(".ec-blockBtn--action").attr('disabled', true);
+            $(".ec-blockBtn--action").css('pointer-events', 'none');
+            $(".ec-blockBtn--cancel").attr('disabled', true);
+            $(".ec-blockBtn--cancel").css('pointer-events', 'none');
+
+            typingTimer = setTimeout(function () {
+                loadingOverlay();
+                handelChangeQuantity(event.target);
+            }, doneTypingInterval);
+        });
+
+        function handelChangeQuantity(target) {
+            let value = target.value.trim();
+            let id = target.id;
+            let step = $(target).attr('step');
+            let current_value = $(target).attr('current_value');
+            let productclassid = $(target).attr('productclassid');
+            let flg = true;
+
+            let input = document.getElementById(id);
+            input.setCustomValidity('');
+
+            if (value == "") {
+                input.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+                input.reportValidity();
+                flg = false;
+            }
+
+            if (parseInt(value) == 0 && (parseInt(step) == 1)) {
+                input.setCustomValidity(step+'{{ 'front.product.invalid_quantity'|trans }}');
+                input.reportValidity();
+                flg = false;
+            }
+
+            if (parseInt(value) == 0 && (parseInt(step) != 1)) {
+                let msgShow         = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                msgShow             = msgShow.replace('%number%', step);
+                input.setCustomValidity(msgShow);
+                input.reportValidity();
+                flg = false;
+            }
+
+            if (parseInt(value) % parseInt(step)  !== 0) {
+                let msgShow         = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                msgShow             = msgShow.replace('%number%', step);
+                input.setCustomValidity(msgShow);
+                input.reportValidity();
+                flg = false;
+            }
+
+            if (parseInt(value) == parseInt(current_value)) {
+                flg = false;
+            }
+
+            if (flg) {
+                $.cookie( 'quantity' + id, value, { path: '/' });
+
+                // Call ajax update cart
+                $.ajax({
+                    url: '/cart/update_cart',
+                    type: 'POST',
+                    dataType: "json",
+                    timeout: 1000,
+                    async:false,
+                    data: {
+                        '_token':'{{ csrf_token('_token') }}',
+                        'current_quantity': current_value,
+                        'quantity': value,
+                        'productClassId':productclassid,
+                    },
+                    beforeSend: function( xhr ) {
+                        loadingOverlay();
+                    }
+                })
+                .done(function(data) {
+                    if (data.status) {
+                        window.location.reload();
+                    } else {
+                        console.log(data.msg);
+                    }
+                })
+                .fail(function(data) {
+                    console.log(data);
+                }).always(function() {
+                });
+            }
+
+            setTimeout(function () {
+                loadingOverlay('hide');
+                $(".ec-blockBtn--action").attr('disabled', false);
+                $(".ec-blockBtn--action").css('pointer-events', 'auto');
+                $(".ec-blockBtn--cancel").attr('disabled', false);
+                $(".ec-blockBtn--cancel").css('pointer-events', 'auto');
+            }, 1000);
         }
 
-        $.ajax({
-            url: '/cart/update_cart',
-            type: 'POST',
-            dataType: "json",
-            timeout: 1000,
-            async:false,
-            data: {
-                'quantity': valInput,
-                '_token':'{{ csrf_token('_token') }}',
-                'product_id':productIdEc,
-                'productClassId':productClassId,
-                {#'oneCartId':'{{ oneCartId }}',#}
-                'is_update':1
+        $('.ec-blockBtn--action').click(function() {
+            let flg = true;
+
+            $( ".inputCart" ).each(function( index ) {
+                let value = $(this).val()
+                let id = $(this).attr('id');
+                let step = $(this).attr('step');
+
+                let input = document.getElementById(id);
+                input.setCustomValidity('');
+
+                if (value == "") {
+                    input.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+                    input.reportValidity();
+                    flg = false;
+                }
+
+                if (parseInt(value) == 0 && (parseInt(step) == 1)) {
+                    input.setCustomValidity(step+'{{ 'front.product.invalid_quantity'|trans }}');
+                    input.reportValidity();
+                    flg = false;
+                }
+
+                if (parseInt(value) == 0 && (parseInt(step) != 1)) {
+                    let msgShow         = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                    msgShow             = msgShow.replace('%number%', step);
+                    input.setCustomValidity(msgShow);
+                    input.reportValidity();
+                    flg = false;
+                }
+
+                if (parseInt(value) % parseInt(step)  !== 0) {
+                    let msgShow         = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                    msgShow             = msgShow.replace('%number%', step);
+                    input.setCustomValidity(msgShow);
+                    input.reportValidity();
+                    flg = false;
+                }
+            });
+
+            if (flg == true) {
+                {% if onecart_key|length > 0 %}
+                    let cart_buystep = "{{ path('cart_buystep', {'cart_key':onecart_key}) }}";
+                    window.location.href = cart_buystep;
+                {% endif %}
             }
-        })
-        .done(function(htmlRe, statusText, jqXHR) {
-            window.location.reload();
-        })
-        .fail(function(jqXHR, statusText, errorThrown) {
         });
-    }
 
-    $('.ec-blockBtn--action').click(function() {
-        let objNext =this;
-        let is_valid = true;
+        $('.ec-blockBtn--cancel').click(function() {
+            let flg = true;
 
-          $( ".inputCart" ).each(function( index ) {
-            let quantityId = "quantity"+$(this).attr('myid');
-            let productIdEc = $(this).attr('myid');
-            let valInput = $('#'+quantityId).val().trim();
-            let productClassId = $(this).attr('productclassid');
-            let resultCheck = checkInput(quantityId);
-            if(resultCheck == false){
-                is_valid = false;
-                return;
+            $( ".inputCart" ).each(function( index ) {
+                let value = $(this).val()
+                let id = $(this).attr('id');
+                let step = $(this).attr('step');
+
+                let input = document.getElementById(id);
+                input.setCustomValidity('');
+
+                if (value == "") {
+                    input.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+                    input.reportValidity();
+                    flg = false;
+                }
+
+                if (parseInt(value) == 0 && (parseInt(step) == 1)) {
+                    input.setCustomValidity(step+'{{ 'front.product.invalid_quantity'|trans }}');
+                    input.reportValidity();
+                    flg = false;
+                }
+
+                if (parseInt(value) == 0 && (parseInt(step) != 1)) {
+                    let msgShow         = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                    msgShow             = msgShow.replace('%number%', step);
+                    input.setCustomValidity(msgShow);
+                    input.reportValidity();
+                    flg = false;
+                }
+
+                if (parseInt(value) % parseInt(step)  !== 0) {
+                    let msgShow         = "{{ 'front.product.invalid_quantity_big'|trans }}";
+                    msgShow             = msgShow.replace('%number%', step);
+                    input.setCustomValidity(msgShow);
+                    input.reportValidity();
+                    flg = false;
+                }
+            });
+
+            if (flg == true) {
+                previewUrl();
             }
-          });
-
-          if(is_valid==true){
-              {% if onecart_key|length > 0 %}
-               let cart_buystep = "{{ path('cart_buystep', {'cart_key':onecart_key}) }}";
-            window.location.href=cart_buystep;
-              {% endif %}
-
-          }
-
-
-    });
-
-    $('.ec-blockBtn--cancel').click(function() {
-        let objNext =this;
-        let is_valid = true;
-
-          $( ".inputCart" ).each(function( index ) {
-            let quantityId = "quantity"+$(this).attr('myid');
-            let productIdEc = $(this).attr('myid');
-            let valInput = $('#'+quantityId).val().trim();
-            let productClassId = $(this).attr('productclassid');
-            let resultCheck = checkInput(quantityId);
-            if(resultCheck == false){
-                is_valid = false;
-                return;
-            }
-          });
-
-          if (is_valid == true) {
-              previewUrl();
-          }
-    });
-
-    $(function() {
-        $(document).on("keydown", "input", function(event) {
-           return event.key != "Enter";
         });
-    })
-</script>
+
+        $(function() {
+            $(document).on("keydown", "input", function(event) {
+                return event.key != "Enter";
+            });
+        })
+    </script>
 {% endblock javascript %}
 {% block main %}
     <style>

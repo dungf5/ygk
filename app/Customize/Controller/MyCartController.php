@@ -331,19 +331,64 @@ class MyCartController extends AbstractController
      */
     public function upCart(Request $request)
     {
-        $productClassId = $request->get('productClassId');
-        $ProductClass = $this->productClassRepository->find($productClassId);
-        $myQuantity = $request->get('quantity');
-        $oneCartId = $request->get('oneCartId');
-        $product_id = $ProductClass->getProduct()->getId();
-        setcookie($ProductClass->getProduct()->getId(), $myQuantity, 0, '/');
+        try {
+            $productClassId = $request->get('productClassId');
+            $current_quantity = $request->get('current_quantity');
+            $quantity = $request->get('quantity');
+            log_info('カート明細操作開始', ['product_class_id' => $productClassId]);
 
-        $msg = $this->cartService->updateProductCustomize($ProductClass, $myQuantity, $oneCartId, $productClassId);
+            $this->isTokenValid();
 
-        return $this->json([
-            'is_ok' => 1,
-            'msg' => $msg,
-        ], 200);
+            /** @var ProductClass $ProductClass */
+            $ProductClass = $this->productClassRepository->find($productClassId);
+
+            if (is_null($ProductClass)) {
+                log_info('商品が存在しないため、カート画面へredirect', ['product_class_id' => $productClassId]);
+
+                return $this->redirectToRoute('cart');
+            }
+
+            // Get mst_product
+            Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+            $commonService = new MyCommonService($this->entityManager);
+            $mstProduct = $this->mstProductRepository->getData($ProductClass->getProduct()->getId());
+            $price = $mstProduct['unit_price'] ?? 0;
+            $mst_quantity = $mstProduct['quantity'] ?? 1;
+
+            // Override price
+            $customer_code = $this->globalService->customerCode();
+            $login_type = $this->globalService->getLoginType();
+            $login_code = $this->globalService->getLoginCode();
+            $relationCus = $commonService->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
+
+            if ($relationCus) {
+                $customerCode = $relationCus['customer_code'];
+                $shippingCode = $relationCus['shipping_code'];
+
+                if (empty($shippingCode)) {
+                    $shippingCode = $this->globalService->getShippingCode();
+                }
+
+                $dtPrice = $commonService->getPriceFromDtPrice($customerCode, $shippingCode, $mstProduct->getProductCode());
+            }
+
+            if (!empty($dtPrice)) {
+                $price = $dtPrice['price_s01'];
+            }
+            // End - Override price
+
+            $this->cartService->addProduct($ProductClass, ($quantity / $mst_quantity) - ($current_quantity / $mst_quantity), $price);
+
+            setcookie($ProductClass->getProduct()->getId(), $quantity, 0, '/');
+
+            // カートを取得して明細の正規化を実行
+            $Carts = $this->cartService->getCarts();
+            $this->execPurchaseFlow($Carts);
+
+            return $this->json(['status' => 1, 'msg' => ''], 200);
+        } catch (\Exception $e) {
+            return $this->json(['status' => 1, 'msg' => $e->getMessage()], 400);
+        }
     }
 
     /**
