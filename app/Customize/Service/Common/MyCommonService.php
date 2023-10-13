@@ -429,13 +429,11 @@ SQL;
     /**
      * @param $loginType
      * @param $customerId
-     * @param MoreOrder $moreOrder
-     *
      * @return array
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getMstShippingCustomer($loginType, $customerId, MoreOrder $moreOrder = null)
+    public function getMstShippingCustomer($loginType, $customerId)
     {
         $column = '
                             mc.customer_code as shipping_no,
@@ -571,11 +569,6 @@ SQL;
                             ON
                                 mc.customer_code = dcur.shipping_code
                         ";
-        }
-
-        if (null != $moreOrder) {
-            $sql .= ' WHERE dcur.shipping_code = ? ';
-            $param[] = $moreOrder->getShippingCode();
         }
 
         $statement = $this->entityManager->getConnection()->prepare($sql);
