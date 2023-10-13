@@ -332,16 +332,19 @@ class MailService
     /**
      * Send order mail.
      *
+     * @param \Eccube\Entity\Order $Order 受注情報
+     *
      * @return \Swift_Message
      */
-    public function sendOrderMail($Order, $EC_Order)
+    public function sendOrderMail(\Eccube\Entity\Order $Order)
     {
         log_info('受注メール送信開始');
 
-        if (empty($Order['email'])) {
-            $company = $Order['company_name'] ?? '';
-            log_info("Company name: {$company} no email");
+        if (empty($Order->getEmail())) {
+            return;
+        }
 
+        if (!filter_var($Order->getEmail(), FILTER_VALIDATE_EMAIL)) {
             return;
         }
 
@@ -354,7 +357,7 @@ class MailService
         $message = (new \Swift_Message())
             ->setSubject('['.$this->BaseInfo->getShopName().'] '.$MailTemplate->getMailSubject())
             ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
-            ->setTo([$Order['email']])
+            ->setTo([$Order->getEmail()])
             ->setBcc($this->BaseInfo->getEmail01())
             ->setReplyTo($this->BaseInfo->getEmail03())
             ->setReturnPath($this->BaseInfo->getEmail04());
@@ -395,7 +398,7 @@ class MailService
         $MailHistory = new MailHistory();
         $MailHistory->setMailSubject($message->getSubject())
             ->setMailBody($message->getBody())
-            ->setOrder($EC_Order)
+            ->setOrder($Order)
             ->setSendDate(new \DateTime());
 
         // HTML用メールの設定

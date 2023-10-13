@@ -17,11 +17,11 @@ file that was distributed with this source code.
 　ご注文商品明細
 ************************************************
 {% for OrderItem in Order.ProductOrderItems %}
-JANコード：{{ OrderItem.jan_code }}
-商品名：{{ OrderItem.product_name }}
+JANコード：{{ OrderItem.MstProduct.jan_code }}
+商品名：{{ OrderItem.MstProduct.product_name }}
 単価：{% if global_service.getPriceViewFlg %}{{ roundPrice(OrderItem.price) | raw }}{% endif %} 
-数量：{{ OrderItem.quantity|number_format }}{% if OrderItem.mst_quantity>1 %}
-箱/({{ OrderItem.mst_quantity*OrderItem.quantity}}個)
+数量：{{ OrderItem.quantity|number_format }}{% if OrderItem.MstProduct.quantity > 1 %}
+箱/({{ OrderItem.MstProduct.quantity * OrderItem.quantity}}個)
 {% else %}
 個
 {% endif %}
@@ -29,7 +29,7 @@ JANコード：{{ OrderItem.jan_code }}
 {% endfor %}
 -------------------------------------------------
 小　計：{% if global_service.getPriceViewFlg %}{{ roundPriceZeroTotal(Order.subtotal) | raw }}{% endif %} 
-消費税：{% if global_service.getPriceViewFlg %}{{ roundPriceZeroTax(Order.charge) | raw }}{% endif %} 
+消費税：{% if global_service.getPriceViewFlg %}{{ roundPriceZeroTax(Order.tax) | raw }}{% endif %}
 
 ============================================
 お支払い合計：{% if global_service.getPriceViewFlg %}{{ roundPriceZeroTotalAll(Order.payment_total) | raw }}(税込){% endif %} 
@@ -40,8 +40,8 @@ JANコード：{{ OrderItem.jan_code }}
 {% if Order.company_name %}
 会社名：{{ Order.company_name }}
 {% endif %}
-{% if Order.name %}
-担当者：{{ Order.name }} 様
+{% if Order.name01 %}
+担当者：{{ Order.name01 }} 様
 {% else %}
 担当者：ご担当者様
 {% endif %}
@@ -55,19 +55,17 @@ JANコード：{{ OrderItem.jan_code }}
 ************************************************
 ◎お届け先
 
-{% if Order.Shipping.company_name %}
-会社名：{{ Order.Shipping.company_name }}
+{% if Order.Otodoke is defined %}
+{% if Order.Otodoke.company_name %}
+会社名：{{ Order.Otodoke.company_name }}
 {% endif %}
-{% if Order.Shipping.customer_name %}
-担当者：{{ Order.Shipping.customer_name }} 様
-{% else %}
-担当者：ご担当者様
+担当者：{% if Order.Otodoke.customer_name %} {{ Order.Otodoke.customer_name }} 様 {% else %} ご担当者様 {% endif %}
+郵便番号：〒{{ Order.Otodoke.postal_code }}
+住所：{{ Order.Otodoke.addr01 }}{{ Order.Otodoke.addr02 }}{{ Order.Otodoke.addr03 }}
+電話番号：{{ Order.Otodoke.phone_number }}
 {% endif %}
-郵便番号：〒{{ Order.Shipping.postal_code }}
-住所：{{ Order.Shipping.addr01 }}{{ Order.Shipping.addr02 }}{{ Order.Shipping.addr03 }}
-電話番号：{{ Order.Shipping.phone_number }}
 
-お届け希望日：{{ Order.Shipping.shipping_plan_date|date_day }}
+お届け希望日：{{ Order.delivery_date|date_day }}
 倉庫状況によりご希望日に添えない場合がございます。
 詳しくは各担当者までお問い合わせください
 配送確定はマイページの出荷履歴をご確認ください

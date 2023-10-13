@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of EC-CUBE
  *
@@ -9,7 +10,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Customize\Controller;
+
 use Customize\Common\MyCommon;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Repository\MstDeliveryPlanRepository;
@@ -47,69 +50,86 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+
 class MyProductController extends AbstractController
 {
     /**
      * @var ProductClassRepository
      */
     protected $productClassRepository;
+
     /**
      * @var PurchaseFlow
      */
     protected $purchaseFlow;
+
     /**
      * @var CustomerFavoriteProductRepository
      */
     protected $customerFavoriteProductRepository;
+
     /**
      * @var CartService
      */
     protected $cartService;
+
     /**
      * @var ProductRepository
      */
     protected $productRepository;
+
     /**
      * @var BaseInfo
      */
     protected $BaseInfo;
+
     /**
      * @var AuthenticationUtils
      */
     protected $helper;
+
     /**
      * @var ProductListMaxRepository
      */
     protected $productListMaxRepository;
+
     private $title = '';
+
     /**
      * @var PriceRepository
      */
     protected $priceRepository;
+
     /**
      * @var StockListRepository
      */
     protected $stockListRepository;
+
     /**
      * @var MstProductRepository
      */
     protected $mstProductRepository;
+
     /**
      * @var
      */
     protected $mstDeliveryPlanRepository;
+
     /**
      * @var ProductCustomizeRepository
      */
     protected $productCustomizeRepository;
+
     /**
      * @var EncoderFactoryInterface
      */
     protected $encoderFactory;
+
     /**
      * @var GlobalService
      */
     protected $globalService;
+
     /***
      * MyProductController constructor.
      * @param PurchaseFlow $cartPurchaseFlow
@@ -155,6 +175,7 @@ class MyProductController extends AbstractController
         $this->encoderFactory = $encoderFactory;
         $this->globalService = $globalService;
     }
+
     /**
      * 商品一覧画面.
      *
@@ -167,34 +188,44 @@ class MyProductController extends AbstractController
         if (!$this->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('homepage');
         }
+
         log_info('Start MyProductController/Index');
         $time_start = time();
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
         // Doctrine SQLFilter
         if ($this->BaseInfo->isOptionNostockHidden()) {
             $this->entityManager->getFilters()->enable('option_nostock_hidden');
         }
+
         // searchForm
         $builder = $this->formFactory->createNamedBuilder('', \Customize\Form\Type\SearchProductType::class);
+
         if ($request->getMethod() === 'GET') {
             $builder->setMethod('GET');
             $request->query->set('pageno', $request->query->get('pageno', ''));
         }
+
         $event = new EventArgs(
             [
                 'builder' => $builder,
             ],
             $request
         );
+
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_INITIALIZE, $event);
+
         $searchForm = $builder->getForm();
         $searchForm->handleRequest($request);
         $searchData = $searchForm->getData();
         $commonService = new MyCommonService($this->entityManager);
         $customer_code = '';
+
         if ($this->isGranted('ROLE_USER')) {
             $customer_code = $this->globalService->customerCode();
         }
+
         $login_type = $this->globalService->getLoginType();
         $login_code = $this->globalService->getLoginCode();
         $customerCode = '';
@@ -202,16 +233,21 @@ class MyProductController extends AbstractController
         $location = '';
         $arTanakaNumber = [];
         $relationCus = $commonService->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
+
         if ($relationCus) {
             $customerCode = $relationCus['customer_code'];
             $shippingCode = $relationCus['shipping_code'];
+
             if (empty($shippingCode)) {
                 $shippingCode = $this->globalService->getShippingCode();
             }
+
             $location = $commonService->getCustomerLocation($customerCode);
             $arTanakaNumber = $commonService->getTankaList($searchData, $shippingCode, $customerCode);
         }
+
         $qb = $this->productCustomizeRepository->getQueryBuilderBySearchData($searchData, $customerCode, $shippingCode, $arTanakaNumber, $location);
+
         $event = new EventArgs(
             [
                 'searchData' => $searchData,
@@ -219,31 +255,39 @@ class MyProductController extends AbstractController
             ],
             $request
         );
+
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_SEARCH, $event);
         $searchData = $event->getArgument('searchData');
         $query = $qb->getQuery()->useResultCache(true, $this->eccubeConfig['eccube_result_cache_lifetime_short']);
+
         /** @var SlidingPagination $pagination */
         $pagination = $paginator->paginate(
             $query,
             !empty($searchData['pageno']) ? $searchData['pageno'] : 1,
             !empty($searchData['disp_number']) ? $searchData['disp_number']->getId() : $this->productListMaxRepository->findOneBy([], ['sort_no' => 'ASC'])->getId()
         );
+
         $ids = [];
         foreach ($pagination as $key => $Product) {
             $ids[] = $Product['id'];
         }
+
         $ProductsAndClassCategories = $this->productRepository->findProductsWithSortedClassCategories($ids, 'p.id');
         $listImgs = $commonService->getImageFromEcProductId($ids);
         $hsKeyImg = [];
+
         foreach ($listImgs as $itemImg) {
             $hsKeyImg[$itemImg['product_id']] = $itemImg['file_name'];
         }
+
         // addCart form
         $forms = [];
+
         foreach ($pagination as $Product) {
             if (!isset($ProductsAndClassCategories[$Product['id']])) {
                 continue;
             }
+
             /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
             $builder = $this->formFactory->createNamedBuilder(
                 '',
@@ -254,9 +298,11 @@ class MyProductController extends AbstractController
                     'allow_extra_fields' => true,
                 ]
             );
+
             $addCartForm = $builder->getForm();
             $forms[$Product['id']] = $addCartForm->createView();
         }
+
         // 表示件数
         $builder = $this->formFactory->createNamedBuilder(
             'disp_number',
@@ -268,18 +314,22 @@ class MyProductController extends AbstractController
                 'choice_value' => 'sort_no',
             ]
         );
+
         if ($request->getMethod() === 'GET') {
             $builder->setMethod('GET');
         }
+
         $event = new EventArgs(
             [
                 'builder' => $builder,
             ],
             $request
         );
+
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_DISP, $event);
         $dispNumberForm = $builder->getForm();
         $dispNumberForm->handleRequest($request);
+
         // ソート順
         $builder = $this->formFactory->createNamedBuilder(
             'orderby',
@@ -291,23 +341,29 @@ class MyProductController extends AbstractController
                 'choice_value' => 'sort_no',
             ]
         );
+
         if ($request->getMethod() === 'GET') {
             $builder->setMethod('GET');
         }
+
         $event = new EventArgs(
             [
                 'builder' => $builder,
             ],
             $request
         );
+
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_INDEX_ORDER, $event);
+
         $orderByForm = $builder->getForm();
         $orderByForm->handleRequest($request);
         $Category = $searchForm->get('category_id')->getData();
+
         $time_end = time();
         $execution_time = ($time_end - $time_start);
         log_info("Time Total for MyProductController/Index Is: $execution_time s");
         log_info('End MyProductController/Index');
+
         return [
             'subtitle' => $this->getPageTitle($searchData),
             'pagination' => $pagination,
@@ -319,6 +375,7 @@ class MyProductController extends AbstractController
             'Category' => $Category,
         ];
     }
+
     /**
      * 商品詳細画面.
      *
@@ -334,16 +391,21 @@ class MyProductController extends AbstractController
     public function detail(Request $request, Product $Product)
     {
         $referer = $request->headers->get('referer', '/products/list');
+
         //Not login. Redirect home page
         if (!$this->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('homepage');
         }
+
         log_info('Start MyProductController/Detail');
         $time_start = time();
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
         if (!$this->checkVisibility($Product)) {
             throw new NotFoundHttpException();
         }
+
         $builder = $this->formFactory->createNamedBuilder(
             '',
             AddCartType::class,
@@ -353,6 +415,7 @@ class MyProductController extends AbstractController
                 'id_add_product_id' => false,
             ]
         );
+
         $event = new EventArgs(
             [
                 'builder' => $builder,
@@ -360,12 +423,15 @@ class MyProductController extends AbstractController
             ],
             $request
         );
+
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_DETAIL_INITIALIZE, $event);
+
         $is_favorite = false;
         $price = null;
         $stock = null;
         $mstDeliveryPlan = null;
         $mstProduct = $this->mstProductRepository->getData($Product->getId());
+
         //Check product type
         if ($this->globalService->getProductType() == 2 && $this->globalService->getSpecialOrderFlg() == 1) {
             if ($mstProduct->getSpecialOrderFlg() == null || strtolower($mstProduct->getSpecialOrderFlg()) != 'y') {
@@ -380,43 +446,55 @@ class MyProductController extends AbstractController
             // normal product
             $mstProduct->product_type = '1';
         }
+
         if (
             empty($mstProduct) ||
             (!$this->globalService->getSpecialOrderFlg() && strtoupper($mstProduct->getSpecialOrderFlg()) == 'Y')
         ) {
             return $this->redirect($referer);
         }
+
         $commonService = new MyCommonService($this->entityManager);
         $login_type = $this->globalService->getLoginType();
         $login_code = $this->globalService->getLoginCode();
+
         if ($this->isGranted('ROLE_USER')) {
             $Customer = $this->getUser();
             $customer_code = $this->globalService->customerCode();
             $is_favorite = $this->customerFavoriteProductRepository->isFavorite($Customer, $Product);
             $relationCus = $commonService->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
+
             if ($relationCus) {
                 $customerCode = $relationCus['customer_code'];
                 $shippingCode = $relationCus['shipping_code'];
+
                 if (empty($shippingCode)) {
                     $shippingCode = $this->globalService->getShippingCode();
                 }
+
                 $price = $commonService->getPriceFromDtPrice($customerCode, $shippingCode, $mstProduct->getProductCode());
+
                 //Nếu dt_price no data
                 if (empty($price)) {
                     log_info('MyProductController/Detail: No Price_S01');
+
                     return $this->redirect($referer);
                 }
+
                 $location = $commonService->getCustomerLocation($customerCode ?? '');
                 $stock = $this->stockListRepository->getData($mstProduct->getProductCode(), $location);
             }
+
             if ($stock) {
                 $mstDeliveryPlan = $this->mstDeliveryPlanRepository->getData($mstProduct->getProductCode(), $stock);
             }
         }
+
         $time_end = time();
         $execution_time = ($time_end - $time_start);
         log_info("Time Total for MyProductController/Detail Is: $execution_time s");
         log_info('End MyProductController/Detail');
+
         return [
             'title' => $this->title,
             'subtitle' => $Product->getName(),
@@ -430,6 +508,7 @@ class MyProductController extends AbstractController
             'url_referer' => $referer,
         ];
     }
+
     /**
      * カートに追加.
      *
@@ -447,11 +526,13 @@ class MyProductController extends AbstractController
     {
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $commonService = new MyCommonService($this->entityManager);
+
         // エラーメッセージの配列
         $errorMessages = [];
         if (!$this->checkVisibility($Product)) {
             throw new NotFoundHttpException();
         }
+
         $builder = $this->formFactory->createNamedBuilder(
             '',
             AddCartType::class,
@@ -461,6 +542,7 @@ class MyProductController extends AbstractController
                 'id_add_product_id' => false,
             ]
         );
+
         $event = new EventArgs(
             [
                 'builder' => $builder,
@@ -468,35 +550,61 @@ class MyProductController extends AbstractController
             ],
             $request
         );
+
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_CART_ADD_INITIALIZE, $event);
+
         $form = $builder->getForm();
         $form->handleRequest($request);
+
+        // Push session cart product type
+        $cart_product_type = $this->globalService->getCartProductType();
+        if (empty($cart_product_type)) {
+            $_SESSION['cart_product_type'] = $request->get('product_type', 1);
+        } else {
+            if ($cart_product_type != $request->get('product_type', 1)) {
+                return $this->json([
+                    'status' => 0,
+                    'message' => '通常品と特注品を混在してカートに入れることはできません',
+                ]);
+            }
+        }
+
         $carSession = MyCommon::getCarSession();
+
         // Get mst_product
         $mstProduct = $this->mstProductRepository->getData($Product->getId());
+
         $addCartData = $form->getData();
         $product_quantity = $addCartData['quantity'];
+
         if (!empty($mstProduct) && (int) $mstProduct->getQuantity() > 1) {
             $product_quantity = (int) $addCartData['quantity'] / (int) $mstProduct['quantity'];
         }
+
         $price = $mstProduct['unit_price'] ?? 0;
+
         // Override price
         $customer_code = $this->globalService->customerCode();
         $login_type = $this->globalService->getLoginType();
         $login_code = $this->globalService->getLoginCode();
         $relationCus = $commonService->getCustomerRelationFromUser($customer_code, $login_type, $login_code);
+
         if ($relationCus) {
             $customerCode = $relationCus['customer_code'];
             $shippingCode = $relationCus['shipping_code'];
+
             if (empty($shippingCode)) {
                 $shippingCode = $this->globalService->getShippingCode();
             }
+
             $dtPrice = $commonService->getPriceFromDtPrice($customerCode, $shippingCode, $mstProduct->getProductCode());
         }
+
         if (!empty($dtPrice)) {
             $price = $dtPrice['price_s01'];
         }
         // End - Override price
+
         log_info(
             'カート追加処理開始',
             [
@@ -507,10 +615,13 @@ class MyProductController extends AbstractController
                 'product_type' => $request->get('product_type', 1),
             ]
         );
+
         // カートへ追加
         $this->cartService->addProduct($addCartData['product_class_id'], $product_quantity, $price);
+
         // 明細の正規化
         $Carts = $this->cartService->getCarts();
+
         foreach ($Carts as $Cart) {
             $result = $this->purchaseFlow->validate($Cart, new PurchaseContext($Cart, $this->getUser()));
             // 復旧不可のエラーが発生した場合は追加した明細を削除.
@@ -523,6 +634,7 @@ class MyProductController extends AbstractController
             foreach ($result->getWarning() as $warning) {
                 $errorMessages[] = $warning->getMessage();
             }
+
             //update cookie
             foreach ($Cart['CartItems'] as $CartItem) {
                 if ($Cart['key_eccube'] == $carSession) {
@@ -532,8 +644,10 @@ class MyProductController extends AbstractController
                 }
             }
         }
+
         $this->cartService->save();
         $cartId = $Carts[0]->getId() ?? '';
+
         log_info(
             'カート追加処理完了',
             [
@@ -544,6 +658,7 @@ class MyProductController extends AbstractController
                 'product_type' => $request->get('product_type', 1),
             ]
         );
+
         $event = new EventArgs(
             [
                 'form' => $form,
@@ -551,15 +666,20 @@ class MyProductController extends AbstractController
             ],
             $request
         );
+
         $this->eventDispatcher->dispatch(EccubeEvents::FRONT_PRODUCT_CART_ADD_COMPLETE, $event);
+
         if ($event->getResponse() !== null) {
             return $event->getResponse();
         }
+
         if ($request->isXmlHttpRequest()) {
             // ajaxでのリクエストの場合は結果をjson形式で返す。
+
             // 初期化
             $done = null;
             $messages = [];
+
             if (empty($errorMessages)) {
                 // エラーが発生していない場合
                 $done = true;
@@ -569,15 +689,18 @@ class MyProductController extends AbstractController
                 $done = false;
                 $messages = $errorMessages;
             }
-            return $this->json(['done' => $done, 'messages' => $messages, 'cart_quantity_total' => $commonService->getTotalItemCart($cartId) ?? 1]);
+
+            return $this->json(['status' => 1, 'done' => $done, 'messages' => $messages, 'cart_quantity_total' => $commonService->getTotalItemCart($cartId) ?? 1]);
         } else {
             // ajax以外でのリクエストの場合はカート画面へリダイレクト
             foreach ($errorMessages as $errorMessage) {
                 $this->addRequestError($errorMessage);
             }
+
             return $this->redirectToRoute('cart');
         }
     }
+
     /**
      * 閲覧可能な商品かどうかを判定
      *
@@ -589,6 +712,7 @@ class MyProductController extends AbstractController
     {
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $is_admin = $this->session->has('_security_admin');
+
         // 管理ユーザの場合はステータスやオプションにかかわらず閲覧可能.
         if (!$is_admin) {
             // 在庫なし商品の非表示オプションが有効な場合.
@@ -602,8 +726,10 @@ class MyProductController extends AbstractController
                 return false;
             }
         }
+
         return true;
     }
+
     /**
      * カートに追加.
      *
@@ -616,10 +742,13 @@ class MyProductController extends AbstractController
             $cartId = $Carts[0]->getId();
             $myComS = new MyCommonService($this->entityManager);
             $totalNew = $myComS->getTotalItemCart($cartId);
+
             return $this->json(['done' => true, 'messages' => 'Get cart Total', 'totalNew' => $totalNew]);
         }
+
         return $this->json(['done' => true, 'messages' => 'Get cart Total', 'totalNew' => 0]);
     }
+
     /**
      * ページタイトルの設定
      *
@@ -637,6 +766,7 @@ class MyProductController extends AbstractController
             return trans('front.product.all_products');
         }
     }
+
     /**
      * Change Product Type.
      *
@@ -648,10 +778,13 @@ class MyProductController extends AbstractController
         try {
             if ('POST' === $request->getMethod()) {
                 $product_type = $request->get('product_type', 1);
+
                 //Nạp lại session product_type
                 $_SESSION['s_product_type'] = in_array($product_type, [1, 2]) ? $product_type : 1;
+
                 return $this->json(['status' => 1], 200);
             }
+
             return $this->json(['status' => 0, 'message' => 'Method not Allowed'], 400);
         } catch (\Exception $e) {
             return $this->json(['status' => -1, 'message' => $e->getMessage()], 400);
