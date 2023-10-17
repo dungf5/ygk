@@ -215,7 +215,7 @@ class MypageController extends AbstractController
         $fusrstr8 = (int) (isset($arRe[0]['fusrstr8']) ? $arRe[0]['fusrstr8'] : 0);
         $delivery_no = isset($arRe[0]['delivery_no']) ? $arRe[0]['delivery_no'] : '';
 
-        if ($fusrstr8 != 1) {
+        if ($fusrstr8 != 1 && $fusrstr8 != 2) {
             $shipFee = '*****';
 
         } elseif (!empty($delivery_no)) {
@@ -1126,7 +1126,7 @@ class MypageController extends AbstractController
                 $fusrstr8 = (int) (isset($arRe[0]['fusrstr8']) ? $arRe[0]['fusrstr8'] : 0);
                 $delivery_no = isset($arRe[0]['delivery_no']) ? $arRe[0]['delivery_no'] : '';
 
-                if ($fusrstr8 != 1) {
+                if ($fusrstr8 != 1 && $fusrstr8 != 2) {
                     $shipFee = '*****';
 
                 } elseif (!empty($delivery_no)) {
@@ -1270,7 +1270,7 @@ class MypageController extends AbstractController
                 $fusrstr8 = (int) (isset($arRe[0]['fusrstr8']) ? $arRe[0]['fusrstr8'] : 0);
                 $delivery_no = isset($arRe[0]['delivery_no']) ? $arRe[0]['delivery_no'] : '';
 
-                if ($fusrstr8 != 1) {
+                if ($fusrstr8 != 1 && $fusrstr8 != 2) {
                     $shipFee = '*****';
 
                 } elseif (!empty($delivery_no)) {
@@ -1401,7 +1401,7 @@ class MypageController extends AbstractController
                 $fusrstr8 = (int) (isset($arRe[0]['fusrstr8']) ? $arRe[0]['fusrstr8'] : 0);
                 $delivery_no = isset($arRe[0]['delivery_no']) ? $arRe[0]['delivery_no'] : '';
 
-                if ($fusrstr8 != 1) {
+                if ($fusrstr8 != 1 && $fusrstr8 != 2) {
                     $shipFee = '*****';
 
                 } elseif (!empty($delivery_no)) {
