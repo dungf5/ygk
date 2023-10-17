@@ -138,6 +138,7 @@ file that was distributed with this source code.
                             <option value="0" {% if 0 == search_parameter.shipping_status %}selected{%  endif %}>すべて</option>
                             <option value="1" {% if 1 == search_parameter.shipping_status %}selected{%  endif %}>出荷指示済</option>
                             <option value="2" {% if 2 == search_parameter.shipping_status %}selected{%  endif %}>出荷済</option>
+                            <option value="2" {% if 9 == search_parameter.shipping_status %}selected{%  endif %}>返品</option>
                         </select>
                     </th>
                     <th title="{{ 'front.mypage.shipping.plan_date'|trans| raw }}" style="min-width: 105px">
@@ -180,7 +181,8 @@ file that was distributed with this source code.
                             </td>
                             <td>
                                 {% if Shipping.shipping_status == 1 %} 出荷指示済 {% endif %}
-                                {% if Shipping.shipping_status != 1 %} 出荷済 {% endif %}
+                                {% if Shipping.shipping_status == 2 %} 出荷済 {% endif %}
+                                {% if Shipping.shipping_status == 9 %} 返品 {% endif %}
                             </td>
                             <td>{{ Shipping.shipping_plan_date|date("Y-m-d") }}</td>
                             <td>{{ Shipping.shipping_date|date("Y-m-d") }}</td>
