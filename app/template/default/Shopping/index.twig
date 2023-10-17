@@ -355,7 +355,8 @@ file that was distributed with this source code.
                 $("#customer_order_no-error").text('入力は20文字までとなります');
                 $("#customer_order_no-error").css('display', 'initial');
                 isSubmit = 0;
-            } else {
+
+            } else if ($("#customer_order_no").val().trim().length > 1) {
                 $("#customer_order_no-error").text('');
                 $("#customer_order_no-error").css('display', 'none');
                 loadingOverlay();
@@ -378,6 +379,9 @@ file that was distributed with this source code.
                 }).always(function() {
                     loadingOverlay('hide');
                 });
+            } else {
+                $("#customer_order_no-error").text('');
+                $("#customer_order_no-error").css('display', 'none');
             }
 
             if (checkDate() && isSubmit === 1) {
