@@ -14,218 +14,218 @@ file that was distributed with this source code.
 
 {% block javascript %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script>
+    <script>
     $(document).on("keydown", "form", function(event) {
         return event.key != "Enter";
     });
 
-    // 表示件数を変更
-    $('.disp-number').change(function() {
-        var dispNumber = $(this).val();
-        $('#disp_number').val(dispNumber);
-        $('#pageno').val(1);
-        $("#form1").submit();
-    });
+// 表示件数を変更
+$('.disp-number').change(function() {
+    var dispNumber = $(this).val();
+    $('#disp_number').val(dispNumber);
+    $('#pageno').val(1);
+    $("#form1").submit();
+});
 
-    // 並び順を変更
-    $('.order-by').change(function() {
-        var orderBy = $(this).val();
-        $('#orderby').val(orderBy);
-        $('#pageno').val(1);
-        $("#form1").submit();
-    });
+// 並び順を変更
+$('.order-by').change(function() {
+    var orderBy = $(this).val();
+    $('#orderby').val(orderBy);
+    $('#pageno').val(1);
+    $("#form1").submit();
+});
 
-    $('.add-cart').on('click', function(e) {
-        var $form = $(this).parents('tr').find('form');
+$('.add-cart').on('click', function(e) {
+    var $form = $(this).parents('tr').find('form');
 
-        {#// 個数フォームのチェック#}
-        let $quantity = $form.parent().find('.quantity');
-        let idProduct = $quantity.attr('myid');
-        let $checkQuantity = $form.parent().find('.checkQuantity');
-        let rsCheck = checkInput('quantity' + idProduct);
+{#// 個数フォームのチェック#}
+let $quantity = $form.parent().find('.quantity');
+let idProduct = $quantity.attr('myid');
+let $checkQuantity = $form.parent().find('.checkQuantity');
+let rsCheck = checkInput('quantity' + idProduct);
 
-        if (rsCheck == false) {
-            return;
-        }
+if (rsCheck == false) {
+    return;
+}
 
-        e.preventDefault();
-        $.ajax({
-            url: $form.attr('action'),
-            type: $form.attr('method'),
-            data: $form.serialize(),
-            dataType: 'json',
-            beforeSend: function(xhr, settings) {
-                // Buttonを無効にする
-                $('.add-cart').prop('disabled', true);
-            }
-        })
-        .done(function(data) {
-             if (!data.status) {
-                // difference product type
-                swal("エラー", data.message, "error");
-                return;
-
-            }
-             else {
-                if (data.cart_quantity_total) {
-                    if (data.cart_quantity_total > 1) {
-                        $('a.cart_quantity_total>.fnDIN').text(data.cart_quantity_total);
-                    }
-                    else {
-                        const node = document.createElement("span");
-                        node.classList.add('fnDIN');
-                        const textnode = document.createTextNode(data.cart_quantity_total);
-                        node.appendChild(textnode);
-                        document.getElementsByClassName('cart_quantity_total')[0].appendChild(node);
-                    }
-
-                    // レスポンス内のメッセージをalertで表示
-                    $.each(data.messages, function() {
-                        $('#ec-modal-header').html(this);
-                    });
-
-                    $('.ec-modal').show();
-
-                    let cookie_product_quantity = $.cookie(idProduct);
-                    if (cookie_product_quantity != undefined) {
-                        $('#quantity'+idProduct).val(cookie_product_quantity);
-                    }
-                }
-             }
-        })
-        .fail(function(data) {
-            alert('{{ 'front.product.add_cart_error'|trans }}');
-        })
-        .always(function(data) {
-            // Buttonを有効にする
-            $('.add-cart').prop('disabled', false);
-        });
-    });
-
-    $("input[name='rd_product_type']").change(function() {
-    loadingOverlay();
-    let value = $(this).val();
-
-    $.ajax({
-        url: '/products/type/change',
-        type: 'POST',
-        dataType: "json",
-        timeout: 1000,
-        async:false,
-        data: {
-            'product_type': value,
-            '_token':'{{ csrf_token('_token') }}',
-        }
-    })
-    .done(function(data) {
-        if (data.status == 1) {
-            window.location.reload();
-        } else {
-            console.log(data.message);
-        }
-    })
-    .fail(function(jqXHR, statusText, errorThrown) {});
-    });
-
-    $('.ec-modal-wrap').on('click', function(e) {
-        // モーダル内の処理は外側にバブリングさせない
-        e.stopPropagation();
-    });
-
-    $('.ec-modal-overlay, .ec-modal, .ec-modal-close, .ec-inlineBtn--cancel').on('click', function() {
-        $('.ec-modal').hide()
-    });
-
-    //nvtrong add
-    function initInputVal() {
-        var myStringArray = ALL_PRODUCT;
-        var arrayLength = myStringArray.length;
-        for (var i = 0; i < arrayLength; i++) {
-            let myValue =   $.cookie(myStringArray[i] );
-            if( myValue!=undefined){
-                $('#quantity'+myStringArray[i]).val(myValue);
-            }
-        }
+e.preventDefault();
+$.ajax({
+    url: $form.attr('action'),
+    type: $form.attr('method'),
+    data: $form.serialize(),
+    dataType: 'json',
+    beforeSend: function(xhr, settings) {
+        // Buttonを無効にする
+        $('.add-cart').prop('disabled', true);
     }
+})
+.done(function(data) {
+     if (!data.status) {
+        // difference product type
+        swal("エラー", data.message, "error");
+        return;
 
-    function checkInput(idQuantity) {
-        var valInput = $('#'+idQuantity).val().trim();
-        let mymst_quantity = $('#'+idQuantity).attr('mymst_quantity');
-        let input1 =document.getElementById(idQuantity);
-        input1.setCustomValidity('');
-
-        if (valInput == "") {
-            input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
-            input1.reportValidity();
-
-            return false;
-        }
-
-        if ( (valInput == 0) && (1 == mymst_quantity) ) {
-            input1.setCustomValidity(mymst_quantity+'{{ 'front.product.invalid_quantity'|trans }}');
-            input1.reportValidity();
-
-            return false;
-        }
-
-        if ((valInput == 0) && (1 != mymst_quantity)) {
-            //%number%
-            let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
-            msgShow = msgShow.replace('%number%',mymst_quantity);
-            input1.setCustomValidity(msgShow);
-            input1.reportValidity();
-
-            return false;
-        }
-
-        if(valInput % mymst_quantity  !== 0) {
-            let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
-            msgShow = msgShow.replace('%number%',mymst_quantity);
-            $('#'+idQuantity)[0].setCustomValidity(msgShow);
-            $('#'+idQuantity)[0].reportValidity();
-
-            return false;
-        }
-
-        $.cookie( idQuantity,valInput, { path: '/' });
-
-        return true;
     }
-
-    $(function() {
-        initInputVal();
-        $.cookie( 'listUrl',window.location.href);
-
-        // 表示件数を変更
-        $('.quantity').on("input", function(ev) {
-            var objT        = this;
-            var isFail      = false;
-
-            //href set
-            var dtId        = "link_detail"+$(objT).attr('myid');
-
-            //quantity1421
-            let quantityId  = "quantity"+$(objT).attr('myid');
-
-            let myUrl       = $("#"+dtId).attr('href');
-
-            //let okmyUrl   = 'myUrl.replace(/#|_/g,'')'; // result: "this is a test"
-            let okmyUrl     = '/products/detail/'+$(objT).attr('myid'); // result: "this is a test"
-
-            //let newUrl    = "#"+myUrl;
-            let newUrl      = "javascript:;";
-            let input1      = document.getElementById(objT.id);
-
-            input1.setCustomValidity('');
-            let mymst_quantity  = $(objT).attr('mymst_quantity');
-            let resultCheck     = checkInput(quantityId);
-
-            if (resultCheck == true) {
-                $.cookie( $(objT).attr('myid'),objT.value, { path: '/' });
-                $("#"+dtId).attr('href',okmyUrl);
+     else {
+        if (data.cart_quantity_total) {
+            if (data.cart_quantity_total > 1) {
+                $('a.cart_quantity_total>.fnDIN').text(data.cart_quantity_total);
             }
-        });
-    });
+            else {
+                const node = document.createElement("span");
+                node.classList.add('fnDIN');
+                const textnode = document.createTextNode(data.cart_quantity_total);
+                node.appendChild(textnode);
+                document.getElementsByClassName('cart_quantity_total')[0].appendChild(node);
+            }
+
+            // レスポンス内のメッセージをalertで表示
+            $.each(data.messages, function() {
+                $('#ec-modal-header').html(this);
+            });
+
+            $('.ec-modal').show();
+
+            let cookie_product_quantity = $.cookie(idProduct);
+            if (cookie_product_quantity != undefined) {
+                $('#quantity'+idProduct).val(cookie_product_quantity);
+            }
+        }
+     }
+})
+.fail(function(data) {
+    alert('{{ 'front.product.add_cart_error'|trans }}');
+})
+.always(function(data) {
+    // Buttonを有効にする
+    $('.add-cart').prop('disabled', false);
+});
+});
+
+$("input[name='rd_product_type']").change(function() {
+loadingOverlay();
+let value = $(this).val();
+
+$.ajax({
+url: '/products/type/change',
+type: 'POST',
+dataType: "json",
+timeout: 1000,
+async:false,
+data: {
+    'product_type': value,
+    '_token':'{{ csrf_token('_token') }}',
+}
+})
+.done(function(data) {
+if (data.status == 1) {
+    window.location.reload();
+} else {
+    console.log(data.message);
+}
+})
+.fail(function(jqXHR, statusText, errorThrown) {});
+});
+
+$('.ec-modal-wrap').on('click', function(e) {
+// モーダル内の処理は外側にバブリングさせない
+e.stopPropagation();
+});
+
+$('.ec-modal-overlay, .ec-modal, .ec-modal-close, .ec-inlineBtn--cancel').on('click', function() {
+$('.ec-modal').hide()
+});
+
+//nvtrong add
+function initInputVal() {
+var myStringArray = ALL_PRODUCT;
+var arrayLength = myStringArray.length;
+for (var i = 0; i < arrayLength; i++) {
+    let myValue =   $.cookie(myStringArray[i] );
+    if( myValue!=undefined){
+        $('#quantity'+myStringArray[i]).val(myValue);
+    }
+}
+}
+
+function checkInput(idQuantity) {
+var valInput = $('#'+idQuantity).val().trim();
+let mymst_quantity = $('#'+idQuantity).attr('mymst_quantity');
+let input1 =document.getElementById(idQuantity);
+input1.setCustomValidity('');
+
+if (valInput == "") {
+    input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+    input1.reportValidity();
+
+    return false;
+}
+
+if ( (valInput == 0) && (1 == mymst_quantity) ) {
+    input1.setCustomValidity(mymst_quantity+'{{ 'front.product.invalid_quantity'|trans }}');
+    input1.reportValidity();
+
+    return false;
+}
+
+if ((valInput == 0) && (1 != mymst_quantity)) {
+    //%number%
+    let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
+    msgShow = msgShow.replace('%number%',mymst_quantity);
+    input1.setCustomValidity(msgShow);
+    input1.reportValidity();
+
+    return false;
+}
+
+if(valInput % mymst_quantity  !== 0) {
+    let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
+    msgShow = msgShow.replace('%number%',mymst_quantity);
+    $('#'+idQuantity)[0].setCustomValidity(msgShow);
+    $('#'+idQuantity)[0].reportValidity();
+
+    return false;
+}
+
+$.cookie( idQuantity,valInput, { path: '/' });
+
+return true;
+}
+
+$(function() {
+initInputVal();
+$.cookie( 'listUrl',window.location.href);
+
+// 表示件数を変更
+$('.quantity').on("input", function(ev) {
+    var objT        = this;
+    var isFail      = false;
+
+    //href set
+    var dtId        = "link_detail"+$(objT).attr('myid');
+
+    //quantity1421
+    let quantityId  = "quantity"+$(objT).attr('myid');
+
+    let myUrl       = $("#"+dtId).attr('href');
+
+    //let okmyUrl   = 'myUrl.replace(/#|_/g,'')'; // result: "this is a test"
+    let okmyUrl     = '/products/detail/'+$(objT).attr('myid'); // result: "this is a test"
+
+    //let newUrl    = "#"+myUrl;
+    let newUrl      = "javascript:;";
+    let input1      = document.getElementById(objT.id);
+
+    input1.setCustomValidity('');
+    let mymst_quantity  = $(objT).attr('mymst_quantity');
+    let resultCheck     = checkInput(quantityId);
+
+    if (resultCheck == true) {
+        $.cookie( $(objT).attr('myid'),objT.value, { path: '/' });
+        $("#"+dtId).attr('href',okmyUrl);
+    }
+});
+});
 </script>
 {% endblock %}
 
@@ -264,7 +264,7 @@ file that was distributed with this source code.
                         {% for Path in Category.path %}
                             <li class="ec-topicpath__divider">|</li>
                             <li class="ec-topicpath__item{% if loop.last %}--active{% endif %}"><a
-                                    href="{{ url('product_list') }}?category_id={{ Path.id }}">{{ Path.name }}</a>
+                                        href="{{ url('product_list') }}?category_id={{ Path.id }}">{{ Path.name }}</a>
                             </li>
                         {% endfor %}
                     {% endif %}
@@ -300,20 +300,16 @@ file that was distributed with this source code.
         </div>
         <div class="ec-shelfRole">
             {% if pagination.totalItemCount > 0 %}
-                <div class="ec-pagerRole">
-                    {% include "pager.twig" with {'pages': pagination.paginationData} %}
-                </div>
-
                 <div class="w-100" >
                     {% if app.user==null %}
                         <div style="text-align: center;color:#00B050">未ログインのため、標準単価を表示しています</div>
                     {% endif %}
                     <table class="ec-productList">
                         <thead>
-                            <tr>
-                                <th class="item">{{ 'front.product.content'|trans }}</th>
-                                <th class="cart">{{ 'front.product.cart'|trans }}</th>
-                            </tr>
+                        <tr>
+                            <th class="item">{{ 'front.product.content'|trans }}</th>
+                            <th class="cart">{{ 'front.product.cart'|trans }}</th>
+                        </tr>
                         </thead>
                         <tbody>
                         {% for Product in pagination %}
@@ -458,7 +454,7 @@ file that was distributed with this source code.
                                             {% endif %}
 
                                             <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}:</span>
-                                                    {{ form_widget(form.quantity, {'attr': {'myId':Product.id,'title':'','mymst_quantity':Product.quantity,'class': 'quantity','value': Product.quantity|number_format
+                                                {{ form_widget(form.quantity, {'attr': {'myId':Product.id,'title':'','mymst_quantity':Product.quantity,'class': 'quantity','value': Product.quantity|number_format
                                                     ,'min':Product.quantity
                                                     ,'step':Product.quantity}}) }}
                                                 {{ form_errors(form.quantity) }}
