@@ -238,18 +238,96 @@ file that was distributed with this source code.
 
                 window.location.reload();
             });
-    }
+        }
 
-        function checkOrderNotExisted(target) {
-            let name                = target['name'];
-            let value               = target['value'];
+        $("#customer_order_no").on('keyup', function(event) {
+            let key = event.keyCode || event.charCode;
+            let target  = event.target;
+            let value = target.value;
 
             clearTimeout(typingTimer);
+            $("#customer_order_no-error").text('');
+            $("#customer_order_no-error").css('display', 'none');
 
-            typingTimer      = setTimeout(function () {
-                handleCheckOrderNotExisted(value);
-            }, 1000);
-        }
+            if (key == 8 || key == 46) {
+                $("#customer_order_no").val('');
+
+                return;
+            }
+
+            if (value.length > 20) {
+                $("#customer_order_no-error").text('20文字まで入力可');
+                $("#customer_order_no-error").css('display', 'initial');
+
+                return;
+            }
+
+            if (key != 8 && key != 46) {
+                typingTimer      = setTimeout(function () {
+                    handleCheckOrderNotExisted(value);
+                }, 1000);
+            }
+        });
+
+        $("#remarks1").on('keyup', function(event) {
+            let target  = event.target;
+            let value = target.value;
+
+            $("#remarks1-error").text('');
+            $("#remarks1-error").css('display', 'none');
+
+            if (value.length > 20) {
+                $("#remarks1-error").text('20文字まで入力可');
+                $("#remarks1-error").css('display', 'initial');
+
+                return;
+            }
+        });
+
+        $("#remarks2").on('keyup', function(event) {
+            let target  = event.target;
+            let value = target.value;
+
+            $("#remarks2-error").text('');
+            $("#remarks2-error").css('display', 'none');
+
+            if (value.length > 20) {
+                $("#remarks2-error").text('20文字まで入力可');
+                $("#remarks2-error").css('display', 'block');
+
+                return;
+            }
+        });
+
+        $("#remarks3").on('keyup', function(event) {
+            let target  = event.target;
+            let value = target.value;
+
+            $("#remarks3-error").text('');
+            $("#remarks3-error").css('display', 'none');
+
+            if (value.length > 50) {
+                $("#remarks3-error").text('50文字まで入力可');
+                $("#remarks3-error").css('display', 'initial');
+
+                return;
+            }
+        });
+
+        $("#remarks4").on('keyup', function(event) {
+            let target  = event.target;
+            let value = target.value;
+
+            $("#remarks4-error").text('');
+            $("#remarks4-error").css('display', 'none');
+
+            if (value.length > 50) {
+                $("#remarks4-error").text('50文字まで入力可');
+                $("#remarks4-error").css('display', 'initial');
+
+                return;
+            }
+        })
 
         function handleCheckOrderNotExisted(value) {
             $.ajax({
@@ -267,9 +345,6 @@ file that was distributed with this source code.
                 if (data.status == 1) {
                     $("#customer_order_no-error").text('客先注文番号がすでに登録されています');
                     $("#customer_order_no-error").css('display', 'initial');
-                } else {
-                    $("#customer_order_no-error").text('');
-                    $("#customer_order_no-error").css('display', 'none');
                 }
             }).always(function() {
                 loadingOverlay('hide');
@@ -302,6 +377,15 @@ file that was distributed with this source code.
                 isSubmit = 0;
             } else {
                 $('.remarks-error').hide();
+            }
+
+            if (
+                $("#remarks1-error").text().trim() != '' ||
+                $("#remarks2-error").text().trim() != '' ||
+                $("#remarks3-error").text().trim() != '' ||
+                $("#remarks4-error").text().trim() != ''
+            ) {
+                isSubmit = 0;
             }
 
             if (checkDate() && isSubmit === 1) {
@@ -919,13 +1003,11 @@ file that was distributed with this source code.
                             <div style="background-color: #ffdc00; font-weight: bold">客先発注番号</div>
                         </div>
                         <div class="shipping_destination_right">
-                            <input type="text" class="form-control" name="customer_order_no" id="customer_order_no" value="{% if customer_order_no is defined %}{{ customer_order_no }}{% endif %}" onkeyup="checkOrderNotExisted(this)" maxlength="20">
+                            <input type="text" class="form-control" name="customer_order_no" id="customer_order_no" value="{% if customer_order_no is defined %}{{ customer_order_no }}{% endif %}">
                         </div>
                     </div>
                 </div>
-                <p id="customer_order_no-error" style="color: red;font-size: larger;font-weight: bold;display: none">
-                    客先注文番号がすでに登録されています。
-                </p>
+                <p id="customer_order_no-error" style="color: red;font-size: larger;font-weight: bold;display: none"></p>
                 {#Customer Order No#}
 
                 {# Remarks #}
@@ -944,6 +1026,7 @@ file that was distributed with this source code.
                         <input type="text" class="form-control" name="remarks3" id="remarks3" value="{{ remarks3 }}">
                     </div>
                 </div>
+                <p id="remarks3-error" style="color: red;font-size: larger;font-weight: bold;display: none"></p>
 
                 <div>
                     <p>
@@ -960,6 +1043,7 @@ file that was distributed with this source code.
                         <input type="text" class="form-control" name="remarks4" id="remarks4" value="{{ remarks4 }}">
                     </div>
                 </div>
+                <p id="remarks4-error" style="color: red;font-size: larger;font-weight: bold;display: none"></p>
 
                 <div>
                     <p>
@@ -976,6 +1060,7 @@ file that was distributed with this source code.
                         <input type="text" class="form-control" name="remarks1" id="remarks1" value="{{ remarks1 }}">
                     </div>
                 </div>
+                <p id="remarks1-error" style="color: red;font-size: larger;font-weight: bold;display: none"></p>
 
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-top: 10px">
                     <div class="shipping_destination_left">
@@ -985,6 +1070,7 @@ file that was distributed with this source code.
                         <input type="text" class="form-control" name="remarks2" id="remarks2" value="{{ remarks2 }}">
                     </div>
                 </div>
+                <p id="remarks2-error" style="color: red;font-size: larger;font-weight: bold;display: none"></p>
 
                 <p class="remarks-error" style="color: red;font-size: larger;font-weight: bold;display: none">
                     生産依頼備考１または生産依頼備考２を入力してください
