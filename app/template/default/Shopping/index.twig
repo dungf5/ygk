@@ -240,94 +240,34 @@ file that was distributed with this source code.
             });
         }
 
-        $("#customer_order_no").on('keyup', function(event) {
-            let key = event.keyCode || event.charCode;
-            let target  = event.target;
-            let value = target.value;
-
-            clearTimeout(typingTimer);
-            $("#customer_order_no-error").text('');
-            $("#customer_order_no-error").css('display', 'none');
-
-            if (key == 8 || key == 46) {
-                $("#customer_order_no").val('');
-
-                return;
-            }
-
-            if (value.length > 20) {
-                $("#customer_order_no-error").text('20文字まで入力可');
-                $("#customer_order_no-error").css('display', 'initial');
-
-                return;
-            }
-
-            if (key != 8 && key != 46) {
-                typingTimer      = setTimeout(function () {
-                    handleCheckOrderNotExisted(value);
-                }, 1000);
-            }
-        });
-
-        $("#remarks1").on('keyup', function(event) {
-            let target  = event.target;
-            let value = target.value;
-
-            $("#remarks1-error").text('');
-            $("#remarks1-error").css('display', 'none');
-
-            if (value.length > 20) {
-                $("#remarks1-error").text('20文字まで入力可');
-                $("#remarks1-error").css('display', 'initial');
-
-                return;
-            }
-        });
-
-        $("#remarks2").on('keyup', function(event) {
-            let target  = event.target;
-            let value = target.value;
-
-            $("#remarks2-error").text('');
-            $("#remarks2-error").css('display', 'none');
-
-            if (value.length > 20) {
-                $("#remarks2-error").text('20文字まで入力可');
-                $("#remarks2-error").css('display', 'block');
-
-                return;
-            }
-        });
-
-        $("#remarks3").on('keyup', function(event) {
-            let target  = event.target;
-            let value = target.value;
-
-            $("#remarks3-error").text('');
-            $("#remarks3-error").css('display', 'none');
-
-            if (value.length > 50) {
-                $("#remarks3-error").text('50文字まで入力可');
-                $("#remarks3-error").css('display', 'initial');
-
-                return;
-            }
-        });
-
-        $("#remarks4").on('keyup', function(event) {
-            let target  = event.target;
-            let value = target.value;
-
-            $("#remarks4-error").text('');
-            $("#remarks4-error").css('display', 'none');
-
-            if (value.length > 50) {
-                $("#remarks4-error").text('50文字まで入力可');
-                $("#remarks4-error").css('display', 'initial');
-
-                return;
-            }
-        })
+        // $("#customer_order_no").on('keyup', function(event) {
+        //     let key = event.keyCode || event.charCode;
+        //     let target  = event.target;
+        //     let value = target.value;
+        //
+        //     clearTimeout(typingTimer);
+        //     $("#customer_order_no-error").text('');
+        //     $("#customer_order_no-error").css('display', 'none');
+        //
+        //     if (key == 8 || key == 46) {
+        //         $("#customer_order_no").val('');
+        //
+        //         return;
+        //     }
+        //
+        //     if (value.length > 20) {
+        //         $("#customer_order_no-error").text('20文字まで入力可');
+        //         $("#customer_order_no-error").css('display', 'initial');
+        //
+        //         return;
+        //     }
+        //
+        //     if (key != 8 && key != 46) {
+        //         typingTimer      = setTimeout(function () {
+        //             handleCheckOrderNotExisted(value);
+        //         }, 1000);
+        //     }
+        // });
 
         function handleCheckOrderNotExisted(value) {
             $.ajax({
@@ -368,8 +308,40 @@ file that was distributed with this source code.
                  $('.otodoke_code-error').hide();
             }
 
-            if ($("#customer_order_no").val().trim() != '' && $("#customer_order_no-error").text().trim() != '') {
+            if ($("#remarks1").val().trim().length > 20) {
+                $("#remarks1-error").text('入力は20文字までとなります');
+                $("#remarks1-error").css('display', 'initial');
                 isSubmit = 0;
+            } else {
+                $("#remarks1-error").text('');
+                $("#remarks1-error").css('display', 'none');
+            }
+
+            if ($("#remarks2").val().trim().length > 20) {
+                $("#remarks2-error").text('入力は20文字までとなります');
+                $("#remarks2-error").css('display', 'block');
+                isSubmit = 0;
+            } else {
+                $("#remarks2-error").text('');
+                $("#remarks2-error").css('display', 'none');
+            }
+
+            if ($("#remarks3").val().trim().length > 50) {
+                $("#remarks3-error").text('50 入力は50文字までとなります');
+                $("#remarks3-error").css('display', 'initial');
+                isSubmit = 0;
+            } else {
+                $("#remarks3-error").text('');
+                $("#remarks3-error").css('display', 'none');
+            }
+
+            if ($("#remarks4").val().trim().length > 50) {
+                $("#remarks4-error").text('50 入力は50文字までとなります');
+                $("#remarks4-error").css('display', 'initial');
+                isSubmit = 0;
+            } else {
+                $("#remarks4-error").text('');
+                $("#remarks4-error").css('display', 'none');
             }
 
             if ("{{ global_service.getCartProductType }}" == 2 && $("#remarks1").val().trim() == '' && $("#remarks2").val().trim() == '') {
@@ -379,13 +351,33 @@ file that was distributed with this source code.
                 $('.remarks-error').hide();
             }
 
-            if (
-                $("#remarks1-error").text().trim() != '' ||
-                $("#remarks2-error").text().trim() != '' ||
-                $("#remarks3-error").text().trim() != '' ||
-                $("#remarks4-error").text().trim() != ''
-            ) {
+            if ($("#customer_order_no").val().trim().length > 20) {
+                $("#customer_order_no-error").text('入力は20文字までとなります');
+                $("#customer_order_no-error").css('display', 'initial');
                 isSubmit = 0;
+            } else {
+                $("#customer_order_no-error").text('');
+                $("#customer_order_no-error").css('display', 'none');
+                loadingOverlay();
+
+                $.ajax({
+                    url: '{{ url('check_order_existed') }}',
+                    type: 'POST',
+                    async:false,
+                    data: {
+                        customer_order_no: $("#customer_order_no").val().trim(),
+                        '_token':'{{ csrf_token('_token') }}',
+                    },
+                })
+                .done(function(data) {
+                    if (data.status == 1) {
+                        $("#customer_order_no-error").text('客先注文番号がすでに登録されています');
+                        $("#customer_order_no-error").css('display', 'initial');
+                        isSubmit = 0;
+                    }
+                }).always(function() {
+                    loadingOverlay('hide');
+                });
             }
 
             if (checkDate() && isSubmit === 1) {
@@ -1001,6 +993,7 @@ file that was distributed with this source code.
                     <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
                         <div class="shipping_destination_left">
                             <div style="background-color: #ffdc00; font-weight: bold">客先発注番号</div>
+                            <label style="font-size: 0.8em;">20文字まで入力可</label>
                         </div>
                         <div class="shipping_destination_right">
                             <input type="text" class="form-control" name="customer_order_no" id="customer_order_no" value="{% if customer_order_no is defined %}{{ customer_order_no }}{% endif %}">
@@ -1021,6 +1014,7 @@ file that was distributed with this source code.
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
                     <div class="shipping_destination_left">
                         <div>発注書備考</div>
+                        <label style="font-size: 0.8em;">50文字まで入力可</label>
                     </div>
                     <div class="col-md-12" style="padding: 0">
                         <input type="text" class="form-control" name="remarks3" id="remarks3" value="{{ remarks3 }}">
@@ -1038,6 +1032,7 @@ file that was distributed with this source code.
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
                     <div class="shipping_destination_left">
                         <div>発注書コメント</div>
+                        <label style="font-size: 0.8em;">50文字まで入力可</label>
                     </div>
                     <div class="col-md-12" style="padding: 0">
                         <input type="text" class="form-control" name="remarks4" id="remarks4" value="{{ remarks4 }}">
@@ -1055,6 +1050,7 @@ file that was distributed with this source code.
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-bottom: 10px">
                     <div class="shipping_destination_left">
                         <div> {{ 'front.mypage.remarks'|trans }}１</div>
+                        <label style="font-size: 0.8em;">20文字まで入力可</label>
                     </div>
                     <div class="col-md-12" style="padding: 0">
                         <input type="text" class="form-control" name="remarks1" id="remarks1" value="{{ remarks1 }}">
@@ -1065,6 +1061,7 @@ file that was distributed with this source code.
                 <div class="col-md-12" style="display: inline-flex; padding: 0; margin-top: 10px">
                     <div class="shipping_destination_left">
                         <div> {{ 'front.mypage.remarks'|trans }}２</div>
+                        <label style="font-size: 0.8em;">20文字まで入力可</label>
                     </div>
                     <div class="col-md-12" style="padding: 0">
                         <input type="text" class="form-control" name="remarks2" id="remarks2" value="{{ remarks2 }}">
