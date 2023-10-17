@@ -43,6 +43,7 @@ class OrderItemRepository extends AbstractRepository
      * @param array $paramSearch
      * @param string $customer_code
      * @param string $login_type
+     *
      * @return QueryBuilder
      */
     public function getQueryBuilderByCustomer($paramSearch = [], $customer_code = '', $login_type = '')
@@ -446,6 +447,11 @@ class OrderItemRepository extends AbstractRepository
             case 2:
                 $qb->andWhere('shipping.shipping_status = :shipping_status')
                     ->setParameter(':shipping_status', 2);
+                break;
+
+            case 9:
+                $qb->andWhere('shipping.shipping_status = :shipping_status')
+                    ->setParameter(':shipping_status', 9);
                 break;
         }
 
