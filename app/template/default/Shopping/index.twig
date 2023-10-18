@@ -292,6 +292,7 @@ file that was distributed with this source code.
         }
 
         $('.mySubmitConfirm').click(function() {
+            loadingOverlay();
             let isSubmit                = 1;
 
             if ($("#shipping_code").val().trim() == '') {
@@ -359,7 +360,6 @@ file that was distributed with this source code.
             } else if ($("#customer_order_no").val().trim().length > 1) {
                 $("#customer_order_no-error").text('');
                 $("#customer_order_no-error").css('display', 'none');
-                loadingOverlay();
 
                 $.ajax({
                     url: '{{ url('check_order_existed') }}',
@@ -376,8 +376,6 @@ file that was distributed with this source code.
                         $("#customer_order_no-error").css('display', 'initial');
                         isSubmit = 0;
                     }
-                }).always(function() {
-                    loadingOverlay('hide');
                 });
             } else {
                 $("#customer_order_no-error").text('');
@@ -387,6 +385,10 @@ file that was distributed with this source code.
             if (checkDate() && isSubmit === 1) {
                 $('#shopping-form').submit();
             }
+
+            setTimeout(function() {
+                loadingOverlay('hide');
+            }, 1000);
         });
     </script>
 {% endblock javascript %}
