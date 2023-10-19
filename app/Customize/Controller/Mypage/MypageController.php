@@ -701,7 +701,7 @@ class MypageController extends AbstractController
             $qb,
             $request->get('pageno', 1),
             $this->eccubeConfig['eccube_search_pmax'],
-            ['distinct' => false]
+            ['distinct' => true]
         );
 
         $listItem = !is_array($pagination) ? $pagination->getItems() : [];
