@@ -58,8 +58,7 @@ class CustomerRepository extends AbstractRepository
     protected $encoderFactory;
 
     public const COLUMNS = [
-        'customer_id' => 'c.id'
-        ,'name'=> 'c.name01'
+        'customer_id' => 'c.id', 'name' => 'c.name01',
     ];
 
     /**
@@ -103,57 +102,53 @@ class CustomerRepository extends AbstractRepository
 
     public function getUserByCode($login_code)
     {
-        $myCommon       = new MyCommonService($this->getEntityManager());
+        $myCommon = new MyCommonService($this->getEntityManager());
 
         //Check login type
-        $loginType      = $myCommon->checkLoginType($login_code);
+        $loginType = $myCommon->checkLoginType($login_code);
 
         if (!empty($_SESSION["usc_{$login_code}"])) {
-            $loginType              = $_SESSION["usc_{$login_code}"]['login_type'];
+            $loginType = $_SESSION["usc_{$login_code}"]['login_type'];
 
-            $Customer               = $this->findOneBy([
-                'id'                => $login_code,
-                'Status'            => CustomerStatus::REGULAR,
+            $Customer = $this->findOneBy([
+                'id' => $login_code,
+                'Status' => CustomerStatus::REGULAR,
             ]);
 
-            if (!empty($Customer)) return $Customer;
+            if (!empty($Customer)) {
+                return $Customer;
+            }
         }
 
-        if ($loginType == "supper_user" || $loginType == "represent_code") {
-            $dataGet    = $myCommon->getCustomerByRepresentType($login_code);
+        if ($loginType == 'supper_user' || $loginType == 'represent_code' || $loginType == 'approve_user' || $loginType == 'stock_user') {
+            $dataGet = $myCommon->getCustomerByRepresentType($login_code);
+        } elseif ($loginType == 'shipping_code') {
+            $dataGet = $myCommon->getCustomerByShippingType($login_code);
+        } elseif ($loginType == 'otodoke_code') {
+            $dataGet = $myCommon->getCustomerByOtodokeType($login_code);
+        } else {
+            $dataGet = $myCommon->getCustomerFromUserCode($login_code);
         }
 
-        elseif ($loginType == "shipping_code") {
-            $dataGet    = $myCommon->getCustomerByShippingType($login_code);
-        }
-
-        elseif ($loginType == "otodoke_code") {
-            $dataGet    = $myCommon->getCustomerByOtodokeType($login_code);
-        }
-
-        else {
-            $dataGet    = $myCommon->getCustomerFromUserCode($login_code);
-        }
-
-        $id             = "";
+        $id = '';
 
         if (count($dataGet)) {
-            $id         =  $dataGet[0]["ec_customer_id"];
+            $id = $dataGet[0]['ec_customer_id'];
         }
 
         //Push to session
         if (!empty($id)) {
-            $_SESSION["customer_id"]= $id;
+            $_SESSION['customer_id'] = $id;
 
-            $_SESSION["usc_{$id}"]  = [
-                "login_type"        => $loginType,
-                "login_code"        => $login_code,
+            $_SESSION["usc_{$id}"] = [
+                'login_type' => $loginType,
+                'login_code' => $login_code,
             ];
         }
 
-        $Customer       = $this->findOneBy([
-            'id'        => $id,
-            'Status'    => CustomerStatus::REGULAR,
+        $Customer = $this->findOneBy([
+            'id' => $id,
+            'Status' => CustomerStatus::REGULAR,
         ]);
 
         return $Customer;
@@ -163,8 +158,6 @@ class CustomerRepository extends AbstractRepository
     {
         $qb = $this->createQueryBuilder('c')
             ->select('c');
-
-
 
         if (isset($searchData['multi']) && StringUtil::isNotBlank($searchData['multi'])) {
             //スペース除去

@@ -42,6 +42,8 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class MyShoppingController extends AbstractShoppingController
 {
+    use TraitController;
+
     /**
      * @var CartService
      */
@@ -136,6 +138,10 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function index(PurchaseFlow $cartPurchaseFlow)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         // ログイン状態のチェック.
         $commonService = new MyCommonService($this->entityManager);
 
@@ -384,6 +390,10 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function confirm(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         // ログイン状態のチェック.
         if ($this->orderHelper->isLoginRequired()) {
             log_info('[注文確認] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
@@ -581,6 +591,10 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function checkout(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // ログイン状態のチェック.
@@ -860,6 +874,10 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function getOtodokeOption(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         try {
             if ('POST' === $request->getMethod()) {
                 $customer_id = $request->get('customer_id', '');
@@ -893,6 +911,10 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function changeShippingCode(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         try {
             if ('POST' === $request->getMethod()) {
                 $shipping_code = $request->get('shipping_code', '');
@@ -918,6 +940,10 @@ class MyShoppingController extends AbstractShoppingController
      */
     public function changeOtodokeCode(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         try {
             if ('POST' === $request->getMethod()) {
                 $otodoke_code = $request->get('otodoke_code', '');

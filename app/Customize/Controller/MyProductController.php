@@ -52,6 +52,8 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class MyProductController extends AbstractController
 {
+    use TraitController;
+
     /**
      * @var ProductClassRepository
      */
@@ -189,6 +191,10 @@ class MyProductController extends AbstractController
      */
     public function detail(Request $request, Product $Product)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         $referer = $request->headers->get('referer', '/products/list');
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
@@ -497,6 +503,10 @@ class MyProductController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // Doctrine SQLFilter

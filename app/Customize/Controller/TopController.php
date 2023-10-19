@@ -23,6 +23,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TopController extends AbstractController
 {
+    use TraitController;
+
     /**
      * @var CartService
      */
@@ -48,6 +50,10 @@ class TopController extends AbstractController
      */
     public function index()
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         $this->updateCart();
 
         return [];
