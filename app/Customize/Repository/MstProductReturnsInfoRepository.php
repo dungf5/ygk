@@ -406,15 +406,15 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             ->addSelect(
                 "(
                 SELECT SUM(IFNULL(mst_pri.returns_num, 0)) FROM Customize\Entity\MstProductReturnsInfo mst_pri
-                WHERE 
-                    mst_pri.shipping_no = shipping.shipping_no 
-                AND 
+                WHERE
+                    mst_pri.shipping_no = shipping.shipping_no
+                AND
                     mst_pri.product_code = shipping.product_code
-                AND 
+                AND
                     mst_pri.cus_order_no = shipping.cus_order_no
-                AND 
+                AND
                     mst_pri.cus_order_lineno = shipping.cus_order_lineno
-                AND 
+                AND
                     mst_pri.shipping_date = shipping.shipping_date
                 ) AS total_returns_num"
             );
@@ -464,7 +464,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         return $qb;
     }
 
-    public function getReturnDataList($paramSearch = [], $customer_code)
+    public function getReturnDataList($paramSearch = [], $customer_code = '')
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('product_returns_info.returns_no');
@@ -484,8 +484,11 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'returns_reson.returns_reson_id=product_returns_info.reason_returns_code'
         );
 
-        $qb->andWhere('product_returns_info.customer_code = :customer_code')
-            ->setParameter('customer_code', $customer_code);
+        if (!empty($customer_code)) {
+            $qb->andWhere('product_returns_info.customer_code = :customer_code')
+                ->setParameter('customer_code', $customer_code);
+        }
+
         $qb->andWhere('product_returns_info.returns_request_date >= :returns_request_date')
             ->setParameter('returns_request_date', date('Y-m-d', strtotime('-24 MONTH')));
 
@@ -498,23 +501,37 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'product_returns_info.otodoke_name',
             'product_returns_info.jan_code',
             'product_returns_info.returns_request_date',
+            'product_returns_info.aprove_date',
+            'product_returns_info.product_receipt_date',
             'product_returns_info.shipping_num',
             'product.product_code',
             'product.product_name',
             'product.quantity',
             'returns_reson.returns_reson',
             'product_returns_info.cus_order_no',
-            'product_returns_info.cus_order_lineno',
+            'product_returns_info.cus_order_lineno'
         );
+
+        $qb->addSelect("(SELECT CONCAT(IFNULL(mst_cus.company_name, ''), ' 〒 ', IFNULL(mst_cus.postal_code, ''), IFNULL(mst_cus.addr01, ''), IFNULL(mst_cus.addr02, ''), IFNULL(mst_cus.addr03, '')) FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = product_returns_info.customer_code) customer_name");
 
         if (!empty($paramSearch['search_jan_code'])) {
             $qb->andWhere('product_returns_info.jan_code LIKE :search_jan_code')
                 ->setParameter(':search_jan_code', "%{$paramSearch['search_jan_code']}%");
         }
 
+        if (isset($paramSearch['returns_status_flag'])) {
+            $qb->andWhere('product_returns_info.returns_status_flag = :returns_status_flag')
+                ->setParameter(':returns_status_flag', $paramSearch['returns_status_flag']);
+        }
+
         if (!empty($paramSearch['search_shipping_date']) && $paramSearch['search_shipping_date'] != 0) {
             $qb->andWhere('product_returns_info.shipping_date LIKE :search_shipping_date')
                 ->setParameter(':search_shipping_date', "{$paramSearch['search_shipping_date']}-%");
+        }
+
+        if (!empty($paramSearch['search_customer']) && $paramSearch['search_customer'] != '0') {
+            $qb->andWhere('product_returns_info.customer_code = :search_customer')
+                ->setParameter(':search_customer', $paramSearch['search_customer']);
         }
 
         if (!empty($paramSearch['search_shipping']) && $paramSearch['search_shipping'] != '0') {

@@ -2143,6 +2143,10 @@ SQL;
             return 'shipping_code';
         } elseif (!empty($login_code) && str_starts_with($login_code, 't')) {
             return 'otodoke_code';
+        } elseif (!empty($login_code) && trim($login_code) == 're100') {
+            return 'approve_user';
+        } elseif (!empty($login_code) && trim($login_code) == 're200') {
+            return 'stock_user';
         }
 
         return 'customer_code';
@@ -3189,7 +3193,7 @@ SQL;
     public function getSumAmountDtOrder($order_no)
     {
         $sql = '
-                SELECT 
+                SELECT
                     SUM(demand_quantity * order_price) AS amount
                 FROM
                     dt_order
@@ -3242,6 +3246,121 @@ SQL;
             return $statement->executeQuery($params);
         } catch (Exception $e) {
             return null;
+        }
+    }
+
+    public function getMstCustomerList()
+    {
+        $column = '
+                    `a`.`ec_customer_id` as id,
+                    `a`.`customer_code`,
+                    `a`.`company_name`,
+                    `a`.`postal_code`,
+                    `a`.`addr01`,
+                    `a`.`addr02`,
+                    `a`.`addr03`
+         ';
+
+        $sql = "
+                SELECT {$column}
+                FROM `mst_customer` a
+                JOIN `dtb_customer` `dtcus`
+                ON `dtcus`.`id` = `a`.`ec_customer_id`
+                WHERE `a`.`customer_code` NOT IN ('approveuser', 'stockuser', 'supperuser')
+            ";
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+
+        try {
+            $result = $statement->executeQuery();
+            $rows = $result->fetchAllAssociative();
+
+            return $rows;
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getReturnShippingList ()
+    {
+        $column = '
+                    dcur.shipping_code,
+                    mc.company_name,
+                    mc.postal_code,
+                    mc.addr01,
+                    mc.addr02,
+                    mc.addr03
+            ';
+
+        $sql = " SELECT
+                    $column
+                FROM
+                    dtb_customer dc
+                JOIN
+                    mst_customer mc
+                ON
+                    dc.id = mc.ec_customer_id
+                JOIN
+                    (SELECT
+                        dcr.shipping_code
+                    FROM
+                        dt_customer_relation dcr
+                    GROUP BY
+                        dcr.shipping_code
+                    ) AS dcur
+                ON
+                    mc.customer_code = dcur.shipping_code
+            ";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery();
+            $rows = $result->fetchAllAssociative();
+
+            return $rows;
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getReturnOtodokeList ()
+    {
+        $column = '
+                    dcur.otodoke_code,
+                    mc.company_name,
+                    mc.postal_code,
+                    mc.addr01,
+                    mc.addr02,
+                    mc.addr03
+            ';
+
+        $sql = " SELECT
+                    $column
+                FROM
+                    dtb_customer dc
+                JOIN
+                    mst_customer mc
+                ON
+                    dc.id = mc.ec_customer_id
+                JOIN
+                    (SELECT
+                        dcr.otodoke_code
+                    FROM
+                        dt_customer_relation dcr
+                    GROUP BY
+                        dcr.otodoke_code
+                    ) AS dcur
+                ON
+                    mc.customer_code = dcur.otodoke_code
+            ";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery();
+            $rows = $result->fetchAllAssociative();
+
+            return $rows;
+        } catch (Exception $e) {
+            return [];
         }
     }
 }

@@ -1,0 +1,405 @@
+{% extends 'default_frame.twig' %}
+{% set mypageno = 'approve2' %}
+{% set body_class = 'mypage' %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" href="{{ asset('assets/css/select2/select2.min.css', 'user_data') }}">
+    <style>
+        .alert-search {
+            border: solid 1px #333;
+            background-color: #ccc;
+            border-radius: 8px;
+        }
+        .btn-search,
+        .btn-search:hover,
+        .btn-search:focus {
+            background-color: #000;
+            color: #fff;
+            border-radius: 8px;
+        }
+        .alert-return {
+            float: right;
+        }
+        .btn-return,
+        .btn-return:hover,
+        .btn-return:focus {
+            border: none;
+            border-radius: 0;
+            background-color: #f00;
+            color: #fff;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 12px 36px;
+            position: relative;
+        }
+        .btn-return:after {
+            content: "";
+            position: absolute;
+            left: -24px;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-top: 24px solid #f00;
+            border-bottom: 23px solid #f00;
+        }
+        .btn-return:before {
+            content: "";
+            position: absolute;
+            right: -24px;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border-left: 25px solid red;
+            border-top: 24px solid transparent;
+            border-bottom: 23px solid transparent;
+        }
+        .search,
+        .search:hover,
+        .search:focus {
+            color: #fff;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .p-0 {
+            padding: 0;
+        }
+        .p-l-15 {
+            padding-left: 15px;
+        }
+        .p-r-15 {
+            padding-right: 15px;
+        }
+        .table {
+            font-size: 87.5%;
+            margin: 0 0 50px;
+        }
+        .table thead tr th {
+            background: #666;
+            font-size: 93.75%;
+            color: #fff;
+            text-align: center !important;
+            vertical-align: middle;
+            border-top: 2px solid #ccc !important;
+            border-bottom: 2px solid #ccc !important;
+            border-left: 1px dotted #ccc;
+            padding: 0.5em;
+        }
+        .table tbody tr:nth-child(even) td {
+            background: #fdfdf4;
+        }
+        .table tbody tr td:first-child {
+            border-left: none;
+        }
+        .table tbody tr td {
+            text-align: center!important;
+            vertical-align: middle;
+            border-top: none!important;
+            border-bottom: 2px solid #ccc!important;
+            border-left: 1px dotted #ccc;
+            padding: 0.5em;
+        }
+        .ec-mypageRole .ec-navlistRole .ec-navlistRole__navlist {
+            max-width: 380px;
+        }
+    </style>
+{% endblock stylesheet %}
+
+{% block main %}
+    <div class="ec-layoutRole__main">
+        <div class="ec-mypageRole">
+            <div class="ec-pageHeader">
+                <h1>返品受取一覧画面イメージ</h1>
+            </div>
+{#            {% include 'Approve/navi2.twig' %}#}
+        </div>
+
+        <div class="ec-mypageRole">
+            <div class="row">
+                <div class="col-md-6 col-xs-12 p-0 p-l-15">
+                    <div class="alert alert-search" role="alert">
+                        <form class="form-inline" method="GET">
+                            <div class="form-group">
+                                <label for="jan_code">JANコード</label>
+                                <input type="text" class="form-control" id="search_jan_code" name="search_jan_code" value="{{ param.search_jan_code }}"/>
+                            </div>
+                            <button type="submit" class="btn btn-search">
+                                <i class="fas fa-angle-double-right" style="color: #f00"></i > 絞り込み
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {% if pagination and pagination.totalItemCount > 0 %}
+                <p class="ec-para-normal">
+                    {{ 'front.mypage.approve2_count'|trans({'%count%':pagination.totalItemCount}) }}
+                </p>
+            {% endif %}
+
+
+            <div class="row p-l-15 p-r-15">
+                <button class="btn btn-danger btn-print-pdf" disabled="" onclick="handlePrintPDF()">返品リストダウンロード</button>
+                <input type="hidden" id="check-box-value-print-pdf" value=""/>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th title="選択">
+                            <p class="text-nowrap">選択</p>
+                        </th>
+
+                        <th title="返品番号">
+                            <p class="text-nowrap">返品番号</p>
+                        </th>
+
+                        <th title="依頼日">
+                            <p class="text-nowrap">依頼日</p>
+                            {#                                <select class="hidden" id="search_request_date" name="search_request_date">#}
+                            {#                                    <option value="0" {% if param.search_request_date == 0 %} selected {% endif %}>全て</option>#}
+                            {#                                    {% for request_date in request_date_list %}#}
+                            {#                                        <option value="{{ request_date }}" {% if param.search_request_date == request_date %} selected {% endif %}>{{ request_date }}</option>#}
+                            {#                                    {% endfor %}#}
+                            {#                                </select>#}
+                            {#                                <a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_request_date').select2('open')">#}
+                            {#                                    依頼日#}
+                            {#                                    <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>#}
+                            {#                                </a>#}
+                        </th>
+
+                        <th title="承認日">
+                            <p class="text-nowrap">承認日</p>
+                        </th>
+
+                        <th title="顧客 | 出荷先 | 届け先">
+                            <select class="hidden" id="search_customer" name="search_customer">
+                                <option value="0" {% if param.search_customer == 0 %} selected {% endif %}>全て</option>
+                                {% for customer in customers %}
+                                    <option
+                                        value="{{ customer.customer_code }}"
+                                        {% if param.search_customer == customer.customer_code %} selected {% endif %}
+                                    >
+                                        {{ customer.company_name }} 〒 {{ customer.postal_code }} {{ customer.addr01 }} {{ customer.addr02 }} {{ customer.addr03 }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_customer').select2('open')">
+                                顧客 <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+                            </a>
+                            <br/>
+
+                            <select class="hidden" id="search_shipping" name="search_shipping">
+                                <option value="0" {% if param.search_shipping == 0 %} selected {% endif %}>全て</option>
+                                {% for shipping in shippings %}
+                                    <option
+                                        value="{{ shipping.shipping_code }}"
+                                        {% if param.search_shipping == shipping.shipping_code %} selected {% endif %}
+                                    >
+                                        {{ shipping.company_name }} 〒 {{ shipping.postal_code }} {{ shipping.addr01 }} {{ shipping.addr02 }} {{ shipping.addr03 }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_shipping').select2('open')">
+                                出荷先 <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+                            </a>
+                            <br/>
+
+                            <select class="hidden" id="search_otodoke" name="search_otodoke">
+                                <option value="0" {% if param.search_otodoke == 0 %} selected {% endif %}>全て</option>
+                                {% for otodoke in otodokes %}
+                                    <option
+                                        value="{{ otodoke.otodoke_code }}"
+                                        {% if param.search_otodoke == otodoke.otodoke_code %} selected {% endif %}
+                                    >
+                                        {{ otodoke.company_name }} 〒 {{ otodoke.postal_code }} {{ otodoke.addr01 }} {{ otodoke.addr02 }} {{otodoke.addr03 }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_otodoke').select2('open')">
+                                届け先 <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+                            </a>
+                        </th>
+
+                        <th title='{{ "front.mypage.history.jan_code" | trans | raw }} {{ "front.mypage.history.product_name" | trans | raw }}'>
+                            <p class="text-nowrap">{{ "front.mypage.history.jan_code" | trans | raw }}</p>
+                            <p class="text-nowrap">{{ "front.mypage.history.product_name" | trans | raw }}</p>
+                        </th>
+
+                        <th title={{ "front.mypage.history.return_number" | trans | raw }}>
+                            <p class="text-nowrap">{{ "front.mypage.history.return_number" | trans | raw }}</p>
+                        </th>
+                    </tr>
+                    </thead>
+
+                    {% if pagination and pagination.totalItemCount > 0 %}
+                        <tbody>
+                        {% for item in pagination %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="check-box-print-pdf" name="check-box-print-pdf" value="{{item.returns_no}}" onchange="handleCheckBox(this)"/>
+                                </td>
+
+                                <td title="{{ item.returns_no }}">
+                                    <a href="{{ item.url }}">
+                                        <p class="text-nowrap">{{ item.returns_no }}</p>
+                                    </a>
+                                </td>
+
+                                <td title="{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}">
+                                    <p class="text-nowrap">{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}</p>
+                                </td>
+
+                                <td title="{{ item.aprove_date is empty ? "" : item.aprove_date|date('Y-m-d') }}">
+                                    <p class="text-nowrap">{{ item.aprove_date is empty ? "" : item.aprove_date|date('Y-m-d') }}</p>
+                                </td>
+
+                                <td title="{{ item.shipping_name }} | {{ item.otodoke_name }}">
+                                    <p class="text-nowrap text-left">{{ item.customer_name }}</p>
+                                    <p class="text-nowrap text-left">{{ item.shipping_name }}</p>
+                                    <p class="text-nowrap text-left">{{ item.otodoke_name }}</p>
+                                </td>
+
+                                <td title="{{ item.jan_code }} | {{ item.product_name }}">
+                                    <p class="text-nowrap">{{ item.jan_code }}</p>
+                                    <p class="text-nowrap">{{ item.product_name }}</p>
+                                </td>
+
+                                <td title="{{ item.returns_num }}">
+                                    <p class="text-nowrap">{{ item.returns_num }}</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    {% else %}
+                        <tbody>
+                        <tr>
+                            <td colspan="7">
+                                <p>返品手続きの履歴がありません。</p>
+                            </td>
+                        </tr>
+                        </tbody>
+                    {% endif %}
+                </table>
+            </div>
+
+            {% if pagination and pagination.totalItemCount > 0 %}
+                <div class="ec-pagerRole">
+                    {% include "pager.twig" with {'pages': pagination.paginationData} %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock main%}
+
+{% block javascript %}
+<script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
+<script>
+	var search_jan_code      = "{{ param.search_jan_code }}"
+	var search_customer      = "{{ param.search_customer }}"
+	var search_shipping      = "{{ param.search_shipping }}"
+	var search_otodoke       = "{{ param.search_otodoke }}"
+
+	function reload() {
+		loadingOverlay("show")
+		let _parser = new URL( window.location.href )
+		_parser.searchParams.set( 'search_jan_code', search_jan_code )
+		_parser.searchParams.set( 'search_customer', search_customer )
+		_parser.searchParams.set( 'search_shipping', search_shipping )
+		_parser.searchParams.set( 'search_otodoke', search_otodoke )
+		window.location = _parser.href
+	}
+
+	$( function() {
+		$("#search_customer").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_customer = e.params.data.id
+			if( search_customer == 0 ) search_shipping = 0
+			reload()
+		});
+
+		$("#search_shipping").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_shipping = e.params.data.id
+			if( search_shipping == 0 ) search_otodoke = 0
+			reload()
+		});
+
+		$("#search_otodoke").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_otodoke = e.params.data.id
+			reload()
+		});
+	} );
+
+	function handleCheckBox(target) {
+            let name                = target.name;
+
+            if (name == 'check-box-print-pdf') {
+                let temp_value = '';
+                let count = 0;
+                $(".check-box-print-pdf").each(function () {
+                    if (this.checked) {
+                       temp_value += ',' + $(this).val();
+                       count++;
+                    }
+                });
+
+                if (count > 0) {
+                    $("#check-box-value-print-pdf").val(temp_value);
+                    $(".btn-print-pdf").prop('disabled', false);
+                } else {
+                    $("#check-box-value-print-pdf").val('');
+                    $(".btn-print-pdf").prop('disabled', true);
+                }
+            }
+
+            if (name == 'check-box-all-print-pdf') {
+                let temp_value = '';
+                let count = 0;
+
+                if (target.checked) {
+                    $(".check-box-print-pdf").each(function () {
+                        temp_value += ',' + $(this).val();
+                        count++;
+                    });
+                    $(".check-box-print-pdf").prop("checked", true);
+
+                } else {
+                    count = 0;
+                    $(".check-box-print-pdf").prop("checked", false);
+                }
+
+                if (count > 0) {
+                    // change check-all to print all data
+                    // $("#check-box-value-print-pdf").val(temp_value);
+                    $("#check-box-value-print-pdf").val('all');
+                    $(".btn-print-pdf").prop('disabled', false);
+                } else {
+                    $("#check-box-value-print-pdf").val('');
+                    $(".btn-print-pdf").prop('disabled', true);
+                }
+            }
+        }
+
+    function handlePrintPDF() {
+
+    }
+</script>
+{% endblock %}

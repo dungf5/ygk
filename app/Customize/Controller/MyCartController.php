@@ -35,6 +35,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class MyCartController extends AbstractController
 {
+    use TraitController;
+    
     /**
      * @var ProductClassRepository
      */
@@ -115,6 +117,10 @@ class MyCartController extends AbstractController
      */
     public function index(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         if ('POST' === $request->getMethod()) {
             $commonService = new MyCommonService($this->entityManager);
             $shipping_code = $request->get('shipping_code');
@@ -331,6 +337,10 @@ class MyCartController extends AbstractController
      */
     public function showCart(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         // カートを取得して明細の正規化を実行
         $Carts = $this->cartService->getCarts();
 
