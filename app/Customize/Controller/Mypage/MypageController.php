@@ -16,6 +16,7 @@ namespace Customize\Controller\Mypage;
 use Customize\Common\FileUtil;
 use Customize\Common\MyCommon;
 use Customize\Common\MyConstant;
+use Customize\Controller\TraitController;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Repository\DtReturnsImageInfoRepository;
 use Customize\Repository\MstProductReturnsInfoRepository;
@@ -46,6 +47,8 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class MypageController extends AbstractController
 {
+    use TraitController;
+    
     /**
      * @var BaseInfo
      */
@@ -2027,6 +2030,10 @@ class MypageController extends AbstractController
      */
     public function returnHistory(Request $request, PaginatorInterface $paginator)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // 購入処理中/決済処理中ステータスの受注を非表示にする.
