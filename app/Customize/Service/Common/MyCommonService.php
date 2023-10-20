@@ -3249,96 +3249,131 @@ SQL;
         }
     }
 
-    public function getReturnCustomerList()
+    public function getReturnNoList($status = 0)
     {
         $column = '
-                    `mp`.`customer_code`,
-                    `mp`.`company_name`,
-                    `mp`.`postal_code`,
-                    `mp`.`addr01`,
-                    `mp`.`addr02`,
-                    `mp`.`addr03`
+                    `mprt`.`returns_no`
          ';
-
         $sql = "
                 SELECT {$column}
                 FROM `mst_product_returns_info` `mprt`
-                JOIN `mst_customer` `mp`
-                ON `mp`.`customer_code` = `mprt`.`customer_code`
-                JOIN `dtb_customer` `dtcus`
-                ON `dtcus`.`id` = `mp`.`ec_customer_id`
-                GROUP BY `mprt`.`customer_code`
+                WHERE `mprt`.`returns_status_flag` = ?
             ";
         $statement = $this->entityManager->getConnection()->prepare($sql);
-
         try {
-            $result = $statement->executeQuery();
+            $result = $statement->executeQuery([$status]);
             $rows = $result->fetchAllAssociative();
-
             return $rows ?? [];
         } catch (Exception $e) {
             return [];
         }
     }
-
-    public function getReturnShippingList()
+    public function getReturnCustomerList($status = 0)
     {
         $column = '
-                    `mprt`.`shipping_code`,
-                    `mp`.`company_name`,
-                    `mp`.`postal_code`,
-                    `mp`.`addr01`,
-                    `mp`.`addr02`,
-                    `mp`.`addr03`
+                    `mc`.`customer_code`,
+                    `mc`.`company_name`,
+                    `mc`.`postal_code`,
+                    `mc`.`addr01`,
+                    `mc`.`addr02`,
+                    `mc`.`addr03`
          ';
-
         $sql = "
                 SELECT {$column}
-                FROM `mst_product_returns_info` `mprt`
-                JOIN `mst_customer` `mp`
-                ON `mp`.`customer_code` = `mprt`.`shipping_code`
+                FROM `mst_product_returns_info` `mcrt`
+                JOIN `mst_customer` `mc`
+                ON `mc`.`customer_code` = `mcrt`.`customer_code`
                 JOIN `dtb_customer` `dtcus`
-                ON `dtcus`.`id` = `mp`.`ec_customer_id`
-                GROUP BY `mprt`.`shipping_code`
+                ON `dtcus`.`id` = `mc`.`ec_customer_id`
+                WHERE `mcrt`.`returns_status_flag` = ?
+                GROUP BY `mcrt`.`customer_code`
             ";
         $statement = $this->entityManager->getConnection()->prepare($sql);
-
         try {
-            $result = $statement->executeQuery();
+            $result = $statement->executeQuery([$status]);
             $rows = $result->fetchAllAssociative();
-
             return $rows ?? [];
         } catch (Exception $e) {
             return [];
         }
     }
-
-    public function getReturnOtodokeList()
+    public function getReturnShippingList($status = 0)
     {
         $column = '
-                    `mprt`.`otodoke_code`,
-                    `mp`.`company_name`,
-                    `mp`.`postal_code`,
-                    `mp`.`addr01`,
-                    `mp`.`addr02`,
-                    `mp`.`addr03`
+                    `mcrt`.`shipping_code`,
+                    `mc`.`company_name`,
+                    `mc`.`postal_code`,
+                    `mc`.`addr01`,
+                    `mc`.`addr02`,
+                    `mc`.`addr03`
          ';
-
+        $sql = "
+                SELECT {$column}
+                FROM `mst_product_returns_info` `mcrt`
+                JOIN `mst_customer` `mc`
+                ON `mc`.`customer_code` = `mcrt`.`shipping_code`
+                JOIN `dtb_customer` `dtcus`
+                ON `dtcus`.`id` = `mc`.`ec_customer_id`
+                WHERE `mcrt`.`returns_status_flag` = ?
+                GROUP BY `mcrt`.`shipping_code`
+            ";
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery([$status]);
+            $rows = $result->fetchAllAssociative();
+            return $rows ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+    public function getReturnOtodokeList($status = 0)
+    {
+        $column = '
+                    `mcrt`.`otodoke_code`,
+                    `mc`.`company_name`,
+                    `mc`.`postal_code`,
+                    `mc`.`addr01`,
+                    `mc`.`addr02`,
+                    `mc`.`addr03`
+         ';
+        $sql = "
+                SELECT {$column}
+                FROM `mst_product_returns_info` `mcrt`
+                JOIN `mst_customer` `mc`
+                ON `mc`.`customer_code` = `mcrt`.`otodoke_code`
+                JOIN `dtb_customer` `dtcus`
+                ON `dtcus`.`id` = `mc`.`ec_customer_id`
+                WHERE `mcrt`.`returns_status_flag` = ?
+                GROUP BY `mcrt`.`otodoke_code`
+            ";
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery([$status]);
+            $rows = $result->fetchAllAssociative();
+            return $rows ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+    public function getReturnProductList($status = 0)
+    {
+        $column = '
+                    `mprt`.`jan_code`,
+                    `mp`.`product_code`,
+                    `mp`.`product_name`
+         ';
         $sql = "
                 SELECT {$column}
                 FROM `mst_product_returns_info` `mprt`
-                JOIN `mst_customer` `mp`
-                ON `mp`.`customer_code` = `mprt`.`otodoke_code`
-                JOIN `dtb_customer` `dtcus`
-                ON `dtcus`.`id` = `mp`.`ec_customer_id`
-                GROUP BY `mprt`.`otodoke_code`
+                JOIN `mst_product` `mp`
+                ON `mp`.`product_code` = `mprt`.`product_code`
+                WHERE `mprt`.`returns_status_flag` = ?
+                GROUP BY `mprt`.`jan_code`
             ";
         $statement = $this->entityManager->getConnection()->prepare($sql);
-
         try {
-            $result = $statement->executeQuery();
+            $result = $statement->executeQuery([$status]);
             $rows = $result->fetchAllAssociative();
-
             return $rows ?? [];
         } catch (Exception $e) {
             return [];

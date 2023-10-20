@@ -118,7 +118,7 @@
         -webkit-box-orient: vertical;
     }
     a > label {
-        width: 50px;
+        width: 60px;
     }
 </style>
 {% endblock stylesheet %}
@@ -160,21 +160,31 @@
                     <thead>
                         <tr>
                             <th title="返品番号" width="10%">
-                                <p class="">返品番号</p>
+                                <select class="hidden" id="search_returns_no" name="search_returns_no">
+                                    <option value="0" {% if param.search_returns_no == 0 %} selected {% endif %}>全て</option>
+                                    {% for return in returnNo %}
+                                        <option value="{{ return.returns_no }}" {% if param.search_returns_no == return.returns_no %} selected {% endif %}>
+                                            {{ return.returns_no }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <a href="javascript:void(0)" class="search" onclick="$('#search_returns_no').select2('open')">
+                                    <label>返品番号</label>
+                                    <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+                                </a>
                             </th>
 
                             <th title="依頼日" width="10%">
-                                <p class="">依頼日</p>
-{#                                <select class="hidden" id="search_request_date" name="search_request_date">#}
-{#                                    <option value="0" {% if param.search_request_date == 0 %} selected {% endif %}>全て</option>#}
-{#                                    {% for request_date in request_date_list %}#}
-{#                                        <option value="{{ request_date }}" {% if param.search_request_date == request_date %} selected {% endif %}>{{ request_date }}</option>#}
-{#                                    {% endfor %}#}
-{#                                </select>#}
-{#                                <a href="javascript:void(0)" class="search" onclick="$('#search_request_date').select2('open')">#}
-{#                                    依頼日#}
-{#                                    <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>#}
-{#                                </a>#}
+                                <select class="hidden" id="search_request_date" name="search_request_date">
+                                    <option value="0" {% if param.search_request_date == 0 %} selected {% endif %}>全て</option>
+                                    {% for request_date in request_date_list %}
+                                        <option value="{{ request_date }}" {% if param.search_request_date == request_date %} selected {% endif %}>{{ request_date }}</option>
+                                    {% endfor %}
+                                </select>
+                                <a href="javascript:void(0)" class="search" onclick="$('#search_request_date').select2('open')">
+                                    <label>依頼日</label>
+                                    <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+                                </a>
                             </th>
 
                             <th title="顧客 | 出荷先 | 届け先" width="40%">
@@ -231,7 +241,19 @@
 
                             <th title='{{ "front.mypage.history.jan_code" | trans | raw }} {{ "front.mypage.history.product_name" | trans | raw }}' width="30%">
                                 <p class="">{{ "front.mypage.history.jan_code" | trans | raw }}</p>
-                                <p class="">{{ "front.mypage.history.product_name" | trans | raw }}</p>
+                                <br>
+                                <select class="hidden" id="search_product" name="search_product">
+                                    <option value="0" {% if param.search_product == 0 %} selected {% endif %}>全て</option>
+                                    {% for product in products %}
+                                        <option value="{{ product.jan_code }}" {% if param.search_product == product.jan_code %} selected {% endif %}>
+                                            {{ product.product_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <a href="javascript:void(0)" class="search" onclick="$('#search_product').select2('open')">
+                                    <label>{{ "front.mypage.history.product_name" | trans | raw }}</label>
+                                    <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+                                </a>
                             </th>
 
                             <th title={{ "front.mypage.history.return_number" | trans | raw }} width="10%">
@@ -295,29 +317,56 @@
 {% block javascript %}
 <script src="{{ asset('assets/js/select2/select2.min.js', 'user_data') }}"></script>
 <script>
-	var search_jan_code      = "{{ param.search_jan_code }}"
-	var search_customer      = "{{ param.search_customer }}"
-	var search_shipping      = "{{ param.search_shipping }}"
-	var search_otodoke       = "{{ param.search_otodoke }}"
+	var search_returns_no = "{{ param.search_returns_no }}";
+	var search_request_date = "{{ param.search_request_date }}";
+	var search_jan_code = "{{ param.search_jan_code }}";
+	var search_customer = "{{ param.search_customer }}";
+	var search_shipping = "{{ param.search_shipping }}";
+	var search_otodoke = "{{ param.search_otodoke }}";
+	var search_product = "{{ param.search_product }}";
 
 	function reload() {
 		loadingOverlay("show")
 		let _parser = new URL( window.location.href )
+		_parser.searchParams.set( 'search_returns_no', search_returns_no )
+		_parser.searchParams.set( 'search_request_date', search_request_date )
 		_parser.searchParams.set( 'search_jan_code', search_jan_code )
 		_parser.searchParams.set( 'search_customer', search_customer )
 		_parser.searchParams.set( 'search_shipping', search_shipping )
 		_parser.searchParams.set( 'search_otodoke', search_otodoke )
+		_parser.searchParams.set( 'search_product', search_product )
 		window.location = _parser.href
 	}
 
 	$( function() {
+        $("#search_returns_no").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_returns_no = e.params.data.id
+			reload()
+		});
+
+        $("#search_request_date").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_request_date = e.params.data.id
+			reload()
+		});
+
 		$("#search_customer").select2({
 			'dropdownAutoWidth': true,
 			'selectionCssClass': 'hidden',
 		})
 		.on('select2:select', function (e) {
 			search_customer = e.params.data.id
-			if( search_customer == 0 ) search_shipping = 0
+			if( search_customer == 0 ) {
+			    search_shipping = 0;
+			    search_otodoke = 0
+			}
 			reload()
 		});
 
@@ -337,6 +386,15 @@
 		})
 		.on('select2:select', function (e) {
 			search_otodoke = e.params.data.id
+			reload()
+		});
+
+		$("#search_product").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+			search_product = e.params.data.id
 			reload()
 		});
 	} );
