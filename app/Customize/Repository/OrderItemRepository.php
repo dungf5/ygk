@@ -391,11 +391,19 @@ class OrderItemRepository extends AbstractRepository
             'product.product_code = order_status.product_code'
         );
 
+        //$qb->innerJoin(
+        //    'Customize\Entity\MstShipping',
+        //    'shipping',
+        //    Join::WITH,
+        //    'shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno'
+        //);
+
+        // Tạm thời bỏ AND shipping.cus_order_lineno = order_status.cus_order_lineno
         $qb->innerJoin(
             'Customize\Entity\MstShipping',
             'shipping',
             Join::WITH,
-            'shipping.cus_order_no = order_status.cus_order_no AND shipping.cus_order_lineno = order_status.cus_order_lineno'
+            'shipping.cus_order_no = order_status.cus_order_no'
         );
 
         $qb->leftJoin(
