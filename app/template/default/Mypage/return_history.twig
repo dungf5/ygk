@@ -66,13 +66,24 @@
 				</p>
 			{% endif %}
 
+			<div class="row p-l-15 p-r-15">
+				<button class="btn btn-danger btn-print-pdf" disabled="" onclick="handlePrintPDF()">返品リストダウンロード</button>
+				<input type="hidden" id="check-box-value-print-pdf" value=""/>
+			</div>
+
 			<div class="table-responsive">
 				<table class="table">
 					<thead>
 						<tr>
+							<th title="選択">
+								<input type="checkbox" class="check-box-all-print-pdf" name="check-box-all-print-pdf" value="" onchange="handleCheckBox(this)"/>
+								<p class="text-nowrap">選択</p>
+							</th>
+
 							<th title={{ "front.mypage.history.return_no" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.mypage.history.return_no" | trans | raw }}</p>
 							</th>
+
 							<th title={{ "front.mypage.history.return_request_date" | trans | raw }} style="min-width: 110px;">
 								<select class="hidden" id="search_request_date" name="search_shipping_date">
 									<option value="0" {% if param.search_request_date == 0 %} selected {% endif %}>全て</option>
@@ -84,6 +95,7 @@
 									{{ "front.mypage.history.return_request_date" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
 								</a>
 							</th>
+
 							<th title={{ "front.mypage.history.reason_return" | trans | raw }}>
 								<select class="hidden" id="search_reason_return" name="search_reason_return">
 									<option value="0" {% if param.search_reason_return == 0 %} selected {% endif %}>全て</option>
@@ -99,21 +111,27 @@
 									{{ "front.mypage.history.reason_return" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
 								</a>
 							</th>
+
 							<th title={{ "front.mypage.history.return_status" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.mypage.history.return_status" | trans | raw }}</p>
 							</th>
+
 							<th title={{ "front.mypage.history.shipping_no" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.mypage.history.shipping_no" | trans | raw }}</p>
 							</th>
+
 							<th title={{ "front.mypage.history.shipping_date" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.mypage.history.shipping_date" | trans | raw }}</p>
 							</th>
+
 							<th title={{ "front.order.cus_order_no" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.order.cus_order_no" | trans | raw }}</p>
 							</th>
+
 							<th title={{ "front.order.cus_order_lineno" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.order.cus_order_lineno" | trans | raw }}</p>
 							</th>
+
 							<th title='{{ "front.mypage.history.shiping_code" | trans | raw}} {{ "front.mypage.history.otodoke_code" | trans | raw }}'>
 								<select class="hidden" id="search_shipping" name="search_shipping">
 									<option value="0" {% if param.search_shipping == 0 %} selected {% endif %}>全て</option>
@@ -145,13 +163,16 @@
 									{{ "front.mypage.history.otodoke_code" | trans | raw }} <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
 								</a>
 							</th>
+
 							<th title='{{ "front.mypage.history.jan_code" | trans | raw }} {{ "front.mypage.history.product_name" | trans | raw }}'>
 								<p class="text-nowrap">{{ "front.mypage.history.jan_code" | trans | raw }}</p>
 								<p class="text-nowrap">{{ "front.mypage.history.product_name" | trans | raw }}</p>
 							</th>
+
 							<th title={{ "front.mypage.history.shipping_num" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.mypage.history.shipping_num" | trans | raw }}</p>
 							</th>
+
 							<th title={{ "front.mypage.history.return_number" | trans | raw }}>
 								<p class="text-nowrap">{{ "front.mypage.history.return_number" | trans | raw }}</p>
 							</th>
@@ -161,15 +182,22 @@
 						<tbody>
 							{% for item in pagination %}
 								<tr>
+									<td>
+										<input type="checkbox" class="check-box-print-pdf" name="check-box-print-pdf" value="{{item.returns_no}}" onchange="handleCheckBox(this)"/>
+									</td>
+
 									<td title="{{ item.returns_no }}">
 										<p class="text-nowrap">{{ item.returns_no }}</p>
 									</td>
+
 									<td title="{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}">
 										<p class="text-nowrap">{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}</p>
 									</td>
+
 									<td title="{{ item.returns_reson }}">
 										<p class="text-nowrap">{{ item.returns_reson }}</p>
 									</td>
+
 									<td title={{ item.returns_status_flag is empty ? "" : item.returns_status_flag }}>
 										{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
 											{% if item.returns_status_flag == 0 %}
@@ -189,26 +217,33 @@
 											<p class="text-nowrap"></p>
 										{% endif %}
 									</td>
+
 									<td title="{{ item.shipping_no }}">
 										<p class="text-nowrap">{{ item.shipping_no }}</p>
 									</td>
+
 									<td title="{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}">
 										<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
 									</td>
+
 									<td title="{{ item.cus_order_no }}">
 										<p class="text-nowrap">{{ item.cus_order_no }}</p>
 									</td>
+
 									<td title="{{ item.cus_order_lineno }}">
 										<p class="text-nowrap">{{ item.cus_order_lineno }}</p>
 									</td>
+
 									<td title="{{ item.shipping_name }} | {{ item.otodoke_name }}">
 										<p class="text-nowrap">{{ item.shipping_name }}</p>
 										<p class="text-nowrap">{{ item.otodoke_name }}</p>
 									</td>
+
 									<td title="{{ item.jan_code }} | {{ item.product_name }}">
 										<p class="text-nowrap">{{ item.jan_code }}</p>
 										<p class="text-nowrap">{{ item.product_name }}</p>
 									</td>
+
 									<td>
 										<p class="text-nowrap">
 											{% if item.quantity > 1 %}
@@ -218,6 +253,7 @@
 											{% endif %}
 										</p>
 									</td>
+
 									<td title="{{ item.returns_num }}">
 										<p class="text-nowrap">{{ item.returns_num }}</p>
 									</td>
@@ -301,5 +337,75 @@
 			reload()
 		});
 	});
+
+	function handleCheckBox(target) {
+            let name                = target.name;
+
+            if (name == 'check-box-print-pdf') {
+                let temp_value = '';
+                let count = 0;
+                $(".check-box-print-pdf").each(function () {
+                    if (this.checked) {
+                       temp_value += ',' + $(this).val();
+                       count++;
+                    }
+                });
+
+                if (count > 0) {
+                    $("#check-box-value-print-pdf").val(temp_value);
+                    $(".btn-print-pdf").prop('disabled', false);
+
+                    if (count == {{ pagination.totalItemCount }}) {
+                        $(".check-box-all-print-pdf").prop("checked", true);
+                    } else {
+                        $(".check-box-all-print-pdf").prop("checked", false);
+                    }
+
+                } else {
+                	$("#check-box-value-print-pdf").val('');
+                    $(".btn-print-pdf").prop('disabled', true);
+                }
+            }
+
+            if (name == 'check-box-all-print-pdf') {
+                let temp_value = '';
+                let count = 0;
+
+                if (target.checked) {
+                    $(".check-box-print-pdf").each(function () {
+                        temp_value += ',' + $(this).val();
+                        count++;
+                    });
+                    $(".check-box-print-pdf").prop("checked", true);
+
+                } else {
+                    count = 0;
+                    $(".check-box-print-pdf").prop("checked", false);
+                }
+
+                if (count > 0) {
+                    $("#check-box-value-print-pdf").val('all');
+                    $(".btn-print-pdf").prop('disabled', false);
+                } else {
+                    $("#check-box-value-print-pdf").val('');
+                    $(".btn-print-pdf").prop('disabled', true);
+                }
+            }
+        }
+
+    function handlePrintPDF() {
+            path = '&search_request_date=' + search_request_date;
+            path += '&search_reason_return=' + search_reason_return;
+            path += '&search_shipping=' + search_shipping;
+            path += '&search_otodoke=' + search_otodoke;
+
+            let url = '/mypage/return/history/export/pdf?return_no=' + $("#check-box-value-print-pdf").val() + path;
+
+            console.log(url);
+            // let a = document.createElement('a');
+            // a.target = '_blank';
+            // a.href = url;
+            // a.click();
+    }
 </script>
 {% endblock %}

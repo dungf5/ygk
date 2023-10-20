@@ -514,6 +514,11 @@ class MstProductReturnsInfoRepository extends AbstractRepository
 
         $qb->addSelect("(SELECT CONCAT(IFNULL(mst_cus.company_name, ''), ' 〒 ', IFNULL(mst_cus.postal_code, ''), IFNULL(mst_cus.addr01, ''), IFNULL(mst_cus.addr02, ''), IFNULL(mst_cus.addr03, '')) FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = product_returns_info.customer_code) customer_name");
 
+        if (!empty($paramSearch['search_returns_no']) && $paramSearch['search_returns_no'] != '0') {
+            $qb->andWhere('product_returns_info.returns_no = :search_returns_no')
+                ->setParameter(':search_returns_no', $paramSearch['search_returns_no']);
+        }
+
         if (!empty($paramSearch['search_jan_code'])) {
             $qb->andWhere('product_returns_info.jan_code LIKE :search_jan_code')
                 ->setParameter(':search_jan_code', "%{$paramSearch['search_jan_code']}%");
@@ -549,17 +554,32 @@ class MstProductReturnsInfoRepository extends AbstractRepository
                 ->setParameter(':search_request_date', "{$paramSearch['search_request_date']}-%");
         }
 
+        if (!empty($paramSearch['search_aprove_date']) && $paramSearch['search_aprove_date'] != 0) {
+            $qb->andWhere('product_returns_info.aprove_date LIKE :search_aprove_date')
+                ->setParameter(':search_aprove_date', "{$paramSearch['search_aprove_date']}-%");
+        }
+
+        if (!empty($paramSearch['search_product_receipt_date']) && $paramSearch['search_product_receipt_date'] != 0) {
+            $qb->andWhere('product_returns_info.product_receipt_date LIKE :search_product_receipt_date')
+                ->setParameter(':search_product_receipt_date', "{$paramSearch['search_product_receipt_date']}-%");
+        }
+
         if (!empty($paramSearch['search_reason_return']) && $paramSearch['search_reason_return'] != '0') {
             $qb->andWhere('product_returns_info.reason_returns_code = :search_reason_return')
                 ->setParameter(':search_reason_return', $paramSearch['search_reason_return']);
         }
 
+        if (!empty($paramSearch['search_product']) && $paramSearch['search_product'] != '0') {
+            $qb->andWhere('product_returns_info.jan_code = :search_product')
+                ->setParameter(':search_product', $paramSearch['search_product']);
+        }
+
         // // Order By
         $qb->addOrderBy('product_returns_info.returns_no', 'DESC');
 
-        // dump($qb->getQuery()->getSQL());
-        // dump($qb->getParameters());
-        // die();
+//         dump($qb->getQuery()->getSQL());
+//         dump($qb->getParameters());
+//         die();
         return $qb;
     }
 }

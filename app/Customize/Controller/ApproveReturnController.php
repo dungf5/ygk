@@ -166,10 +166,12 @@ class ApproveReturnController extends AbstractController
         $param = [
             'returns_status_flag' => 0,
             'search_jan_code' => $request->get('search_jan_code', ''),
+            'search_returns_no' => $request->get('search_returns_no', 0),
             'search_request_date' => $request->get('search_request_date', 0),
             'search_customer' => $request->get('search_customer', 0),
             'search_shipping' => $request->get('search_shipping', 0),
             'search_otodoke' => $request->get('search_otodoke', 0),
+            'search_product' => $request->get('search_product', 0),
         ];
 
         // paginator
@@ -186,13 +188,15 @@ class ApproveReturnController extends AbstractController
 
         /*create list order date*/
         $request_date_list = [];
-        //for ($i = 0; $i < 14; $i++) {
-        //    $request_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
-        //}
+        for ($i = 0; $i < 14; $i++) {
+            $request_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
+        }
 
-        $customers = $commonService->getReturnCustomerList();
-        $shippings = $commonService->getReturnShippingList();
-        $otodokes = $commonService->getReturnOtodokeList();
+        $returnNo = $commonService->getReturnNoList($param['returns_status_flag']);
+        $customers = $commonService->getReturnCustomerList($param['returns_status_flag']);
+        $shippings = $commonService->getReturnShippingList($param['returns_status_flag']);
+        $otodokes = $commonService->getReturnOtodokeList($param['returns_status_flag']);
+        $products = $commonService->getReturnProductList($param['returns_status_flag']);
 
         $listItem = !is_array($pagination) ? $pagination->getItems() : [];
         foreach ($listItem as &$item) {
@@ -205,9 +209,11 @@ class ApproveReturnController extends AbstractController
             'pagination' => $pagination,
             'param' => $param,
             'request_date_list' => $request_date_list,
+            'returnNo' => $returnNo,
             'customers' => $customers,
             'shippings' => $shippings,
             'otodokes' => $otodokes,
+            'products' => $products,
         ];
     }
 
@@ -232,10 +238,13 @@ class ApproveReturnController extends AbstractController
         $param = [
             'returns_status_flag' => 1,
             'search_jan_code' => $request->get('search_jan_code', ''),
+            'search_returns_no' => $request->get('search_returns_no', 0),
             'search_request_date' => $request->get('search_request_date', 0),
+            'search_aprove_date' => $request->get('search_aprove_date', 0),
             'search_customer' => $request->get('search_customer', 0),
             'search_shipping' => $request->get('search_shipping', 0),
             'search_otodoke' => $request->get('search_otodoke', 0),
+            'search_product' => $request->get('search_product', 0),
         ];
 
         // paginator
@@ -259,21 +268,25 @@ class ApproveReturnController extends AbstractController
 
         /*create list order date*/
         $request_date_list = [];
-        //for ($i = 0; $i < 14; $i++) {
-        //    $request_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
-        //}
+        for ($i = 0; $i < 14; $i++) {
+            $request_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
+        }
 
-        $customers = $commonService->getReturnCustomerList();
-        $shippings = $commonService->getReturnShippingList();
-        $otodokes = $commonService->getReturnOtodokeList();
+        $returnNo = $commonService->getReturnNoList($param['returns_status_flag']);
+        $customers = $commonService->getReturnCustomerList($param['returns_status_flag']);
+        $shippings = $commonService->getReturnShippingList($param['returns_status_flag']);
+        $otodokes = $commonService->getReturnOtodokeList($param['returns_status_flag']);
+        $products = $commonService->getReturnProductList($param['returns_status_flag']);
 
         return [
             'pagination' => $pagination,
             'param' => $param,
             'request_date_list' => $request_date_list,
+            'returnNo' => $returnNo,
             'customers' => $customers,
             'shippings' => $shippings,
             'otodokes' => $otodokes,
+            'products' => $products,
         ];
     }
 
@@ -298,10 +311,13 @@ class ApproveReturnController extends AbstractController
         $param = [
             'returns_status_flag' => 3,
             'search_jan_code' => $request->get('search_jan_code', ''),
+            'search_returns_no' => $request->get('search_returns_no', 0),
             'search_request_date' => $request->get('search_request_date', 0),
+            'search_product_receipt_date' => $request->get('search_product_receipt_date', 0),
             'search_customer' => $request->get('search_customer', 0),
             'search_shipping' => $request->get('search_shipping', 0),
             'search_otodoke' => $request->get('search_otodoke', 0),
+            'search_product' => $request->get('search_product', 0),
         ];
 
         // paginator
@@ -325,21 +341,25 @@ class ApproveReturnController extends AbstractController
 
         /*create list order date*/
         $request_date_list = [];
-        //for ($i = 0; $i < 14; $i++) {
-        //    $request_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
-        //}
+        for ($i = 0; $i < 14; $i++) {
+            $request_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
+        }
 
-        $customers = $commonService->getReturnCustomerList();
-        $shippings = $commonService->getReturnShippingList();
-        $otodokes = $commonService->getReturnOtodokeList();
+        $returnNo = $commonService->getReturnNoList($param['returns_status_flag']);
+        $customers = $commonService->getReturnCustomerList($param['returns_status_flag']);
+        $shippings = $commonService->getReturnShippingList($param['returns_status_flag']);
+        $otodokes = $commonService->getReturnOtodokeList($param['returns_status_flag']);
+        $products = $commonService->getReturnProductList($param['returns_status_flag']);
 
         return [
             'pagination' => $pagination,
             'param' => $param,
             'request_date_list' => $request_date_list,
+            'returnNo' => $returnNo,
             'customers' => $customers,
             'shippings' => $shippings,
             'otodokes' => $otodokes,
+            'products' => $products,
         ];
     }
 }
