@@ -190,7 +190,7 @@ class ApproveReturnController extends AbstractController
         //    $request_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
         //}
 
-        $customers = $commonService->getMstCustomerList();
+        $customers = $commonService->getReturnCustomerList();
         $shippings = $commonService->getReturnShippingList();
         $otodokes = $commonService->getReturnOtodokeList();
 
@@ -263,7 +263,7 @@ class ApproveReturnController extends AbstractController
         //    $request_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
         //}
 
-        $customers = $commonService->getMstCustomerList();
+        $customers = $commonService->getReturnCustomerList();
         $shippings = $commonService->getReturnShippingList();
         $otodokes = $commonService->getReturnOtodokeList();
 
@@ -329,7 +329,7 @@ class ApproveReturnController extends AbstractController
         //    $request_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
         //}
 
-        $customers = $commonService->getMstCustomerList();
+        $customers = $commonService->getReturnCustomerList();
         $shippings = $commonService->getReturnShippingList();
         $otodokes = $commonService->getReturnOtodokeList();
 
