@@ -17,6 +17,7 @@
             background-color: #000;
             color: #fff;
             border-radius: 8px;
+            width: 100px;
         }
         .alert-return {
             float: right;
@@ -127,6 +128,9 @@
     <div class="ec-layoutRole__main">
         <div class="ec-mypageRole">
             <div class="ec-pageHeader">
+                <a href="{{ url('logout') }}" style="float: right;">
+                    <i class="fas fa-sign-out-alt" style="font-size:36px;color: lightgray;"></i>
+                </a>
                 <h1>返品受取一覧</h1>
             </div>
 {#            {% include 'Approve/navi2.twig' %}#}
@@ -143,6 +147,9 @@
                             </div>
                             <button type="submit" class="btn btn-search">
                                 <i class="fas fa-angle-double-right" style="color: #f00"></i > 絞り込み
+                            </button>
+                            <button type="button" class="btn btn-search" style="background: red;" onclick="location.href='{{ url('approve_return_2') }}'">
+                                リセット
                             </button>
                         </form>
                     </div>
