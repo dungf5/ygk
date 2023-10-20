@@ -58,6 +58,7 @@
         .search:hover,
         .search:focus {
             color: #fff;
+            text-decoration: none;
         }
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
@@ -108,6 +109,16 @@
         .ec-mypageRole .ec-navlistRole .ec-navlistRole__navlist {
             max-width: 380px;
         }
+        .table > tbody > tr > td > p {
+            -webkit-line-clamp: 1;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            overflow: hidden;
+            -webkit-box-orient: vertical;
+        }
+        a > label {
+            width: 50px;
+        }
     </style>
 {% endblock stylesheet %}
 
@@ -115,7 +126,7 @@
     <div class="ec-layoutRole__main">
         <div class="ec-mypageRole">
             <div class="ec-pageHeader">
-                <h1>返品受取一覧画面イメージ</h1>
+                <h1>返品受取一覧</h1>
             </div>
 {#            {% include 'Approve/navi2.twig' %}#}
         </div>
@@ -144,136 +155,121 @@
             {% endif %}
 
 
-            <div class="row p-l-15 p-r-15">
-                <button class="btn btn-danger btn-print-pdf" disabled="" onclick="handlePrintPDF()">返品リストダウンロード</button>
-                <input type="hidden" id="check-box-value-print-pdf" value=""/>
-            </div>
+{#            <div class="row p-l-15 p-r-15">#}
+{#                <button class="btn btn-danger btn-print-pdf" disabled="" onclick="handlePrintPDF()">返品リストダウンロード</button>#}
+{#                <input type="hidden" id="check-box-value-print-pdf" value=""/>#}
+{#            </div>#}
 
             <div class="table-responsive">
                 <table class="table">
                     <thead>
-                    <tr>
-                        <th title="選択">
-                            <p class="text-nowrap">選択</p>
-                        </th>
+                        <tr>
+                            <th title="返品番号" width="10%">
+                                <p class="">返品番号</p>
+                            </th>
 
-                        <th title="返品番号">
-                            <p class="text-nowrap">返品番号</p>
-                        </th>
+                            <th title="依頼日" width="10%">
+                                <p class="">依頼日</p>
+                            </th>
 
-                        <th title="依頼日">
-                            <p class="text-nowrap">依頼日</p>
-                            {#                                <select class="hidden" id="search_request_date" name="search_request_date">#}
-                            {#                                    <option value="0" {% if param.search_request_date == 0 %} selected {% endif %}>全て</option>#}
-                            {#                                    {% for request_date in request_date_list %}#}
-                            {#                                        <option value="{{ request_date }}" {% if param.search_request_date == request_date %} selected {% endif %}>{{ request_date }}</option>#}
-                            {#                                    {% endfor %}#}
-                            {#                                </select>#}
-                            {#                                <a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_request_date').select2('open')">#}
-                            {#                                    依頼日#}
-                            {#                                    <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>#}
-                            {#                                </a>#}
-                        </th>
+                            <th title="承認日">
+                                <p class="text-nowrap">承認日</p>
+                            </th>
 
-                        <th title="承認日">
-                            <p class="text-nowrap">承認日</p>
-                        </th>
+                            <th title="顧客 | 出荷先 | 届け先" width="35%">
+                                <select class="hidden" id="search_customer" name="search_customer">
+                                    <option value="0" {% if param.search_customer == 0 %} selected {% endif %}>全て</option>
+                                    {% for customer in customers %}
+                                        <option
+                                                value="{{ customer.customer_code }}"
+                                                {% if param.search_customer == customer.customer_code %} selected {% endif %}
+                                        >
+                                            {{ customer.company_name }} 〒 {{ customer.postal_code }} {{ customer.addr01 }} {{ customer.addr02 }} {{ customer.addr03 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <a href="javascript:void(0)" class="search" onclick="$('#search_customer').select2('open')">
+                                    <label>顧客</label>
+                                    <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+                                </a>
+                                <br/>
 
-                        <th title="顧客 | 出荷先 | 届け先">
-                            <select class="hidden" id="search_customer" name="search_customer">
-                                <option value="0" {% if param.search_customer == 0 %} selected {% endif %}>全て</option>
-                                {% for customer in customers %}
-                                    <option
-                                        value="{{ customer.customer_code }}"
-                                        {% if param.search_customer == customer.customer_code %} selected {% endif %}
-                                    >
-                                        {{ customer.company_name }} 〒 {{ customer.postal_code }} {{ customer.addr01 }} {{ customer.addr02 }} {{ customer.addr03 }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                            <a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_customer').select2('open')">
-                                顧客 <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
-                            </a>
-                            <br/>
+                                <select class="hidden" id="search_shipping" name="search_shipping">
+                                    <option value="0" {% if param.search_shipping == 0 %} selected {% endif %}>全て</option>
+                                    {% for shipping in shippings %}
+                                        <option
+                                                value="{{ shipping.shipping_code }}"
+                                                {% if param.search_shipping == shipping.shipping_code %} selected {% endif %}
+                                        >
+                                            {{ shipping.company_name }} 〒 {{ shipping.postal_code }} {{ shipping.addr01 }} {{ shipping.addr02 }} {{ shipping.addr03 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <a href="javascript:void(0)" class="search" onclick="$('#search_shipping').select2('open')">
+                                    <label>出荷先</label>
+                                    <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+                                </a>
+                                <br/>
 
-                            <select class="hidden" id="search_shipping" name="search_shipping">
-                                <option value="0" {% if param.search_shipping == 0 %} selected {% endif %}>全て</option>
-                                {% for shipping in shippings %}
-                                    <option
-                                        value="{{ shipping.shipping_code }}"
-                                        {% if param.search_shipping == shipping.shipping_code %} selected {% endif %}
-                                    >
-                                        {{ shipping.company_name }} 〒 {{ shipping.postal_code }} {{ shipping.addr01 }} {{ shipping.addr02 }} {{ shipping.addr03 }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                            <a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_shipping').select2('open')">
-                                出荷先 <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
-                            </a>
-                            <br/>
+                                <select class="hidden" id="search_otodoke" name="search_otodoke">
+                                    <option value="0" {% if param.search_otodoke == 0 %} selected {% endif %}>全て</option>
+                                    {% for otodoke in otodokes %}
+                                        <option
+                                                value="{{ otodoke.otodoke_code }}"
+                                                {% if param.search_otodoke == otodoke.otodoke_code %} selected {% endif %}
+                                        >
+                                            {{ otodoke.company_name }} 〒 {{ otodoke.postal_code }} {{ otodoke.addr01 }} {{ otodoke.addr02 }} {{otodoke.addr03 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <a href="javascript:void(0)" class="search" onclick="$('#search_otodoke').select2('open')">
+                                    <label>届け先</label>
+                                    <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+                                </a>
+                            </th>
 
-                            <select class="hidden" id="search_otodoke" name="search_otodoke">
-                                <option value="0" {% if param.search_otodoke == 0 %} selected {% endif %}>全て</option>
-                                {% for otodoke in otodokes %}
-                                    <option
-                                        value="{{ otodoke.otodoke_code }}"
-                                        {% if param.search_otodoke == otodoke.otodoke_code %} selected {% endif %}
-                                    >
-                                        {{ otodoke.company_name }} 〒 {{ otodoke.postal_code }} {{ otodoke.addr01 }} {{ otodoke.addr02 }} {{otodoke.addr03 }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                            <a href="javascript:void(0)" class="text-nowrap search" onclick="$('#search_otodoke').select2('open')">
-                                届け先 <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
-                            </a>
-                        </th>
+                            <th title='{{ "front.mypage.history.jan_code" | trans | raw }} {{ "front.mypage.history.product_name" | trans | raw }}' width="25%">
+                                <p class="">{{ "front.mypage.history.jan_code" | trans | raw }}</p>
+                                <p class="">{{ "front.mypage.history.product_name" | trans | raw }}</p>
+                            </th>
 
-                        <th title='{{ "front.mypage.history.jan_code" | trans | raw }} {{ "front.mypage.history.product_name" | trans | raw }}'>
-                            <p class="text-nowrap">{{ "front.mypage.history.jan_code" | trans | raw }}</p>
-                            <p class="text-nowrap">{{ "front.mypage.history.product_name" | trans | raw }}</p>
-                        </th>
-
-                        <th title={{ "front.mypage.history.return_number" | trans | raw }}>
-                            <p class="text-nowrap">{{ "front.mypage.history.return_number" | trans | raw }}</p>
-                        </th>
-                    </tr>
+                            <th title={{ "front.mypage.history.return_number" | trans | raw }} width="10%">
+                                <p class="">{{ "front.mypage.history.return_number" | trans | raw }}</p>
+                            </th>
+                        </tr>
                     </thead>
 
                     {% if pagination and pagination.totalItemCount > 0 %}
                         <tbody>
                         {% for item in pagination %}
                             <tr>
-                                <td>
-                                    <input type="checkbox" class="check-box-print-pdf" name="check-box-print-pdf" value="{{item.returns_no}}" onchange="handleCheckBox(this)"/>
-                                </td>
-
-                                <td title="{{ item.returns_no }}">
+                                <td title="{{ item.returns_no }}" width="10%">
                                     <a href="{{ item.url }}">
-                                        <p class="text-nowrap">{{ item.returns_no }}</p>
+                                        <p class="">{{ item.returns_no }}</p>
                                     </a>
                                 </td>
 
-                                <td title="{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}">
-                                    <p class="text-nowrap">{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}</p>
+                                <td title="{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}" width="10%">
+                                    <p class="">{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}</p>
                                 </td>
 
                                 <td title="{{ item.aprove_date is empty ? "" : item.aprove_date|date('Y-m-d') }}">
                                     <p class="text-nowrap">{{ item.aprove_date is empty ? "" : item.aprove_date|date('Y-m-d') }}</p>
                                 </td>
 
-                                <td title="{{ item.shipping_name }} | {{ item.otodoke_name }}">
-                                    <p class="text-nowrap text-left">{{ item.customer_name }}</p>
-                                    <p class="text-nowrap text-left">{{ item.shipping_name }}</p>
-                                    <p class="text-nowrap text-left">{{ item.otodoke_name }}</p>
+                                <td width="35%">
+                                    <p title="{{ item.customer_name }}" class="text-left">{{ item.customer_name }}</p>
+                                    <p title="{{ item.shipping_name }}" class="text-left">{{ item.shipping_name }}</p>
+                                    <p title="{{ item.otodoke_name }}" class="text-left">{{ item.otodoke_name }}</p>
                                 </td>
 
-                                <td title="{{ item.jan_code }} | {{ item.product_name }}">
-                                    <p class="text-nowrap">{{ item.jan_code }}</p>
-                                    <p class="text-nowrap">{{ item.product_name }}</p>
+                                <td width="25%">
+                                    <p title="{{ item.jan_code }}" class="">{{ item.jan_code }}</p>
+                                    <p title="{{ item.product_name }}" class="">{{ item.product_name }}</p>
                                 </td>
 
-                                <td title="{{ item.returns_num }}">
-                                    <p class="text-nowrap">{{ item.returns_num }}</p>
+                                <td title="{{ item.returns_num }}" width="10%">
+                                    <p class="">{{ item.returns_num }}</p>
                                 </td>
                             </tr>
                         {% endfor %}
