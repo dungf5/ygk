@@ -270,6 +270,13 @@ file that was distributed with this source code.
                 return false;
             }
 
+            if (valInput <= 0) {
+                input1.setCustomValidity('1以上で入力してください。');
+                input1.reportValidity();
+
+                return false;
+            }
+
             if ((valInput == 0) && (1 == {{ MstProduct.quantity }})) {
                 input1.setCustomValidity('{{ MstProduct.quantity }}{{ 'front.product.invalid_quantity'|trans }}');
                 input1.reportValidity();
