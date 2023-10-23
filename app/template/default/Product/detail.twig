@@ -263,7 +263,13 @@ eccube.classCategories = {{ class_categories_as_json(Product)|raw }};
                     input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
                     input1.reportValidity();
                     return false;
-              }
+             }
+
+            if (valInput <= 0) {
+                input1.setCustomValidity('1以上で入力してください。');
+                input1.reportValidity();
+                return false;
+            }
 
              if ( (valInput == 0) && (1 == {{ MstProduct.quantity }}) ){
 
