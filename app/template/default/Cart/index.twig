@@ -35,7 +35,7 @@ function checkInput(idQuantity){
     let mymst_quantity = $('#'+idQuantity).attr('mymst_quantity');
     let input1 =document.getElementById(idQuantity);
     input1.setCustomValidity('');
-    if (valInput == "") {
+    if (valInput == "" || valInput <= 0) {
 
 
         input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
