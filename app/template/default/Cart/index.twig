@@ -35,13 +35,20 @@ function checkInput(idQuantity){
     let mymst_quantity = $('#'+idQuantity).attr('mymst_quantity');
     let input1 =document.getElementById(idQuantity);
     input1.setCustomValidity('');
-    if (valInput == "" || valInput <= 0) {
+    if (valInput == "") {
 
 
         input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
                     input1.reportValidity();
                     return false;
               }
+
+    if (valInput <= 0) {
+        input1.setCustomValidity('1以上で入力してください。');
+        input1.reportValidity();
+
+        return false;
+    }
 
              if ( (valInput == 0) && (1 == mymst_quantity) ){
 
