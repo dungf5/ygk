@@ -500,11 +500,22 @@ class ProductRepository extends AbstractRepository
                 $qb->andWhere($orStatements);
             }
             if (StringUtil::isNotBlank($searchData['s_catalog_code'])) {
-                $key = $searchData['s_catalog_code'];
-                $arCode = $commonService->getSearchCatalogCode($key);
-                $whereMore2 = 'mst_product.jan_code in(:jan_code_s_catalog_code)';
-                $qb->setParameter(':jan_code_s_catalog_code', $arCode);
-                $qb->andWhere($whereMore2);
+                //$key = $searchData['s_catalog_code'];
+                //$arCode = $commonService->getSearchCatalogCode($key);
+                //$whereMore2 = 'mst_product.jan_code in(:jan_code_s_catalog_code)';
+                //$qb->setParameter(':jan_code_s_catalog_code', $arCode);
+                //$qb->andWhere($whereMore2);
+
+                $s_catalog_code = $searchData['s_catalog_code'];
+                $s_catalog_code = explode(' ', $s_catalog_code);
+                $orStatements = $qb->expr()->orX();
+
+                foreach ($s_catalog_code as $key => $value) {
+                    $orStatements->add(
+                        $qb->expr()->like('mst_product.catalog_code', $qb->expr()->literal('%'.$value.'%'))
+                    );
+                }
+                $qb->andWhere($orStatements);
             }
         }
         if (isset($searchData['name']) && StringUtil::isNotBlank($searchData['name'])) {
