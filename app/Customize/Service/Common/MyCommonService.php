@@ -3379,4 +3379,119 @@ SQL;
             return [];
         }
     }
+
+    public function getReturnNoPrintPDF($customer_code, $params)
+    {
+        $myPara = [$customer_code];
+
+        $condition = '';
+        if (!empty($paramSearch['search_request_date']) && $paramSearch['search_request_date'] != 0) {
+            $condition .= ' AND returns_request_date LIKE ? ';
+            $myPara[] = $params['search_request_date'].'-%';
+        }
+
+        if (!empty($paramSearch['search_reason_return']) && $paramSearch['search_reason_return'] != '0') {
+            $condition .= ' AND reason_returns_code = ? ';
+            $myPara[] = $params['search_reason_return'];
+        }
+
+        if (!empty($paramSearch['search_shipping']) && $paramSearch['search_shipping'] != '0') {
+            $condition .= ' AND shipping_code = ? ';
+            $myPara[] = $params['search_shipping'];
+        }
+
+        if (!empty($paramSearch['search_otodoke']) && $paramSearch['search_otodoke'] != '0') {
+            $condition .= ' AND otodoke_code = ? ';
+            $myPara[] = $params['search_otodoke'];
+        }
+
+        $sql = "
+                        SELECT
+                            returns_no
+                        FROM
+                            mst_product_returns_info
+                        WHERE
+                            customer_code = ?
+                            {$condition}
+                        ORDER BY
+                            returns_no DESC
+                ";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery($myPara);
+            $rows = $result->fetchAllAssociative();
+            $arRe = [];
+
+            foreach ($rows as $item) {
+                $arRe[] = $item['returns_no'];
+            }
+
+            return $arRe;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    public function getPdfReturns($customer_code, $returns_no)
+    {
+        $myPara = [$customer_code];
+
+        $cols = '
+                mst_product_returns_info.returns_no,
+                mst_product_returns_info.returns_num,
+                mst_product_returns_info.returns_status_flag,
+                mst_product_returns_info.shipping_no,
+                mst_product_returns_info.shipping_date,
+                mst_product_returns_info.shipping_name,
+                mst_product_returns_info.otodoke_name,
+                mst_product_returns_info.jan_code,
+                mst_product_returns_info.returns_request_date,
+                mst_product_returns_info.aprove_date,
+                mst_product_returns_info.product_receipt_date,
+                mst_product_returns_info.shipping_num,
+                mst_product_returns_info.cus_order_no,
+                mst_product_returns_info.cus_order_lineno,
+                mst_product.product_code,
+                mst_product.product_name,
+                mst_product.quantity,
+                dt_returns_reson.returns_reson
+            ';
+
+        $subWhere = '';
+        $c = count($returns_no);
+        for ($i = 0; $i < $c; $i++) {
+            if ($i == $c - 1) {
+                $subWhere .= '?';
+            } else {
+                $subWhere .= '?,';
+            }
+            $myPara[] = $returns_no[$i];
+        }
+
+        $sql = "
+                        SELECT
+                            {$cols}
+                        FROM
+                            mst_product_returns_info
+                        JOIN
+                            mst_product
+                        ON mst_product.product_code = mst_product_returns_info.product_code
+                        LEFT JOIN
+                            dt_returns_reson
+                        ON dt_returns_reson.returns_reson_id = mst_product_returns_info.reason_returns_code
+                        WHERE
+                            mst_product_returns_info.customer_code = ?
+                        AND
+                            mst_product_returns_info.returns_no IN ({$subWhere})
+                        ORDER BY
+                            mst_product_returns_info.returns_no DESC
+                ";
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery($myPara);
+        $rows = $result->fetchAllAssociative();
+
+        return $rows;
+    }
 }

@@ -402,10 +402,10 @@
             let url = '/mypage/return/history/export/pdf?return_no=' + $("#check-box-value-print-pdf").val() + path;
 
             console.log(url);
-            // let a = document.createElement('a');
-            // a.target = '_blank';
-            // a.href = url;
-            // a.click();
+            let a = document.createElement('a');
+            a.target = '_blank';
+            a.href = url;
+            a.click();
     }
 </script>
 {% endblock %}

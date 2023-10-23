@@ -2348,4 +2348,78 @@ class MypageController extends AbstractController
             return $this->redirectToRoute('mypage_delivery_print');
         }
     }
+
+    /**
+     * マイページ.
+     *
+     * @Route("/mypage/return/history/export/pdf", name="exportPdfReturn", methods={"GET"})
+     * @Template("/Mypage/exportPdfReturns.twig")
+     */
+    public function exportPdfReturn(Request $request)
+    {
+        try {
+            set_time_limit(0);
+            ini_set('memory_limit', '9072M');
+            ini_set('max_execution_time', '0');
+            ini_set('max_input_time', '-1');
+            $htmlFileName = 'Mypage/exportPdfReturns.twig';
+            $returns_no = MyCommon::getPara('return_no');
+
+            $params = [
+                'search_request_date' => MyCommon::getPara('search_request_date'),
+                'search_reason_return' => MyCommon::getPara('search_reason_return'),
+                'search_shipping' => MyCommon::getPara('search_shipping'),
+                'search_otodoke' => MyCommon::getPara('search_otodoke'),
+            ];
+
+            $commonService = new MyCommonService($this->entityManager);
+            $customer_code = $this->globalService->customerCode();
+
+            if (trim($returns_no) == 'all') {
+                $arr_returns_no = $commonService->getReturnNoPrintPDF($customer_code, $params);
+            } else {
+                $arr_returns_no = array_values(array_diff(explode(',', $returns_no), ['']));
+            }
+
+            $data = $commonService->getPdfReturns($customer_code, $arr_returns_no);
+            $data['data'] = array_chunk($data, 20);
+            $data['customer'] = $this->globalService->customer();
+
+            $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
+            FileUtil::makeDirectory($dirPdf);
+            $namePdf = count($arr_returns_no) == 1 ? 'returns_'.$arr_returns_no[0].'.pdf' : 'returns_'.date('YmdHis').'.pdf';
+            $file = $dirPdf.'/'.$namePdf;
+            $html = $this->twig->render($htmlFileName, $data);
+
+            if (env('APP_IS_LOCAL', 1) != 1) {
+                MyCommon::converHtmlToPdf($dirPdf, $namePdf, $html);
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="'.basename($file).'"');
+                readfile($file);
+                unlink($file);
+                unlink(str_replace('.pdf', '.html', $file));
+
+                return;
+            } else {
+                //$dompdf = new Dompdf();
+                //$dompdf->loadHtml($html);
+                //$dompdf->setPaper('A4');
+                //$dompdf->render();
+                //$output = $dompdf->output();
+                //file_put_contents($file, $output);
+                //$dompdf->stream($file);
+
+                if (count($data)) {
+                    return $data;
+                } else {
+                    return $this->redirectToRoute('mypage_return_history');
+                }
+            }
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            return $this->redirectToRoute('mypage_return_history');
+        }
+    }
 }
