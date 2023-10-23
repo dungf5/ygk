@@ -3444,17 +3444,17 @@ SQL;
             }
 
             if (StringUtil::isNotBlank($searchData['s_catalog_code'])) {
-                $arCode = $commonService->getSearchCatalogCode($searchData['s_catalog_code']);
+                $arrCatalog = explode(' ', $searchData['s_catalog_code']);
                 $tempCondition = '';
 
-                foreach ($arCode as $item) {
+                foreach ($arrCatalog as $item) {
                     $item = trim($item);
                     if ($item == '') {
                         continue;
                     }
 
-                    $tempCondition .= ' mp.jan_code = ? or ';
-                    array_push($param, $item);
+                    $tempCondition .= ' mp.catalog_code like ? or ';
+                    array_push($param, '%'.$item.'%');
                 }
 
                 $additionalCondition .= ' AND ( '.trim($tempCondition, 'or ').' ) ';
