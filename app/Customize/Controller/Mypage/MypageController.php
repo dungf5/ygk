@@ -1398,13 +1398,19 @@ class MypageController extends AbstractController
                     // Send mail Aprove step 1
                     $email2 = getenv('EMAIL_RETURN_CC') ?? '';
                     $url_approve = $this->generateUrl('mypage_return_approve', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
-                    $this->mailService->sendMailReturnProductApprove($email2, $url_approve);
+                    $this->mailService->sendMailReturnProductApprove($email2, ['url_approve' => $url_approve, 'company_name' => $customer['company_name'] ?? '']);
                 } else {
                     // Auto Aprove Step 1, send mail aprove step 2
                     $email2 = getenv('EMAIL_RETURN_CC') ?? '';
                     $url_approve_finish = $this->generateUrl('mypage_return_approve_finish', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
                     $url_receipt = $this->generateUrl('mypage_return_receipt', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
-                    $this->mailService->sendMailReturnProductApproveYes($email2, $url_approve_finish, $url_receipt);
+                    $this->mailService->sendMailReturnProductApproveYes($email2,
+                        [
+                            'url_approve_finish' => $url_approve_finish,
+                            'url_receipt' =>$url_receipt,
+                            'company_name' => $customer['company_name'] ?? ''
+                        ]
+                    );
                 }
 
                 return $this->redirectToRoute('mypage_return_save_complete');
@@ -1746,7 +1752,13 @@ class MypageController extends AbstractController
                     $email = getenv('EMAIL_RETURN_CC') ?? '';
                     $url_approve_finish = $this->generateUrl('mypage_return_approve_finish', ['returns_no' => $product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
                     $url_receipt = $this->generateUrl('mypage_return_receipt', ['returns_no' => $product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
-                    $this->mailService->sendMailReturnProductApproveYes($email, $url_approve_finish, $url_receipt);
+                    $this->mailService->sendMailReturnProductApproveYes($email,
+                        [
+                            'url_approve_finish' => $url_approve_finish,
+                            'url_receipt' =>$url_receipt,
+                            'company_name' => $customer['company_name'] ?? ''
+                        ]
+                    );
                 } else {
                     $email = $customer['customer_email'] ?? $customer['email'];
                     $this->mailService->sendMailReturnProductApproveNo($email, $aprove_comment_not_yet);
@@ -1907,7 +1919,14 @@ class MypageController extends AbstractController
                     $email = $email = getenv('EMAIL_RETURN_CC') ?? '';
                     $url_return_receipt_finish = $this->generateUrl('mypage_return_complete', ['returns_no' => $product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
                     $cus_reviews_flag = $product_returns_info->getCusReviewsFlag() == 1 ? '良品' : ($product_returns_info->getCusReviewsFlag() == 2 ? '不良品' : '');
-                    $this->mailService->sendMailReturnProductReceiptYes($email, $receipt_comment, $url_return_receipt_finish, $cus_reviews_flag);
+                    $this->mailService->sendMailReturnProductReceiptYes($email,
+                        [
+                            'receipt_comment' => $receipt_comment,
+                            'url_return_receipt_finish' => $url_return_receipt_finish,
+                            'cus_reviews_flag' => $cus_reviews_flag,
+                            'company_name' => $customer['company_name'] ?? '',
+                        ]
+                    );
                 } else {
                     $email = $customer['customer_email'] ?? $customer['email'];
                     $this->mailService->sendMailReturnProductReceiptNo($email, $receipt_not_yet_comment);
