@@ -2382,7 +2382,7 @@ class MypageController extends AbstractController
             }
 
             $data = $commonService->getPdfReturns($customer_code, $arr_returns_no);
-            $data['data'] = array_chunk($data, 14);
+            $data['data'] = array_chunk($data, 12);
             $data['customer'] = $this->globalService->customer();
 
             $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
