@@ -93,6 +93,12 @@ file that was distributed with this source code.
                 flg = false;
             }
 
+            if (parseInt(value) <= 0) {
+                input.setCustomValidity('1以上で入力してください。');
+                input.reportValidity();
+                flg = false;
+            }
+
             if (parseInt(value) == 0 && (parseInt(step) == 1)) {
                 input.setCustomValidity(step+'{{ 'front.product.invalid_quantity'|trans }}');
                 input.reportValidity();
