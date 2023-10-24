@@ -105,36 +105,24 @@
                         <div class="ec-off2Grid">
                             <div class="ec-off2Grid__cell">
                                 <form name="login_mypage" id="login_mypage" method="post" action="{{ url('mypage_login') }}">
-                                    {% if app.session.flashBag.has('eccube.login.target.path') %}
-                                        {% for targetPath in app.session.flashBag.peek('eccube.login.target.path') %}
-                                            <input type="hidden" name="_target_path" value="{{ targetPath }}" />
-                                        {% endfor %}
-                                    {% endif %}
                                     <div class="ec-login">
                                         <div class="ec-login__icon">
                                             <div class="ec-icon"><img src="{{ asset('assets/icon/user.svg') }}" alt=""></div>
                                         </div>
                                         <div class="ec-login__input">
                                             <div class="ec-input">
-                                                {{ form_widget(form.login_email, {'attr': {'style' : 'ime-mode: disabled;', 'placeholder' : 'common.mail_address', 'autofocus': true}}) }}
-                                                {{ form_widget(form.login_pass,  {'attr': {'placeholder' : 'common.password' }}) }}
+                                                <input type="text" id="login_email" name="login_email" required="required" maxlength="255" style="ime-mode: disabled;" placeholder="ユーザーコード" autofocus="autofocus" class="form-control" value="" />
+                                                <input type="password" id="login_pass" name="login_pass" required="required" maxlength="255" placeholder="パスワード" class="form-control" />
                                             </div>
+
                                             {% if BaseInfo.option_remember_me %}
                                                 <div class="ec-checkbox">
                                                     <label>
-                                                        {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                                                            <input type="hidden" name="login_memory" value="1">
-                                                        {% else %}
-                                                            {{ form_widget(form.login_memory, { 'label': 'common.remember_me'|trans }) }}
-                                                        {% endif %}
+                                                        <div class="form-check">
+                                                            <input type="checkbox" id="login_memory" name="login_memory" class="form-check-input" value="1">
+                                                            <label class="form-check-label" for="login_memory">次回から自動的にログインする</label></div>
                                                     </label>
                                                 </div>
-                                            {% endif %}
-                                            {% for reset_complete in app.session.flashbag.get('password_reset_complete') %}
-                                                <p>{{ reset_complete|trans }}</p>
-                                            {% endfor %}
-                                            {% if error %}
-                                                <p class="ec-errorMessage">{{ error.messageKey|trans(error.messageData, 'validators')|nl2br }}</p>
                                             {% endif %}
                                         </div>
                                         <div class="ec-grid2">
