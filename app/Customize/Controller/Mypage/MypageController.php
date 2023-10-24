@@ -1397,13 +1397,13 @@ class MypageController extends AbstractController
                 if (!$param['returns_status_flag']) {
                     // Send mail Aprove step 1
                     $email2 = getenv('EMAIL_RETURN_CC') ?? '';
-                    $url_approve = $this->generateUrl('mypage_login', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $url_approve = $this->generateUrl('mypage_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
                     $this->mailService->sendMailReturnProductApprove($email2, ['url_approve' => $url_approve, 'company_name' => $customer['company_name'] ?? '']);
                 } else {
                     // Auto Aprove Step 1, send mail aprove step 2
                     $email2 = getenv('EMAIL_RETURN_CC') ?? '';
                     $url_approve_finish = $this->generateUrl('mypage_return_approve_finish', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
-                    $url_receipt = $this->generateUrl('mypage_login', ['returns_no' => $mst_product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $url_receipt = $this->generateUrl('mypage_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
                     $this->mailService->sendMailReturnProductApproveYes($email2,
                         [
                             'url_approve_finish' => $url_approve_finish,
@@ -1751,7 +1751,7 @@ class MypageController extends AbstractController
                 if ($submit == 'aprove') {
                     $email = getenv('EMAIL_RETURN_CC') ?? '';
                     $url_approve_finish = $this->generateUrl('mypage_return_approve_finish', ['returns_no' => $product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
-                    $url_receipt = $this->generateUrl('mypage_login', ['returns_no' => $product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $url_receipt = $this->generateUrl('mypage_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
                     $this->mailService->sendMailReturnProductApproveYes($email,
                         [
                             'url_approve_finish' => $url_approve_finish,
@@ -1917,7 +1917,7 @@ class MypageController extends AbstractController
 
                 if ($receipt == 'yes') {
                     $email = $email = getenv('EMAIL_RETURN_CC') ?? '';
-                    $url_return_receipt_finish = $this->generateUrl('mypage_login', ['returns_no' => $product_returns_info->getReturnsNo()], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $url_return_receipt_finish = $this->generateUrl('mypage_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
                     $cus_reviews_flag = $product_returns_info->getCusReviewsFlag() == 1 ? '良品' : ($product_returns_info->getCusReviewsFlag() == 2 ? '不良品' : '');
                     $this->mailService->sendMailReturnProductReceiptYes($email,
                         [
@@ -2363,7 +2363,24 @@ class MypageController extends AbstractController
                 'search_reason_return' => MyCommon::getPara('search_reason_return'),
                 'search_shipping' => MyCommon::getPara('search_shipping'),
                 'search_otodoke' => MyCommon::getPara('search_otodoke'),
+                ////
+                'search_returns_no' => MyCommon::getPara('search_returns_no'),
+                'search_aprove_date' => MyCommon::getPara('search_aprove_date'),
+                'search_jan_code' => MyCommon::getPara('search_jan_code'),
+                'search_customer' => MyCommon::getPara('search_customer'),
+                'search_product' => MyCommon::getPara('search_product'),
+                'returns_status_flag' => MyCommon::getPara('returns_status_flag'),
             ];
+
+            if ((int) $params['returns_status_flag'] == 1) {
+                if (!empty($this->traitRedirectStockApprove())) {
+                    return $this->redirect($this->traitRedirectStockApprove());
+                }
+            } else {
+                if (!empty($this->traitRedirectApprove())) {
+                    return $this->redirect($this->traitRedirectApprove());
+                }
+            }
 
             $commonService = new MyCommonService($this->entityManager);
             $customer_code = $this->globalService->customerCode();
