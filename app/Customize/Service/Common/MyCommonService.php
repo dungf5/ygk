@@ -3548,13 +3548,6 @@ SQL;
     public function getPdfApprove($params, $returns_no)
     {
         $myPara = [];
-
-        $addWhere = '';
-        if (!empty($params['search_customer']) && $params['search_customer'] != 0) {
-            $addWhere = ' AND mst_product_returns_info.customer_code = ? ';
-            $myPara[] = $params['search_customer'];
-        }
-
         $cols = '
                 mst_product_returns_info.returns_no,
                 mst_product_returns_info.returns_num,
@@ -3587,6 +3580,12 @@ SQL;
             $myPara[] = $returns_no[$i];
         }
 
+        $addWhere = '';
+        if (!empty($params['search_customer']) && $params['search_customer'] != 0) {
+            $addWhere = ' AND mst_product_returns_info.customer_code = ? ';
+            $myPara[] = $params['search_customer'];
+        }
+
         $sql = "
                         SELECT
                             {$cols}
@@ -3605,10 +3604,14 @@ SQL;
                             mst_product_returns_info.returns_no DESC
                 ";
 
-        $statement = $this->entityManager->getConnection()->prepare($sql);
-        $result = $statement->executeQuery($myPara);
-        $rows = $result->fetchAllAssociative();
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery($myPara);
+            $rows = $result->fetchAllAssociative();
 
-        return $rows;
+            return $rows ?? [];
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 }

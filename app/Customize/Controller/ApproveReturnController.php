@@ -394,7 +394,6 @@ class ApproveReturnController extends AbstractController
             ];
 
             $commonService = new MyCommonService($this->entityManager);
-            $customer_code = $this->globalService->customerCode();
 
             if (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] == 1) {
                 if (!empty($this->traitRedirectStockApprove())) {
@@ -413,7 +412,7 @@ class ApproveReturnController extends AbstractController
             } else {
                 $arr_returns_no = array_values(array_diff(explode(',', $returns_no), ['']));
             }
-
+           
             $data = $commonService->getPdfApprove($params, $arr_returns_no);
             $data['data'] = array_chunk($data, 12);
             $data['customer'] = $this->globalService->customer();
