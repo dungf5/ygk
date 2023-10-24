@@ -48,7 +48,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class MypageController extends AbstractController
 {
     use TraitController;
-    
+
     /**
      * @var BaseInfo
      */
@@ -1408,7 +1408,7 @@ class MypageController extends AbstractController
                         [
                             'url_approve_finish' => $url_approve_finish,
                             'url_receipt' => $url_receipt,
-                            'company_name' => $customer['company_name'] ?? ''
+                            'company_name' => $customer['company_name'] ?? '',
                         ]
                     );
                 }
@@ -1756,7 +1756,7 @@ class MypageController extends AbstractController
                         [
                             'url_approve_finish' => $url_approve_finish,
                             'url_receipt' => $url_receipt,
-                            'company_name' => $customer['company_name'] ?? ''
+                            'company_name' => $customer['company_name'] ?? '',
                         ]
                     );
                 } else {
@@ -2372,11 +2372,13 @@ class MypageController extends AbstractController
                 'returns_status_flag' => MyCommon::getPara('returns_status_flag'),
             ];
 
-            if ((int) $params['returns_status_flag'] == 1) {
+            if (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] == 1) {
                 if (!empty($this->traitRedirectStockApprove())) {
                     return $this->redirect($this->traitRedirectStockApprove());
                 }
-            } else {
+            }
+
+            if (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] != 1) {
                 if (!empty($this->traitRedirectApprove())) {
                     return $this->redirect($this->traitRedirectApprove());
                 }
