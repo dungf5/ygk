@@ -29,6 +29,10 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
+use Eccube\Entity\Customer;
+use Eccube\Event\EccubeEvents;
+use Eccube\Event\EventArgs;
+use Eccube\Form\Type\Front\CustomerLoginType;
 use Eccube\Repository\BaseInfoRepository;
 use Eccube\Repository\CustomerFavoriteProductRepository;
 use Knp\Component\Pager\PaginatorInterface;
@@ -36,6 +40,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class ApproveReturnController extends AbstractController
 {
@@ -453,5 +458,47 @@ class ApproveReturnController extends AbstractController
 
             return $this->redirectToRoute('mypage_return_history');
         }
+    }
+
+    /**
+     * ログイン画面.
+     *
+     * @Route("/approve/login", name="approve_login", methods={"GET", "POST"})
+     * @Template("Approve/login.twig")
+     *
+     * @param Request $request
+     * @param AuthenticationUtils $utils
+     *
+     * @return array|bool[]|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function login(Request $request, AuthenticationUtils $utils)
+    {
+        /* @var $form \Symfony\Component\Form\FormInterface */
+        $builder = $this->formFactory->createNamedBuilder('', CustomerLoginType::class);
+
+        $builder->get('login_memory')->setData((bool) $request->getSession()->get('_security.login_memory'));
+
+        if ($this->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            $Customer = $this->getUser();
+            if ($Customer instanceof Customer) {
+                $builder->get('login_email')
+                    ->setData($Customer->getEmail());
+            }
+        }
+
+        $event = new EventArgs(
+            [
+                'builder' => $builder,
+            ],
+            $request
+        );
+        $this->eventDispatcher->dispatch(EccubeEvents::FRONT_MYPAGE_MYPAGE_LOGIN_INITIALIZE, $event);
+
+        $form = $builder->getForm();
+
+        return [
+            'error' => $utils->getLastAuthenticationError(),
+            'form' => $form->createView(),
+        ];
     }
 }
