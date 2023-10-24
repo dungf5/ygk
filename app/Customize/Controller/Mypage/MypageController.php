@@ -2370,26 +2370,7 @@ class MypageController extends AbstractController
                 'search_reason_return' => MyCommon::getPara('search_reason_return'),
                 'search_shipping' => MyCommon::getPara('search_shipping'),
                 'search_otodoke' => MyCommon::getPara('search_otodoke'),
-                ////
-                'search_returns_no' => MyCommon::getPara('search_returns_no'),
-                'search_aprove_date' => MyCommon::getPara('search_aprove_date'),
-                'search_jan_code' => MyCommon::getPara('search_jan_code'),
-                'search_customer' => MyCommon::getPara('search_customer'),
-                'search_product' => MyCommon::getPara('search_product'),
-                'returns_status_flag' => MyCommon::getPara('returns_status_flag'),
             ];
-
-            if (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] == 1) {
-                if (!empty($this->traitRedirectStockApprove())) {
-                    return $this->redirect($this->traitRedirectStockApprove());
-                }
-            }
-
-            if (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] != 1) {
-                if (!empty($this->traitRedirectApprove())) {
-                    return $this->redirect($this->traitRedirectApprove());
-                }
-            }
 
             $commonService = new MyCommonService($this->entityManager);
             $customer_code = $this->globalService->customerCode();

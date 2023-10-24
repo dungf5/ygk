@@ -507,9 +507,13 @@
     function handlePrintPDF() {
             path = '&search_returns_no=' + search_returns_no;
             path += '&search_request_date=' + search_request_date;
-            path += '&search_reason_return=' + search_reason_return;
+            path += '&search_aprove_date=' + search_aprove_date;
+            path += '&search_jan_code=' + search_jan_code;
+            path += '&search_customer=' + search_customer;
             path += '&search_shipping=' + search_shipping;
             path += '&search_otodoke=' + search_otodoke;
+            path += '&search_product=' + search_product;
+            path += '&returns_status_flag=' + 1;
 
             let url = '/mypage/return/history/export/pdf?return_no=' + $("#check-box-value-print-pdf").val() + path;
 
