@@ -3454,11 +3454,17 @@ SQL;
                             mst_product_returns_info.returns_no DESC
                 ";
 
-        $statement = $this->entityManager->getConnection()->prepare($sql);
-        $result = $statement->executeQuery($myPara);
-        $rows = $result->fetchAllAssociative();
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery($myPara);
+            $rows = $result->fetchAllAssociative();
 
-        return $rows;
+            return $rows ?? [];
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+            
+            return [];
+        }
     }
 
     public function getApproveNoPrintPDF($params)
@@ -3611,6 +3617,8 @@ SQL;
 
             return $rows ?? [];
         } catch (\Exception $e) {
+            log_error($e->getMessage());
+
             return [];
         }
     }
