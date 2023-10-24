@@ -1662,6 +1662,10 @@ class MypageController extends AbstractController
      */
     public function returnApprove(Request $request, string $returns_no)
     {
+        if (!empty($this->traitRedirectApprove())) {
+            return $this->redirect($this->traitRedirectApprove());
+        }
+
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
@@ -1705,6 +1709,10 @@ class MypageController extends AbstractController
      */
     public function returnApproveFinish(Request $request, string $returns_no)
     {
+        if (!empty($this->traitRedirectApprove())) {
+            return $this->redirect($this->traitRedirectApprove());
+        }
+
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
@@ -1796,6 +1804,10 @@ class MypageController extends AbstractController
      */
     public function returnReceipt(Request $request, string $returns_no)
     {
+        if (!empty($this->traitRedirectStockApprove())) {
+            return $this->redirect($this->traitRedirectStockApprove());
+        }
+
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
@@ -1839,6 +1851,10 @@ class MypageController extends AbstractController
      */
     public function returnReceiptFinish(Request $request, string $returns_no)
     {
+        if (!empty($this->traitRedirectStockApprove())) {
+            return $this->redirect($this->traitRedirectStockApprove());
+        }
+
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
@@ -1965,6 +1981,10 @@ class MypageController extends AbstractController
      */
     public function returnComplete(Request $request, string $returns_no)
     {
+        if (!empty($this->traitRedirectApprove())) {
+            return $this->redirect($this->traitRedirectApprove());
+        }
+
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
@@ -2001,6 +2021,10 @@ class MypageController extends AbstractController
      */
     public function returnCompleteFinish(Request $request, string $returns_no)
     {
+        if (!empty($this->traitRedirectApprove())) {
+            return $this->redirect($this->traitRedirectApprove());
+        }
+        
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
