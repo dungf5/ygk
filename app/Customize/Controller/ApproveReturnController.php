@@ -13,6 +13,8 @@
 
 namespace Customize\Controller;
 
+use Customize\Common\FileUtil;
+use Customize\Common\MyCommon;
 use Customize\Doctrine\DBAL\Types\UTCDateTimeTzType;
 use Customize\Repository\DtReturnsImageInfoRepository;
 use Customize\Repository\MstProductReturnsInfoRepository;
@@ -361,5 +363,96 @@ class ApproveReturnController extends AbstractController
             'otodokes' => $otodokes,
             'products' => $products,
         ];
+    }
+
+    /**
+     * Export PDF
+     *
+     * @Route("/mypage/approve/export/pdf", name="exportPdfApprove", methods={"GET"})
+     * @Template("/Mypage/exportPdfReturns.twig")
+     */
+    public function exportPdfApprove(Request $request)
+    {
+        try {
+            set_time_limit(0);
+            ini_set('memory_limit', '9072M');
+            ini_set('max_execution_time', '0');
+            ini_set('max_input_time', '-1');
+            $htmlFileName = 'Mypage/exportPdfReturns.twig';
+            $returns_no = MyCommon::getPara('return_no');
+
+            $params = [
+                'search_returns_no' => MyCommon::getPara('search_returns_no'),
+                'search_request_date' => MyCommon::getPara('search_request_date'),
+                'search_aprove_date' => MyCommon::getPara('search_aprove_date'),
+                'search_jan_code' => MyCommon::getPara('search_jan_code'),
+                'search_customer' => MyCommon::getPara('search_customer'),
+                'search_shipping' => MyCommon::getPara('search_shipping'),
+                'search_otodoke' => MyCommon::getPara('search_otodoke'),
+                'search_product' => MyCommon::getPara('search_product'),
+                'returns_status_flag' => MyCommon::getPara('returns_status_flag'),
+            ];
+
+            $commonService = new MyCommonService($this->entityManager);
+            $customer_code = $this->globalService->customerCode();
+
+            if (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] == 1) {
+                if (!empty($this->traitRedirectStockApprove())) {
+                    return $this->redirect($this->traitRedirectStockApprove());
+                }
+            }
+
+            if (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] != 1) {
+                if (!empty($this->traitRedirectApprove())) {
+                    return $this->redirect($this->traitRedirectApprove());
+                }
+            }
+
+            if (trim($returns_no) == 'all') {
+                $arr_returns_no = $commonService->getApproveNoPrintPDF($customer_code, $params);
+            } else {
+                $arr_returns_no = array_values(array_diff(explode(',', $returns_no), ['']));
+            }
+
+            $data = $commonService->getPdfReturns($customer_code, $arr_returns_no);
+            $data['data'] = array_chunk($data, 12);
+            $data['customer'] = $this->globalService->customer();
+
+            $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
+            FileUtil::makeDirectory($dirPdf);
+            $namePdf = count($arr_returns_no) == 1 ? 'returns_'.$arr_returns_no[0].'.pdf' : 'returns_'.date('YmdHis').'.pdf';
+            $file = $dirPdf.'/'.$namePdf;
+            $html = $this->twig->render($htmlFileName, $data);
+
+            if (env('APP_IS_LOCAL', 1) != 1) {
+                MyCommon::converHtmlToPdf($dirPdf, $namePdf, $html);
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="'.basename($file).'"');
+                readfile($file);
+                unlink($file);
+                unlink(str_replace('.pdf', '.html', $file));
+
+                return;
+            } else {
+                //$dompdf = new Dompdf();
+                //$dompdf->loadHtml($html);
+                //$dompdf->setPaper('A4');
+                //$dompdf->render();
+                //$output = $dompdf->output();
+                //file_put_contents($file, $output);
+                //$dompdf->stream($file);
+
+                if (count($data)) {
+                    return $data;
+                } else {
+                    return $this->redirectToRoute('mypage_return_history');
+                }
+            }
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            return $this->redirectToRoute('mypage_return_history');
+        }
     }
 }

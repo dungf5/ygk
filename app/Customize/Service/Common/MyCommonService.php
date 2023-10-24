@@ -3351,22 +3351,22 @@ SQL;
         $myPara = [$customer_code];
 
         $condition = '';
-        if (!empty($paramSearch['search_request_date']) && $paramSearch['search_request_date'] != 0) {
+        if (!empty($params['search_request_date']) && $params['search_request_date'] != 0) {
             $condition .= ' AND returns_request_date LIKE ? ';
             $myPara[] = $params['search_request_date'].'-%';
         }
 
-        if (!empty($paramSearch['search_reason_return']) && $paramSearch['search_reason_return'] != '0') {
+        if (!empty($params['search_reason_return']) && $params['search_reason_return'] != '0') {
             $condition .= ' AND reason_returns_code = ? ';
             $myPara[] = $params['search_reason_return'];
         }
 
-        if (!empty($paramSearch['search_shipping']) && $paramSearch['search_shipping'] != '0') {
+        if (!empty($params['search_shipping']) && $params['search_shipping'] != '0') {
             $condition .= ' AND shipping_code = ? ';
             $myPara[] = $params['search_shipping'];
         }
 
-        if (!empty($paramSearch['search_otodoke']) && $paramSearch['search_otodoke'] != '0') {
+        if (!empty($params['search_otodoke']) && $params['search_otodoke'] != '0') {
             $condition .= ' AND otodoke_code = ? ';
             $myPara[] = $params['search_otodoke'];
         }
@@ -3459,5 +3459,89 @@ SQL;
         $rows = $result->fetchAllAssociative();
 
         return $rows;
+    }
+
+    public function getApproveNoPrintPDF($params)
+    {
+        $myPara = [];
+
+        $condition = '';
+
+        if (!empty($params['search_returns_no']) && $params['search_returns_no'] != 0) {
+            $condition .= ' AND returns_no = ? ';
+            $myPara[] = $params['search_returns_no'];
+        }
+
+        if (!empty($params['search_request_date']) && $params['search_request_date'] != 0) {
+            $condition .= ' AND returns_request_date LIKE ? ';
+            $myPara[] = $params['search_request_date'].'-%';
+        }
+
+        if (!empty($params['search_aprove_date']) && $params['search_aprove_date'] != 0) {
+            $condition .= ' AND aprove_date LIKE ? ';
+            $myPara[] = $params['search_aprove_date'].'-%';
+        }
+
+        if (!empty($params['search_jan_code']) && $params['search_jan_code'] != 0) {
+            $condition .= ' AND jan_code = ? ';
+            $myPara[] = $params['search_jan_code'];
+        }
+
+        if (!empty($params['search_customer']) && $params['search_customer'] != 0) {
+            $condition .= ' AND customer_code = ? ';
+            $myPara[] = $params['search_customer'];
+        }
+
+        if (!empty($params['search_shipping']) && $params['search_shipping'] != '0') {
+            $condition .= ' AND shipping_code = ? ';
+            $myPara[] = $params['search_shipping'];
+        }
+
+        if (!empty($params['search_otodoke']) && $params['search_otodoke'] != '0') {
+            $condition .= ' AND otodoke_code = ? ';
+            $myPara[] = $params['search_otodoke'];
+        }
+
+        if (!empty($params['search_product']) && $params['search_product'] != 0) {
+            $condition .= ' AND jan_code = ? ';
+            $myPara[] = $params['search_product'];
+        }
+
+        if (!empty($params['returns_status_flag']) && $params['returns_status_flag'] != 0) {
+            $condition .= ' AND returns_status_flag = ? ';
+            $myPara[] = $params['returns_status_flag'];
+        }
+
+        $condition = trim($condition, ' AND');
+
+        if (empty($condition)) {
+            return [];
+        }
+
+        $sql = "
+                        SELECT
+                            returns_no
+                        FROM
+                            mst_product_returns_info
+                        WHERE
+                            {$condition}
+                        ORDER BY
+                            returns_no DESC
+                ";
+
+        try {
+            $statement = $this->entityManager->getConnection()->prepare($sql);
+            $result = $statement->executeQuery($myPara);
+            $rows = $result->fetchAllAssociative();
+            $arRe = [];
+
+            foreach ($rows as $item) {
+                $arRe[] = $item['returns_no'];
+            }
+
+            return $arRe;
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 }
