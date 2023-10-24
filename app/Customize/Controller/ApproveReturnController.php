@@ -394,7 +394,6 @@ class ApproveReturnController extends AbstractController
             ];
 
             $commonService = new MyCommonService($this->entityManager);
-            $customer_code = $this->globalService->customerCode();
 
             if (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] == 1) {
                 if (!empty($this->traitRedirectStockApprove())) {
