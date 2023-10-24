@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="{{ eccube_config.locale }}">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# product: http://ogp.me/ns/product#">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="eccube-csrf-token" content="{{ csrf_token(constant('Eccube\\Common\\Constant::TOKEN_NAME')) }}">
+    <title>DEV1 XBRAID JAPAN / 返品手続き/ログイン</title>
+
+    <meta property="og:type" content="article"/>
+    <meta property="og:site_name" content="DEV1 XBRAID JAPAN"/>
+
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="{{ asset('assets/img/common/favicon.ico', 'user_data') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/3.4.1/bootstrap.min.css', 'user_data') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/5.3.1/fontawesome.css', 'user_data') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/slick/1.6.0/slick.css', 'user_data') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+    <script src="{{ asset('assets/js/jquery/3.6.0/jquery.min.js', 'user_data') }}"></script>
+    <script>
+        $(function() {
+            $.ajaxSetup({
+                'headers': {
+                    'ECCUBE-CSRF-TOKEN': $('meta[name="eccube-csrf-token"]').attr('content')
+                }
+            });
+        });
+    </script>
+    <!-- ▼head｜フォント指定｜全ページ共通 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Oswald:wght@500&display=swap" rel="stylesheet">
+    <!-- ▲head｜フォント指定｜全ページ共通 -->
+
+    <link rel="stylesheet" href="{{ asset('assets/css/customize.css', 'user_data') }}">
+    <script src="{{ asset('assets/js/sweetalert/2.1.2/sweetalert.min.js', 'user_data') }}"></script>
+
+    <script>
+        $(document).ready(function () {
+            $(".action").on('click', function () {
+                loadingOverlay();
+            })
+        })
+    </script>
+
+    <style>
+        .headerMenu .menu {
+            justify-content: space-evenly;
+        }
+        .ec-layoutRole .ec-layoutRole__left {
+            display: none;
+        }
+        .ec-layoutRole .ec-layoutRole__mainWithColumn {
+            width: 100%!important;
+        }
+        @media screen and (max-width:767px) {
+            .headerLogo .logo h1, .headerLogo .logo .ttl {
+                text-align: left;
+            }
+            .headerLogo .logo .menu {
+                justify-content: space-between;
+            }
+            .headerLogo .logo .menu li.mypage {
+                order: 2;
+                width: 35%;
+            }
+            .headerLogo .logo .menu li.mypage img {
+                width: 100%;
+            }
+            .headerLogo .logo .menu li.logo {
+                order: 1;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+    <body class="mypage">
+        <div class="ec-layoutRole">
+            <div class="ec-layoutRole__header">
+                <!-- ▼header｜下層ページ -->
+                <div class="header">
+                    <div class="headerLogo">
+                        <div class="logo">
+                            <h1>Everything’s the best No.1</h1>
+                            <ul class="menu">
+                                <li class="mypage"><a href="{{ url('mypage_login') }}"><img src="/html/user_data/assets/img/common/headerLogin3.png" alt="ログインはこちら"></a></li>
+                                <li class="logo"><a href="{{ url('homepage') }}"><img src="/html/user_data/assets/img/common/logo_R+W.svg" alt="{{ BaseInfo.shop_name }}"></a></li>
+                            </ul>
+                        </div>
+
+                        <div class="headerInfo">
+                            <div class="login">
+                                <a href="{{ url('approve_login') }}"><img src="/html/user_data/assets/img/common/headerLogin3.png" alt="ログインはこちら"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ec-layoutRole__contents">
+                <div class="ec-layoutRole__mainWithColumn">
+                    <div class="ec-role">
+                        <div class="ec-pageHeader">
+                            <h1>{{ 'common.login'|trans }}</h1>
+                        </div>
+                        <div class="ec-off2Grid">
+                            <div class="ec-off2Grid__cell">
+                                <form name="login_mypage" id="login_mypage" method="post" action="{{ url('mypage_login') }}">
+                                    {% if app.session.flashBag.has('eccube.login.target.path') %}
+                                        {% for targetPath in app.session.flashBag.peek('eccube.login.target.path') %}
+                                            <input type="hidden" name="_target_path" value="{{ targetPath }}" />
+                                        {% endfor %}
+                                    {% endif %}
+                                    <div class="ec-login">
+                                        <div class="ec-login__icon">
+                                            <div class="ec-icon"><img src="{{ asset('assets/icon/user.svg') }}" alt=""></div>
+                                        </div>
+                                        <div class="ec-login__input">
+                                            <div class="ec-input">
+                                                {{ form_widget(form.login_email, {'attr': {'style' : 'ime-mode: disabled;', 'placeholder' : 'common.mail_address', 'autofocus': true}}) }}
+                                                {{ form_widget(form.login_pass,  {'attr': {'placeholder' : 'common.password' }}) }}
+                                            </div>
+                                            {% if BaseInfo.option_remember_me %}
+                                                <div class="ec-checkbox">
+                                                    <label>
+                                                        {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                                                            <input type="hidden" name="login_memory" value="1">
+                                                        {% else %}
+                                                            {{ form_widget(form.login_memory, { 'label': 'common.remember_me'|trans }) }}
+                                                        {% endif %}
+                                                    </label>
+                                                </div>
+                                            {% endif %}
+                                            {% for reset_complete in app.session.flashbag.get('password_reset_complete') %}
+                                                <p>{{ reset_complete|trans }}</p>
+                                            {% endfor %}
+                                            {% if error %}
+                                                <p class="ec-errorMessage">{{ error.messageKey|trans(error.messageData, 'validators')|nl2br }}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="ec-grid2">
+                                            <div class="ec-grid2__cell">
+                                                <div class="ec-login__actions">
+                                                    <button type="submit"
+                                                            class="ec-blockBtn--cancel">{{ 'common.login'|trans }}</button>
+                                                </div>
+                                            </div>
+                                            <div class="ec-grid2__cell">
+                                                <div class="ec-login__link" style="text-align: center;margin-top: 0;">
+                                                    <a class="ec-link" href="{{ url('forgot') }}">
+                                                        パスワード新規登録・変更<br/>
+                                                        または<br/>
+                                                        パスワードのお忘れの場合はこちら
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="ec-layoutRole__footer">
+                <!-- ▼footer｜全ページ共通 -->
+                <div class="footer">
+                    <div class="footerMenu">
+                        <div class="footerWrapper">
+                            <div class="logo">
+                                <a href="{{ url('homepage') }}"><img src="/html/user_data/assets/img/common/logo_R+W.svg" alt="{{ BaseInfo.shop_name }}"></a>
+                            </div>
+                            <div class="menu">
+                                <div class="inner"></div>
+                                <div class="inner">
+                                    <div class="ttl fnDIN">CONTENTS</div>
+                                    <ul>
+                                        <li><a href="{{ url('help_privacy') }}">{{ 'front.block.footer.privacy_policy'|trans }}</a></li>
+                                        <li><a href="{{ url('help_tradelaw') }}">{{ 'front.block.footer.act_on_specified_commercial_transactions'|trans }}</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="shopInfo">
+                                <div class="name fnDIN">株式会社　XBRAID JAPAN</div>
+                                <div class="company"><br/>〒550-0005大阪市西区西本町1-7-21<br/>ニシモトビル303</div>
+                                <div class="tel">TEL 050-5526-8046<br/>FAX 050-3385-5614</div>
+                                <div class="notice"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="copyright"><small>&copy; 2022{{ BaseInfo.shop_name }}</small></div>
+                </div>
+                <!-- ▲footer｜全ページ共通 -->
+            </div>
+        </div>
+        <!-- ec-layoutRole -->
+
+        <div class="ec-overlayRole"></div>
+        <div class="ec-drawerRoleClose"><i class="fas fa-times"></i></div>
+        <div class="ec-drawerRole">
+
+        </div>
+        <script src="{{ asset('assets/js/bootstrap/3.4.1/bootstrap.min.js', 'user_data') }}"></script>
+        <script src="{{ asset('assets/js/slick/1.6.0/slick.min.js', 'user_data') }}"></script>
+        <script src="{{ asset('assets/js/function.js') }}"></script>
+        <script src="{{ asset('assets/js/eccube.js') }}"></script>
+        <script src="{{ asset('assets/js/customize.js', 'user_data') }}"></script>
+    </body>
+</html>

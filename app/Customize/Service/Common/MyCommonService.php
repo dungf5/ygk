@@ -3462,7 +3462,7 @@ SQL;
             return $rows ?? [];
         } catch (\Exception $e) {
             log_error($e->getMessage());
-            
+
             return [];
         }
     }
