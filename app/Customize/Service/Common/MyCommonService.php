@@ -3578,4 +3578,71 @@ SQL;
             return [];
         }
     }
+
+    public function getPdfApprove($params, $returns_no)
+    {
+        $myPara = [];
+
+        $addWhere = '';
+        if (!empty($params['search_customer']) && $params['search_customer'] != 0) {
+            $addWhere = ' AND mst_product_returns_info.customer_code = ? ';
+            $myPara[] = $params['search_customer'];
+        }
+
+        $cols = '
+                mst_product_returns_info.returns_no,
+                mst_product_returns_info.returns_num,
+                mst_product_returns_info.returns_status_flag,
+                mst_product_returns_info.shipping_no,
+                mst_product_returns_info.shipping_date,
+                mst_product_returns_info.shipping_name,
+                mst_product_returns_info.otodoke_name,
+                mst_product_returns_info.jan_code,
+                mst_product_returns_info.returns_request_date,
+                mst_product_returns_info.aprove_date,
+                mst_product_returns_info.product_receipt_date,
+                mst_product_returns_info.shipping_num,
+                mst_product_returns_info.cus_order_no,
+                mst_product_returns_info.cus_order_lineno,
+                mst_product.product_code,
+                mst_product.product_name,
+                mst_product.quantity,
+                dt_returns_reson.returns_reson
+            ';
+
+        $subWhere = '';
+        $c = count($returns_no);
+        for ($i = 0; $i < $c; $i++) {
+            if ($i == $c - 1) {
+                $subWhere .= '?';
+            } else {
+                $subWhere .= '?,';
+            }
+            $myPara[] = $returns_no[$i];
+        }
+
+        $sql = "
+                        SELECT
+                            {$cols}
+                        FROM
+                            mst_product_returns_info
+                        JOIN
+                            mst_product
+                        ON mst_product.product_code = mst_product_returns_info.product_code
+                        LEFT JOIN
+                            dt_returns_reson
+                        ON dt_returns_reson.returns_reson_id = mst_product_returns_info.reason_returns_code
+                        WHERE
+                            mst_product_returns_info.returns_no IN ({$subWhere})
+                        {$addWhere}
+                        ORDER BY
+                            mst_product_returns_info.returns_no DESC
+                ";
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery($myPara);
+        $rows = $result->fetchAllAssociative();
+
+        return $rows;
+    }
 }

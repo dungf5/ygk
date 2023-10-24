@@ -409,12 +409,12 @@ class ApproveReturnController extends AbstractController
             }
 
             if (trim($returns_no) == 'all') {
-                $arr_returns_no = $commonService->getApproveNoPrintPDF($customer_code, $params);
+                $arr_returns_no = $commonService->getApproveNoPrintPDF($params);
             } else {
                 $arr_returns_no = array_values(array_diff(explode(',', $returns_no), ['']));
             }
 
-            $data = $commonService->getPdfReturns($customer_code, $arr_returns_no);
+            $data = $commonService->getPdfApprove($params, $arr_returns_no);
             $data['data'] = array_chunk($data, 12);
             $data['customer'] = $this->globalService->customer();
 
