@@ -163,15 +163,20 @@
             {% endif %}
 
 
-{#            <div class="row p-l-15 p-r-15">#}
-{#                <button class="btn btn-danger btn-print-pdf" disabled="" onclick="handlePrintPDF()">返品リストダウンロード</button>#}
-{#                <input type="hidden" id="check-box-value-print-pdf" value=""/>#}
-{#            </div>#}
+            <div class="row p-l-15 p-r-15">
+                <button class="btn btn-danger btn-print-pdf" disabled="" onclick="handlePrintPDF()">返品リストダウンロード</button>
+                <input type="hidden" id="check-box-value-print-pdf" value=""/>
+            </div>
 
             <div class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr>
+                            <th title="選択">
+                                <input type="checkbox" class="check-box-all-print-pdf" name="check-box-all-print-pdf" value="" onchange="handleCheckBox(this)"/>
+                                <p class="text-nowrap">選択</p>
+                            </th>
+
                             <th title="返品番号" width="10%">
                                 <select class="hidden" id="search_returns_no" name="search_returns_no">
                                     <option value="0" {% if param.search_returns_no == 0 %} selected {% endif %}>全て</option>
@@ -292,6 +297,10 @@
                         <tbody>
                         {% for item in pagination %}
                             <tr>
+                                <td>
+                                    <input type="checkbox" class="check-box-print-pdf" name="check-box-print-pdf" value="{{item.returns_no}}" onchange="handleCheckBox(this)"/>
+                                </td>
+
                                 <td title="{{ item.returns_no }}" width="10%">
                                     <a href="{{ item.url }}">
                                         <p class="">{{ item.returns_no }}</p>
@@ -440,58 +449,75 @@
 		});
 	} );
 
-	function handleCheckBox(target) {
-            let name                = target.name;
+    function handleCheckBox(target) {
+        let name                = target.name;
 
-            if (name == 'check-box-print-pdf') {
-                let temp_value = '';
-                let count = 0;
-                $(".check-box-print-pdf").each(function () {
-                    if (this.checked) {
-                       temp_value += ',' + $(this).val();
-                       count++;
-                    }
-                });
-
-                if (count > 0) {
-                    $("#check-box-value-print-pdf").val(temp_value);
-                    $(".btn-print-pdf").prop('disabled', false);
-                } else {
-                    $("#check-box-value-print-pdf").val('');
-                    $(".btn-print-pdf").prop('disabled', true);
+        if (name == 'check-box-print-pdf') {
+            let temp_value = '';
+            let count = 0;
+            $(".check-box-print-pdf").each(function () {
+                if (this.checked) {
+                   temp_value += ',' + $(this).val();
+                   count++;
                 }
-            }
+            });
 
-            if (name == 'check-box-all-print-pdf') {
-                let temp_value = '';
-                let count = 0;
+            if (count > 0) {
+                $("#check-box-value-print-pdf").val(temp_value);
+                $(".btn-print-pdf").prop('disabled', false);
 
-                if (target.checked) {
-                    $(".check-box-print-pdf").each(function () {
-                        temp_value += ',' + $(this).val();
-                        count++;
-                    });
-                    $(".check-box-print-pdf").prop("checked", true);
-
+                if (count == {{ pagination.totalItemCount }}) {
+                    $(".check-box-all-print-pdf").prop("checked", true);
                 } else {
-                    count = 0;
-                    $(".check-box-print-pdf").prop("checked", false);
+                    $(".check-box-all-print-pdf").prop("checked", false);
                 }
 
-                if (count > 0) {
-                    // change check-all to print all data
-                    // $("#check-box-value-print-pdf").val(temp_value);
-                    $("#check-box-value-print-pdf").val('all');
-                    $(".btn-print-pdf").prop('disabled', false);
-                } else {
-                    $("#check-box-value-print-pdf").val('');
-                    $(".btn-print-pdf").prop('disabled', true);
-                }
+            } else {
+                $("#check-box-value-print-pdf").val('');
+                $(".btn-print-pdf").prop('disabled', true);
             }
         }
 
-    function handlePrintPDF() {
+        if (name == 'check-box-all-print-pdf') {
+            let temp_value = '';
+            let count = 0;
 
+            if (target.checked) {
+                $(".check-box-print-pdf").each(function () {
+                    temp_value += ',' + $(this).val();
+                    count++;
+                });
+                $(".check-box-print-pdf").prop("checked", true);
+
+            } else {
+                count = 0;
+                $(".check-box-print-pdf").prop("checked", false);
+            }
+
+            if (count > 0) {
+                $("#check-box-value-print-pdf").val('all');
+                $(".btn-print-pdf").prop('disabled', false);
+            } else {
+                $("#check-box-value-print-pdf").val('');
+                $(".btn-print-pdf").prop('disabled', true);
+            }
+        }
+    }
+
+    function handlePrintPDF() {
+            path = '&search_returns_no=' + search_returns_no;
+            path += '&search_request_date=' + search_request_date;
+            path += '&search_reason_return=' + search_reason_return;
+            path += '&search_shipping=' + search_shipping;
+            path += '&search_otodoke=' + search_otodoke;
+
+            let url = '/mypage/return/history/export/pdf?return_no=' + $("#check-box-value-print-pdf").val() + path;
+
+            console.log(url);
+            let a = document.createElement('a');
+            a.target = '_blank';
+            a.href = url;
+            a.click();
     }
 </script>
 {% endblock %}
