@@ -27,8 +27,6 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
      */
     class MstShipping extends AbstractEntity
     {
-
-
         /**
          * @var string
          *
@@ -41,10 +39,8 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
          * @var string
          *
          * @ORM\Column(name="order_no", type="string", length=15)
-         * @ORM\Id
          */
         private $order_no;
-
 
         /**
          * @var string
@@ -73,7 +69,6 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
          * @var string
          *
          * @ORM\Column(name="order_lineno", type="string", length=8)
-         * @ORM\Id
          */
         private $order_lineno;
 
@@ -199,7 +194,6 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
          */
         private $shipping_status;
 
-
         /**
          * @var string
          *
@@ -213,14 +207,12 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
          */
         private $ec_order_lineno;
 
-
         /**
          * @var int
          *
          * @ORM\Column(name="shipping_num", type="integer", nullable=false, options={"default":0})
          */
         private $shipping_num;
-
 
         /**
          * @var string
@@ -258,8 +250,6 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         private $create_date;
 
         /**
-
-         *
          * @ORM\Column(name="update_date", type="datetimetz")
          */
         private $update_date;
@@ -302,8 +292,6 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         {
             $this->order_no = $order_no;
         }
-
-
 
         /**
          * @return string
@@ -476,7 +464,7 @@ if (!class_exists('\Customize\Entity\MstShipping', false)) {
         /**
          * @param  $update_date
          */
-        public function setUpdateDate( $update_date)
+        public function setUpdateDate($update_date)
         {
             $this->update_date = $update_date;
         }
