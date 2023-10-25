@@ -378,6 +378,10 @@ class ApproveReturnController extends AbstractController
      */
     public function exportPdfApprove(Request $request)
     {
+        if (!empty($this->traitRedirectStockApprove())) {
+            return $this->redirect($this->traitRedirectStockApprove());
+        }
+
         try {
             set_time_limit(0);
             ini_set('memory_limit', '9072M');

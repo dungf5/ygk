@@ -2457,10 +2457,10 @@ class MypageController extends AbstractController
      */
     public function exportPdfReturn(Request $request)
     {
-        if (!empty($this->traitRedirectStockApprove())) {
-            return $this->redirect($this->traitRedirectStockApprove());
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
         }
-        
+
         try {
             set_time_limit(0);
             ini_set('memory_limit', '9072M');
