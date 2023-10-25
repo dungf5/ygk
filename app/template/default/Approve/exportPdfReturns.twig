@@ -249,7 +249,6 @@
                 font-weight: normal;
             }
             #dash {
-                background-image: url("{{getWebRootUrl()}}/html/user_data/assets/img/common/dash_dot.png");
                 width: 100%;
                 height: 10px;
                 margin-bottom: 10px;
@@ -286,6 +285,30 @@
             }
             .col-xs-3 {
                 width: 25%;
+            }
+            .ec-mypageRole img {
+                width: 100%;
+                max-width: 100%;
+            }
+            .img-thumbnail {
+                line-height: 1.42857143;
+                background-color: #fff;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                -webkit-transition: all .2s ease-in-out;
+                -o-transition: all .2s ease-in-out;
+                transition: all .2s ease-in-out;
+                display: inline-block;
+                max-width: 100%;
+                max-height: 300px;
+            }
+            .col-xs-2 {
+                position: relative;
+                min-height: 1px;
+                max-height: 300px;
+                padding-right: 15px;
+                padding-left: 15px;
+                width: 16.66666667%;
             }
         </style>
     </head>
@@ -449,43 +472,43 @@
                             </tr>
                             <tr>
                                 <td colspan="2">
-                                    <div class="row">
-{#                                            {% if item.cus_image_url_path1|trim is not empty %}#}
-{#                                                <div class="col-xs-2">#}
-{#                                                    <img src="{{ url('homepage') }}{{ item.cus_image_url_path1 }}" class="img-thumbnail" />#}
-{#                                                </div>#}
-{#                                            {% endif %}#}
-{#                                            {% if item.cus_image_url_path2|trim is not empty %}#}
-{#                                                <div class="col-xs-2">#}
-{#                                                    <img src="{{ url('homepage') }}{{ item.cus_image_url_path2 }}" class="img-thumbnail" />#}
-{#                                                </div>#}
-{#                                            {% endif %}#}
-{#                                            {% if item.cus_image_url_path3|trim is not empty %}#}
-{#                                                <div class="col-xs-2">#}
-{#                                                    <img src="{{ url('homepage') }}{{ item.cus_image_url_path3 }}" class="img-thumbnail" />#}
-{#                                                </div>#}
-{#                                            {% endif %}#}
-{#                                            {% if item.cus_image_url_path4|trim is not empty %}#}
-{#                                                <div class="col-xs-2">#}
-{#                                                    <img src="{{ url('homepage') }}{{ item.cus_image_url_path4 }}" class="img-thumbnail" />#}
-{#                                                </div>#}
-{#                                            {% endif %}#}
-{#                                            {% if item.cus_image_url_path5|trim is not empty %}#}
-{#                                                <div class="col-xs-2">#}
-{#                                                    <img src="{{ url('homepage') }}{{ item.cus_image_url_path5 }}" class="img-thumbnail" />#}
-{#                                                </div>#}
-{#                                            {% endif %}#}
-{#                                            {% if item.cus_image_url_path6|trim is not empty %}#}
-{#                                                <div class="col-xs-2">#}
-{#                                                    <img src="{{ url('homepage') }}{{ item.cus_image_url_path6 }}" class="img-thumbnail" />#}
-{#                                                </div>#}
-{#                                            {% endif %}#}
+                                    <div class="row col-xs-12" style="min-height: 300px; display: flex;">
+                                        {% if item.cus_image_url_path1|trim is not empty %}
+                                            <div class="col-xs-2">
+                                                <img src="{{ item.cus_image_url_path1 }}" class="img-thumbnail"/>
+                                            </div>
+                                        {% endif %}
+                                        {% if item.cus_image_url_path2|trim is not empty %}
+                                            <div class="col-xs-2">
+                                                <img src="{{ item.cus_image_url_path2 }}" class="img-thumbnail"/>
+                                            </div>
+                                        {% endif %}
+                                        {% if item.cus_image_url_path3|trim is not empty %}
+                                            <div class="col-xs-2">
+                                                <img src="{{ item.cus_image_url_path3 }}" class="img-thumbnail"/>
+                                            </div>
+                                        {% endif %}
+                                        {% if item.cus_image_url_path4|trim is not empty %}
+                                            <div class="col-xs-2">
+                                                <img src="{{ item.cus_image_url_path4 }}" class="img-thumbnail"/>
+                                            </div>
+                                        {% endif %}
+                                        {% if item.cus_image_url_path5|trim is not empty %}
+                                            <div class="col-xs-2">
+                                                <img src="{{ item.cus_image_url_path5 }}" class="img-thumbnail"/>
+                                            </div>
+                                        {% endif %}
+                                        {% if item.cus_image_url_path6|trim is not empty %}
+                                            <div class="col-xs-2">
+                                                <img src="{{ item.cus_image_url_path6 }}" class="img-thumbnail"/>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
                         </table>
 
-                        <hr style="border: 2px black dashed; margin-bottom: 20px;">
+                        <div id="dash" style="background-image: url('{{ line }}');"></div>
 
                         <div class="col-xs-12 text-left">
                             <p><strong>【郵送先】</strong></p>

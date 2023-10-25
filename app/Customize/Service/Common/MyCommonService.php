@@ -3571,6 +3571,12 @@ SQL;
                 mst_product_returns_info.cus_order_lineno,
                 mst_product_returns_info.customer_comment,
                 mst_product_returns_info.shipping_fee,
+                mst_product_returns_info.cus_image_url_path1,
+                mst_product_returns_info.cus_image_url_path2,
+                mst_product_returns_info.cus_image_url_path3,
+                mst_product_returns_info.cus_image_url_path4,
+                mst_product_returns_info.cus_image_url_path5,
+                mst_product_returns_info.cus_image_url_path6,
                 mst_product_returns_info.create_date,
                 mst_product.product_code,
                 mst_product.product_name,
@@ -3594,6 +3600,11 @@ SQL;
         if (!empty($params['search_customer']) && $params['search_customer'] != 0) {
             $addWhere = ' AND mst_product_returns_info.customer_code = ? ';
             $myPara[] = $params['search_customer'];
+        }
+
+        if (!empty($params['returns_status_flag']) && $params['returns_status_flag'] != 0) {
+            $addWhere .= ' AND returns_status_flag = ? ';
+            $myPara[] = $params['returns_status_flag'];
         }
 
         $sql = "
