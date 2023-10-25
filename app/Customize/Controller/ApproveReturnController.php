@@ -374,7 +374,7 @@ class ApproveReturnController extends AbstractController
      * Export PDF
      *
      * @Route("/mypage/approve/export/pdf", name="exportPdfApprove", methods={"GET"})
-     * @Template("/Approve/exportPdfReturns.twig")
+     * @Template("/Approve/exportPdfApprove.twig")
      */
     public function exportPdfApprove(Request $request)
     {
@@ -383,7 +383,7 @@ class ApproveReturnController extends AbstractController
             ini_set('memory_limit', '9072M');
             ini_set('max_execution_time', '0');
             ini_set('max_input_time', '-1');
-            $htmlFileName = 'Approve/exportPdfReturns.twig';
+            $htmlFileName = 'Approve/exportPdfApprove.twig';
             $returns_no = MyCommon::getPara('return_no');
 
             $params = [
