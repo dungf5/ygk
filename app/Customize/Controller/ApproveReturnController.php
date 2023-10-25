@@ -431,9 +431,17 @@ class ApproveReturnController extends AbstractController
 
                 $item['barcode'] = $barcode;
                 $item['create_date'] = date('Y年m月d日', strtotime($item['create_date']));
+                $item['cus_image_url_path1'] = $this->imgToBase64($item['cus_image_url_path1']);
+                $item['cus_image_url_path2'] = $this->imgToBase64($item['cus_image_url_path2']);
+                $item['cus_image_url_path3'] = $this->imgToBase64($item['cus_image_url_path3']);
+                $item['cus_image_url_path4'] = $this->imgToBase64($item['cus_image_url_path4']);
+                $item['cus_image_url_path5'] = $this->imgToBase64($item['cus_image_url_path5']);
+                $item['cus_image_url_path6'] = $this->imgToBase64($item['cus_image_url_path6']);
             }
 
             $arr_data['data'] = $data;
+            $arr_data['line'] = $this->imgToBase64('html/user_data/assets/img/common/dash_dot.png');
+
             $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
             FileUtil::makeDirectory($dirPdf);
             $namePdf = count($arr_returns_no) == 1 ? 'returns_'.$arr_returns_no[0].'.pdf' : 'returns_'.date('YmdHis').'.pdf';
@@ -469,6 +477,30 @@ class ApproveReturnController extends AbstractController
             log_error($e->getMessage());
 
             return $this->redirectToRoute('mypage_return_history');
+        }
+    }
+
+    private function imgToBase64($path)
+    {
+        if (empty($path) || !file_exists($path)) {
+            return '';
+        }
+
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+
+        if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
+            return '';
+        }
+
+        try {
+            $data = file_get_contents($path);
+            $base64 = 'data:image/'.$extension.';base64,'.base64_encode($data);
+
+            return $base64;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            return '';
         }
     }
 
