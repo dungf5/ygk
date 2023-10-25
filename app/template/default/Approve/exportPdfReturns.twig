@@ -251,7 +251,7 @@
             #dash {
                 width: 100%;
                 height: 10px;
-                margin-bottom: 10px;
+                margin-bottom: 25px;
             }
             table {
                 background-color: transparent;
@@ -287,11 +287,20 @@
                 width: 25%;
             }
             .ec-mypageRole img {
-               width: 100%;
-               max-width: 100%;
-           }
-
+                width: 100%;
+                max-width: 100%;
+            }
+            .ec-mypageRole *, .ec-mypageRole *::before, .ec-mypageRole *::after {
+                box-sizing: inherit;
+            }
+            .ec-mypageRole *, .ec-mypageRole *::before, .ec-mypageRole *::after {
+                box-sizing: inherit;
+            }
+            .row:after {
+                clear: both;
+            }
             .img-thumbnail {
+                padding: 4px;
                 line-height: 1.42857143;
                 background-color: #fff;
                 border: 1px solid #ddd;
@@ -300,8 +309,7 @@
                 -o-transition: all .2s ease-in-out;
                 transition: all .2s ease-in-out;
                 display: inline-block;
-                /*max-width: 100%;*/
-                max-height: 250px;
+                max-height: 230px;
             }
             .col-xs-2 {
                 position: relative;
@@ -311,220 +319,224 @@
                 padding-left: 15px;
                 width: 16.66666667%;
             }
+            u {
+                text-decoration-line: underline;
+                text-underline-offset: 5px;
+            }
         </style>
     </head>
     <body style="margin: -25px 25px -5px 25px; margin-top: 0; margin-bottom: 25px;">
-        {% set page = 0 %}
-        {% for item in data %}
-            <div class="pagebreak">
-                {% set page = page + 1 %}
-                <div class="">
-                    <header class="header">
-                        <div class="title">返品リスト</div>
-                        <div class="clear-float"></div>
-                    </header>
+    {% set page = 0 %}
+    {% for item in data %}
+        <div class="pagebreak">
+            {% set page = page + 1 %}
+            <div class="">
+                <header class="header">
+                    <div class="title"><u>返品リスト</u></div>
+                    <div class="clear-float"></div>
+                </header>
 
-                    <div class="shelf_title">
-                        <div class="header1_left">
-                            <div>
-                                <img src="data:image/png;base64, {{ item.barcode }}" style="max-width: 250px;"/>
-                            </div>
-                        </div>
-
-                        <div class="header1_right">
-                            <div>
-                                <p>発行日：{{ item.create_date }}</p>
-                            </div>
+                <div class="shelf_title">
+                    <div class="header1_left">
+                        <div>
+                            <img src="data:image/png;base64, {{ item.barcode }}" style="max-width: 250px;"/>
                         </div>
                     </div>
 
-                    <div class="returns-info">
-                        <table class="table table-bordered">
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">返品番号</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    <p>{{ item.returns_no }}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">お客様</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    <p>{{ item.company_name }}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">出荷先</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    <p>{{ item.shipping_name }}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">届け先</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    <p>{{ item.otodoke_name }}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">出荷指示№</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    <p>{{ item.shipping_no }}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">出荷日</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    <p>{{ item.shipping_date|date('Y-m-d') }}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">JANコード</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    <p>{{ item.jan_code }}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">商品名</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    <p>{{ item.product_name }}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">出荷数</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    <p>{{ item.shipping_num }}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">返品理由</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    <p>{{ item.returns_reson }}</p>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">コメント</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    <p>{{ item.customer_comment }}</p>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">返品数</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    <p>{{ item.returns_num }}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">返品依頼日</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    <p>{{ item.returns_request_date|date('Y-m-d') }}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">返品承認日</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    {% if item.aprove_date is not empty %}
-                                        <p>{{ item.aprove_date|date('Y-m-d') }}</p>
-                                    {% endif %}
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="col-xs-3 text-right left_background">
-                                    <label for="customer_code">送料</label>
-                                </td>
-                                <td class="col-xs-9 text-left">
-                                    {% if item.shipping_fee == 1 %} <p>元払い</p> {% endif %}
-                                    {% if item.shipping_fee == 2 %} <p>着払い</p> {% endif %}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center left_background" colspan="2">
-                                    <label>商品画像</label>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <div class="row">
-                                        {% if item.cus_image_url_path1|trim is not empty %}
-                                            <div class="col-xs-2">
-                                                <img src="{{ item.cus_image_url_path1 }}" class="img-thumbnail"/>
-                                            </div>
-                                        {% endif %}
-                                        {% if item.cus_image_url_path2|trim is not empty %}
-                                            <div class="col-xs-2">
-                                                <img src="{{ item.cus_image_url_path2 }}" class="img-thumbnail"/>
-                                            </div>
-                                        {% endif %}
-                                        {% if item.cus_image_url_path3|trim is not empty %}
-                                            <div class="col-xs-2">
-                                                <img src="{{ item.cus_image_url_path3 }}" class="img-thumbnail"/>
-                                            </div>
-                                        {% endif %}
-                                        {% if item.cus_image_url_path4|trim is not empty %}
-                                            <div class="col-xs-2">
-                                                <img src="{{ item.cus_image_url_path4 }}" class="img-thumbnail"/>
-                                            </div>
-                                        {% endif %}
-                                        {% if item.cus_image_url_path5|trim is not empty %}
-                                            <div class="col-xs-2">
-                                                <img src="{{ item.cus_image_url_path5 }}" class="img-thumbnail"/>
-                                            </div>
-                                        {% endif %}
-                                        {% if item.cus_image_url_path6|trim is not empty %}
-                                            <div class="col-xs-2">
-                                                <img src="{{ item.cus_image_url_path6 }}" class="img-thumbnail"/>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <div id="dash" style="background-image: url('{{ line }}');"></div>
-
-                        <div class="col-xs-12 text-left">
-                            <p><strong>【郵送先】</strong></p>
-                            <p>〒559-0032</p>
-                            <p>大阪府大阪市住之江区南港南2-4-43 GLP大阪3階</p>
-                            <p>株式会社HMKロジサービス XBRAID JAPAN様出荷センター</p>
+                    <div class="header1_right">
+                        <div>
+                            <p>発行日：{{ item.create_date }}</p>
                         </div>
                     </div>
                 </div>
 
-                {% if data|length > 1 %}
-                <span style="float: right">page {{ page }}</span>
-                {% endif %}
+                <div class="returns-info">
+                    <table class="table table-bordered">
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">返品番号</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                <p>{{ item.returns_no }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">お客様</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                <p>{{ item.company_name }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">出荷先</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                <p>{{ item.shipping_name }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">届け先</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                <p>{{ item.otodoke_name }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">出荷指示№</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                <p>{{ item.shipping_no }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">出荷日</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                <p>{{ item.shipping_date|date('Y-m-d') }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">JANコード</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                <p>{{ item.jan_code }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">商品名</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                <p>{{ item.product_name }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">出荷数</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                <p>{{ item.shipping_num }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">返品理由</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                <p>{{ item.returns_reson }}</p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">コメント</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                <p>{{ item.customer_comment }}</p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">返品数</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                <p>{{ item.returns_num }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">返品依頼日</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                <p>{{ item.returns_request_date|date('Y-m-d') }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">返品承認日</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                {% if item.aprove_date is not empty %}
+                                    <p>{{ item.aprove_date|date('Y-m-d') }}</p>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="col-xs-3 text-right left_background">
+                                <label for="customer_code">送料</label>
+                            </td>
+                            <td class="col-xs-9 text-left">
+                                {% if item.shipping_fee == 1 %} <p>元払い</p> {% endif %}
+                                {% if item.shipping_fee == 2 %} <p>着払い</p> {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center left_background" colspan="2">
+                                <label>商品画像</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <div class="row">
+                                    {% if item.cus_image_url_path1|trim is not empty %}
+                                        <div class="col-xs-2">
+                                            <img src="{{ item.cus_image_url_path1 }}" class="img-thumbnail"/>
+                                        </div>
+                                    {% endif %}
+                                    {% if item.cus_image_url_path2|trim is not empty %}
+                                        <div class="col-xs-2">
+                                            <img src="{{ item.cus_image_url_path2 }}" class="img-thumbnail"/>
+                                        </div>
+                                    {% endif %}
+                                    {% if item.cus_image_url_path3|trim is not empty %}
+                                        <div class="col-xs-2">
+                                            <img src="{{ item.cus_image_url_path3 }}" class="img-thumbnail"/>
+                                        </div>
+                                    {% endif %}
+                                    {% if item.cus_image_url_path4|trim is not empty %}
+                                        <div class="col-xs-2">
+                                            <img src="{{ item.cus_image_url_path4 }}" class="img-thumbnail"/>
+                                        </div>
+                                    {% endif %}
+                                    {% if item.cus_image_url_path5|trim is not empty %}
+                                        <div class="col-xs-2">
+                                            <img src="{{ item.cus_image_url_path5 }}" class="img-thumbnail"/>
+                                        </div>
+                                    {% endif %}
+                                    {% if item.cus_image_url_path6|trim is not empty %}
+                                        <div class="col-xs-2">
+                                            <img src="{{ item.cus_image_url_path6 }}" class="img-thumbnail"/>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div id="dash" style="background-image: url('{{ line }}');"></div>
+
+                    <div class="col-xs-12 text-left">
+                        <p><strong>【郵送先】</strong></p>
+                        <p>〒559-0032</p>
+                        <p>大阪府大阪市住之江区南港南2-4-43 GLP大阪3階</p>
+                        <p>株式会社HMKロジサービス XBRAID JAPAN様出荷センター</p>
+                    </div>
+                </div>
             </div>
-        {% endfor %}
+
+            {% if data|length > 1 %}
+                <span style="float: right">page {{ page }}</span>
+            {% endif %}
+        </div>
+    {% endfor %}
     </body>
 </html>
 
