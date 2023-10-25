@@ -251,7 +251,7 @@
             #dash {
                 width: 100%;
                 height: 10px;
-                margin-bottom: 25px;
+                margin-bottom: 20px;
             }
             table {
                 background-color: transparent;
@@ -528,13 +528,13 @@
                         <p>〒559-0032</p>
                         <p>大阪府大阪市住之江区南港南2-4-43 GLP大阪3階</p>
                         <p>株式会社HMKロジサービス XBRAID JAPAN様出荷センター</p>
+
+                        {% if data|length > 1 %}
+                            <p style="float: right">page {{ page }}</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-
-            {% if data|length > 1 %}
-                <span style="float: right">page {{ page }}</span>
-            {% endif %}
         </div>
     {% endfor %}
     </body>
