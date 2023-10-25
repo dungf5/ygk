@@ -167,6 +167,10 @@ class MypageController extends AbstractController
      */
     public function shippingList(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         $comS = new MyCommonService($this->entityManager);
         $customer_code = $this->twig->getGlobals()['app']->MyDataMstCustomer['customer_code'];
         $type = $request->get('type');
@@ -205,6 +209,10 @@ class MypageController extends AbstractController
      */
     public function exportOrderPdf(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         $htmlFileName = 'Mypage/exportOrderPdf.twig';
         $delivery_no = MyCommon::getPara('delivery_no');
         $order_no_line_no = MyCommon::getPara('order_no_line_no');
@@ -285,6 +293,10 @@ class MypageController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // 購入処理中/決済処理中ステータスの受注を非表示にする.
@@ -592,6 +604,10 @@ class MypageController extends AbstractController
      */
     public function favorite(Request $request, PaginatorInterface $paginator)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         if (!$this->BaseInfo->isOptionFavoriteProduct()) {
             throw new NotFoundHttpException();
         }
@@ -633,6 +649,10 @@ class MypageController extends AbstractController
      */
     public function changeShippingCode(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         try {
             if ('POST' === $request->getMethod()) {
                 $shipping_code = $request->get('shipping_code', '');
@@ -676,6 +696,10 @@ class MypageController extends AbstractController
      */
     public function shipping(Request $request, PaginatorInterface $paginator)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         $search_parameter = [
@@ -791,6 +815,10 @@ class MypageController extends AbstractController
      */
     public function delivery(Request $request, PaginatorInterface $paginator)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // 購入処理中/決済処理中ステータスの受注を非表示にする.
@@ -895,6 +923,10 @@ class MypageController extends AbstractController
      */
     public function changeRepresentCode(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         try {
             if ('POST' === $request->getMethod()) {
                 $represent_code = $request->get('represent_code', '');
@@ -933,6 +965,10 @@ class MypageController extends AbstractController
      */
     public function return(Request $request, PaginatorInterface $paginator)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
         $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
 
@@ -998,6 +1034,10 @@ class MypageController extends AbstractController
      */
     public function returnCreate(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         try {
             $commonService = new MyCommonService($this->entityManager);
             $login_type = $this->globalService->getLoginType();
@@ -1067,6 +1107,10 @@ class MypageController extends AbstractController
      */
     public function returnConfirm(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         try {
             $commonService = new MyCommonService($this->entityManager);
             $login_type = $this->globalService->getLoginType();
@@ -1204,6 +1248,10 @@ class MypageController extends AbstractController
      */
     public function returnSave(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         try {
             $commonService = new MyCommonService($this->entityManager);
             $login_type = $this->globalService->getLoginType();
@@ -1437,6 +1485,10 @@ class MypageController extends AbstractController
      */
     public function returnSaveComplete(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         return [];
     }
 
@@ -1577,6 +1629,10 @@ class MypageController extends AbstractController
      */
     public function returnEdit(Request $request, string $returns_no)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
@@ -1626,6 +1682,10 @@ class MypageController extends AbstractController
      */
     public function returnPreview(Request $request, string $returns_no)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
@@ -2028,7 +2088,7 @@ class MypageController extends AbstractController
         if (!empty($this->traitRedirectApprove())) {
             return $this->redirect($this->traitRedirectApprove());
         }
-        
+
         try {
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
@@ -2147,6 +2207,10 @@ class MypageController extends AbstractController
      */
     public function getProductName(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         $result = [
             'status' => false,
         ];
@@ -2185,6 +2249,10 @@ class MypageController extends AbstractController
      */
     public function deliveryPrint(Request $request, PaginatorInterface $paginator)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         Type::overrideType('datetimetz', UTCDateTimeTzType::class);
 
         // 購入処理中/決済処理中ステータスの受注を非表示にする.
@@ -2289,6 +2357,10 @@ class MypageController extends AbstractController
      */
     public function exportPdfMultiple(Request $request)
     {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
         $htmlFileName = 'Mypage/exportPdfMultiple.twig';
         $preview = MyCommon::getPara('preview');
         $delivery_no = MyCommon::getPara('delivery_no');
@@ -2385,6 +2457,10 @@ class MypageController extends AbstractController
      */
     public function exportPdfReturn(Request $request)
     {
+        if (!empty($this->traitRedirectStockApprove())) {
+            return $this->redirect($this->traitRedirectStockApprove());
+        }
+        
         try {
             set_time_limit(0);
             ini_set('memory_limit', '9072M');
