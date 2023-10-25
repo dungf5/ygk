@@ -374,7 +374,7 @@ class ApproveReturnController extends AbstractController
      * Export PDF
      *
      * @Route("/mypage/approve/export/pdf", name="exportPdfApprove", methods={"GET"})
-     * @Template("/Mypage/exportPdfReturns.twig")
+     * @Template("/Approve/exportPdfReturns.twig")
      */
     public function exportPdfApprove(Request $request)
     {
@@ -383,7 +383,7 @@ class ApproveReturnController extends AbstractController
             ini_set('memory_limit', '9072M');
             ini_set('max_execution_time', '0');
             ini_set('max_input_time', '-1');
-            $htmlFileName = 'Mypage/exportPdfReturns.twig';
+            $htmlFileName = 'Approve/exportPdfReturns.twig';
             $returns_no = MyCommon::getPara('return_no');
 
             $params = [
@@ -419,14 +419,26 @@ class ApproveReturnController extends AbstractController
             }
 
             $data = $commonService->getPdfApprove($params, $arr_returns_no);
-            $data['data'] = array_chunk($data, 12);
-            $data['customer'] = $this->globalService->customer();
 
+            // Modify data
+            foreach ($data as &$item) {
+                try {
+                    $generator = new \Picqer\Barcode\BarcodeGeneratorJPG();
+                    $barcode = base64_encode($generator->getBarcode($item['returns_no'], $generator::TYPE_CODE_39));
+                } catch (\Exception $e) {
+                    $barcode = '';
+                }
+
+                $item['barcode'] = $barcode;
+                $item['create_date'] = date('Y年m月d日', strtotime($item['create_date']));
+            }
+
+            $arr_data['data'] = $data;
             $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
             FileUtil::makeDirectory($dirPdf);
             $namePdf = count($arr_returns_no) == 1 ? 'returns_'.$arr_returns_no[0].'.pdf' : 'returns_'.date('YmdHis').'.pdf';
             $file = $dirPdf.'/'.$namePdf;
-            $html = $this->twig->render($htmlFileName, $data);
+            $html = $this->twig->render($htmlFileName, $arr_data);
 
             if (env('APP_IS_LOCAL', 1) != 1) {
                 MyCommon::converHtmlToPdf($dirPdf, $namePdf, $html);
@@ -447,8 +459,8 @@ class ApproveReturnController extends AbstractController
                 //file_put_contents($file, $output);
                 //$dompdf->stream($file);
 
-                if (count($data)) {
-                    return $data;
+                if (count($arr_data)) {
+                    return $arr_data;
                 } else {
                     return $this->redirectToRoute('mypage_return_history');
                 }

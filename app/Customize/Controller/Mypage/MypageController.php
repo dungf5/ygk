@@ -1773,6 +1773,10 @@ class MypageController extends AbstractController
                 }
             }
 
+            if (!in_array($product_returns_info->getReturnsStatusFlag(), ['1', '2'])) {
+                return $this->redirectToRoute('mypage_return_history');
+            }
+
             return [
                 'product_returns_info' => $product_returns_info,
                 'customer' => $customer,
