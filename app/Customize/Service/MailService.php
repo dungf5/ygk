@@ -1207,6 +1207,39 @@ class MailService
         return $this->mailer->send($message);
     }
 
+
+    public function sendMailReturnProductApproveYesCustomer($email, $data)
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        $body = $this->twig->render('Mail/return_product_approve_yes_customer.twig', [
+            'data' => $data,
+        ]);
+        $message = (new \Swift_Message())
+            ->setSubject('[XBRAID JAPAN] 返品リクエスト承認のご案内')
+            ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
+            ->setTo([$email])
+            ->setBody($body);
+
+        if (getenv('APP_IS_LOCAL') != 1 && getenv('EMAIL_RETURN_CC')) {
+            $email = getenv('EMAIL_RETURN_CC');
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $message->setCc($email);
+            }
+        }
+
+        if (getenv('APP_IS_LOCAL') != 1 && getenv('EMAIL_BCC')) {
+            $email = getenv('EMAIL_BCC');
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $message->setBcc($email);
+            }
+        }
+
+        return $this->mailer->send($message);
+    }
+
     public function sendMailReturnProductApproveNo($email, $aprove_comment_not_yet)
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {

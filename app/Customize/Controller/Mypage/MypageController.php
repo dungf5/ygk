@@ -1459,6 +1459,15 @@ class MypageController extends AbstractController
                             'company_name' => $customer['company_name'] ?? '',
                         ]
                     );
+
+                    // Send mail Customer
+                    $email_customer = $customer['customer_email'] ?? $customer['email'];
+                    $url_return_history = $this->generateUrl('mypage_return_history', [], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $this->mailService->sendMailReturnProductApproveYesCustomer($email_customer,
+                        [
+                            'url_return_history' => $url_return_history,
+                        ]
+                    );
                 }
 
                 return $this->redirectToRoute('mypage_return_save_complete');
@@ -1825,6 +1834,15 @@ class MypageController extends AbstractController
                             'url_approve_finish' => $url_approve_finish,
                             'url_receipt' => $url_receipt,
                             'company_name' => $customer['company_name'] ?? '',
+                        ]
+                    );
+
+                    // Send mail Customer
+                    $email_customer = $customer['customer_email'] ?? $customer['email'];
+                    $url_return_history = $this->generateUrl('mypage_return_history', [], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $this->mailService->sendMailReturnProductApproveYesCustomer($email_customer,
+                        [
+                            'url_return_history' => $url_return_history,
                         ]
                     );
                 } else {
