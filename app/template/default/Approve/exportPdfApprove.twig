@@ -496,11 +496,18 @@
                             </td>
                             <td class="col-xs-9 text-left">
                                 {% if item.shipping_fee == 1 %}
-                                    <p>⚫元払い&nbsp;&nbsp;◯着払い</p>
+                                    <span style="background: black; border-radius: 50%;">〇</span>
+                                    <span>元払い</span>&nbsp;&nbsp;
+                                    <span>〇</span>
+                                    <span>着払い</span>
                                 {% elseif item.shipping_fee == 2 %}
-                                    <p>◯元払い&nbsp;&nbsp;⚫着払い</p>
+                                    <span>〇</span>
+                                    <span>元払い</span>&nbsp;&nbsp;
+                                    <span style="background: black; border-radius: 50%;">〇</span>
+                                    <span>着払い</span>
                                 {% else %}
-                                    <p>◯元払い&nbsp;&nbsp;◯着払い</p>
+                                    <span>〇</span><span>元払い</span>&nbsp;&nbsp;
+                                    <span>〇</span><span>着払い</span>
                                 {% endif %}
                             </td>
                         </tr>
