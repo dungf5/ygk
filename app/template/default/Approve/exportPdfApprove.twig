@@ -495,16 +495,13 @@
                                 <label for="customer_code">送料</label>
                             </td>
                             <td class="col-xs-9 text-left">
-{#                                {% if item.shipping_fee == 1 %} <p>元払い</p> {% endif %}#}
-{#                                {% if item.shipping_fee == 2 %} <p>着払い</p> {% endif %}#}
-                                <span class="radio-inline">
-                                    <input type="radio"
-                                            {% if item.shipping_fee == 1 %} checked {% endif %}> 元払い
-                                </span>
-                                <span class="radio-inline">
-                                    <input type="radio"
-                                            {% if item.shipping_fee == 2 %} checked {% endif %}> 着払い
-                                </span>
+                                {% if item.shipping_fee == 1 %}
+                                    <p>⚫元払い&nbsp;&nbsp;◯着払い</p>
+                                {% elseif item.shipping_fee == 2 %}
+                                    <p>◯元払い&nbsp;&nbsp;⚫着払い</p>
+                                {% else %}
+                                    <p>◯元払い&nbsp;&nbsp;◯着払い</p>
+                                {% endif %}
                             </td>
                         </tr>
                         <tr>
