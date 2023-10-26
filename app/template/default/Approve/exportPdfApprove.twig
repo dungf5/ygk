@@ -1,5 +1,6 @@
 <html >
     <head>
+        <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/3.4.1/bootstrap.min.css', 'user_data') }}">
         <style>
             @font-face {
                 font-family: msgothic;
@@ -285,6 +286,24 @@
             }
             .col-xs-3 {
                 width: 25%;
+                position: relative;
+                min-height: 1px;
+                padding-right: 15px;
+                padding-left: 15px;
+            }
+            .col-xs-4 {
+                width: 33.33333333%;
+                position: relative;
+                min-height: 1px;
+                padding-right: 15px;
+                padding-left: 15px;
+            }
+            .col-xs-5 {
+                width: 38%;
+                position: relative;
+                min-height: 1px;
+                padding-right: 15px;
+                padding-left: 15px;
             }
             .ec-mypageRole img {
                 width: 100%;
@@ -309,7 +328,9 @@
                 -o-transition: all .2s ease-in-out;
                 transition: all .2s ease-in-out;
                 display: inline-block;
-                max-height: 230px;
+                width: 100%;
+                height: auto;
+                object-fit: contain;
             }
             .col-xs-2 {
                 position: relative;
@@ -487,32 +508,32 @@
                             <td colspan="2">
                                 <div class="row">
                                     {% if item.cus_image_url_path1|trim is not empty %}
-                                        <div class="col-xs-2">
+                                        <div class="col-xs-5">
                                             <img src="{{ item.cus_image_url_path1 }}" class="img-thumbnail"/>
                                         </div>
                                     {% endif %}
                                     {% if item.cus_image_url_path2|trim is not empty %}
-                                        <div class="col-xs-2">
+                                        <div class="col-xs-5">
                                             <img src="{{ item.cus_image_url_path2 }}" class="img-thumbnail"/>
                                         </div>
                                     {% endif %}
                                     {% if item.cus_image_url_path3|trim is not empty %}
-                                        <div class="col-xs-2">
+                                        <div class="col-xs-5">
                                             <img src="{{ item.cus_image_url_path3 }}" class="img-thumbnail"/>
                                         </div>
                                     {% endif %}
                                     {% if item.cus_image_url_path4|trim is not empty %}
-                                        <div class="col-xs-2">
+                                        <div class="col-xs-5">
                                             <img src="{{ item.cus_image_url_path4 }}" class="img-thumbnail"/>
                                         </div>
                                     {% endif %}
                                     {% if item.cus_image_url_path5|trim is not empty %}
-                                        <div class="col-xs-2">
+                                        <div class="col-xs-5">
                                             <img src="{{ item.cus_image_url_path5 }}" class="img-thumbnail"/>
                                         </div>
                                     {% endif %}
                                     {% if item.cus_image_url_path6|trim is not empty %}
-                                        <div class="col-xs-2">
+                                        <div class="col-xs-5">
                                             <img src="{{ item.cus_image_url_path6 }}" class="img-thumbnail"/>
                                         </div>
                                     {% endif %}
