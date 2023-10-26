@@ -43,6 +43,7 @@ class OrderItemRepository extends AbstractRepository
      * @param array $paramSearch
      * @param string $customer_code
      * @param string $login_type
+     *
      * @return QueryBuilder
      */
     public function getQueryBuilderByCustomer($paramSearch = [], $customer_code = '', $login_type = '')
@@ -209,7 +210,7 @@ class OrderItemRepository extends AbstractRepository
 
         $qb->where('shipping.delete_flg IS NOT NULL AND shipping.delete_flg <> 0')
             ->andWhere('order_status.order_date >= :order_date')
-            ->andWhere('delivery.delivery_lineno = 1')
+            //->andWhere('delivery.delivery_lineno = 1')
             ->andWhere($condition)
             ->setParameter(':order_date', date('Y-m-d', strtotime('-14 MONTH')))
             ->setParameter(':customer_code', $customer_code);
@@ -446,6 +447,11 @@ class OrderItemRepository extends AbstractRepository
             case 2:
                 $qb->andWhere('shipping.shipping_status = :shipping_status')
                     ->setParameter(':shipping_status', 2);
+                break;
+
+            case 9:
+                $qb->andWhere('shipping.shipping_status = :shipping_status')
+                    ->setParameter(':shipping_status', 9);
                 break;
         }
 

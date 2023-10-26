@@ -32,6 +32,8 @@ if (!class_exists('\Eccube\Entity\OrderItem')) {
     {
         use PointRateTrait;
 
+        private $MstProduct = [];
+
         /**
          * Get price IncTax
          *
@@ -853,6 +855,16 @@ if (!class_exists('\Eccube\Entity\OrderItem')) {
         public function getOrderItemType()
         {
             return $this->OrderItemType;
+        }
+
+        public function getMstProduct()
+        {
+            return $this->MstProduct;
+        }
+
+        public function setMstProduct($data)
+        {
+            $this->MstProduct = $data;
         }
     }
 }

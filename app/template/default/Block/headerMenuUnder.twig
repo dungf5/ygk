@@ -70,10 +70,9 @@
                 {% endif %}
 
                 {% if totalQuantity > 0 %}
-                    <li class="cart action"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div><span class="fnDIN">{{ totalQuantity|number_format }}</span></a></li>
-
+                    <li class="cart action"><a class="cart_quantity_total" href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div><span class="fnDIN">{{ totalQuantity|number_format }}</span></a></li>
                 {% else %}
-                    <li class="cart action"><a href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div></a></li>
+                    <li class="cart action"><a class="cart_quantity_total" href="{{ urlCart }}"><i class="fas fa-shopping-cart"></i><div>カート</div></a></li>
                 {% endif %}
             </ul>
         </div>
