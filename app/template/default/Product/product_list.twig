@@ -15,10 +15,9 @@ file that was distributed with this source code.
 {% block javascript %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-$(function() {
     $(document).on("keydown", "form", function(event) {
-       return event.key != "Enter";
-     });
+        return event.key != "Enter";
+    });
 
     // 表示件数を変更
     $('.disp-number').change(function() {
@@ -37,21 +36,15 @@ $(function() {
     });
 
     $('.add-cart').on('click', function(e) {
-        let userCode='{{getUserCode()}}';
-        {#if(userCode=="6000"){#}
-        {#    alert("{{ 'messge.cannotcart.all'|trans }}");#}
-
-        {#    return ;#}
-        {#}#}
-
         var $form = $(this).parents('tr').find('form');
 
         {#// 個数フォームのチェック#}
-        var $quantity = $form.parent().find('.quantity');
+        let $quantity = $form.parent().find('.quantity');
         let idProduct = $quantity.attr('myid');
-        var $checkQuantity = $form.parent().find('.checkQuantity');
-        let rsCheck = checkInput('quantity'+idProduct);
-        if(rsCheck==false){
+        let $checkQuantity = $form.parent().find('.checkQuantity');
+        let rsCheck = checkInput('quantity' + idProduct);
+
+        if (rsCheck == false) {
             return;
         }
 
@@ -65,167 +58,181 @@ $(function() {
                 // Buttonを無効にする
                 $('.add-cart').prop('disabled', true);
             }
-        }).done(function(data) {
-            if (!data.status) {
+        })
+        .done(function(data) {
+             if (!data.status) {
                 // difference product type
                 swal("エラー", data.message, "error");
                 return;
 
-            } else {
-                // Normal
-                // レスポンス内のメッセージをalertで表示
-                $.each(data.messages, function() {
-                    $('#ec-modal-header').html(this);
-                });
-
-                $('.ec-modal').show();
-
-                       $('a>.fnDIN').html(data.totalNew);
-
-                       let cartHtml ="<span class='fnDIN'>"+data.totalNew+"</span>";
-                        $('#emptyCart').html(cartHtml);
-                         //nvtrongxxx
-
-                        let myValue =   $.cookie(idProduct);
-                        if( myValue!=undefined){
-                          $('#quantity'+idProduct).val(myValue);
-                         }
-                // カートブロックを更新する
-                $.ajax({
-                    url: '{{ url('block_cart') }}',
-                    type: 'GET',
-                    dataType: 'html'
-                }).done(function(html) {
-                    $('.ec-headerRole__cart').html(html);
-                });
             }
-        }).fail(function(data) {
+             else {
+                if (data.cart_quantity_total) {
+                    if (data.cart_quantity_total > 1) {
+                        $('a.cart_quantity_total>.fnDIN').text(data.cart_quantity_total);
+                    }
+                    else {
+                        const node = document.createElement("span");
+                        node.classList.add('fnDIN');
+                        const textnode = document.createTextNode(data.cart_quantity_total);
+                        node.appendChild(textnode);
+                        document.getElementsByClassName('cart_quantity_total')[0].appendChild(node);
+                    }
+
+                    // レスポンス内のメッセージをalertで表示
+                    $.each(data.messages, function() {
+                        $('#ec-modal-header').html(this);
+                    });
+
+                    $('.ec-modal').show();
+
+                    let cookie_product_quantity = $.cookie(idProduct);
+                    if (cookie_product_quantity != undefined) {
+                        $('#quantity'+idProduct).val(cookie_product_quantity);
+                    }
+                }
+             }
+        })
+        .fail(function(data) {
             alert('{{ 'front.product.add_cart_error'|trans }}');
-        }).always(function(data) {
+        })
+        .always(function(data) {
             // Buttonを有効にする
             $('.add-cart').prop('disabled', false);
         });
     });
 
     $("input[name='rd_product_type']").change(function() {
-        loadingOverlay();
-        let value = $(this).val();
+    loadingOverlay();
+    let value = $(this).val();
 
-        $.ajax({
-            url: '/products/type/change',
-            type: 'POST',
-            dataType: "json",
-            timeout: 1000,
-            async:false,
-            data: {
-                'product_type': value,
-                '_token':'{{ csrf_token('_token') }}',
-            }
-        }).done(function(data) {
-            if (data.status == 1) {
-                window.location.reload();
-            } else {
-                console.log(data.message);
-            }
-        }).fail(function(jqXHR, statusText, errorThrown) {
-        });
+    $.ajax({
+        url: '/products/type/change',
+        type: 'POST',
+        dataType: "json",
+        timeout: 1000,
+        async:false,
+        data: {
+            'product_type': value,
+            '_token':'{{ csrf_token('_token') }}',
+        }
     })
-});
+    .done(function(data) {
+        if (data.status == 1) {
+            window.location.reload();
+        } else {
+            console.log(data.message);
+        }
+    })
+    .fail(function(jqXHR, statusText, errorThrown) {});
+    });
 
-$('.ec-modal-wrap').on('click', function(e) {
-    // モーダル内の処理は外側にバブリングさせない
-    e.stopPropagation();
-});
+    $('.ec-modal-wrap').on('click', function(e) {
+        // モーダル内の処理は外側にバブリングさせない
+        e.stopPropagation();
+    });
 
-$('.ec-modal-overlay, .ec-modal, .ec-modal-close, .ec-inlineBtn--cancel').on('click', function() {
-    $('.ec-modal').hide()
-});
+    $('.ec-modal-overlay, .ec-modal, .ec-modal-close, .ec-inlineBtn--cancel').on('click', function() {
+        $('.ec-modal').hide()
+    });
 
-//nvtrong add
-function initInputVal() {
-    var myStringArray = ALL_PRODUCT;
-    var arrayLength = myStringArray.length;
-    for (var i = 0; i < arrayLength; i++) {
-        let myValue =   $.cookie(myStringArray[i] );
-        if( myValue!=undefined){
-          $('#quantity'+myStringArray[i]).val(myValue);
-         }
-    }
-}
-
-function checkInput(idQuantity){
-    var valInput = $('#'+idQuantity).val().trim();
-    let mymst_quantity = $('#'+idQuantity).attr('mymst_quantity');
-    let input1 =document.getElementById(idQuantity);
-    input1.setCustomValidity('');
-
-    if (valInput == "") {
-        input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
-        input1.reportValidity();
-        return false;
+    //nvtrong add
+    function initInputVal() {
+        var myStringArray = ALL_PRODUCT;
+        var arrayLength = myStringArray.length;
+        for (var i = 0; i < arrayLength; i++) {
+            let myValue =   $.cookie(myStringArray[i] );
+            if( myValue!=undefined){
+                $('#quantity'+myStringArray[i]).val(myValue);
+            }
+        }
     }
 
-    if ( (valInput == 0) && (1 == mymst_quantity) ) {
-        input1.setCustomValidity(mymst_quantity+'{{ 'front.product.invalid_quantity'|trans }}');
-        input1.reportValidity();
-        return false;
-    }
+    function checkInput(idQuantity) {
+        var valInput = $('#'+idQuantity).val().trim();
+        let mymst_quantity = $('#'+idQuantity).attr('mymst_quantity');
+        let input1 =document.getElementById(idQuantity);
+        input1.setCustomValidity('');
 
-    if ( (valInput == 0) && (1 != mymst_quantity) ){
-           //%number%
-           let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
-           msgShow = msgShow.replace('%number%',mymst_quantity);
+        if (valInput == "") {
+            input1.setCustomValidity('{{ 'front.product.not_input_quantity'|trans }}');
+            input1.reportValidity();
+
+            return false;
+        }
+
+        if (valInput <= 0) {
+            input1.setCustomValidity('1以上で入力してください。');
+            input1.reportValidity();
+
+            return false;
+        }
+
+        if ( (valInput == 0) && (1 == mymst_quantity) ) {
+            input1.setCustomValidity(mymst_quantity+'{{ 'front.product.invalid_quantity'|trans }}');
+            input1.reportValidity();
+
+            return false;
+        }
+
+        if ((valInput == 0) && (1 != mymst_quantity)) {
+            //%number%
+            let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
+            msgShow = msgShow.replace('%number%',mymst_quantity);
             input1.setCustomValidity(msgShow);
             input1.reportValidity();
+
             return false;
-    }
-
-    if(valInput % mymst_quantity  !== 0) {
-       let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
-       msgShow = msgShow.replace('%number%',mymst_quantity);
-        $('#'+idQuantity)[0].setCustomValidity(msgShow);
-        $('#'+idQuantity)[0].reportValidity();
-         return false;
-    }
-
-    $.cookie( idQuantity,valInput, { path: '/' });
-
-    return true;
-}
-
-$(function() {
-    initInputVal();
-    $.cookie( 'listUrl',window.location.href);
-    // 表示件数を変更
-    $('.quantity').on("input", function(ev) {
-        var objT        = this;
-        var isFail      = false;
-
-        //href set
-        var dtId        = "link_detail"+$(objT).attr('myid');
-
-        //quantity1421
-        let quantityId  = "quantity"+$(objT).attr('myid');
-
-        let myUrl       = $("#"+dtId).attr('href');
-
-        //let okmyUrl   = 'myUrl.replace(/#|_/g,'')'; // result: "this is a test"
-        let okmyUrl     = '/products/detail/'+$(objT).attr('myid'); // result: "this is a test"
-
-        //let newUrl    = "#"+myUrl;
-        let newUrl      = "javascript:;";
-        let input1      = document.getElementById(objT.id);
-
-        input1.setCustomValidity('');
-        let mymst_quantity  = $(objT).attr('mymst_quantity');
-        let resultCheck     = checkInput(quantityId);
-
-        if(resultCheck==true) {
-            $.cookie( $(objT).attr('myid'),objT.value, { path: '/' });
-            $("#"+dtId).attr('href',okmyUrl);
         }
+
+        if(valInput % mymst_quantity  !== 0) {
+            let msgShow = "{{ 'front.product.invalid_quantity_big'|trans }}";
+            msgShow = msgShow.replace('%number%',mymst_quantity);
+            $('#'+idQuantity)[0].setCustomValidity(msgShow);
+            $('#'+idQuantity)[0].reportValidity();
+
+            return false;
+        }
+
+        $.cookie( idQuantity,valInput, { path: '/' });
+
+        return true;
+    }
+
+    $(function() {
+        initInputVal();
+        $.cookie( 'listUrl',window.location.href);
+
+        // 表示件数を変更
+        $('.quantity').on("input", function(ev) {
+            var objT        = this;
+            var isFail      = false;
+
+            //href set
+            var dtId        = "link_detail"+$(objT).attr('myid');
+
+            //quantity1421
+            let quantityId  = "quantity"+$(objT).attr('myid');
+
+            let myUrl       = $("#"+dtId).attr('href');
+
+            //let okmyUrl   = 'myUrl.replace(/#|_/g,'')'; // result: "this is a test"
+            let okmyUrl     = '/products/detail/'+$(objT).attr('myid'); // result: "this is a test"
+
+            //let newUrl    = "#"+myUrl;
+            let newUrl      = "javascript:;";
+            let input1      = document.getElementById(objT.id);
+
+            input1.setCustomValidity('');
+            let mymst_quantity  = $(objT).attr('mymst_quantity');
+            let resultCheck     = checkInput(quantityId);
+
+            if (resultCheck == true) {
+                $.cookie( $(objT).attr('myid'),objT.value, { path: '/' });
+                $("#"+dtId).attr('href',okmyUrl);
+            }
+        });
     });
-});
 </script>
 {% endblock %}
 
@@ -330,21 +337,23 @@ $(function() {
                                         </div>
 
                                         <div class="itemName">
+                                            <input type="hidden" name="product_code" readonly value="{{ Product.product_code }}"/>
+                                            <input type="hidden" name="product_name_kana" readonly value="{{ Product.product_name_kana }}"/>
                                             <p class="sku">{{ Product.jan_code }}</p>
                                             <p class="name">{{ Product.product_name }}</p>
                                             <div class="numPrice">
-                                                {% if Product.mst_quantity > 1 %}
+                                                {% if Product.quantity > 1 %}
                                                     <dl>
                                                         <dt>販売単位</dt>
-                                                        <dd> : {{ Product.mst_quantity }}個/箱～</dd>
+                                                        <dd> : {{ Product.quantity }}個/箱～</dd>
                                                     </dl>
                                                 {% else %}
                                                     <dl>
                                                         <dt>販売単位</dt>
                                                         <dd>
-                                                            : {{ Product.mst_quantity }}個～
+                                                            : {{ Product.quantity }}個～
 
-                                                            {% if Product.mst_quantity == 1 and Product.quantity_box > 0 %}
+                                                            {% if Product.quantity == 1 and Product.quantity_box > 0 %}
                                                                 （ボックス単位数：{{ Product.quantity_box }}個）
                                                             {% endif %}
                                                         </dd>
@@ -452,12 +461,12 @@ $(function() {
                                             {% endif %}
 
                                             <div class="ec-numberInput"><span>{{ 'common.quantity'|trans }}:</span>
-                                                    {{ form_widget(form.quantity, {'attr': {'myId':Product.id,'title':'','mymst_quantity':Product.mst_quantity,'class': 'quantity','value': Product.mst_quantity|number_format
-                                                    ,'min':Product.mst_quantity
-                                                    ,'step':Product.mst_quantity}}) }}
+                                                    {{ form_widget(form.quantity, {'attr': {'myId':Product.id,'title':'','mymst_quantity':Product.quantity,'class': 'quantity','value': Product.quantity|number_format
+                                                    ,'min':Product.quantity
+                                                    ,'step':Product.quantity}}) }}
                                                 {{ form_errors(form.quantity) }}
                                             </div>
-                                            <input type="hidden" id="checkQuantity{{ Product.id }}" class="checkQuantity"  value="{{ Product.mst_quantity }}">
+                                            <input type="hidden" id="checkQuantity{{ Product.id }}" class="checkQuantity"  value="{{ Product.quantity }}">
 
                                             {#product type#}
                                             <input type="hidden" name="product_type" value="{{ Product.product_type }}">

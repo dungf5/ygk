@@ -24,6 +24,25 @@ if (!class_exists('\Eccube\Entity\Order')) {
     /**
      * Order
      *
+     * @property mixed|null remarks1
+     * @property mixed|null remarks2
+     * @property mixed|null remarks3
+     * @property mixed|null remarks4
+     * @property false|mixed|string delivery_date
+     * @property mixed|null customer_order_no
+     * @property mixed shipping_no
+     * @property mixed shipping_name
+     * @property string shipping_address
+     * @property mixed otodoke_no
+     * @property mixed otodoke_name
+     * @property string otodoke_address
+     * @property mixed seikyu_name
+     * @property string seikyu_address
+     * @property mixed seikyu_code
+     * @property mixed|string customer_code
+     * @property mixed|string location
+     * @property string fvehicleno
+     * @property mixed|null Otodoke
      * @ORM\Table(name="dtb_order", indexes={
      *     @ORM\Index(name="dtb_order_email_idx", columns={"email"}),
      *     @ORM\Index(name="dtb_order_order_date_idx", columns={"order_date"}),
@@ -370,6 +389,13 @@ if (!class_exists('\Eccube\Entity\Order')) {
          * @ORM\Column(name="addr02", type="string", length=255, nullable=true)
          */
         private $addr02;
+
+        /**
+         * @var string|null
+         *
+         * @ORM\Column(name="addr03", type="string", length=255, nullable=true)
+         */
+        private $addr03;
 
         /**
          * @var \DateTime|null
@@ -1822,6 +1848,22 @@ if (!class_exists('\Eccube\Entity\Order')) {
             }
 
             return $quantity;
+        }
+
+        /**
+         * @return string|null
+         */
+        public function getAddr03()
+        {
+            return $this->addr03;
+        }
+
+        /**
+         * @param string|null $addr03
+         */
+        public function setAddr03($addr03 = null)
+        {
+            $this->addr03 = $addr03;
         }
     }
 }
