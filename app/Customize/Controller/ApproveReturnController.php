@@ -490,6 +490,10 @@ class ApproveReturnController extends AbstractController
 
             $data = $commonService->getPdfApprove($params, $arr_returns_no);
 
+            if (!count($data)) {
+                return $this->redirect('/');
+            }
+
             // Modify data
             foreach ($data as &$item) {
                 try {
