@@ -482,6 +482,18 @@ class ApproveReturnController extends AbstractController
                 return $this->redirect('/');
             }
 
+            if (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] == 1) {
+                if (!empty($this->traitRedirectStockApprove())) {
+                    return $this->redirect($this->traitRedirectStockApprove());
+                }
+            } elseif (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] == 5) {
+                if (!empty($this->traitRedirectApprove())) {
+                    return $this->redirect($this->traitRedirectApprove());
+                }
+            } else {
+                return $this->redirect('/');
+            }
+
             if (trim($returns_no) == 'all') {
                 $arr_returns_no = $commonService->getApproveNoPrintPDF($params);
             } else {
