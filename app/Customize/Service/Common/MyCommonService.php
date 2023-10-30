@@ -3488,6 +3488,11 @@ SQL;
             $myPara[] = $params['search_aprove_date'].'-%';
         }
 
+        if (!empty($params['search_returned_date']) && $params['search_returned_date'] != 0) {
+            $condition .= ' AND returned_date LIKE ? ';
+            $myPara[] = $params['search_returned_date'].'-%';
+        }
+
         if (!empty($params['search_jan_code']) && $params['search_jan_code'] != 0) {
             $condition .= ' AND jan_code = ? ';
             $myPara[] = $params['search_jan_code'];

@@ -45,4 +45,13 @@ trait TraitController
 
         return '';
     }
+
+    public function traitRedirectApproveExport()
+    {
+        if ($this->globalService->getLoginType() != 'approve_user' && $this->globalService->getLoginType() != 'stock_user') {
+            return '/';
+        }
+
+        return '';
+    }
 }
