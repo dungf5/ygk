@@ -464,6 +464,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'product_returns_info.returns_request_date',
             'product_returns_info.aprove_date',
             'product_returns_info.product_receipt_date',
+            'product_returns_info.returned_date',
             'product_returns_info.shipping_num',
             'product.product_code',
             'product.product_name',
@@ -523,6 +524,11 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         if (!empty($paramSearch['search_product_receipt_date']) && $paramSearch['search_product_receipt_date'] != 0) {
             $qb->andWhere('product_returns_info.product_receipt_date LIKE :search_product_receipt_date')
                 ->setParameter(':search_product_receipt_date', "{$paramSearch['search_product_receipt_date']}-%");
+        }
+
+        if (!empty($paramSearch['search_returned_date']) && $paramSearch['search_returned_date'] != 0) {
+            $qb->andWhere('product_returns_info.returned_date LIKE :search_returned_date')
+                ->setParameter(':search_returned_date', "{$paramSearch['search_returned_date']}-%");
         }
 
         if (!empty($paramSearch['search_reason_return']) && $paramSearch['search_reason_return'] != '0') {

@@ -371,6 +371,79 @@ class ApproveReturnController extends AbstractController
     }
 
     /**
+     * 返品手続き
+     *
+     * @Route("/mypage/approve/5", name="approve_return_5", methods={"GET"})
+     * @Template("Approve/approve5.twig")
+     */
+    public function approveReturn5(Request $request, PaginatorInterface $paginator)
+    {
+        if (!empty($this->traitRedirectApprove())) {
+            return $this->redirect($this->traitRedirectApprove());
+        }
+
+        Type::overrideType('datetimetz', UTCDateTimeTzType::class);
+
+        // 購入処理中/決済処理中ステータスの受注を非表示にする.
+        $this->entityManager->getFilters()->enable('incomplete_order_status_hidden');
+
+        //Params
+        $param = [
+            'returns_status_flag' => 5,
+            'search_jan_code' => $request->get('search_jan_code', ''),
+            'search_returns_no' => $request->get('search_returns_no', 0),
+            'search_request_date' => $request->get('search_request_date', 0),
+            'search_returned_date' => $request->get('search_returned_date', 0),
+            'search_customer' => $request->get('search_customer', 0),
+            'search_shipping' => $request->get('search_shipping', 0),
+            'search_otodoke' => $request->get('search_otodoke', 0),
+            'search_product' => $request->get('search_product', 0),
+        ];
+
+        // paginator
+        $commonService = new MyCommonService($this->entityManager);
+        $qb = $this->mstProductReturnsInfoRepository->getReturnDataList($param);
+
+        // Paginator
+        $pagination = $paginator->paginate(
+            $qb,
+            $request->get('pageno', 1),
+            $this->eccubeConfig['eccube_search_pmax'],
+            ['distinct' => true]
+        );
+
+        $listItem = !is_array($pagination) ? $pagination->getItems() : [];
+        foreach ($listItem as &$item) {
+            $item['url'] = $this->generateUrl('mypage_return_complete', ['returns_no' => $item['returns_no']], UrlGeneratorInterface::ABSOLUTE_URL);
+        }
+
+        $pagination->setItems($listItem);
+
+        /*create list order date*/
+        $request_date_list = [];
+        for ($i = 0; $i < 14; $i++) {
+            $request_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
+        }
+
+        $returnNo = $commonService->getReturnNoList($param['returns_status_flag']);
+        $customers = $commonService->getReturnCustomerList($param['returns_status_flag']);
+        $shippings = $commonService->getReturnShippingList($param['returns_status_flag']);
+        $otodokes = $commonService->getReturnOtodokeList($param['returns_status_flag']);
+        $products = $commonService->getReturnProductList($param['returns_status_flag']);
+
+        return [
+            'pagination' => $pagination,
+            'param' => $param,
+            'request_date_list' => $request_date_list,
+            'returnNo' => $returnNo,
+            'customers' => $customers,
+            'shippings' => $shippings,
+            'otodokes' => $otodokes,
+            'products' => $products,
+        ];
+    }
+
+    /**
      * Export PDF
      *
      * @Route("/mypage/approve/export/pdf", name="exportPdfApprove", methods={"GET"})
@@ -378,8 +451,8 @@ class ApproveReturnController extends AbstractController
      */
     public function exportPdfApprove(Request $request)
     {
-        if (!empty($this->traitRedirectStockApprove())) {
-            return $this->redirect($this->traitRedirectStockApprove());
+        if (!empty($this->traitRedirectApproveExport())) {
+            return $this->redirect($this->traitRedirectApproveExport());
         }
 
         try {
@@ -394,6 +467,7 @@ class ApproveReturnController extends AbstractController
                 'search_returns_no' => MyCommon::getPara('search_returns_no'),
                 'search_request_date' => MyCommon::getPara('search_request_date'),
                 'search_aprove_date' => MyCommon::getPara('search_aprove_date'),
+                'search_returned_date' => MyCommon::getPara('search_returned_date'),
                 'search_jan_code' => MyCommon::getPara('search_jan_code'),
                 'search_customer' => MyCommon::getPara('search_customer'),
                 'search_shipping' => MyCommon::getPara('search_shipping'),
@@ -404,16 +478,8 @@ class ApproveReturnController extends AbstractController
 
             $commonService = new MyCommonService($this->entityManager);
 
-            if (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] == 1) {
-                if (!empty($this->traitRedirectStockApprove())) {
-                    return $this->redirect($this->traitRedirectStockApprove());
-                }
-            }
-
-            if (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] != 1) {
-                if (!empty($this->traitRedirectApprove())) {
-                    return $this->redirect($this->traitRedirectApprove());
-                }
+            if (!in_array((int) $params['returns_status_flag'], [1, 5])) {
+                return $this->redirect('/');
             }
 
             if (trim($returns_no) == 'all') {
