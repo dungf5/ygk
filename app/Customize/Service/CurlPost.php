@@ -26,7 +26,11 @@ trait CurlPost
     public function pushGoogleChat($content = null, $thread = null)
     {
         try {
-            $webhook = !empty(getenv('WEBHOOK_GOOGLE_CHAT')) ? getenv('WEBHOOK_GOOGLE_CHAT') : 'https://chat.googleapis.com/v1/spaces/AAAAhrDa68s/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=JXDyJVzlOlq_H5ZO4NyVjpoV22Qk781-86aJPTxx5_E%3D';
+            $webhook = getenv('WEBHOOK_GOOGLE_CHAT');
+
+            if (empty($webhook)) {
+                return;
+            }
 
             $data = json_encode([
                 'text' => $content,
