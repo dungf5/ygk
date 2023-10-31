@@ -2464,7 +2464,7 @@ class MypageController extends AbstractController
      * マイページ.
      *
      * @Route("/mypage/return/history/export/pdf", name="exportPdfReturn", methods={"GET"})
-     * @Template("/Mypage/exportPdfReturns.twig")
+     * @Template("/Approve/exportPdfApprove.twig")
      */
     public function exportPdfReturn(Request $request)
     {
@@ -2477,7 +2477,7 @@ class MypageController extends AbstractController
             ini_set('memory_limit', '9072M');
             ini_set('max_execution_time', '0');
             ini_set('max_input_time', '-1');
-            $htmlFileName = 'Mypage/exportPdfReturns.twig';
+            $htmlFileName = '/Approve/exportPdfApprove.twig';
             $returns_no = MyCommon::getPara('return_no');
 
             $params = [
@@ -2497,14 +2497,36 @@ class MypageController extends AbstractController
             }
 
             $data = $commonService->getPdfReturns($customer_code, $arr_returns_no);
-            $data['data'] = array_chunk($data, 12);
-            $data['customer'] = $this->globalService->customer();
+            if (!count($data)) {
+                return $this->redirectToRoute('mypage_return_history');
+            }
+
+            // Modify data
+            foreach ($data as &$item) {
+                try {
+                    $generator = new \Picqer\Barcode\BarcodeGeneratorJPG();
+                    $barcode = base64_encode($generator->getBarcode($item['returns_no'], $generator::TYPE_CODE_39));
+                } catch (\Exception $e) {
+                    $barcode = '';
+                }
+
+                $item['barcode'] = $barcode;
+                $item['create_date'] = date('Y年m月d日', strtotime($item['create_date']));
+                $item['cus_image_url_path1'] = $this->imgToBase64($item['cus_image_url_path1']);
+                $item['cus_image_url_path2'] = $this->imgToBase64($item['cus_image_url_path2']);
+                $item['cus_image_url_path3'] = $this->imgToBase64($item['cus_image_url_path3']);
+                $item['cus_image_url_path4'] = $this->imgToBase64($item['cus_image_url_path4']);
+                $item['cus_image_url_path5'] = $this->imgToBase64($item['cus_image_url_path5']);
+                $item['cus_image_url_path6'] = $this->imgToBase64($item['cus_image_url_path6']);
+            }
+
+            $arr_data['data'] = $data;
 
             $dirPdf = MyCommon::getHtmluserDataDir().'/pdf';
             FileUtil::makeDirectory($dirPdf);
             $namePdf = count($arr_returns_no) == 1 ? 'returns_'.$arr_returns_no[0].'.pdf' : 'returns_'.date('YmdHis').'.pdf';
             $file = $dirPdf.'/'.$namePdf;
-            $html = $this->twig->render($htmlFileName, $data);
+            $html = $this->twig->render($htmlFileName, $arr_data);
 
             if (env('APP_IS_LOCAL', 1) != 1) {
                 MyCommon::converHtmlToPdf($dirPdf, $namePdf, $html);
@@ -2525,8 +2547,8 @@ class MypageController extends AbstractController
                 //file_put_contents($file, $output);
                 //$dompdf->stream($file);
 
-                if (count($data)) {
-                    return $data;
+                if (count($arr_data)) {
+                    return $arr_data;
                 } else {
                     return $this->redirectToRoute('mypage_return_history');
                 }
@@ -2535,6 +2557,30 @@ class MypageController extends AbstractController
             log_error($e->getMessage());
 
             return $this->redirectToRoute('mypage_return_history');
+        }
+    }
+
+    private function imgToBase64($path)
+    {
+        if (empty($path) || !file_exists($path)) {
+            return '';
+        }
+
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+
+        if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
+            return '';
+        }
+
+        try {
+            $data = file_get_contents($path);
+            $base64 = 'data:image/'.$extension.';base64,'.base64_encode($data);
+
+            return $base64;
+        } catch (\Exception $e) {
+            log_error($e->getMessage());
+
+            return '';
         }
     }
 }
