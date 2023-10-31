@@ -3452,10 +3452,20 @@ SQL;
                 mst_product_returns_info.shipping_num,
                 mst_product_returns_info.cus_order_no,
                 mst_product_returns_info.cus_order_lineno,
+                mst_product_returns_info.customer_comment,
+                mst_product_returns_info.shipping_fee,
+                mst_product_returns_info.cus_image_url_path1,
+                mst_product_returns_info.cus_image_url_path2,
+                mst_product_returns_info.cus_image_url_path3,
+                mst_product_returns_info.cus_image_url_path4,
+                mst_product_returns_info.cus_image_url_path5,
+                mst_product_returns_info.cus_image_url_path6,
+                mst_product_returns_info.create_date,
                 mst_product.product_code,
                 mst_product.product_name,
                 mst_product.quantity,
-                dt_returns_reson.returns_reson
+                (SELECT mc.company_name FROM mst_customer mc WHERE mc.customer_code = mst_product_returns_info.customer_code LIMIT 1) AS company_name,
+                (SELECT drr.returns_reson FROM dt_returns_reson drr WHERE drr.returns_reson_id = mst_product_returns_info.reason_returns_code LIMIT 1) AS returns_reson
             ';
 
         $subWhere = '';
@@ -3477,9 +3487,6 @@ SQL;
                         JOIN
                             mst_product
                         ON mst_product.product_code = mst_product_returns_info.product_code
-                        LEFT JOIN
-                            dt_returns_reson
-                        ON dt_returns_reson.returns_reson_id = mst_product_returns_info.reason_returns_code
                         WHERE
                             mst_product_returns_info.customer_code = ?
                         AND
