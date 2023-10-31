@@ -1254,6 +1254,13 @@ class MailService
             ->setTo([$email])
             ->setBody($body);
 
+        if (getenv('APP_IS_LOCAL') != 1 && getenv('EMAIL_RETURN_CC')) {
+            $email = getenv('EMAIL_RETURN_CC');
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $message->setCc($email);
+            }
+        }
+
         if (getenv('APP_IS_LOCAL') != 1 && getenv('EMAIL_BCC')) {
             $email = getenv('EMAIL_BCC');
             if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -1303,6 +1310,13 @@ class MailService
             ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
             ->setTo([$email])
             ->setBody($body);
+
+        if (getenv('APP_IS_LOCAL') != 1 && getenv('EMAIL_RETURN_CC')) {
+            $email = getenv('EMAIL_RETURN_CC');
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $message->setCc($email);
+            }
+        }
 
         if (getenv('APP_IS_LOCAL') != 1 && getenv('EMAIL_BCC')) {
             $email = getenv('EMAIL_BCC');
