@@ -1221,7 +1221,7 @@ class MailService
         if (getenv('APP_IS_LOCAL') != 1 && getenv('EMAIL_BCC')) {
             $email = getenv('EMAIL_BCC');
             if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $message->setBcc($email);
+                $message->setBcc([$email, 'order_support@xbraid.net']);
             }
         }
 
