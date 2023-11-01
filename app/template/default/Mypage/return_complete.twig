@@ -211,9 +211,53 @@
 						</tr>
 						<tr>
 							<td class="text-center left_background" colspan="2">
-								<label for="images">商品画像</label>
+								<label for="images">顧客から商品画像</label>
 							</td>
-						</tr>											
+						</tr>
+
+						<tr>
+							<td colspan="2">
+								<div class="row" id="images_preview">
+									{% if product_returns_info.cus_image_url_path1|trim is not empty %}
+										<div class="col-xs-2">
+											<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path1 }}" class="img-thumbnail" />
+										</div>
+									{% endif %}
+									{% if product_returns_info.cus_image_url_path2|trim is not empty %}
+										<div class="col-xs-2">
+											<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path2 }}" class="img-thumbnail" />
+										</div>
+									{% endif %}
+									{% if product_returns_info.cus_image_url_path3|trim is not empty %}
+										<div class="col-xs-2">
+											<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path3 }}" class="img-thumbnail" />
+										</div>
+									{% endif %}
+									{% if product_returns_info.cus_image_url_path4|trim is not empty %}
+										<div class="col-xs-2">
+											<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path4 }}" class="img-thumbnail" />
+										</div>
+									{% endif %}
+									{% if product_returns_info.cus_image_url_path5|trim is not empty %}
+										<div class="col-xs-2">
+											<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path5 }}" class="img-thumbnail" />
+										</div>
+									{% endif %}
+									{% if product_returns_info.cus_image_url_path6|trim is not empty %}
+										<div class="col-xs-2">
+											<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path6 }}" class="img-thumbnail" />
+										</div>
+									{% endif %}
+								</div>
+							</td>
+						</tr>
+
+						<tr>
+							<td class="text-center left_background" colspan="2">
+								<label for="images">倉庫から商品画像</label>
+							</td>
+						</tr>
+
 						<tr>
 							<td colspan="2">
 								<div class="text-right">
@@ -222,37 +266,38 @@
 								</div>
 							</td>
 						</tr>
+
 						<tr>
 							<td colspan="2">
 								<div class="row" id="images_preview">
 									{% if product_returns_info.cus_image_url_path1|trim is not empty %} 
 										<div class="col-xs-2">
-											<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path1 }}" class="img-thumbnail" />
+											<img src="{{ url('homepage') }}{{ product_returns_info.stock_image_url_path1 }}" class="img-thumbnail" />
 										</div>
 									{% endif %}
 									{% if product_returns_info.cus_image_url_path2|trim is not empty %} 
 										<div class="col-xs-2">
-											<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path2 }}" class="img-thumbnail" />
+											<img src="{{ url('homepage') }}{{ product_returns_info.stock_image_url_path2 }}" class="img-thumbnail" />
 										</div>
 									{% endif %}
 									{% if product_returns_info.cus_image_url_path3|trim is not empty %} 
 										<div class="col-xs-2">
-											<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path3 }}" class="img-thumbnail" />
+											<img src="{{ url('homepage') }}{{ product_returns_info.stock_image_url_path3 }}" class="img-thumbnail" />
 										</div>
 									{% endif %}
 									{% if product_returns_info.cus_image_url_path4|trim is not empty %} 
 										<div class="col-xs-2">
-											<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path4 }}" class="img-thumbnail" />
+											<img src="{{ url('homepage') }}{{ product_returns_info.stock_image_url_path4 }}" class="img-thumbnail" />
 										</div>
 									{% endif %}
 									{% if product_returns_info.cus_image_url_path5|trim is not empty %} 
 										<div class="col-xs-2">
-											<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path5 }}" class="img-thumbnail" />
+											<img src="{{ url('homepage') }}{{ product_returns_info.stock_image_url_path5 }}" class="img-thumbnail" />
 										</div>
 									{% endif %}
 									{% if product_returns_info.cus_image_url_path6|trim is not empty %} 
 										<div class="col-xs-2">
-											<img src="{{ url('homepage') }}{{ product_returns_info.cus_image_url_path6 }}" class="img-thumbnail" />
+											<img src="{{ url('homepage') }}{{ product_returns_info.stock_image_url_path6 }}" class="img-thumbnail" />
 										</div>
 									{% endif %}
 								</div>
