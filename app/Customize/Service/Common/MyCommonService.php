@@ -3680,7 +3680,7 @@ SQL;
                             {$cols}
                         FROM
                             mst_product_returns_info
-                        JOIN
+                        LEFT JOIN
                             mst_product
                         ON mst_product.product_code = mst_product_returns_info.product_code
                         WHERE
