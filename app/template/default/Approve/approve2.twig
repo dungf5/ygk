@@ -225,7 +225,7 @@
                             <th title="返品ステータス" width="10%">
                                 <select class="hidden" id="search_returns_status_flag" name="search_returns_status_flag">
                                     <option value="0" {% if param.search_returns_status_flag == '0' %} selected {% endif %}>全て</option>
-                                    <option value="1" {% if param.search_returns_status_flag == '1' %} selected {% endif %}>承認待ち</option>
+                                    <option value="1" {% if param.search_returns_status_flag == '1' %} selected {% endif %}>受取待ち</option>
                                     <option value="3" {% if param.search_returns_status_flag == '3' %} selected {% endif %}>受理済</option>
                                     <option value="4" {% if param.search_returns_status_flag == '4' %} selected {% endif %}>未受理済</option>
                                 </select>
@@ -337,7 +337,7 @@
                                 </td>
 
                                 <td width="10%">
-                                    {% if item.returns_status_flag == 1 %}<p style="color: red;">承認待ち</p>{% endif %}
+                                    {% if item.returns_status_flag == 1 %}<p style="color: red;">受取待ち</p>{% endif %}
                                     {% if item.returns_status_flag == 3 %}<p>受理済</p>{% endif %}
                                     {% if item.returns_status_flag == 4 %}<p>未受理済</p>{% endif %}
                                 </td>
