@@ -1725,7 +1725,7 @@ class MypageController extends AbstractController
     public function returnApprove(Request $request, string $returns_no)
     {
         if (!empty($this->traitRedirectApprove())) {
-            return $this->redirect($this->traitRedirectApprove());
+            return $this->redirectToRoute('mypage_return_history');
         }
 
         try {
@@ -1772,7 +1772,7 @@ class MypageController extends AbstractController
     public function returnApproveFinish(Request $request, string $returns_no)
     {
         if (!empty($this->traitRedirectApprove())) {
-            return $this->redirect($this->traitRedirectApprove());
+            return $this->redirectToRoute('mypage_return_history');
         }
 
         try {
@@ -1849,6 +1849,8 @@ class MypageController extends AbstractController
                     $email = $customer['customer_email'] ?? $customer['email'];
                     $this->mailService->sendMailReturnProductApproveNo($email, $aprove_comment_not_yet);
                 }
+
+                return $this->redirectToRoute('approve_return_1');
             }
 
             if (!in_array($product_returns_info->getReturnsStatusFlag(), ['1', '2'])) {
@@ -1880,7 +1882,7 @@ class MypageController extends AbstractController
     public function returnReceipt(Request $request, string $returns_no)
     {
         if (!empty($this->traitRedirectStockApprove())) {
-            return $this->redirect($this->traitRedirectStockApprove());
+            return $this->redirectToRoute('mypage_return_history');
         }
 
         try {
@@ -1927,7 +1929,7 @@ class MypageController extends AbstractController
     public function returnReceiptFinish(Request $request, string $returns_no)
     {
         if (!empty($this->traitRedirectStockApprove())) {
-            return $this->redirect($this->traitRedirectStockApprove());
+            return $this->redirectToRoute('mypage_return_history');
         }
 
         try {
@@ -2029,6 +2031,12 @@ class MypageController extends AbstractController
                     $email = $customer['customer_email'] ?? $customer['email'];
                     $this->mailService->sendMailReturnProductReceiptNo($email, $receipt_not_yet_comment);
                 }
+
+                return $this->redirectToRoute('approve_return_2');
+            }
+
+            if (!in_array($product_returns_info->getReturnsStatusFlag(), ['3', '4'])) {
+                return $this->redirectToRoute('mypage_return_history');
             }
 
             $returns_reson = $commonService->getReturnsReson();
@@ -2097,7 +2105,7 @@ class MypageController extends AbstractController
     public function returnCompleteFinish(Request $request, string $returns_no)
     {
         if (!empty($this->traitRedirectApprove())) {
-            return $this->redirect($this->traitRedirectApprove());
+            return $this->redirectToRoute('mypage_return_history');
         }
 
         try {
@@ -2128,6 +2136,12 @@ class MypageController extends AbstractController
 
                 $email = $customer['customer_email'] ?? $customer['email'];
                 $this->mailService->sendMailReturnProductComplete($email);
+
+                return $this->redirectToRoute('approve_return_3');
+            }
+
+            if (!in_array($product_returns_info->getReturnsStatusFlag(), ['5'])) {
+                return $this->redirectToRoute('mypage_return_history');
             }
 
             $returns_reson = $commonService->getReturnsReson();
