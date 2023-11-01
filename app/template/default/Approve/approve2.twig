@@ -154,7 +154,15 @@
 
             {% if pagination and pagination.totalItemCount > 0 %}
                 <p class="ec-para-normal">
-                    {{ 'front.mypage.approve2_count'|trans({'%count%':pagination.totalItemCount}) }}
+                    {% if param.search_returns_status_flag == 1 %}
+                        {{ 'front.mypage.approve2_count_1'|trans({'%count%':pagination.totalItemCount}) }}
+                    {% elseif param.search_returns_status_flag == 3 %}
+                        {{ 'front.mypage.approve2_count_3'|trans({'%count%':pagination.totalItemCount}) }}
+                    {% elseif param.search_returns_status_flag == 4 %}
+                        {{ 'front.mypage.approve2_count_4'|trans({'%count%':pagination.totalItemCount}) }}
+                    {% else %}
+                        {{ 'front.mypage.approve2_count_all'|trans({'%count%':pagination.totalItemCount}) }}
+                    {% endif %}
                 </p>
             {% endif %}
 

@@ -188,24 +188,24 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         }
 
         /**
-         * @var string
+         * @var string|null
          *
          * @ORM\Column(name="shipping_date", type="string")
          */
         private $shipping_date;
 
         /**
-         * @return string
+         * @return string|null
          */
-        public function getShippingDate(): ?string
+        public function getShippingDate()
         {
             return $this->shipping_date;
         }
 
         /**
-         * @param string $shipping_date
+         * @param string|null $shipping_date
          */
-        public function setShippingDate(string $shipping_date): void
+        public function setShippingDate($shipping_date): void
         {
             $this->shipping_date = $shipping_date;
         }

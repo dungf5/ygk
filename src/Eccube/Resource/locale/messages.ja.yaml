@@ -237,6 +237,10 @@ front.mypage.nav__withdrow: 退会手続き
 front.mypage.history_count: '%count%件の履歴があります'
 front.mypage.approve1_count: '%count%件の承認待ちがあります'
 front.mypage.approve2_count: '%count%件の受取待ちがあります'
+front.mypage.approve2_count_all: '%count%件の受取一覧があります'
+front.mypage.approve2_count_1: '%count%件の受取待ちがあります'
+front.mypage.approve2_count_3: '%count%件の受理済があります'
+front.mypage.approve2_count_4: '%count%件の未受理済があります'
 front.mypage.approve3_count: '%count%件の完了待ちがあります'
 front.mypage.history_not_found: 注文履歴はありません。
 front.mypage.message_not_found: 記載なし
