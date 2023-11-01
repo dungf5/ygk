@@ -241,6 +241,13 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         private $product_code;
 
         /**
+         * @var string
+         *
+         * @ORM\Column(name="product_name", type="string")
+         */
+        private $product_name;
+
+        /**
          * @return string
          */
         public function getProductCode(): ?string
@@ -1013,6 +1020,22 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         public function setCusOrderLineno(string $cus_order_lineno): void
         {
             $this->cus_order_lineno = $cus_order_lineno;
+        }
+
+        /**
+         * @return string
+         */
+        public function getProductName(): ?string
+        {
+            return $this->product_name;
+        }
+
+        /**
+         * @param string $product_name
+         */
+        public function setProductName(string $product_name): void
+        {
+            $this->product_name = $product_name;
         }
     }
 }
