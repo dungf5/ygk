@@ -52,6 +52,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             $object->setShippingDate($data['shipping_date']);
             $object->setJanCode($data['jan_code']);
             $object->setProductCode($data['product_code']);
+            $object->setProductName($data['product_name']);
             $object->setShippingNum($data['shipping_num']);
             $object->setReasonReturnsCode($data['reason_returns_code']);
             $object->setCustomerComment($data['customer_comment']);
@@ -394,6 +395,8 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             ) AS total_returns_num"
         );
 
+        $qb->andWhere('shipping.shipping_num > 0');
+
         if (!empty($paramSearch['search_jan_code'])) {
             $qb->andWhere('product.jan_code LIKE :search_jan_code')
                 ->setParameter(':search_jan_code', "%{$paramSearch['search_jan_code']}%");
@@ -467,11 +470,11 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'product_returns_info.returned_date',
             'product_returns_info.shipping_num',
             'product.product_code',
-            'product.product_name',
             'product.quantity',
             'returns_reson.returns_reson',
             'product_returns_info.cus_order_no',
-            'product_returns_info.cus_order_lineno'
+            'product_returns_info.cus_order_lineno',
+            'IFNULL(product_returns_info.product_name, product.product_name) AS product_name'
         );
 
         $qb->addSelect("(SELECT CONCAT(IFNULL(mst_cus.company_name, ''), ' 〒 ', IFNULL(mst_cus.postal_code, ''), IFNULL(mst_cus.addr01, ''), IFNULL(mst_cus.addr02, ''), IFNULL(mst_cus.addr03, '')) FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = product_returns_info.customer_code) customer_name");

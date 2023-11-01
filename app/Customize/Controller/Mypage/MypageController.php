@@ -1415,6 +1415,7 @@ class MypageController extends AbstractController
                         'shipping_date' => empty($param['shipping_day']) ? NULL : $param['shipping_day'],
                         'jan_code' => $param['jan_code'],
                         'product_code' => $param['product_code'],
+                        'product_name' => $param['product_name'],
                         'shipping_num' => $param['shipping_num'],
                         'reason_returns_code' => $param['return_reason'],
                         'customer_comment' => $param['customer_comment'],
