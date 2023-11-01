@@ -3468,7 +3468,7 @@ SQL;
                 mst_product_returns_info.cus_image_url_path6,
                 mst_product_returns_info.create_date,
                 mst_product.product_code,
-                mst_product.product_name,
+                IFNULL(mst_product_returns_info.product_name, mst_product.product_name) AS product_name,
                 mst_product.quantity,
                 (SELECT mc.company_name FROM mst_customer mc WHERE mc.customer_code = mst_product_returns_info.customer_code LIMIT 1) AS company_name,
                 (SELECT drr.returns_reson FROM dt_returns_reson drr WHERE drr.returns_reson_id = mst_product_returns_info.reason_returns_code LIMIT 1) AS returns_reson
@@ -3639,7 +3639,7 @@ SQL;
                 mst_product_returns_info.cus_image_url_path6,
                 mst_product_returns_info.create_date,
                 mst_product.product_code,
-                mst_product.product_name,
+                IFNULL(mst_product_returns_info.product_name, mst_product.product_name) AS product_name,
                 mst_product.quantity,
                 (SELECT mc.company_name FROM mst_customer mc WHERE mc.customer_code = mst_product_returns_info.customer_code LIMIT 1) AS company_name,
                 (SELECT drr.returns_reson FROM dt_returns_reson drr WHERE drr.returns_reson_id = mst_product_returns_info.reason_returns_code LIMIT 1) AS returns_reson
