@@ -1285,6 +1285,7 @@ class MypageController extends AbstractController
             // Set Aprove auto. returns_status_flag = 1
             if (
                 in_array(trim($param['return_reason']), ['02', '04']) &&
+                !empty($param['shipping_day']) &&
                 date('Ymd', strtotime(' - 30 days')) <= date('Ymd', strtotime($param['shipping_day'])) &&
                 date('Ymd', strtotime($param['shipping_day'])) <= date('Ymd')
             ) {
@@ -1308,13 +1309,13 @@ class MypageController extends AbstractController
             }
 
             $errors = [];
-            if (empty($param['shipping_no'])) {
-                $errors['shipping_no'] = '出荷指示№を入力してください。';
-            }
+//            if (empty($param['shipping_no'])) {
+//                $errors['shipping_no'] = '出荷指示№を入力してください。';
+//            }
 
-            if (empty($param['jan_code'])) {
-                $errors['jan_code'] = 'JANコードを入力してください。';
-            }
+//            if (empty($param['jan_code'])) {
+//                $errors['jan_code'] = 'JANコードを入力してください。';
+//            }
 
             if (empty($param['return_reason'])) {
                 $errors['return_reason'] = '返品理由を入力してください。';
@@ -1324,16 +1325,16 @@ class MypageController extends AbstractController
                 $errors['customer_comment'] = '顧客コメントを入力してください。';
             }
 
-            if ($param['return_num'] == '') {
-                $errors['return_num'] = '返品数を入力してください。';
-            } elseif ((int) $param['return_num'] <= 0) {
-                $errors['return_num'] = '1以上で入力してください。';
-            } elseif (
-                ((int) $param['total_returns_num'] > (int) $param['shipping_num']) ||
-                ((int) $param['return_num'] > ((int) $param['shipping_num'] - (int) $param['total_returns_num']))
-            ) {
-                $errors['return_num'] = '出荷数以上の数量は入力できません。';
-            }
+//            if ($param['return_num'] == '') {
+//                $errors['return_num'] = '返品数を入力してください。';
+//            } elseif ((int) $param['return_num'] <= 0) {
+//                $errors['return_num'] = '1以上で入力してください。';
+//            } elseif (
+//                ((int) $param['total_returns_num'] > (int) $param['shipping_num']) ||
+//                ((int) $param['return_num'] > ((int) $param['shipping_num'] - (int) $param['total_returns_num']))
+//            ) {
+//                $errors['return_num'] = '出荷数以上の数量は入力できません。';
+//            }
 
             $images = $request->files->get('images', []);
 
@@ -1411,7 +1412,7 @@ class MypageController extends AbstractController
                         'otodoke_code' => $param['otodoke_code'],
                         'otodoke_name' => $otodoke_name,
                         'shipping_no' => $param['shipping_no'],
-                        'shipping_date' => $param['shipping_day'],
+                        'shipping_date' => empty($param['shipping_day']) ? NULL : $param['shipping_day'],
                         'jan_code' => $param['jan_code'],
                         'product_code' => $param['product_code'],
                         'shipping_num' => $param['shipping_num'],
@@ -1943,6 +1944,10 @@ class MypageController extends AbstractController
             $commonService = new MyCommonService($this->entityManager);
             $product_returns_info = $this->mstProductReturnsInfoRepository->find($returns_no);
 
+            $returns_reson = $commonService->getReturnsReson();
+            $returns_reson = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
+            $returns_reson_text = $returns_reson[$product_returns_info->getReasonReturnsCode()];
+
             if (empty($product_returns_info)) {
                 return $this->redirectToRoute('mypage_return_history');
             }
@@ -2001,7 +2006,7 @@ class MypageController extends AbstractController
 
                 if ($receipt == 'yes') {
                     $data['returns_status_flag'] = 3;
-                    $data['receipt_comment'] = $receipt_comment;
+                    $data['reviews_comment'] = $receipt_comment;
                     $data['product_receipt_date'] = date('Y-m-d H:i:s');
                     $data['stock_reviews_flag'] = $stock_reviews_flag;
                 } else {
@@ -2028,7 +2033,7 @@ class MypageController extends AbstractController
                     $cus_reviews_flag = $product_returns_info->getCusReviewsFlag() == 1 ? '良品' : ($product_returns_info->getCusReviewsFlag() == 2 ? '不良品' : '');
                     $this->mailService->sendMailReturnProductReceiptYes($email,
                         [
-                            'receipt_comment' => $receipt_comment,
+                            'returns_reson' => $returns_reson_text,
                             'url_return_receipt_finish' => $url_return_receipt_finish,
                             'cus_reviews_flag' => $cus_reviews_flag,
                             'company_name' => $customer['company_name'] ?? '',
@@ -2045,10 +2050,6 @@ class MypageController extends AbstractController
             if (!in_array($product_returns_info->getReturnsStatusFlag(), ['3', '4'])) {
                 return $this->redirectToRoute('mypage_return_history');
             }
-
-            $returns_reson = $commonService->getReturnsReson();
-            $returns_reson = array_column($returns_reson, 'returns_reson', 'returns_reson_id');
-            $returns_reson_text = $returns_reson[$product_returns_info->getReasonReturnsCode()];
 
             return [
                 'product_returns_info' => $product_returns_info,

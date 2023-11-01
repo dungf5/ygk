@@ -431,7 +431,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         $qb->select('product_returns_info.returns_no');
         $qb->from('Customize\Entity\MstProductReturnsInfo', 'product_returns_info');
 
-        $qb->join(
+        $qb->leftJoin(
             'Customize\Entity\MstProduct',
             'product',
             Join::WITH,
