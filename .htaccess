@@ -1,9 +1,9 @@
 
 ############## quyen vao
-AuthUserFile "/var/www/real/basicauth/.htpasswd"
-AuthName "Member Site"
-AuthType BASIC
-require valid-user
+#AuthUserFile "/var/www/real/basicauth/.htpasswd"
+#AuthName "Member Site"
+#AuthType BASIC
+#require valid-user
 
 RewriteEngine On
 RewriteCond %{HTTP:Authorization} ^(.*)

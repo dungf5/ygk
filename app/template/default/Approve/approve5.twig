@@ -269,7 +269,6 @@
 
                         <th title='{{ "front.mypage.history.jan_code" | trans | raw }} {{ "front.mypage.history.product_name" | trans | raw }}' width="25%">
                             <p class="">{{ "front.mypage.history.jan_code" | trans | raw }}</p>
-                            <br>
                             <select class="hidden" id="search_product" name="search_product">
                                 <option value="0" {% if param.search_product == 0 %} selected {% endif %}>全て</option>
                                 {% for product in products %}
