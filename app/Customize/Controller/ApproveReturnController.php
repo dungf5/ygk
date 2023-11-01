@@ -412,13 +412,6 @@ class ApproveReturnController extends AbstractController
             ['distinct' => true]
         );
 
-        $listItem = !is_array($pagination) ? $pagination->getItems() : [];
-        foreach ($listItem as &$item) {
-            $item['url'] = $this->generateUrl('mypage_return_complete', ['returns_no' => $item['returns_no']], UrlGeneratorInterface::ABSOLUTE_URL);
-        }
-
-        $pagination->setItems($listItem);
-
         /*create list order date*/
         $request_date_list = [];
         for ($i = 0; $i < 14; $i++) {

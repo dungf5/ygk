@@ -181,6 +181,7 @@
 								{% if product_returns_info.stock_reviews_flag == 1 %} <p>良品</p> {% endif %}
 								{% if product_returns_info.stock_reviews_flag == 2 %} <p>不良品</p> {% endif %}
 								{% if product_returns_info.stock_reviews_flag == 3 %} <p>保留品 </p> {% endif %}
+								<p>{{ product_returns_info.reviews_comment }}</p>
 							</td>
 						</tr>
 						<tr>
@@ -217,7 +218,7 @@
 							<td colspan="2">
 								<div class="text-right">
 									<button type="submit" name="complete" value="1" class="btn btn-warning">返品完了</button>
-									<a href="{{ url('mypage_return_history') }}" class="btn btn-warning">閉じる</a>
+									<a href="{{ url('approve_return_3') }}" class="btn btn-warning">閉じる</a>
 								</div>
 							</td>
 						</tr>
