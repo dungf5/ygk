@@ -132,8 +132,8 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             if (!empty($data['stock_image_url_path6'])) {
                 $object->setStockImageUrlPath6($data['stock_image_url_path6']);
             }
-            if (!empty($data['receipt_comment'])) {
-                $object->setReceiptComment($data['receipt_comment']);
+            if (!empty($data['reviews_comment'])) {
+                $object->setReviewsComment($data['reviews_comment']);
             }
             if (!empty($data['product_receipt_date'])) {
                 $object->setProductReceiptDate($data['product_receipt_date']);
