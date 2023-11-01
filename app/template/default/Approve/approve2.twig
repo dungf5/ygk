@@ -214,6 +214,19 @@
                                 </a>
                             </th>
 
+                            <th title="返品ステータス" width="10%">
+                                <select class="hidden" id="search_returns_status_flag" name="search_returns_status_flag">
+                                    <option value="0" {% if param.search_returns_status_flag == '0' %} selected {% endif %}>全て</option>
+                                    <option value="1" {% if param.search_returns_status_flag == '1' %} selected {% endif %}>承認待ち</option>
+                                    <option value="3" {% if param.search_returns_status_flag == '3' %} selected {% endif %}>受理済</option>
+                                    <option value="4" {% if param.search_returns_status_flag == '4' %} selected {% endif %}>未受理済</option>
+                                </select>
+                                <a href="javascript:void(0)" class="search" onclick="$('#search_returns_status_flag').select2('open')">
+                                    <label style="width: 100px;">返品ステータス</label>
+                                    <span class="glyphicon glyphicon-triangle-bottom" style="color: red;"></span>
+                                </a>
+                            </th>
+
                             <th title="顧客 | 出荷先 | 届け先" width="35%">
                                 <select class="hidden" id="search_customer" name="search_customer">
                                     <option value="0" {% if param.search_customer == 0 %} selected {% endif %}>全て</option>
@@ -307,8 +320,14 @@
                                     <p class="">{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}</p>
                                 </td>
 
-                                <td title="{{ item.aprove_date is empty ? "" : item.aprove_date|date('Y-m-d') }}">
+                                <td title="{{ item.aprove_date is empty ? "" : item.aprove_date|date('Y-m-d') }}" width="10%">
                                     <p class="text-nowrap">{{ item.aprove_date is empty ? "" : item.aprove_date|date('Y-m-d') }}</p>
+                                </td>
+
+                                <td width="10%">
+                                    {% if item.returns_status_flag == 1 %}<p style="color: red;">承認待ち</p>{% endif %}
+                                    {% if item.returns_status_flag == 3 %}<p>受理済</p>{% endif %}
+                                    {% if item.returns_status_flag == 4 %}<p>未受理済</p>{% endif %}
                                 </td>
 
                                 <td width="35%">
@@ -355,6 +374,7 @@
 	var search_returns_no = "{{ param.search_returns_no }}";
 	var search_request_date = "{{ param.search_request_date }}";
 	var search_aprove_date = "{{ param.search_aprove_date }}";
+	var search_returns_status_flag = "{{ param.search_returns_status_flag }}";
 	var search_jan_code = "{{ param.search_jan_code }}";
 	var search_customer = "{{ param.search_customer }}";
 	var search_shipping = "{{ param.search_shipping }}";
@@ -364,15 +384,27 @@
 	function reload() {
 		loadingOverlay("show")
 		let _parser = new URL( window.location.href )
+		_parser.searchParams.set( 'search_jan_code', search_jan_code )
 		_parser.searchParams.set( 'search_returns_no', search_returns_no )
 		_parser.searchParams.set( 'search_request_date', search_request_date )
 		_parser.searchParams.set( 'search_aprove_date', search_aprove_date )
-		_parser.searchParams.set( 'search_jan_code', search_jan_code )
+		_parser.searchParams.set( 'search_returns_status_flag', search_returns_status_flag )
 		_parser.searchParams.set( 'search_customer', search_customer )
 		_parser.searchParams.set( 'search_shipping', search_shipping )
 		_parser.searchParams.set( 'search_otodoke', search_otodoke )
 		_parser.searchParams.set( 'search_product', search_product )
 		window.location = _parser.href
+	}
+
+	function resetFilter() {
+		search_returns_no = 0;
+		search_request_date = 0;
+		search_aprove_date = 0;
+		search_returns_status_flag = 0;
+		search_customer = 0;
+		search_shipping = 0;
+        search_otodoke = 0;
+        search_product = 0;
 	}
 
 	$( function() {
@@ -381,6 +413,7 @@
 			'selectionCssClass': 'hidden',
 		})
 		.on('select2:select', function (e) {
+		    resetFilter();
 			search_returns_no = e.params.data.id
 			reload()
 		});
@@ -390,6 +423,7 @@
 			'selectionCssClass': 'hidden',
 		})
 		.on('select2:select', function (e) {
+		    resetFilter();
 			search_request_date = e.params.data.id
 			reload()
 		});
@@ -399,7 +433,18 @@
 			'selectionCssClass': 'hidden',
 		})
 		.on('select2:select', function (e) {
+		    resetFilter();
 			search_aprove_date = e.params.data.id
+			reload()
+		});
+
+        $("#search_returns_status_flag").select2({
+			'dropdownAutoWidth': true,
+			'selectionCssClass': 'hidden',
+		})
+		.on('select2:select', function (e) {
+		    resetFilter();
+			search_returns_status_flag = e.params.data.id
 			reload()
 		});
 
@@ -408,11 +453,8 @@
 			'selectionCssClass': 'hidden',
 		})
 		.on('select2:select', function (e) {
+		    resetFilter();
 			search_customer = e.params.data.id
-			if( search_customer == 0 ) {
-			    search_shipping = 0;
-			    search_otodoke = 0
-			}
 			reload()
 		});
 
@@ -421,8 +463,8 @@
 			'selectionCssClass': 'hidden',
 		})
 		.on('select2:select', function (e) {
+		    resetFilter();
 			search_shipping = e.params.data.id
-			if( search_shipping == 0 ) search_otodoke = 0
 			reload()
 		});
 
@@ -431,6 +473,7 @@
 			'selectionCssClass': 'hidden',
 		})
 		.on('select2:select', function (e) {
+		    resetFilter();
 			search_otodoke = e.params.data.id
 			reload()
 		});
@@ -440,6 +483,7 @@
 			'selectionCssClass': 'hidden',
 		})
 		.on('select2:select', function (e) {
+		    resetFilter();
 			search_product = e.params.data.id
 			reload()
 		});
@@ -509,7 +553,7 @@
             path += '&search_shipping=' + search_shipping;
             path += '&search_otodoke=' + search_otodoke;
             path += '&search_product=' + search_product;
-            path += '&returns_status_flag=' + 1;
+            path += '&returns_status_flag=' + search_returns_status_flag;
 
             let url = '/mypage/approve/export/pdf?return_no=' + $("#check-box-value-print-pdf").val() + path;
 

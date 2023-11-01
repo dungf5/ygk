@@ -487,8 +487,8 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         }
 
         if (isset($paramSearch['returns_status_flag'])) {
-            $qb->andWhere('product_returns_info.returns_status_flag = :returns_status_flag')
-                ->setParameter(':returns_status_flag', $paramSearch['returns_status_flag']);
+            $qb->andWhere('product_returns_info.returns_status_flag IN (:returns_status_flag)')
+                ->setParameter(':returns_status_flag', array_diff(explode(',', $paramSearch['returns_status_flag']), [' ', '']));
         }
 
         if (!empty($paramSearch['search_shipping_date']) && $paramSearch['search_shipping_date'] != 0) {

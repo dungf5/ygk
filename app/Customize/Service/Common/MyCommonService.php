@@ -3198,19 +3198,27 @@ SQL;
 
     public function getReturnNoList($status = 0)
     {
+        $arrStatus = array_diff(explode(',', $status), [' ', '']);
+
+        $in = '';
+        foreach ($arrStatus as $item) {
+            $in .= '?, ';
+        }
+        $in = trim($in, ', ');
+
         $column = '
                     `mprt`.`returns_no`
-         ';
+                ';
 
         $sql = "
                 SELECT {$column}
                 FROM `mst_product_returns_info` `mprt`
-                WHERE `mprt`.`returns_status_flag` = ?
+                WHERE `mprt`.`returns_status_flag` IN ({$in})
             ";
         $statement = $this->entityManager->getConnection()->prepare($sql);
 
         try {
-            $result = $statement->executeQuery([$status]);
+            $result = $statement->executeQuery($arrStatus);
             $rows = $result->fetchAllAssociative();
 
             return $rows ?? [];
@@ -3221,6 +3229,14 @@ SQL;
 
     public function getReturnCustomerList($status = 0)
     {
+        $arrStatus = array_diff(explode(',', $status), [' ', '']);
+
+        $in = '';
+        foreach ($arrStatus as $item) {
+            $in .= '?, ';
+        }
+        $in = trim($in, ', ');
+
         $column = '
                     `mc`.`customer_code`,
                     `mc`.`company_name`,
@@ -3237,13 +3253,13 @@ SQL;
                 ON `mc`.`customer_code` = `mcrt`.`customer_code`
                 JOIN `dtb_customer` `dtcus`
                 ON `dtcus`.`id` = `mc`.`ec_customer_id`
-                WHERE `mcrt`.`returns_status_flag` = ?
+                WHERE `mcrt`.`returns_status_flag` IN ({$in})
                 GROUP BY `mcrt`.`customer_code`
             ";
         $statement = $this->entityManager->getConnection()->prepare($sql);
 
         try {
-            $result = $statement->executeQuery([$status]);
+            $result = $statement->executeQuery($arrStatus);
             $rows = $result->fetchAllAssociative();
 
             return $rows ?? [];
@@ -3254,6 +3270,14 @@ SQL;
 
     public function getReturnShippingList($status = 0)
     {
+        $arrStatus = array_diff(explode(',', $status), [' ', '']);
+
+        $in = '';
+        foreach ($arrStatus as $item) {
+            $in .= '?, ';
+        }
+        $in = trim($in, ', ');
+
         $column = '
                     `mcrt`.`shipping_code`,
                     `mc`.`company_name`,
@@ -3270,13 +3294,13 @@ SQL;
                 ON `mc`.`customer_code` = `mcrt`.`shipping_code`
                 JOIN `dtb_customer` `dtcus`
                 ON `dtcus`.`id` = `mc`.`ec_customer_id`
-                WHERE `mcrt`.`returns_status_flag` = ?
+                WHERE `mcrt`.`returns_status_flag` IN ({$in})
                 GROUP BY `mcrt`.`shipping_code`
             ";
         $statement = $this->entityManager->getConnection()->prepare($sql);
 
         try {
-            $result = $statement->executeQuery([$status]);
+            $result = $statement->executeQuery($arrStatus);
             $rows = $result->fetchAllAssociative();
 
             return $rows ?? [];
@@ -3287,6 +3311,14 @@ SQL;
 
     public function getReturnOtodokeList($status = 0)
     {
+        $arrStatus = array_diff(explode(',', $status), [' ', '']);
+
+        $in = '';
+        foreach ($arrStatus as $item) {
+            $in .= '?, ';
+        }
+        $in = trim($in, ', ');
+
         $column = '
                     `mcrt`.`otodoke_code`,
                     `mc`.`company_name`,
@@ -3303,13 +3335,13 @@ SQL;
                 ON `mc`.`customer_code` = `mcrt`.`otodoke_code`
                 JOIN `dtb_customer` `dtcus`
                 ON `dtcus`.`id` = `mc`.`ec_customer_id`
-                WHERE `mcrt`.`returns_status_flag` = ?
+                WHERE `mcrt`.`returns_status_flag` IN ({$in})
                 GROUP BY `mcrt`.`otodoke_code`
             ";
         $statement = $this->entityManager->getConnection()->prepare($sql);
 
         try {
-            $result = $statement->executeQuery([$status]);
+            $result = $statement->executeQuery($arrStatus);
             $rows = $result->fetchAllAssociative();
 
             return $rows ?? [];
@@ -3320,6 +3352,14 @@ SQL;
 
     public function getReturnProductList($status = 0)
     {
+        $arrStatus = array_diff(explode(',', $status), [' ', '']);
+
+        $in = '';
+        foreach ($arrStatus as $item) {
+            $in .= '?, ';
+        }
+        $in = trim($in, ', ');
+
         $column = '
                     `mprt`.`jan_code`,
                     `mp`.`product_code`,
@@ -3331,13 +3371,13 @@ SQL;
                 FROM `mst_product_returns_info` `mprt`
                 JOIN `mst_product` `mp`
                 ON `mp`.`product_code` = `mprt`.`product_code`
-                WHERE `mprt`.`returns_status_flag` = ?
+                WHERE `mprt`.`returns_status_flag` IN ({$in})
                 GROUP BY `mprt`.`jan_code`
             ";
         $statement = $this->entityManager->getConnection()->prepare($sql);
 
         try {
-            $result = $statement->executeQuery([$status]);
+            $result = $statement->executeQuery($arrStatus);
             $rows = $result->fetchAllAssociative();
 
             return $rows ?? [];
@@ -3526,8 +3566,16 @@ SQL;
         }
 
         if (!empty($params['returns_status_flag']) && $params['returns_status_flag'] != 0) {
-            $condition .= ' AND returns_status_flag = ? ';
-            $myPara[] = $params['returns_status_flag'];
+            $arrStatus = array_diff(explode(',', $params['returns_status_flag']), [' ', '']);
+
+            $in = '';
+            foreach ($arrStatus as $item) {
+                $in .= '?, ';
+                $myPara[] = $item;
+            }
+
+            $in = trim($in, ', ');
+            $condition .= " AND returns_status_flag IN ({$in}) ";
         }
 
         $condition = trim($condition, ' AND');
@@ -3615,8 +3663,16 @@ SQL;
         }
 
         if (!empty($params['returns_status_flag']) && $params['returns_status_flag'] != 0) {
-            $addWhere .= ' AND returns_status_flag = ? ';
-            $myPara[] = $params['returns_status_flag'];
+            $arrStatus = array_diff(explode(',', $params['returns_status_flag']), [' ', '']);
+
+            $in = '';
+            foreach ($arrStatus as $item) {
+                $in .= '?, ';
+                $myPara[] = $item;
+            }
+
+            $in = trim($in, ', ');
+            $addWhere .= " AND returns_status_flag IN ({$in}) ";
         }
 
         $sql = "

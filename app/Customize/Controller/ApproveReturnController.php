@@ -243,7 +243,7 @@ class ApproveReturnController extends AbstractController
 
         //Params
         $param = [
-            'returns_status_flag' => 1,
+            'search_returns_status_flag' => $request->get('search_returns_status_flag', 0),
             'search_jan_code' => $request->get('search_jan_code', ''),
             'search_returns_no' => $request->get('search_returns_no', 0),
             'search_request_date' => $request->get('search_request_date', 0),
@@ -253,6 +253,12 @@ class ApproveReturnController extends AbstractController
             'search_otodoke' => $request->get('search_otodoke', 0),
             'search_product' => $request->get('search_product', 0),
         ];
+
+        if (!in_array($param['search_returns_status_flag'], ['1', '3', '4'])) {
+            $param['returns_status_flag'] = '1,3,4';
+        } else {
+            $param['returns_status_flag'] = $param['search_returns_status_flag'];
+        }
 
         // paginator
         $commonService = new MyCommonService($this->entityManager);
@@ -279,11 +285,12 @@ class ApproveReturnController extends AbstractController
             $request_date_list[] = (string) date('Y-m', strtotime(date('Y-m-01')." -$i months"));
         }
 
-        $returnNo = $commonService->getReturnNoList($param['returns_status_flag']);
-        $customers = $commonService->getReturnCustomerList($param['returns_status_flag']);
-        $shippings = $commonService->getReturnShippingList($param['returns_status_flag']);
-        $otodokes = $commonService->getReturnOtodokeList($param['returns_status_flag']);
-        $products = $commonService->getReturnProductList($param['returns_status_flag']);
+        $status = '1,3,4';
+        $returnNo = $commonService->getReturnNoList($status);
+        $customers = $commonService->getReturnCustomerList($status);
+        $shippings = $commonService->getReturnShippingList($status);
+        $otodokes = $commonService->getReturnOtodokeList($status);
+        $products = $commonService->getReturnProductList($status);
 
         return [
             'pagination' => $pagination,
@@ -471,20 +478,20 @@ class ApproveReturnController extends AbstractController
 
             $commonService = new MyCommonService($this->entityManager);
 
-            if (!in_array((int) $params['returns_status_flag'], [1, 5])) {
-                return $this->redirect('/');
-            }
-
-            if (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] == 1) {
+            if (isset($params['returns_status_flag']) && in_array((int) $params['returns_status_flag'], [0, 1, 3, 4])) {
                 if (!empty($this->traitRedirectStockApprove())) {
                     return $this->redirect($this->traitRedirectStockApprove());
                 }
-            } elseif (!empty($params['returns_status_flag']) && (int) $params['returns_status_flag'] == 5) {
+            } elseif (isset($params['returns_status_flag']) && (int) $params['returns_status_flag'] == 5) {
                 if (!empty($this->traitRedirectApprove())) {
                     return $this->redirect($this->traitRedirectApprove());
                 }
             } else {
                 return $this->redirect('/');
+            }
+
+            if (in_array($params['returns_status_flag'], [0])) {
+                $params['returns_status_flag'] = '1,3,4';
             }
 
             if (trim($returns_no) == 'all') {
