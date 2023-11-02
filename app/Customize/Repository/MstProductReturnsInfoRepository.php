@@ -367,7 +367,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
         $qb->addSelect(
             "'' as returns_num",
             'shipping.shipping_no',
-            'shipping.shipping_date',
+            "DATE_FORMAT(shipping.shipping_date, '%Y-%m-%d') AS shipping_date",
             'product.jan_code',
             'product.product_code',
             'product.product_name',
@@ -391,7 +391,7 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             AND
                 mst_pri.cus_order_lineno = shipping.cus_order_lineno
             AND
-                mst_pri.shipping_date = shipping.shipping_date
+                DATE_FORMAT(mst_pri.shipping_date, '%Y-%m-%d') = DATE_FORMAT(shipping.shipping_date, '%Y-%m-%d')
             ) AS total_returns_num"
         );
 
@@ -460,11 +460,11 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'product_returns_info.returns_num',
             'product_returns_info.returns_status_flag',
             'product_returns_info.shipping_no',
-            'product_returns_info.shipping_date',
+            "DATE_FORMAT(product_returns_info.shipping_date, '%Y-%m-%d') AS shipping_date",
             'product_returns_info.shipping_name',
             'product_returns_info.otodoke_name',
             'product_returns_info.jan_code',
-            'product_returns_info.returns_request_date',
+            "DATE_FORMAT(product_returns_info.returns_request_date, '%Y-%m-%d') AS returns_request_date",
             'product_returns_info.aprove_date',
             'product_returns_info.product_receipt_date',
             'product_returns_info.returned_date',
