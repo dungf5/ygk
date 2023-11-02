@@ -190,8 +190,8 @@
 										<p class="text-nowrap">{{ item.returns_no }}</p>
 									</td>
 
-									<td title="{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}">
-										<p class="text-nowrap">{{ item.returns_request_date is empty ? "" : item.returns_request_date|date('Y-m-d') }}</p>
+									<td title="{{ item.returns_request_date is empty ? "" : item.returns_request_date }}">
+										<p class="text-nowrap">{{ item.returns_request_date is empty ? "" : item.returns_request_date }}</p>
 									</td>
 
 									<td title="{{ item.returns_reson }}">
@@ -222,8 +222,8 @@
 										<p class="text-nowrap">{{ item.shipping_no }}</p>
 									</td>
 
-									<td title="{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}">
-										<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date|date('Y-m-d') }}</p>
+									<td title="{{ item.shipping_date is empty ? "" : item.shipping_date }}">
+										<p class="text-nowrap">{{ item.shipping_date is empty ? "" : item.shipping_date }}</p>
 									</td>
 
 									<td title="{{ item.cus_order_no }}">
