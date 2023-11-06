@@ -198,18 +198,20 @@
 										<p class="text-nowrap">{{ item.returns_reson }}</p>
 									</td>
 
-									<td title={{ item.returns_status_flag is empty ? "" : item.returns_status_flag }}>
+									<td title={{ item.returns_status_flag is empty ? "" : item.returns_status_flag }}
+										{% if item.returns_status_flag == 2 or item.returns_status_flag == 4 %} onclick="handleShowReason('{{ item.comment }}')" {% endif %}
+									>
 										{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
 											{% if item.returns_status_flag == 0 %}
 												<p class="text-nowrap">申請中</p>
 											{% elseif item.returns_status_flag == 1 %}
 												<p class="text-nowrap">承認</p>
 											{% elseif item.returns_status_flag == 2 %}
-												<p class="text-nowrap" onclick="handleShowReason('{{ item.comment }}')">未承認</p>
+												<p class="text-nowrap">未承認</p>
 											{% elseif item.returns_status_flag == 3 %}
 												<p class="text-nowrap">受取受理</p>
 											{% elseif item.returns_status_flag == 4 %}
-												<p class="text-nowrap" onclick="handleShowReason('{{ item.comment }}')">受取未受理</p>
+												<p class="text-nowrap">受取未受理</p>
 											{% elseif item.returns_status_flag == 5 %}
 												<p class="text-nowrap">返品完了</p>
 											{% endif %}
