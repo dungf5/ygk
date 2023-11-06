@@ -2368,7 +2368,7 @@ a { color: #07c; }
 }
 @media screen and (min-width: 768px) {
   .ec-mypageRole, .ec-navlistRole {
-    padding: 50px 6% 0;
+    padding: 50px 2% 0;
   }
   .ec-mypageRole .ec-navlistRole .ec-navlistRole__item a:hover {
     opacity: 0.8;
