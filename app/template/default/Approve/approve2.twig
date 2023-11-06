@@ -115,8 +115,16 @@
             overflow: hidden;
             -webkit-box-orient: vertical;
         }
+        a {
+            text-decoration: none !important;
+            text-align: center;
+        }
         a > label {
             width: 60px;
+        }
+        .ec-mypageRole .ec-pageHeader h1 {
+            margin: 0;
+            padding: 0px 0px 22px !important;
         }
     </style>
 {% endblock stylesheet %}
@@ -125,8 +133,9 @@
     <div class="ec-layoutRole__main">
         <div class="ec-mypageRole">
             <div class="ec-pageHeader">
-                <a href="{{ url('logout') }}" style="float: right;">
-                    <i class="fas fa-lock-open" style="font-size:36px;color: lightgray;"></i>
+                <a href="{{ url('logout') }}" style="float: right; color: lightgray;">
+                    <i class="fas fa-lock-open" style="font-size:36px;"></i>
+                    <p>ログアウト</p>
                 </a>
                 <h1>返品受取一覧</h1>
             </div>
