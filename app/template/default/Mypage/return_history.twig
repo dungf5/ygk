@@ -199,7 +199,7 @@
 									</td>
 
 									<td title={{ item.returns_status_flag is empty ? "" : item.returns_status_flag }}
-										{% if item.returns_status_flag == 2 or item.returns_status_flag == 4 %} onclick="handleShowReason('{{ item.comment }}')" {% endif %}
+										{% if item.returns_status_flag == 2 or item.returns_status_flag == 4 %} onclick="handleShowReason('{{ item.returns_status_flag }}', '{{ item.comment }}')" {% endif %}
 									>
 										{% if item.returns_status_flag is defined and item.returns_status_flag != null %}
 											{% if item.returns_status_flag == 0 %}
@@ -410,9 +410,19 @@
             a.click();
     }
 
-    function handleShowReason(comment) {
+    function handleShowReason(status, comment) {
+		let title = '';
+
+		if (status == '2') {
+			title = '未承認';
+		}
+
+		if (status == '4') {
+			title = '受取未受理';
+		}
+
 		swal({
-			title: "コメント",
+			title: title,
 			text: comment,
 			icon: "",
 			dangerMode: false,
