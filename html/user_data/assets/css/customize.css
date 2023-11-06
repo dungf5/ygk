@@ -2367,8 +2367,11 @@ a { color: #07c; }
   }
 }
 @media screen and (min-width: 768px) {
-  .ec-mypageRole, .ec-navlistRole {
+  .ec-mypageRole {
     padding: 50px 2% 0;
+  }
+  .ec-navlistRole {
+    padding: 50px 6% 0;
   }
   .ec-mypageRole .ec-navlistRole .ec-navlistRole__item a:hover {
     opacity: 0.8;
