@@ -474,7 +474,13 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             'returns_reson.returns_reson',
             'product_returns_info.cus_order_no',
             'product_returns_info.cus_order_lineno',
-            'IFNULL(product_returns_info.product_name, product.product_name) AS product_name'
+            'IFNULL(product_returns_info.product_name, product.product_name) AS product_name',
+            "(CASE 
+                WHEN product_returns_info.returns_status_flag = 2 THEN product_returns_info.aprove_comment_not_yet
+                WHEN product_returns_info.returns_status_flag = 4 THEN product_returns_info.receipt_not_yet_comment
+                ELSE ''
+            END) AS comment
+            "
         );
 
         $qb->addSelect("(SELECT CONCAT(IFNULL(mst_cus.company_name, ''), ' 〒 ', IFNULL(mst_cus.postal_code, ''), IFNULL(mst_cus.addr01, ''), IFNULL(mst_cus.addr02, ''), IFNULL(mst_cus.addr03, '')) FROM Customize\Entity\MstCustomer mst_cus WHERE mst_cus.customer_code = product_returns_info.customer_code) customer_name");
