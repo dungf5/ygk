@@ -122,6 +122,12 @@
     a > label {
         width: 60px;
     }
+    a > i {
+        color: lightgray;
+    }
+    a > p {
+        color: white;
+    }
     .ec-mypageRole .ec-pageHeader h1 {
         margin: 0;
         padding: 0px 0px 22px !important;
@@ -133,7 +139,7 @@
 	<div class="ec-layoutRole__main">
 		<div class="ec-mypageRole">
 			<div class="ec-pageHeader">
-                <a href="{{ url('logout') }}" style="float: right; color: lightgray;">
+                <a href="{{ url('logout') }}" style="float: right;">
                     <i class="fas fa-lock-open" style="font-size:36px;"></i>
                     <p>ログアウト</p>
                 </a>
