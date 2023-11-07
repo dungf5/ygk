@@ -1405,7 +1405,7 @@ class MypageController extends AbstractController
                         'otodoke_code' => $param['otodoke_code'],
                         'otodoke_name' => $otodoke_name,
                         'shipping_no' => $param['shipping_no'],
-                        'shipping_date' => empty($param['shipping_day']) ? NULL : $param['shipping_day'],
+                        'shipping_date' => empty($param['shipping_day']) ? null : $param['shipping_day'],
                         'jan_code' => $param['jan_code'],
                         'product_code' => $param['product_code'],
                         'product_name' => $param['product_name'],
@@ -1422,6 +1422,8 @@ class MypageController extends AbstractController
                         'cus_image_url_path6' => @$cus_image_url_path[5] ?? '',
                         'returns_status_flag' => $param['returns_status_flag'],
                         'returns_request_date' => date('Y-m-d H:i:s'),
+                        'aprove_date' => $param['returns_status_flag'] ? date('Y-m-d H:i:s') : null,
+                        'shipping_fee' => $param['returns_status_flag'] ? 2 : null,
                         'cus_order_no' => $param['cus_order_no'],
                         'cus_order_lineno' => $param['cus_order_lineno'],
                     ]);
