@@ -49,7 +49,14 @@
 		padding: 0.5em;
 	}
 	.swal-button {
-		cursor: url("/html/user_data/assets/img/common/default-black-pointer.png"),auto;
+		cursor: url("/html/user_data/assets/img/common/default-black-pointer.png"), auto;
+	}
+	.show-reason {
+		color: blue;
+		cursor: pointer;
+	}
+	.show-reason:hover {
+		text-decoration: underline;
 	}
 </style>
 {% endblock stylesheet %}
@@ -210,11 +217,11 @@
 											{% elseif item.returns_status_flag == 1 %}
 												<p class="text-nowrap">承認</p>
 											{% elseif item.returns_status_flag == 2 %}
-												<p class="text-nowrap">未承認</p>
+												<p class="text-nowrap show-reason">未承認</p>
 											{% elseif item.returns_status_flag == 3 %}
 												<p class="text-nowrap">受取受理</p>
 											{% elseif item.returns_status_flag == 4 %}
-												<p class="text-nowrap">受取未受理</p>
+												<p class="text-nowrap show-reason">受取未受理</p>
 											{% elseif item.returns_status_flag == 5 %}
 												<p class="text-nowrap">返品完了</p>
 											{% endif %}
