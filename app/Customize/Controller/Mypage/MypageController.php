@@ -1328,8 +1328,9 @@ class MypageController extends AbstractController
             } elseif ((int) $param['return_num'] <= 0) {
                 $errors['return_num'] = '1以上で入力してください。';
             } elseif (
-                ((int) $param['total_returns_num'] > (int) $param['shipping_num']) ||
-                ((int) $param['return_num'] > ((int) $param['shipping_num'] - (int) $param['total_returns_num']))
+                (int) $param['shipping_num'] > 0 &&
+                (((int) $param['total_returns_num'] > (int) $param['shipping_num']) ||
+                ((int) $param['return_num'] > ((int) $param['shipping_num'] - (int) $param['total_returns_num'])))
             ) {
                 $errors['return_num'] = '出荷数以上の数量は入力できません。';
             }
