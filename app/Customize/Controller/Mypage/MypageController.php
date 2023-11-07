@@ -1313,9 +1313,14 @@ class MypageController extends AbstractController
 //                $errors['shipping_no'] = '出荷指示№を入力してください。';
 //            }
 
-//            if (empty($param['jan_code'])) {
-//                $errors['jan_code'] = 'JANコードを入力してください。';
-//            }
+            if (empty($param['jan_code'])) {
+                $errors['jan_code'] = 'JANコードを入力してください。';
+            } else {
+                $product_jan = $commonService->getMstProductByJan($param['jan_code']);
+                if (empty($product_jan)) {
+                    $errors['jan_code'] = 'JANコードが存在しません。';
+                }
+            }
 
             if (empty($param['return_reason'])) {
                 $errors['return_reason'] = '返品理由を入力してください。';
@@ -1325,16 +1330,16 @@ class MypageController extends AbstractController
                 $errors['customer_comment'] = '顧客コメントを入力してください。';
             }
 
-//            if ($param['return_num'] == '') {
-//                $errors['return_num'] = '返品数を入力してください。';
-//            } elseif ((int) $param['return_num'] <= 0) {
-//                $errors['return_num'] = '1以上で入力してください。';
-//            } elseif (
-//                ((int) $param['total_returns_num'] > (int) $param['shipping_num']) ||
-//                ((int) $param['return_num'] > ((int) $param['shipping_num'] - (int) $param['total_returns_num']))
-//            ) {
-//                $errors['return_num'] = '出荷数以上の数量は入力できません。';
-//            }
+            if (trim($param['return_num']) == '') {
+                $errors['return_num'] = '返品数を入力して下さい。';
+            } elseif ((int) $param['return_num'] <= 0) {
+                $errors['return_num'] = '1以上で入力してください。';
+            } elseif (
+                ((int) $param['total_returns_num'] > (int) $param['shipping_num']) ||
+                ((int) $param['return_num'] > ((int) $param['shipping_num'] - (int) $param['total_returns_num']))
+            ) {
+                $errors['return_num'] = '出荷数以上の数量は入力できません。';
+            }
 
             $images = $request->files->get('images', []);
 

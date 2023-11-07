@@ -3771,4 +3771,27 @@ SQL;
             return [];
         }
     }
+
+    public function getMstProductByJan($janCode)
+    {
+        $sql = '
+                SELECT 
+                    *
+                FROM
+				    mst_product 
+                WHERE 
+                    jan_code = ?
+				LIMIT 1; 
+            ';
+
+        $statement = $this->entityManager->getConnection()->prepare($sql);
+        try {
+            $result = $statement->executeQuery([$janCode]);
+            $rows = $result->fetchAllAssociative();
+
+            return $rows[0] ?? null;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
 }

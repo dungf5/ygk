@@ -422,20 +422,20 @@
 				// shipping_no: {
 				// 	required: true,
 				// },
-				// jan_code: {
-				// 	required: true,
-				// },
+				jan_code: {
+					required: true,
+				},
 				return_reason: {
 					required: true,
 				},
 				customer_comment: {
 					required: true
 				},
-				// return_num: {
-				// 	required: true,
-				// 	return_num_min : true,
-				// 	return_num_max : true,
-				// },
+				return_num: {
+					required: true,
+					return_num_min : true,
+					return_num_max : true,
+				},
 				'images[]': {
 					minupload: 1,
 					maxupload: 6,
@@ -448,7 +448,7 @@
 				return_reason   : "返品理由を入力してください。",
 				customer_comment: "顧客コメントを入力してください。",
 				return_num      : {
-					required  : "返品数を入力してください。",
+					required  : "返品数を入力して下さい。",
 					return_num_min: "1以上で入力してください",
 					return_num_max: "出荷数以上の数量は入力できません。",
 				},
