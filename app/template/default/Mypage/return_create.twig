@@ -400,7 +400,7 @@
 		let _shipping_num = parseInt( $("#shipping_num").val() );
 		let _returned_num = parseInt( $("#returned_num").val() );
 		let _cond = _shipping_num > _returned_num ? _shipping_num - _returned_num : _shipping_num;
-		if( value > _cond ) return false;
+		if( _shipping_num > 0 && value > _cond) return false;
 		return true;
 	});
 
