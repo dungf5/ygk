@@ -68,6 +68,8 @@ class MstProductReturnsInfoRepository extends AbstractRepository
             $object->setReturnsRequestDate($data['returns_request_date']);
             $object->setCusOrderNo($data['cus_order_no']);
             $object->setCusOrderLineno($data['cus_order_lineno']);
+            $object->setAproveDate($data['aprove_date']);
+            $object->setShippingFee($data['shipping_fee']);
 
             $this->getEntityManager()->persist($object);
             $this->getEntityManager()->flush();

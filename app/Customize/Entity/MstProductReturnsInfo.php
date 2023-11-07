@@ -747,47 +747,47 @@ if (!class_exists('\Customize\Entity\MstProductReturnsInfo', false)) {
         }
 
         /**
-         * @var string
+         * @var string|null
          *
          * @ORM\Column(name="shipping_fee", type="string")
          */
         private $shipping_fee;
 
         /**
-         * @return string
+         * @return string|null
          */
-        public function getShippingFee(): ?string
+        public function getShippingFee()
         {
             return $this->shipping_fee;
         }
 
         /**
-         * @param string $shipping_fee
+         * @param string|null $shipping_fee
          */
-        public function setShippingFee(string $shipping_fee): void
+        public function setShippingFee($shipping_fee): void
         {
             $this->shipping_fee = $shipping_fee;
         }
 
         /**
-         * @var string
+         * @var string|null
          *
          * @ORM\Column(name="aprove_date", type="string")
          */
         private $aprove_date;
 
         /**
-         * @return string
+         * @return string|null
          */
-        public function getAproveDate(): ?string
+        public function getAproveDate()
         {
             return $this->aprove_date;
         }
 
         /**
-         * @param string $aprove_date
+         * @param string|null $aprove_date
          */
-        public function setAproveDate(string $aprove_date): void
+        public function setAproveDate($aprove_date): void
         {
             $this->aprove_date = $aprove_date;
         }
