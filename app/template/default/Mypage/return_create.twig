@@ -404,6 +404,29 @@
 		return true;
 	});
 
+	$.validator.addMethod('jan_existed', function(value, element, param) {
+		let result = false;
+
+		$.ajax({
+                url: "{{ url('mypage_return_check_jan') }}",
+                async:false,
+                type: 'POST',
+                data: {jan_code: value},
+                dataType: 'json'
+            })
+            .done(function(data) {
+            	if (data.status == '-1') {
+					console.log(data.error);
+                }
+
+                if (data.status == '1') {
+					result = true;
+                }
+            });
+
+		return result;
+	});
+
 	$( function() {
 		$("#images").click(function(e) {
 			e.preventDefault();
@@ -424,6 +447,7 @@
 				// },
 				jan_code: {
 					required: true,
+					jan_existed: true,
 				},
 				return_reason: {
 					required: true,
@@ -444,7 +468,10 @@
 			},
 			messages: {
 				shipping_no     : "出荷指示№を入力してください。",
-				jan_code        : "JANコードを入力してください。",
+				jan_code        : {
+					required : "JANコードを入力してください。",
+					jan_existed: "JANコードが存在しません。",
+				},
 				return_reason   : "返品理由を入力してください。",
 				customer_comment: "顧客コメントを入力してください。",
 				return_num      : {

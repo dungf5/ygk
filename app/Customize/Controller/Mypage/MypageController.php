@@ -2607,4 +2607,32 @@ class MypageController extends AbstractController
             return '';
         }
     }
+
+    /**
+     * Change Otodoke Code.
+     *
+     * @Route("/mypage/return/check-jan", name="mypage_return_check_jan", methods={"POST"})
+     */
+    public function checkJanCode(Request $request)
+    {
+        if (!empty($this->traitRedirect())) {
+            return $this->redirect($this->traitRedirect());
+        }
+
+        try {
+            if ('POST' === $request->getMethod()) {
+                $jan_code = $request->get('jan_code', '');
+                $commonService = new MyCommonService($this->entityManager);
+                $product_jan = $commonService->getMstProductByJan($jan_code);
+
+                if (empty($product_jan)) {
+                    return $this->json(['status' => 0], 200);
+                } else {
+                    return $this->json(['status' => 1], 200);
+                }
+            }
+        } catch (\Exception $e) {
+            return $this->json(['status' => -1, 'error' => $e->getMessage()], 400);
+        }
+    }
 }
