@@ -153,13 +153,10 @@ class ValidateCsvDataCommand extends Command
         /* End - Initial data */
 
         $this->handleValidateWSEOS();
-        sleep(1);
         $this->sendMailWSEOSValidateError();
 
         if ($this->check_validate == false) {
-            sleep(1);
             $this->handleImportOrderWSEOS();
-            sleep(1);
             $this->sendMailOrderSuccess();
         }
     }
@@ -462,8 +459,6 @@ class ValidateCsvDataCommand extends Command
         if (!empty($id)) {
             return $id;
         } else {
-            sleep(1);
-
             return $this->handleInsertDtbOrder();
         }
     }
@@ -643,7 +638,6 @@ class ValidateCsvDataCommand extends Command
         /* End - Initial data */
 
         $this->handleValidateNatEOS();
-        sleep(1);
         $this->sendMailNatEOSValidateError();
     }
 
